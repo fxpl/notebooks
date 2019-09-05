@@ -1,0 +1,9 @@
+== Jupyter-notebooks =
+
+== Möjliga saker att analysera: ==
+* Vilka bibliotek förekommer tillsammans?
+* Vilka funktioner (från dessa bibliotek) anropas tillsammans? Går det att hitta mönster som exv. skulle kunna slås ihop till egna funktioner?
+* Hur används arv?
+* Hur vanliga är kloner?
+* Vilka kloner är mest frekvent förekommande? Varfrån kommer de? (Stackoverflow?)
+* Vilka utvecklare ligger bakom de olika snippetsen?
