@@ -1,6 +1,7 @@
 == Jupyter-notebooks =
 
 == Möjliga saker att analysera: ==
+* Antal (kod)filer/projekt
 * I vilken utsträckning används metoder?
 * I hur vilken utsträckning används klasser?
 * Antal rader kod (per fil, klass och/eller metod)
@@ -11,6 +12,9 @@
 * Vilka bibliotek förekommer tillsammans?
 * Vilka funktioner (från dessa bibliotek) anropas tillsammans? Går det att hitta mönster som exv. skulle kunna slås ihop till egna funktioner?
 * Hur används arv? (Används det över huvud taget?)
+* Koppling mellan klasser
+* Cohesion i klasser
 * Hur vanliga är kloner?
 * Vilka kloner är mest frekvent förekommande? Varfrån kommer de? (Stackoverflow?)
 * Vilka utvecklare ligger bakom de olika snippetsen?
+
