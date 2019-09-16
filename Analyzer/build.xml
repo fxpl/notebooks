@@ -1,0 +1,9 @@
+<project>
+	<property name="bin" value="./bin"/>
+
+	<target name="build">
+		<mkdir dir="${bin}"/>
+		<javac includeantruntime="false" srcdir="src" destdir="${bin}"/>
+	</target>
+
+</project>
