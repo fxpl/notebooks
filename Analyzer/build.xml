@@ -10,4 +10,19 @@
 			</classpath>
 		</javac>
 	</target>
+
+	<target name="test" depends="build">
+		<mkdir dir="reports"/>
+		<junit printsummary="yes" haltonfailure="yes">
+			<classpath>
+				<pathelement location="${bin}"/>
+				<pathelement location="${junit.path}"/>
+			</classpath>
+			<formatter type="plain"/>
+			<batchtest todir="reports">
+				<fileset dir="test"/>
+			</batchtest>
+		</junit>
+	</target>
+
 </project>
