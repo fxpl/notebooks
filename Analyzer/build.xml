@@ -17,6 +17,7 @@
 			<classpath>
 				<pathelement location="${bin}"/>
 				<pathelement location="${junit.path}"/>
+				<pathelement location = "external/json-simple-1.1.1.jar"/>
 			</classpath>
 			<formatter type="plain"/>
 			<batchtest todir="reports">
