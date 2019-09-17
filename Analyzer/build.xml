@@ -1,9 +1,13 @@
 <project>
 	<property name="bin" value="./bin"/>
+	<property name="junit.path" value="/usr/share/java/junit4.jar"/>
 
 	<target name="build">
 		<mkdir dir="${bin}"/>
-		<javac includeantruntime="false" srcdir="src" destdir="${bin}"/>
+		<javac includeantruntime="false" srcdir="src" destdir="${bin}">
+			<classpath>
+				<pathelement location = "external/json-simple-1.1.1.jar"/>
+			</classpath>
+		</javac>
 	</target>
-
 </project>
