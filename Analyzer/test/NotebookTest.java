@@ -7,15 +7,13 @@ import org.json.simple.parser.ParseException;
 import org.junit.Test;
 
 public class NotebookTest {
-
-	@Test
-	public void testTest() {
-		assertTrue(true);
-	}
 	
+	/**
+	 * Test that the correct number of code cells are found in JSON files.
+	 */
 	@Test
 	public void testNumCodeCells() {
-		String dataDir = "testdata/codeCells";
+		String dataDir = "testdata/count";
 		String[] files = {"empty.ipynb", "one.ipynb", "two.ipynb", "three_with_md.ipynb"};
 		int[] numCodeCells = {0, 1, 2, 3};
 		for (int i=0; i<files.length; i++) {

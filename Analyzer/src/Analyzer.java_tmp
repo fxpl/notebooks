@@ -1,5 +1,7 @@
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
+
 import org.json.simple.parser.ParseException;
 
 /**
@@ -10,13 +12,6 @@ public class Analyzer {
 	
 	public Analyzer() {
 		this.notebooks = new ArrayList<Notebook>();
-	}
-	
-	/**
-	 * @return Number of notebooks stored in analyzer
-	 */
-	public int numNotebooks() {
-		return this.notebooks.size();
 	}
 	
 	/**
@@ -56,9 +51,24 @@ public class Analyzer {
 		}
 	}
 	
+	private void analyze(String[] args) {
+		for (String arg: args) {
+			switch (arg) {
+			case "count":
+				/*System.out.println("Notebooks parsed: " + this.numNoteBooks());
+				System.out.println("Notebooks skipped: " + this.skippedNoteBooks());
+				System.out.println("Code snippets: " + this.numSnippets());*/
+				break;
+			default:
+				System.err.println("Unknown argument: " + arg);
+			}
+		}
+	}
+
 	public static void main(String[] args) {
 		File topDirectory = new File(args[0]);
 		Analyzer analyzer = new Analyzer();
 		analyzer.readNotebooksFrom(topDirectory);
+		analyzer.analyze(Arrays.copyOfRange(args, 1, args.length));
 	}
 }
