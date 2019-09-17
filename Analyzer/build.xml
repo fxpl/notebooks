@@ -1,12 +1,15 @@
 <project>
+
+	<!-- NB: These variables may need to be changed! -->
 	<property name="bin" value="./bin"/>
+	<property name="json.path" value="./external/json-simple-1.1.1.jar"/>
 	<property name="junit.path" value="/usr/share/java/junit4.jar"/>
 
 	<target name="build">
 		<mkdir dir="${bin}"/>
 		<javac includeantruntime="false" srcdir="src" destdir="${bin}">
 			<classpath>
-				<pathelement location = "external/json-simple-1.1.1.jar"/>
+				<pathelement location = "${json.path}"/>
 			</classpath>
 		</javac>
 	</target>
@@ -17,8 +20,9 @@
 			<classpath>
 				<pathelement location="${bin}"/>
 				<pathelement location="${junit.path}"/>
-				<pathelement location = "external/json-simple-1.1.1.jar"/>
+				<pathelement location = "${json.path}"/>
 			</classpath>
+
 			<formatter type="plain"/>
 			<batchtest todir="reports">
 				<fileset dir="test"/>

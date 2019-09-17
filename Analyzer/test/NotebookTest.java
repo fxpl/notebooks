@@ -14,7 +14,7 @@ public class NotebookTest {
 	}
 	
 	@Test
-	public void testNumCodeCells() {		
+	public void testNumCodeCells() {
 		String dataDir = "testdata/codeCells";
 		String[] files = {"empty.ipynb", "one.ipynb", "two.ipynb", "three_with_md.ipynb"};
 		int[] numCodeCells = {0, 1, 2, 3};
