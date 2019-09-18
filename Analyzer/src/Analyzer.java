@@ -1,5 +1,7 @@
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
+
 import org.json.simple.parser.ParseException;
 
 /**
@@ -7,6 +9,7 @@ import org.json.simple.parser.ParseException;
  */
 public class Analyzer {
 	private ArrayList<Notebook> notebooks;
+	int numSkippedNotebooks = 0;
 	
 	public Analyzer() {
 		this.notebooks = new ArrayList<Notebook>();
@@ -62,14 +65,31 @@ public class Analyzer {
 			this.notebooks.add(new Notebook(file));
 		} catch (FileNotFoundException e) {
 			System.err.println("File " + file.getPath() + " not found. Skipping!");
+			numSkippedNotebooks++;
 		} catch (IOException | ParseException e) {
 			System.err.println("There was an error parsing " + file.getPath() + ". Skipping!");
+			numSkippedNotebooks++;
 		}
 	}
 	
+	private void analyze(String[] args) {
+		for (String arg: args) {
+			switch (arg) {
+			case "-count":
+				System.out.println("Notebooks parsed: " + this.numNotebooks());
+				System.out.println("Notebooks skipped: " + this.numSkippedNotebooks);
+				System.out.println("Code snippets: " + this.numCodeCells());
+				break;
+			default:
+				System.err.println("Unknown argument: " + arg);
+			}
+		}
+	}
+
 	public static void main(String[] args) {
 		File topDirectory = new File(args[0]);
 		Analyzer analyzer = new Analyzer();
 		analyzer.readNotebooksFrom(topDirectory);
+		analyzer.analyze(Arrays.copyOfRange(args, 1, args.length));
 	}
 }
