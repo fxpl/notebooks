@@ -14,7 +14,17 @@
 		</javac>
 	</target>
 
-	<target name="test" depends="build">
+	<target name="buildTest" depends="build">
+		<mkdir dir="${bin}"/>
+		<javac includeantruntime="false" srcdir="test" destdir="${bin}">
+			<classpath>
+				<pathelement location="${junit.path}"/>
+				<pathelement location = "${json.path}"/>
+			</classpath>
+		</javac>
+	</target>
+
+	<target name="test" depends="buildTest">
 		<mkdir dir="reports"/>
 		<junit printsummary="yes" haltonfailure="yes">
 			<classpath>
