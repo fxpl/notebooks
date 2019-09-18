@@ -17,7 +17,7 @@ public class AnalyzerTest {
 	@Test
 	public void testNumCodeCells() {
 		analyzer.readNotebooksFrom(new File("test/data/count"));
-		assertEquals("Wrong number of cells found in notebooks", 6, analyzer.numCodeCells());
+		assertEquals("Wrong number of cells found in notebooks:", 6, analyzer.numCodeCells());
 	}
 
 	/**
@@ -27,7 +27,7 @@ public class AnalyzerTest {
 	public void testNumNotebooks() {
 		String dataDirectory = "test/data/count";
 		analyzer.readNotebooksFrom(new File(dataDirectory));
-		assertEquals("Wrong number of notebooks read", 6, analyzer.numNotebooks());
+		assertEquals("Wrong number of notebooks read:", 6, analyzer.numNotebooks());
 	}
 
 }
