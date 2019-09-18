@@ -63,9 +63,6 @@ public class Analyzer {
 	private void createNotebook(File file) {
 		try {
 			this.notebooks.add(new Notebook(file));
-		} catch (FileNotFoundException e) {
-			System.err.println("File " + file.getPath() + " not found. Skipping!");
-			numSkippedNotebooks++;
 		} catch (IOException | ParseException e) {
 			System.err.println("There was an error parsing " + file.getPath() + ". Skipping!");
 			numSkippedNotebooks++;
