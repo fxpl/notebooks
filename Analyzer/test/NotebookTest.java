@@ -13,7 +13,7 @@ public class NotebookTest {
 	 */
 	@Test
 	public void testNumCodeCells() {
-		String dataDir = "testdata/count";
+		String dataDir = "test/data/count";
 		String[] files = {"zero.ipynb", "one.ipynb", "two.ipynb", "three_with_md.ipynb"};
 		int[] numCodeCells = {0, 1, 2, 3};
 		for (int i=0; i<files.length; i++) {
@@ -45,6 +45,6 @@ public class NotebookTest {
 	 */
 	@Test (expected=ParseException.class)
 	public void testParsingEmptyFile() throws IOException, ParseException {
-		new Notebook(new File("testdata/count/empty.ipynb"));
+		new Notebook(new File("test/data/count/empty.ipynb"));
 	}
 }

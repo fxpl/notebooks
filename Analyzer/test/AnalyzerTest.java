@@ -18,8 +18,8 @@ public class AnalyzerTest {
 	 * Verify that the right number of notebooks are found under a directory.
 	 */
 	@Test
-	public void testReadNotebooks() {
-		String dataDirectory = "testdata/count";
+	public void testNumNotebooks() {
+		String dataDirectory = "test/data/count";
 		analyzer.readNotebooksFrom(new File(dataDirectory));
 		assertEquals("Wrong number of notebooks read", 6, analyzer.numNotebooks());
 	}
