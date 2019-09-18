@@ -13,6 +13,17 @@ public class Analyzer {
 	}
 	
 	/**
+	 * @return Total number of code cells in notebooks stored in analyzer
+	 */
+	public int numCodeCells() {
+		int numCodeCells = 0;
+		for (Notebook notebook: this.notebooks) {
+			numCodeCells += notebook.numCodeCells();
+		}
+		return numCodeCells;
+	}
+	
+	/**
 	 * @return Number of notebooks stored in analyzer
 	 */
 	public int numNotebooks() {

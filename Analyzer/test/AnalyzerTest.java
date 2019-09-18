@@ -13,6 +13,12 @@ public class AnalyzerTest {
 	public void setUp() {
 		analyzer = new Analyzer();
 	}
+	
+	@Test
+	public void testNumCodeCells() {
+		analyzer.readNotebooksFrom(new File("test/data/count"));
+		assertEquals("Wrong number of cells found in notebooks", 6, analyzer.numCodeCells());
+	}
 
 	/**
 	 * Verify that the right number of notebooks are found under a directory.
