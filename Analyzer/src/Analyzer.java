@@ -1,18 +1,27 @@
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
-
-import org.json.simple.parser.ParseException;
+import java.util.concurrent.*;
 
 /**
  * Analyzer for Jupyter notebooks.
  */
 public class Analyzer {
+	ExecutorService executor;
 	private ArrayList<Notebook> notebooks;
 	int numSkippedNotebooks = 0;
 	
+	/**
+	 * Note that when you are done with this Analyzer, you must call the method
+	 * shutDown!
+	 */
 	public Analyzer() {
 		this.notebooks = new ArrayList<Notebook>();
+		executor = Executors.newCachedThreadPool();
+	}
+	
+	public void shutDown() {
+		executor.shutdown();
 	}
 	
 	/**
@@ -62,11 +71,30 @@ public class Analyzer {
 	 */
 	private void createNotebook(File file) {
 		try {
-			this.notebooks.add(new Notebook(file));
-		} catch (IOException | ParseException e) {
-			System.err.println("There was an error parsing " + file.getPath() +
-					": " + e.getMessage() + ". Skipping!");
+			Future<Notebook> result = executor.submit(new NotebookCreater(file));
+			Notebook notebook = result.get();
+			this.notebooks.add(notebook);
+		} catch (ExecutionException e) {
+			System.err.println("There was an error creating a notebook from " +
+					file.getPath() + ": " + e.getMessage() + " Skipping!");
 			numSkippedNotebooks++;
+		} catch (InterruptedException e) {
+			System.err.println("Thread creating a notebook from " +
+					file.getPath() + " was interrupted: " + e.getMessage() + " Trying again!");
+			createNotebook(file);
+		}
+	}
+	
+	private class NotebookCreater implements Callable<Notebook> {
+		private File notebookFile;
+		
+		public NotebookCreater(File notebookFile) {
+			this.notebookFile = notebookFile;
+		}
+
+		@Override
+		public Notebook call() throws Exception {
+			return new Notebook(notebookFile);
 		}
 	}
 	
@@ -89,5 +117,6 @@ public class Analyzer {
 		Analyzer analyzer = new Analyzer();
 		analyzer.readNotebooksFrom(topDirectory);
 		analyzer.analyze(Arrays.copyOfRange(args, 1, args.length));
+		analyzer.shutDown();
 	}
 }
