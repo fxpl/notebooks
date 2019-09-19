@@ -37,8 +37,8 @@ public class Analyzer {
 	 * Find each notebook file (i.e. file whose name ends with ".ipynb") in the
 	 * file give as an argument to the method, or its sub directories
 	 * (recursively). Create a Notebook from each file and store it in the
-	 * field notebooks. (The argument may itself be a Python notebook file. In
-	 * that case, a Notebooks is created from it.
+	 * field notebooks. (The argument may itself be a Jupyter notebook file. In
+	 * that case, a Notebook is created from it.)
 	 * @param file Directory or file to look in for notebooks
 	 */
 	public void readNotebooksFrom(File file) {
@@ -64,7 +64,8 @@ public class Analyzer {
 		try {
 			this.notebooks.add(new Notebook(file));
 		} catch (IOException | ParseException e) {
-			System.err.println("There was an error parsing " + file.getPath() + ". Skipping!");
+			System.err.println("There was an error parsing " + file.getPath() +
+					": " + e.getMessage() + ". Skipping!");
 			numSkippedNotebooks++;
 		}
 	}
