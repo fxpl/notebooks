@@ -14,8 +14,10 @@ public class NotebookTest {
 	@Test
 	public void testNumCodeCells() {
 		String dataDir = "test/data/count";
-		String[] files = {"zero.ipynb", "one.ipynb", "two.ipynb", "three_with_md.ipynb"};
-		int[] numCodeCells = {0, 1, 2, 3};
+		String[] files = {"zero.ipynb", "one.ipynb", "two.ipynb",
+				"three_with_md.ipynb", "three_in_worksheets.ipynb",
+				"missing_cells.ipynb", "missing_cells_in_worksheet.ipynb"};
+		int[] numCodeCells = {0, 1, 2, 3, 3, 0, 0};
 		for (int i=0; i<files.length; i++) {
 			String fileName = files[i];
 			Notebook notebook = null;
