@@ -1,10 +1,6 @@
 import static org.junit.Assert.*;
 
-import java.io.File;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
 
 public class AnalyzerTest {
 	
@@ -20,9 +16,13 @@ public class AnalyzerTest {
 		analyzer.shutDown();
 	}
 	
+	/**
+	 * Verify that the right number of cells are found in the notebooks under a
+	 * directory.
+	 */
 	@Test
 	public void testNumCodeCells() {
-		analyzer.readNotebooksFrom(new File("test/data/count"));
+		analyzer.initializeNotebooksFrom("test/data/count");
 		assertEquals("Wrong number of cells found in notebooks:", 9, analyzer.numCodeCells());
 	}
 
@@ -31,9 +31,8 @@ public class AnalyzerTest {
 	 */
 	@Test
 	public void testNumNotebooks() {
-		String dataDirectory = "test/data/count";
-		analyzer.readNotebooksFrom(new File(dataDirectory));
-		assertEquals("Wrong number of notebooks read:", 9, analyzer.numNotebooks());
+		analyzer.initializeNotebooksFrom("test/data/count");
+		assertEquals("Wrong number of notebooks found:", 10, analyzer.numNotebooks());
 	}
 
 }

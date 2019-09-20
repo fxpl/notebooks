@@ -1,6 +1,4 @@
 import java.io.*;
-import java.util.ArrayList;
-
 import org.json.simple.*;
 import org.json.simple.parser.*;
 
@@ -13,41 +11,42 @@ public class Notebook {
 		PYTHON, JULIA, R, SCALA, OTHER, UNKNOWN
 	}
 	
-	private ArrayList<JSONObject> codeCells;
 	String path;
 	
-	public Notebook(File file)
-			throws IOException, ParseException {
-		codeCells = new ArrayList<JSONObject>();
-		this.path = file.getAbsolutePath();
-		Reader reader = new FileReader(file);
-		JSONParser parser = new JSONParser();
-		JSONObject notebook = (JSONObject) parser.parse(reader);
-		extractCodeCells(notebook);
+	public Notebook(String path) {
+		this.path = path;
 	}
 	
 	/**
 	 * @return Number of code cells in notebook
+	 * @throws NotebookException if the file could not be parsed 
 	 */
-	public int numCodeCells() {
-		return codeCells.size();
-	}
-	
-	/**
-	 * Extract and store all code cells
-	 * @param notebook JSONObject parsed from input file
-	 */
-	private void extractCodeCells(JSONObject notebook) {
+	public int numCodeCells() throws NotebookException {
+		int numCodeCells = 0;
+		Reader reader;
+		try {
+			reader = new FileReader(this.path);
+		} catch (FileNotFoundException e) {
+			throw new NotebookException("Could not read " + this.path + ": " + e.getMessage());
+		}
+		JSONObject notebook;
+		try {
+			notebook = (JSONObject)new JSONParser().parse(reader);
+		} catch (IOException | ParseException e) {
+			throw new NotebookException("Could not parse " + this.path + ": " + e.getMessage());
+		}
+		
 		JSONArray cells = getCellArray(notebook);
 		for (int i=0; i<cells.size(); i++) {
 			JSONObject cell = (JSONObject) cells.get(i);
 			String type = (String) cell.get("cell_type");
 			if (type.equals("code")) {
-				codeCells.add(cell);
+				numCodeCells++;
 			}
 		}
+		return numCodeCells;
 	}
-
+	
 	/**
 	 * Extract cell array from notebook. Handles cell array on the top level
 	 * but also an array of worksheets, each containing a cell array.

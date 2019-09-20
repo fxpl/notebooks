@@ -1,9 +1,5 @@
 import static org.junit.Assert.*;
 
-import java.io.File;
-import java.io.IOException;
-
-import org.json.simple.parser.ParseException;
 import org.junit.Test;
 
 public class NotebookTest {
@@ -20,33 +16,46 @@ public class NotebookTest {
 		int[] numCodeCells = {0, 1, 2, 3, 3, 0, 0};
 		for (int i=0; i<files.length; i++) {
 			String fileName = files[i];
-			Notebook notebook = null;
+			Notebook notebook = new Notebook(dataDir + "/" + fileName);
 			try {
-				notebook = new Notebook(new File(dataDir + "/" + fileName));
-			} catch (ParseException e) {
-				fail("ParseException when parsing " + fileName +": " + e.getMessage());
-			} catch (IOException e) {
-				fail("IOException when parsing file: " + e.getMessage());
+				assertEquals(numCodeCells[i] + " code cell(s) expected!",
+						numCodeCells[i], notebook.numCodeCells());
+			} catch (NotebookException e) {
+				fail("Could not count code cells: " + e.getMessage());
 			}
-			assertEquals("One code cell expected!", numCodeCells[i], notebook.numCodeCells());
 		}
 	}
 
 	/**
-	 * Verify that an IOException is thrown if we try to create a notebook from
-	 * a missing file.
+	 * Verify that a NotebookException is thrown if we try to count cells in a
+	 * notebook created from a file not containing JSON data.
 	 */
-	@Test (expected=IOException.class)
-	public void testParsingMissingFile() throws IOException, ParseException {
-		new Notebook(new File("nonexistent_file.txt"));
+	@Test
+	public void testParsingEmptyFile() {
+		boolean thrown = false;
+		Notebook notebook = new Notebook("test/data/count/empty.ipynb");
+		try {
+			notebook.numCodeCells();
+		} catch (NotebookException e) {
+			thrown = true;
+		}
+		assertTrue("Expected exception when counting cells in empty file: ", thrown);
 	}
 	
 	/**
-	 * Verify that a ParseException is thrown if we try to create a notebook
-	 * from a file not containing JSON data.
+	 * Verify that a NotebookException is thrown if we try to count cells in a
+	 * notebook created from a missing file.
 	 */
-	@Test (expected=ParseException.class)
-	public void testParsingEmptyFile() throws IOException, ParseException {
-		new Notebook(new File("test/data/count/empty.ipynb"));
+	@Test
+	public void testParsingMissingFile() {
+		boolean thrown = false;
+		Notebook notebook = new Notebook("nonexistent_file.txt");
+		try {
+			notebook.numCodeCells();
+		} catch (NotebookException e) {
+			thrown = true;
+		}
+		assertTrue("Expected exception when counting cells in non-existent file: ", thrown);
 	}
+
 }
