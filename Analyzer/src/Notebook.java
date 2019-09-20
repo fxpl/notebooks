@@ -53,6 +53,7 @@ public class Notebook {
 	 * @param notebook Notebook/worksheet to extract cells from
 	 * @return Array containing all cells of the notebook
 	 */
+	@SuppressWarnings("unchecked")	// The JSON library uses raw types internally
 	private JSONArray getCellArray(JSONObject notebook) {
 		JSONArray cells;
 		if (notebook.containsKey("cells")) {
