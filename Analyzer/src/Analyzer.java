@@ -9,7 +9,6 @@ import java.util.concurrent.*;
 public class Analyzer {
 	ExecutorService executor;
 	private ArrayList<Notebook> notebooks;
-	int numSkippedNotebooks = 0;
 	
 	/**
 	 * Note that when you are done with this Analyzer, you must call the method
@@ -109,7 +108,6 @@ public class Analyzer {
 			switch (arg) {
 			case "-count":
 				System.out.println("Notebooks parsed: " + this.numNotebooks());
-				System.out.println("Notebooks skipped: " + this.numSkippedNotebooks);
 				System.out.println("Code snippets: " + this.numCodeCells());
 				break;
 			default:
