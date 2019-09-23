@@ -35,6 +35,7 @@ public class Analyzer {
 				this.notebooks.add(new Notebook(fileName));
 			}
 		} else {
+			System.out.println("Traversing " + file.getPath());
 			// The file is a directory. Traverse it.
 			String[] subFiles = file.list();
 			for (String subFileName: subFiles) {
@@ -56,8 +57,11 @@ public class Analyzer {
 	 */
 	public int numCodeCells() {
 		int numCodeCells = 0;
-		for (Notebook notebook: this.notebooks) {
-			numCodeCells += numCodeCellsIn(notebook);
+		for (int i=0; i<notebooks.size(); i++) {
+			if (0 == i%100000) {
+				System.out.println("Counting code cells in notebook " + i);
+			}
+			numCodeCells += numCodeCellsIn(notebooks.get(i));
 		}
 		return numCodeCells;
 	}

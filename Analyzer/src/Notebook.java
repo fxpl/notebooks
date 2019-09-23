@@ -11,7 +11,7 @@ public class Notebook {
 		PYTHON, JULIA, R, SCALA, OTHER, UNKNOWN
 	}
 	
-	String path;
+	private String path;
 	
 	public Notebook(String path) {
 		this.path = path;
