@@ -60,7 +60,7 @@ public class Analyzer {
 	 */
 	public int numCodeCells() throws IOException {
 		int totalNumCodeCells = 0;
-		FileWriter writer = new FileWriter("snippets.csv");
+		Writer writer = new FileWriter("snippets.csv");
 		for (int i=0; i<notebooks.size(); i++) {
 			if (0 == i%100000) {
 				System.out.println("Counting code cells in notebook " + i);
