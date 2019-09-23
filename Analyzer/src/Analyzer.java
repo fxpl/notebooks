@@ -63,7 +63,7 @@ public class Analyzer {
 		int totalNumCodeCells = 0;
 		Writer writer = new FileWriter("snippets" + LocalDateTime.now() + ".csv");
 		for (int i=0; i<notebooks.size(); i++) {
-			if (0 == i%100000) {
+			if (0 == i%10000) {
 				System.out.println("Counting code cells in notebook " + i);
 				System.out.println(totalNumCodeCells + " code cells found so far.");
 			}
