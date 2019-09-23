@@ -27,7 +27,7 @@ public class Notebook {
 		try {
 			reader = new FileReader(this.path);
 		} catch (FileNotFoundException e) {
-			throw new NotebookException("Could not read " + this.path + ": " + e.getMessage());
+			throw new NotebookException("Could not read " + this.path + ": " + e.toString());
 		}
 		JSONObject notebook;
 		try {
