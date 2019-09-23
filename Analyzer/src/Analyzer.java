@@ -53,17 +53,25 @@ public class Analyzer {
 	}
 	
 	/**
+	 * Count the number of code cells in each notebook. Print each value on a
+	 * separate line in the file snippets.csv.
 	 * @return Total number of code cells in notebooks stored in analyzer
+	 * @throws IOException On problems with handling snippets.csv
 	 */
-	public int numCodeCells() {
-		int numCodeCells = 0;
+	public int numCodeCells() throws IOException {
+		int totalNumCodeCells = 0;
+		FileWriter writer = new FileWriter("snippets.csv");
 		for (int i=0; i<notebooks.size(); i++) {
 			if (0 == i%100000) {
 				System.out.println("Counting code cells in notebook " + i);
+				System.out.println(totalNumCodeCells + " code cells found so far.");
 			}
-			numCodeCells += numCodeCellsIn(notebooks.get(i));
+			int numCodeCells = numCodeCellsIn(notebooks.get(i));
+			writer.write(numCodeCells + "\n");
+			totalNumCodeCells += numCodeCells;
 		}
-		return numCodeCells;
+		writer.close();
+		return totalNumCodeCells;
 	}
 	
 	/**
@@ -112,7 +120,12 @@ public class Analyzer {
 			switch (arg) {
 			case "-count":
 				System.out.println("Notebooks parsed: " + this.numNotebooks());
-				System.out.println("Code snippets: " + this.numCodeCells());
+				try {
+					System.out.println("Code snippets: " + this.numCodeCells());
+				} catch (IOException e) {
+					System.err.println("I/O errors on handling output file for snippet counts." +
+							"Snippets not counted!");
+				}
 				break;
 			default:
 				System.err.println("Unknown argument: " + arg);
