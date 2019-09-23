@@ -30,32 +30,20 @@ public class NotebookTest {
 	 * Verify that a NotebookException is thrown if we try to count cells in a
 	 * notebook created from a file not containing JSON data.
 	 */
-	@Test
-	public void testParsingEmptyFile() {
-		boolean thrown = false;
+	@Test (expected=NotebookException.class)
+	public void testParsingEmptyFile() throws NotebookException {
 		Notebook notebook = new Notebook("test/data/count/empty.ipynb");
-		try {
-			notebook.numCodeCells();
-		} catch (NotebookException e) {
-			thrown = true;
-		}
-		assertTrue("Expected exception when counting cells in empty file: ", thrown);
+		notebook.numCodeCells();
 	}
 	
 	/**
 	 * Verify that a NotebookException is thrown if we try to count cells in a
 	 * notebook created from a missing file.
 	 */
-	@Test
-	public void testParsingMissingFile() {
-		boolean thrown = false;
+	@Test (expected=NotebookException.class)
+	public void testParsingMissingFile() throws NotebookException  {
 		Notebook notebook = new Notebook("nonexistent_file.txt");
-		try {
-			notebook.numCodeCells();
-		} catch (NotebookException e) {
-			thrown = true;
-		}
-		assertTrue("Expected exception when counting cells in non-existent file: ", thrown);
+		notebook.numCodeCells();
 	}
 
 }
