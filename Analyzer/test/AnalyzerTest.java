@@ -27,6 +27,7 @@ public class AnalyzerTest {
 	public void testNumCodeCells_total() throws IOException {
 		analyzer.initializeNotebooksFrom("test/data/count");
 		assertEquals("Wrong number of cells found in notebooks:", 9, analyzer.numCodeCells());
+		lastSnippetFile().delete();
 	}
 	
 	/**
@@ -36,16 +37,27 @@ public class AnalyzerTest {
 	 */
 	@Test
 	public void testNumCodeCells_csv() throws IOException {
-		analyzer.initializeNotebooksFrom("test/data/count/zero.ipynb");
-		analyzer.initializeNotebooksFrom("test/data/count/one.ipynb");
-		analyzer.initializeNotebooksFrom("test/data/count/three_with_md.ipynb");
+		// Anlayze files
+		String dataDir = "test/data/count";
+		String[] files = {"zero.ipynb", "one.ipynb", "three_with_md.ipynb"};
+		int[] numCodeCells = {0, 1, 3};
+		for (String file: files) {
+			analyzer.initializeNotebooksFrom(dataDir + "/" + file);
+		}
 		analyzer.numCodeCells();
+		
+		// Check results
+		File outputFile = lastSnippetFile();
 		BufferedReader outputReader = new BufferedReader(
-				new FileReader("snippets.csv"));
-		assertEquals("Wrong number of snippets written to output file:", "0", outputReader.readLine());
-		assertEquals("Wrong number of snippets written to output file:", "1", outputReader.readLine());
-		assertEquals("Wrong number of snippets written to output file:", "3", outputReader.readLine());
+				new FileReader(outputFile));
+		for (int expectedCells: numCodeCells) {
+			assertEquals("Wrong number of snippets written to output file:", ""
+					+ expectedCells , outputReader.readLine());
+		}
+		
+		// Clean up
 		outputReader.close();
+		outputFile.delete();
 	}
 
 	/**
@@ -55,6 +67,21 @@ public class AnalyzerTest {
 	public void testNumNotebooks() {
 		analyzer.initializeNotebooksFrom("test/data/count");
 		assertEquals("Wrong number of notebooks found:", 10, analyzer.numNotebooks());
+	}
+	
+	/**
+	 * @return File handler to the snippet output file with greatest (latest) file name
+	 */
+	private File lastSnippetFile() {
+		File directory = new File(".");
+		String outputFileName = "snippets.csv";
+		for (String currentFileName: directory.list()) {
+			if (currentFileName.matches("snippets\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}\\.csv")
+					&& currentFileName.compareTo(outputFileName) > 0) {
+				outputFileName = currentFileName;
+			}
+		}
+		return new File(outputFileName);
 	}
 
 }

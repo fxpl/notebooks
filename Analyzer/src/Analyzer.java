@@ -1,4 +1,5 @@
 import java.io.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.concurrent.*;
@@ -54,13 +55,13 @@ public class Analyzer {
 	
 	/**
 	 * Count the number of code cells in each notebook. Print each value on a
-	 * separate line in the file snippets.csv.
+	 * separate line in the file snippets<current-date-time>.csv.
 	 * @return Total number of code cells in notebooks stored in analyzer
-	 * @throws IOException On problems with handling snippets.csv
+	 * @throws IOException On problems with handling the output file
 	 */
 	public int numCodeCells() throws IOException {
 		int totalNumCodeCells = 0;
-		Writer writer = new FileWriter("snippets.csv");
+		Writer writer = new FileWriter("snippets" + LocalDateTime.now() + ".csv");
 		for (int i=0; i<notebooks.size(); i++) {
 			if (0 == i%100000) {
 				System.out.println("Counting code cells in notebook " + i);
