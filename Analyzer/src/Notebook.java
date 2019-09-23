@@ -19,7 +19,7 @@ public class Notebook {
 	
 	/**
 	 * @return Number of code cells in notebook
-	 * @throws NotebookException if the file could not be parsed 
+	 * @throws NotebookException if the file could not be parsed
 	 */
 	public int numCodeCells() throws NotebookException {
 		int numCodeCells = 0;
@@ -33,7 +33,7 @@ public class Notebook {
 		try {
 			notebook = (JSONObject)new JSONParser().parse(reader);
 		} catch (IOException | ParseException e) {
-			throw new NotebookException("Could not parse " + this.path + ": " + e.getMessage());
+			throw new NotebookException("Could not parse " + this.path + ": " + e.toString());
 		}
 		
 		JSONArray cells = getCellArray(notebook);
