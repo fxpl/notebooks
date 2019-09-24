@@ -20,6 +20,22 @@ public class Notebook {
 	}
 	
 	/**
+	 * @return Total LOC for all code cells in the notebook
+	 * @throws NotebookException if the file could not be parsed
+	 */
+	public int LOC() throws NotebookException {
+		JSONObject notebook = this.getNotebook();
+		List<JSONObject> codeCells = getCodeCells(notebook);
+		int LOC = 0;
+		// TODO: Räkna blankrader separat!
+		for (JSONObject cell: codeCells) {
+			JSONArray source = (JSONArray) cell.get("source");
+			LOC += source.size();
+		}
+		return LOC;
+	}
+	
+	/**
 	 * @return Number of code cells in notebook
 	 * @throws NotebookException if the file could not be parsed
 	 */

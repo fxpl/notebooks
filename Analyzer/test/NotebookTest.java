@@ -4,6 +4,23 @@ import org.junit.Test;
 
 public class NotebookTest {
 	
+	@Test public void testLOC() {
+		String dataDir = "test/data/loc";
+		String[] files = {"markdownCells.ipynb", "one_codeCell_6loc.ipynb",
+				"two_codeCells_13loc.ipynb", "three_codeCells_2loc.ipynb",
+				"code_and_md_3loc.ipynb"};
+		int[] LOC = {0, 6, 13, 2, 3};
+		for (int i=0; i<files.length; i++) {
+			String fileName = files[i];
+			Notebook notebook = new Notebook(dataDir + "/" + fileName);
+			try {
+				assertEquals("Wrong LOC!", LOC[i], notebook.LOC());
+			} catch (NotebookException e) {
+				fail("Could not count LOC: " + e.getMessage());
+			}
+		}
+	}
+	
 	/**
 	 * Verify that the correct number of code cells are found in JSON files.
 	 */
@@ -18,7 +35,7 @@ public class NotebookTest {
 			String fileName = files[i];
 			Notebook notebook = new Notebook(dataDir + "/" + fileName);
 			try {
-				assertEquals(numCodeCells[i] + " code cell(s) expected!",
+				assertEquals("Wrong number of code cells!",
 						numCodeCells[i], notebook.numCodeCells());
 			} catch (NotebookException e) {
 				fail("Could not count code cells: " + e.getMessage());
