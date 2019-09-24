@@ -19,20 +19,63 @@ public class AnalyzerTest {
 	}
 	
 	/**
+	 * Verify that the right number of code lines are found in the notebooks
+	 * under a directory.
+	 * @throws IOException on errors when handling output file
+	 */
+	@Test
+	public void testLOC_total() throws IOException {
+		analyzer.initializeNotebooksFrom("test/data/loc");
+		assertEquals("Wrong LOC!", 24, analyzer.LOC());
+		lastLOCFile().delete();
+	}
+	
+	/**
+	 * Verify that the output file loc<current-date-time>.csv is created and
+	 * filled correctly when the number of LOC are counted.
+	 * @throws IOException on errors when handling output file
+	 */
+	@Test
+	public void testLOC_csv() throws IOException {
+		// Analyze files
+		String dataDir = "test/data/loc";
+		String[] files = {"code_and_md_3loc.ipynb", "markdownCells.ipynb",
+				"two_codeCells_13loc.ipynb"};
+		int[] LOC = {3, 0, 13};
+		for (String file: files) {
+			analyzer.initializeNotebooksFrom(dataDir + "/" + file);
+		}
+		analyzer.LOC();
+		
+		// Check results
+		File outputFile = lastLOCFile();
+		BufferedReader outputReader = new BufferedReader(
+				new FileReader(outputFile));
+		for (int expectedLOC: LOC) {
+			assertEquals("Wrong LOC written to output file:", ""
+					+ expectedLOC , outputReader.readLine());
+		}
+		
+		// Clean up
+		outputReader.close();
+		outputFile.delete();
+	}
+	
+	/**
 	 * Verify that the right number of cells are found in the notebooks under a
 	 * directory.
-	 * @throws IOException on errors when handling snippets.csv
+	 * @throws IOException on errors when handling output file
 	 */
 	@Test
 	public void testNumCodeCells_total() throws IOException {
 		analyzer.initializeNotebooksFrom("test/data/count");
-		assertEquals("Wrong number of cells found in notebooks:", 9, analyzer.numCodeCells());
+		assertEquals("Wrong number of cells found in notebooks!", 9, analyzer.numCodeCells());
 		lastSnippetFile().delete();
 	}
 	
 	/**
-	 * Verify that the output file snippets.csv is created and filled correctly
-	 * when the number of cells are counted.
+	 * Verify that the output file snippets<current-date-time>.csv is created
+	 * and filled correctly when the number of cells are counted.
 	 * @throws IOException on errors when handling output file
 	 */
 	@Test
@@ -67,6 +110,22 @@ public class AnalyzerTest {
 	public void testNumNotebooks() {
 		analyzer.initializeNotebooksFrom("test/data/count");
 		assertEquals("Wrong number of notebooks found:", 10, analyzer.numNotebooks());
+	}
+	
+	// TODO: Mer generell metod for outputfiler!
+	/**
+	 * @return File handler to the LOC output file with greatest (latest) file name
+	 */
+	private File lastLOCFile() {
+		File directory = new File(".");
+		String outputFileName = "loc.csv";
+		for (String currentFileName: directory.list()) {
+			if (currentFileName.matches("loc\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}\\.csv")
+					&& currentFileName.compareTo(outputFileName) > 0) {
+				outputFileName = currentFileName;
+			}
+		}
+		return new File(outputFileName);
 	}
 	
 	/**

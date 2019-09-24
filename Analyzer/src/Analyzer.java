@@ -54,6 +54,56 @@ public class Analyzer {
 	}
 	
 	/**
+	 * Count LOC in each notebook. Print each value on a separate line in the
+	 * file loc<current-date-time>.csv.
+	 * @return Total number of LOC in notebooks stored in analyzer
+	 * @throws IOException On problems with handling the output file
+	 */
+	public int LOC() throws IOException {
+		int totalLOC = 0;
+		Writer writer = new FileWriter("loc" + LocalDateTime.now() + ".csv");
+		for (int i=0; i<notebooks.size(); i++) {
+			if (0 == i%10000) {
+				System.out.println("Counting LOC in notebook " + i);
+				System.out.println(totalLOC + " lines of code found so far.");
+			}
+			int LOC = LOCIn(notebooks.get(i));
+			writer.write(LOC + "\n");
+			totalLOC += LOC;
+		}
+		writer.close();
+		return totalLOC;
+	}
+	
+	// TODO: Mer generell metod!
+	private int LOCIn(Notebook notebook) {
+		try {
+			Future<Integer> result = executor.submit(new LOCCounter(notebook));
+			return result.get();
+		} catch (ExecutionException e) {
+			System.err.println(e.getMessage() + " Skipping!");
+			return 0;
+		} catch (InterruptedException e) {
+			System.err.println("A thread was interrupted: " +
+					e.getMessage() + " Trying again!");
+			return LOCIn(notebook);
+		}
+	}
+	
+	private class LOCCounter implements Callable<Integer> {
+		private Notebook notebook;
+		
+		public LOCCounter(Notebook notebook) {
+			this.notebook = notebook;
+		}
+
+		@Override
+		public Integer call() throws Exception {
+			return notebook.LOC();
+		}
+	}
+	
+	/**
 	 * Count the number of code cells in each notebook. Print each value on a
 	 * separate line in the file snippets<current-date-time>.csv.
 	 * @return Total number of code cells in notebooks stored in analyzer
@@ -87,7 +137,7 @@ public class Analyzer {
 			System.err.println(e.getMessage() + " Skipping!");
 			return 0;
 		} catch (InterruptedException e) {
-			System.err.println("A thread counting code cells was interrupted: " +
+			System.err.println("A thread was interrupted: " +
 					e.getMessage() + " Trying again!");
 			return numCodeCellsIn(notebook);
 		}
@@ -128,6 +178,7 @@ public class Analyzer {
 							"Snippets not counted!");
 				}
 				break;
+				// TODO: LOC
 			default:
 				System.err.println("Unknown argument: " + arg);
 			}
