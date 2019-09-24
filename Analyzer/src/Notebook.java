@@ -25,8 +25,7 @@ public class Notebook {
 	 */
 	public int numCodeCells() throws NotebookException {
 		JSONObject notebook = this.getNotebook();
-		List<JSONObject> codeCells = getCodeCells(notebook);
-		return codeCells.size();
+		return getCodeCells(notebook).size();
 	}
 	
 	/**
