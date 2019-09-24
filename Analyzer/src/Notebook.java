@@ -1,4 +1,6 @@
 import java.io.*;
+import java.util.*;
+
 import org.json.simple.*;
 import org.json.simple.parser.*;
 
@@ -22,29 +24,9 @@ public class Notebook {
 	 * @throws NotebookException if the file could not be parsed
 	 */
 	public int numCodeCells() throws NotebookException {
-		int numCodeCells = 0;
-		Reader reader;
-		try {
-			reader = new FileReader(this.path);
-		} catch (FileNotFoundException e) {
-			throw new NotebookException("Could not read " + this.path + ": " + e.toString());
-		}
-		JSONObject notebook;
-		try {
-			notebook = (JSONObject)new JSONParser().parse(reader);
-		} catch (IOException | ParseException e) {
-			throw new NotebookException("Could not parse " + this.path + ": " + e.toString());
-		}
-		
-		JSONArray cells = getCellArray(notebook);
-		for (int i=0; i<cells.size(); i++) {
-			JSONObject cell = (JSONObject) cells.get(i);
-			String type = (String) cell.get("cell_type");
-			if (type.equals("code")) {
-				numCodeCells++;
-			}
-		}
-		return numCodeCells;
+		JSONObject notebook = this.getNotebook();
+		List<JSONObject> codeCells = getCodeCells(notebook);
+		return codeCells.size();
 	}
 	
 	/**
@@ -74,5 +56,47 @@ public class Notebook {
 			}
 		}
 		return cells;
+	}
+	
+	/**
+	 * @param notebook Notebook to extract code cells from
+	 * @return A list containing all code cells in notebook
+	 */
+	private List<JSONObject> getCodeCells(JSONObject notebook) {
+		JSONArray cells = getCellArray(notebook);
+		List<JSONObject> result = new ArrayList<JSONObject>();
+		for (int i=0; i<cells.size(); i++) {
+			JSONObject cell = (JSONObject) cells.get(i);
+			String type = (String) cell.get("cell_type");
+			if (type.equals("code")) {
+				result.add(cell);
+			}
+		}
+		return result;
+	}
+	
+	/**
+	 * @return A JSONObject containing the contents of the notebook
+	 * @throws NotebookException If the file this.path could not be parsed
+	 */
+	private JSONObject getNotebook() throws NotebookException {
+		Reader reader;
+		JSONObject result;
+		try {
+			reader = new FileReader(this.path);
+		} catch (FileNotFoundException e) {
+			throw new NotebookException("Could not read " + this.path + ": " + e.toString());
+		}
+		try {
+			result = (JSONObject)new JSONParser().parse(reader);
+		} catch (IOException | ParseException e) {
+			throw new NotebookException("Could not parse " + this.path + ": " + e.toString());
+		}
+		try {
+			reader.close();
+		} catch (IOException e) {
+			System.err.println("Warning: Could not close reader of " + this.path + ": " + e.toString());
+		}
+		return result;
 	}
 }
