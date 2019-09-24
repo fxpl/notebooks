@@ -178,7 +178,14 @@ public class Analyzer {
 							"Snippets not counted!");
 				}
 				break;
-				// TODO: LOC
+			case "-loc":
+				try {
+					System.out.println("Lines of code: " + this.LOC());
+				} catch(IOException e) {
+					System.err.println("I/O errors on handling output file for LOC counts." +
+							"LOC not counted!");
+				}
+				break;
 			default:
 				System.err.println("Unknown argument: " + arg);
 			}
