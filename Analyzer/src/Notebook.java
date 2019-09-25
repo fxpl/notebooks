@@ -4,6 +4,8 @@ import java.util.*;
 import org.json.simple.*;
 import org.json.simple.parser.*;
 
+import com.sun.xml.internal.ws.api.pipe.ThrowableContainerPropertySet;
+
 /**
  * A Jupyter notebook.
  */
@@ -14,29 +16,76 @@ public class Notebook {
 	}
 	
 	private String path;
+	private int locTotal;		// Total number of lines of code
+	private int locBlank;		// Number of empty code lines
+	private int locContents;	// Number of non-empty code lines
+	private boolean locCounted = false;
 	
 	public Notebook(String path) {
 		this.path = path;
 	}
 	
 	/**
-	 * @return Total LOC for all code cells in the notebook
-	 * @throws NotebookException if the file could not be parsed
+	 * @return Total lines of code for all code cells in the notebook
+	 * @throws NotebookException if the notebook file could not be parsed
 	 */
 	public int LOC() throws NotebookException {
+		if (!locCounted) {
+			countLines();
+		}
+		return locTotal;
+	}
+	
+	/**
+	 * @return Number of blank code lines in the notebook
+	 * @throws NotebookException if the notebook file could not be parsed
+	 */
+	public int LOCBlank() throws NotebookException {
+		if (!locCounted) {
+			countLines();
+		}
+		return locBlank;
+	}
+	
+	/**
+	 * @return Number of non-blank code lines in the notebook
+	 * @throws NotebookException if the notebook file could not be parsed
+	 */
+	public int LOCNonBlank() throws NotebookException {
+		if(!locCounted) {
+			countLines();
+		}
+		return locContents;
+	}
+	
+	
+	
+	/**
+	 * Count lines of code and set all loc variables.
+	 * @throws NotebookException if the file could not be parsed
+	 */
+	private void countLines() throws NotebookException {
 		JSONObject notebook = this.getNotebook();
 		List<JSONObject> codeCells = getCodeCells(notebook);
-		int LOC = 0;
+		locTotal = 0;
 		for (JSONObject cell: codeCells) {
 			if (cell.containsKey("source")) {
 				JSONArray source = (JSONArray) cell.get("source");
-				LOC += source.size();
+				locTotal += source.size();
+				for (int i=0; i<source.size(); i++) {
+					String line = ((String)source.get(i)).trim();
+					if ("".equals(line)) {
+						locBlank++;
+					} else {
+						locContents++;
+					}
+				}
 			} else {
 				System.err.println("Key \"source\" is missing in a cell in "
 						+ notebook.toString() + " (" + this.path + ")!");
 			}
 		}
-		return LOC;
+		locCounted = true;
 	}
 	
 	/**

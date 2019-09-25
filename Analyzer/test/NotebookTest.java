@@ -4,7 +4,11 @@ import org.junit.Test;
 
 public class NotebookTest {
 	
-	@Test public void testLOC() {
+	/**
+	 * Verify that the correct total number of lines of code are found in JSON
+	 * files.
+	 */
+	@Test public void testLOCTotal() {
 		String dataDir = "test/data/loc";
 		String[] files = {"markdownCells.ipynb", "one_codeCell_6loc.ipynb",
 				"two_codeCells_13loc.ipynb", "three_codeCells_2loc.ipynb",
@@ -18,6 +22,51 @@ public class NotebookTest {
 			} catch (NotebookException e) {
 				fail("Could not count LOC: " + e.getMessage());
 			}
+		}
+	}
+	
+	/**
+	 * Verify that the correct total number of blank code lines are found in
+	 * JSON files.
+	 */
+	@Test
+	public void testLOCBlank() {
+		Notebook notebook = new Notebook("test/data/loc/two_codeCells_13loc.ipynb");
+		try {
+			assertEquals("Wrong number of blank lines!", 2, notebook.LOCBlank());
+		} catch(NotebookException e) {
+			fail("Could not count blank LOC: " + e.getMessage());
+		}
+	}
+	
+	/**
+	 * Verify that the correct total number of non-blank code lines are found
+	 * in JSON files.
+	 */
+	@Test
+	public void testLOCNonBlank() {
+		Notebook notebook = new Notebook("test/data/loc/two_codeCells_13loc.ipynb");
+		try {
+			assertEquals("Wrong number of non-blank lines!", 11, notebook.LOCNonBlank());
+		} catch (NotebookException e) {
+			fail("Could not count non-blank LOC: " + e.getMessage());
+		}
+		
+	}
+	
+	/**
+	 * Verify that all kinds of lines of code are counted correctly, also when
+	 * the methods are called after each other.
+	 */
+	@Test
+	public void testLOCAll() {
+		Notebook notebook = new Notebook("test/data/loc/two_codeCells_13loc.ipynb");
+		try {
+			assertEquals("Wrong LOC!", 13, notebook.LOC());
+			assertEquals("Wrong number of blank lines!", 2, notebook.LOCBlank());
+			assertEquals("Wrong number of non-blank lines!", 11, notebook.LOCNonBlank());
+		} catch (NotebookException e) {
+			fail("Could not count code lines: " + e.getMessage());
 		}
 	}
 	
