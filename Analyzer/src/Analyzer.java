@@ -62,6 +62,7 @@ public class Analyzer {
 	public int LOC() throws IOException {
 		int totalLOC = 0;
 		Writer writer = new FileWriter("loc" + LocalDateTime.now() + ".csv");
+		writer.write("LOC\n");
 		for (int i=0; i<notebooks.size(); i++) {
 			if (0 == i%10000) {
 				System.out.println("Counting LOC in notebook " + i);
@@ -112,6 +113,7 @@ public class Analyzer {
 	public int numCodeCells() throws IOException {
 		int totalNumCodeCells = 0;
 		Writer writer = new FileWriter("snippets" + LocalDateTime.now() + ".csv");
+		writer.write("snippets\n");
 		for (int i=0; i<notebooks.size(); i++) {
 			if (0 == i%10000) {
 				System.out.println("Counting code cells in notebook " + i);

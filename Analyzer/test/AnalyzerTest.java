@@ -30,7 +30,7 @@ public class AnalyzerTest {
 		lastLOCFile().delete();
 	}
 	
-	/**
+	/** TODO: Extract methods to reduce code duplication!
 	 * Verify that the output file loc<current-date-time>.csv is created and
 	 * filled correctly when the number of LOC are counted.
 	 * @throws IOException on errors when handling output file
@@ -51,9 +51,10 @@ public class AnalyzerTest {
 		File outputFile = lastLOCFile();
 		BufferedReader outputReader = new BufferedReader(
 				new FileReader(outputFile));
+		assertEquals("Header missing in LOC csv!", "LOC", outputReader.readLine());
 		for (int expectedLOC: LOC) {
-			assertEquals("Wrong LOC written to output file:", ""
-					+ expectedLOC , outputReader.readLine());
+			assertEquals("Wrong LOC written to output file:",
+					"" + expectedLOC , outputReader.readLine());
 		}
 		
 		// Clean up
@@ -93,9 +94,10 @@ public class AnalyzerTest {
 		File outputFile = lastSnippetFile();
 		BufferedReader outputReader = new BufferedReader(
 				new FileReader(outputFile));
+		assertEquals("Header missing in snippets csv!", "snippets", outputReader.readLine());
 		for (int expectedCells: numCodeCells) {
-			assertEquals("Wrong number of snippets written to output file:", ""
-					+ expectedCells , outputReader.readLine());
+			assertEquals("Wrong number of snippets written to output file:",
+					"" + expectedCells , outputReader.readLine());
 		}
 		
 		// Clean up
