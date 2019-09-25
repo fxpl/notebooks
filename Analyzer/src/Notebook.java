@@ -27,10 +27,14 @@ public class Notebook {
 		JSONObject notebook = this.getNotebook();
 		List<JSONObject> codeCells = getCodeCells(notebook);
 		int LOC = 0;
-		// TODO: Räkna blankrader separat!
 		for (JSONObject cell: codeCells) {
-			JSONArray source = (JSONArray) cell.get("source");
-			LOC += source.size();
+			if (cell.containsKey("source")) {
+				JSONArray source = (JSONArray) cell.get("source");
+				LOC += source.size();
+			} else {
+				System.err.println("Key \"source\" is missing in a cell in "
+						+ notebook.toString() + " (" + this.path + ")!");
+			}
 		}
 		return LOC;
 	}
@@ -82,9 +86,14 @@ public class Notebook {
 		List<JSONObject> result = new ArrayList<JSONObject>();
 		for (int i=0; i<cells.size(); i++) {
 			JSONObject cell = (JSONObject) cells.get(i);
-			String type = (String) cell.get("cell_type");
-			if (type.equals("code")) {
-				result.add(cell);
+			if (cell.containsKey("cell_type")) {
+				String type = (String) cell.get("cell_type");
+				if (type.equals("code")) {
+					result.add(cell);
+				}
+			} else {
+				System.err.println("Key \"cell_type\" is missing in a cell in "
+						+ notebook.toString() + " (" + this.path + ")!");
 			}
 		}
 		return result;

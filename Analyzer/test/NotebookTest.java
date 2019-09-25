@@ -8,8 +8,8 @@ public class NotebookTest {
 		String dataDir = "test/data/loc";
 		String[] files = {"markdownCells.ipynb", "one_codeCell_6loc.ipynb",
 				"two_codeCells_13loc.ipynb", "three_codeCells_2loc.ipynb",
-				"code_and_md_3loc.ipynb"};
-		int[] LOC = {0, 6, 13, 2, 3};
+				"code_and_md_3loc.ipynb", "missing_source.ipynb"};
+		int[] LOC = {0, 6, 13, 2, 3, 2};
 		for (int i=0; i<files.length; i++) {
 			String fileName = files[i];
 			Notebook notebook = new Notebook(dataDir + "/" + fileName);
@@ -29,8 +29,9 @@ public class NotebookTest {
 		String dataDir = "test/data/count";
 		String[] files = {"zero.ipynb", "one.ipynb", "two.ipynb",
 				"three_with_md.ipynb", "three_in_worksheets.ipynb",
-				"missing_cells.ipynb", "missing_cells_in_worksheet.ipynb"};
-		int[] numCodeCells = {0, 1, 2, 3, 3, 0, 0};
+				"missing_cells.ipynb", "missing_cells_in_worksheet.ipynb",
+				"missing_cell_type.ipynb"};
+		int[] numCodeCells = {0, 1, 2, 3, 3, 0, 0, 2};
 		for (int i=0; i<files.length; i++) {
 			String fileName = files[i];
 			Notebook notebook = new Notebook(dataDir + "/" + fileName);
