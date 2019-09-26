@@ -54,48 +54,35 @@ public class Analyzer {
 	}
 	
 	/**
-	 * Count LOC in each notebook. Print each value on a separate line in the
-	 * file loc<current-date-time>.csv.
+	 * Create a file loc<current-date-time>.csv with the header line
+	 * followed by the number of lines of code for each notebook on the format
+	 * <total loc>, <non-blank loc>, <blank loc>
+	 * The data for each notebook is print on a separate line.
 	 * @return Total number of LOC in notebooks stored in analyzer
 	 * @throws IOException On problems with handling the output file
 	 */
 	public int LOC() throws IOException {
 		int totalLOC = 0;
 		Writer writer = new FileWriter("loc" + LocalDateTime.now() + ".csv");
-		writer.write("LOC\n");
+		writer.write("total, non-blank, blank\n");
 		for (int i=0; i<notebooks.size(); i++) {
 			if (0 == i%10000) {
 				System.out.println("Counting LOC in notebook " + i);
 				System.out.println(totalLOC + " lines of code found so far.");
 			}
-			int LOC = LOCIn(notebooks.get(i));
-			writer.write(LOC + "\n");
+			int LOC = employ(new TotalLOCCounter(notebooks.get(i)));
+			int LOCNonBlank = employ(new NonBlankLOCCounter(notebooks.get(i)));
+			int LOCBlank = employ(new BlankLOCCounter(notebooks.get(i)));
+			writer.write(LOC + ", " + LOCNonBlank + ", " + LOCBlank + "\n");
 			totalLOC += LOC;
 		}
 		writer.close();
 		return totalLOC;
 	}
 	
-	// TODO: Mer generell metod!
-	private int LOCIn(Notebook notebook) {
-		try {
-			Future<Integer> result = executor.submit(new LOCCounter(notebook));
-			return result.get();
-		} catch (ExecutionException e) {
-			System.err.println(e.getMessage() + " Skipping!");
-			return 0;
-		} catch (InterruptedException e) {
-			System.err.println("A thread was interrupted: " +
-					e.getMessage() + " Trying again!");
-			return LOCIn(notebook);
-		}
-	}
-	
-	private class LOCCounter implements Callable<Integer> {
-		private Notebook notebook;
-		
-		public LOCCounter(Notebook notebook) {
-			this.notebook = notebook;
+	private class TotalLOCCounter extends Worker {
+		public TotalLOCCounter(Notebook notebook) {
+			super(notebook);
 		}
 
 		@Override
@@ -104,9 +91,32 @@ public class Analyzer {
 		}
 	}
 	
+	private class NonBlankLOCCounter extends Worker {
+		public NonBlankLOCCounter(Notebook notebook) {
+			super(notebook);
+		}
+		
+		@Override
+		public Integer call() throws Exception {
+			return notebook.LOCNonBlank();
+		}
+	}
+	
+	private class BlankLOCCounter extends Worker {
+		public BlankLOCCounter(Notebook notebook) {
+			super(notebook);
+		}
+		
+		@Override
+		public Integer call() throws Exception {
+			return notebook.LOCBlank();
+		}
+	}
+	
 	/**
 	 * Count the number of code cells in each notebook. Print each value on a
-	 * separate line in the file snippets<current-date-time>.csv.
+	 * separate line in the file snippets<current-date-time>.csv. Start the csv
+	 * file with the header "snippets".
 	 * @return Total number of code cells in notebooks stored in analyzer
 	 * @throws IOException On problems with handling the output file
 	 */
@@ -119,7 +129,7 @@ public class Analyzer {
 				System.out.println("Counting code cells in notebook " + i);
 				System.out.println(totalNumCodeCells + " code cells found so far.");
 			}
-			int numCodeCells = numCodeCellsIn(notebooks.get(i));
+			int numCodeCells = employ(new CodeCellCounter(notebooks.get(i)));
 			writer.write(numCodeCells + "\n");
 			totalNumCodeCells += numCodeCells;
 		}
@@ -127,29 +137,9 @@ public class Analyzer {
 		return totalNumCodeCells;
 	}
 	
-	/**
-	 * @param notebook Notebook of which to count code cells 
-	 * @return The number of code cells found in the notebook given as argument (0 on error)
-	 */
-	private int numCodeCellsIn(Notebook notebook) {
-		try {
-			Future<Integer> result = executor.submit(new CodeCellCounter(notebook));
-			return result.get();
-		} catch (ExecutionException e) {
-			System.err.println(e.getMessage() + " Skipping!");
-			return 0;
-		} catch (InterruptedException e) {
-			System.err.println("A thread was interrupted: " +
-					e.getMessage() + " Trying again!");
-			return numCodeCellsIn(notebook);
-		}
-	}
-	
-	private class CodeCellCounter implements Callable<Integer> {
-		private Notebook notebook;
-		
+	private class CodeCellCounter extends Worker {
 		public CodeCellCounter(Notebook notebook) {
-			this.notebook = notebook;
+			super(notebook);
 		}
 
 		@Override
@@ -191,6 +181,28 @@ public class Analyzer {
 			default:
 				System.err.println("Unknown argument: " + arg);
 			}
+		}
+	}
+	
+	private abstract class Worker implements Callable<Integer>{
+		protected Notebook notebook;
+		
+		Worker(Notebook notebook) {
+			this.notebook = notebook;
+		}
+	}
+	
+	private int employ(Worker worker) {
+		try {
+			Future<Integer> result = executor.submit(worker);
+			return result.get();
+		} catch (ExecutionException e) {
+			System.err.println(e.getMessage() + " Skipping!");
+			return 0;
+		} catch (InterruptedException e) {
+			System.err.println("A thread was interrupted: " +
+					e.getMessage() + " Trying again!");
+			return employ(worker);
 		}
 	}
 

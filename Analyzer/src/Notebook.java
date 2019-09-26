@@ -58,6 +58,14 @@ public class Notebook {
 		return locContents;
 	}
 	
+	/**
+	 * @return Number of code cells in notebook
+	 * @throws NotebookException if the file could not be parsed
+	 */
+	public int numCodeCells() throws NotebookException {
+		JSONObject notebook = this.getNotebook();
+		return getCodeCells(notebook).size();
+	}
 	
 	
 	/**
@@ -86,15 +94,6 @@ public class Notebook {
 			}
 		}
 		locCounted = true;
-	}
-	
-	/**
-	 * @return Number of code cells in notebook
-	 * @throws NotebookException if the file could not be parsed
-	 */
-	public int numCodeCells() throws NotebookException {
-		JSONObject notebook = this.getNotebook();
-		return getCodeCells(notebook).size();
 	}
 	
 	/**

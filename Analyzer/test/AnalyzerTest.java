@@ -42,6 +42,7 @@ public class AnalyzerTest {
 		String[] files = {"code_and_md_3loc.ipynb", "markdownCells.ipynb",
 				"two_codeCells_13loc.ipynb"};
 		int[] LOC = {3, 0, 13};
+		int[] emptyLOC = {0, 0, 2};
 		for (String file: files) {
 			analyzer.initializeNotebooksFrom(dataDir + "/" + file);
 		}
@@ -51,10 +52,11 @@ public class AnalyzerTest {
 		File outputFile = lastLOCFile();
 		BufferedReader outputReader = new BufferedReader(
 				new FileReader(outputFile));
-		assertEquals("Header missing in LOC csv!", "LOC", outputReader.readLine());
-		for (int expectedLOC: LOC) {
+		assertEquals("Header missing in LOC csv!", "total, non-blank, blank", outputReader.readLine());
+		for (int i=0; i<LOC.length; i++) {
+			String expectedLine = LOC[i] + ", " + (LOC[i]-emptyLOC[i]) + ", " + emptyLOC[i];
 			assertEquals("Wrong LOC written to output file:",
-					"" + expectedLOC , outputReader.readLine());
+					"" + expectedLine , outputReader.readLine());
 		}
 		
 		// Clean up
