@@ -1,16 +1,18 @@
 == Jupyter-notebooks =
 
 == Möjliga saker att analysera: ==
+* Vilka språk används?
 * Antal (kod)filer/projekt
 * I vilken utsträckning används metoder?
 * I hur vilken utsträckning används klasser?
-* Antal rader kod (per fil, klass och/eller metod)
+* Antal snippets per notebook
+* Antal rader kod (per fil, snippet, klass och/eller metod)
 * Kod/text-kvot
 * Antal utvecklare som har bidragit till filen
 * Cyklomatisk komplexitet
-* Commit-historik
+* Commit-historik, ålder
 
-* Vilka bibliotek förekommer tillsammans?
+* Vilka bibliotek förekommer (tillsammans)?
 * Vilka funktioner (från dessa bibliotek) anropas tillsammans? Går det att hitta mönster som exv. skulle kunna slås ihop till egna funktioner?
 * Hur används arv? (Används det över huvud taget?)
 * Koppling mellan klasser
@@ -18,4 +20,8 @@
 * Hur vanliga är kloner?
 * Vilka kloner är mest frekvent förekommande? Varfrån kommer de? (Stackoverflow?)
 * Vilka utvecklare ligger bakom de olika snippetsen?
+* Hur många utvecklare ligger bakom respektive notebook?
+* Antal commits, issues, korrelerat exv. till storlek
+* Plottar
+* Finns data så att vi kan köra?
 
