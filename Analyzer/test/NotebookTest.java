@@ -63,6 +63,7 @@ public class NotebookTest {
 		Notebook notebook = new Notebook("test/data/loc/two_codeCells_13loc.ipynb");
 		try {
 			assertEquals("Wrong LOC!", 13, notebook.LOC());
+			assertEquals("Wrong LOC!", 13, notebook.LOC());
 			assertEquals("Wrong number of blank lines!", 2, notebook.LOCBlank());
 			assertEquals("Wrong number of non-blank lines!", 11, notebook.LOCNonBlank());
 		} catch (NotebookException e) {

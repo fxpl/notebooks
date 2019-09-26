@@ -4,8 +4,6 @@ import java.util.*;
 import org.json.simple.*;
 import org.json.simple.parser.*;
 
-import com.sun.xml.internal.ws.api.pipe.ThrowableContainerPropertySet;
-
 /**
  * A Jupyter notebook.
  */
