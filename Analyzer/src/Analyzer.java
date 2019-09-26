@@ -17,7 +17,9 @@ public class Analyzer {
 	 */
 	public Analyzer() {
 		this.notebooks = new ArrayList<Notebook>();
-		executor = Executors.newCachedThreadPool();
+		int cores = Runtime.getRuntime().availableProcessors();
+		System.out.println("Running " + (2*cores) + " threads.");
+		executor = Executors.newFixedThreadPool(2*cores);
 	}
 	
 	/**
