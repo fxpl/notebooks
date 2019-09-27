@@ -27,28 +27,28 @@ public class Notebook {
 		JSONObject notebook = this.getNotebook();
 		if (null != notebook && notebook.containsKey("metadata")) {
 			JSONObject metadata = (JSONObject) notebook.get("metadata");
-			if (metadata.containsKey("kernelspec")) {
+			if (null != metadata && metadata.containsKey("kernelspec")) {
 				JSONObject kernelspec = (JSONObject)metadata.get("kernelspec");
-				if (kernelspec.containsKey("language")) {
+				if (null != kernelspec && kernelspec.containsKey("language")) {
 					return "kenelspec:language:" + kernelspec.get("language");
 				}
-				if (kernelspec.containsKey("name")) {
+				if (null != kernelspec && kernelspec.containsKey("name")) {
 					return "kernelspec:name:" + kernelspec.get("name");
 				}
-				if (kernelspec.containsKey("display_name")) {
+				if (null != kernelspec && kernelspec.containsKey("display_name")) {
 					return "kernelspec:display_name:" + kernelspec.get("display_name");
 				}
 			}
-			if (metadata.containsKey("language_info")) {
+			if (null!=metadata && metadata.containsKey("language_info")) {
 				JSONObject languageinfo = (JSONObject)notebook.get("language_info");
-				if (languageinfo.containsKey("name")) {
+				if (null != languageinfo && languageinfo.containsKey("name")) {
 					return "language_info:name:" + languageinfo.get("name");
 				}
-				if (languageinfo.containsKey("version")) {
+				if (null!= languageinfo && languageinfo.containsKey("version")) {
 					return "language_info:version:" + languageinfo.get("version");
 				}
 			}
-			if (metadata.containsKey("language")) {
+			if (null != metadata && metadata.containsKey("language")) {
 				return "language:" + metadata.get("language");
 			}
 			System.err.println("No language found in " + this.path);
