@@ -23,6 +23,41 @@ public class Notebook {
 		this.path = path;
 	}
 	
+	public String language() throws NotebookException {
+		JSONObject notebook = this.getNotebook();
+		if (null != notebook && notebook.containsKey("metadata")) {
+			JSONObject metadata = (JSONObject) notebook.get("metadata");
+			if (metadata.containsKey("kernelspec")) {
+				JSONObject kernelspec = (JSONObject)metadata.get("kernelspec");
+				if (kernelspec.containsKey("language")) {
+					return "kenelspec:language:" + kernelspec.get("language");
+				}
+				if (kernelspec.containsKey("name")) {
+					return "kernelspec:name:" + kernelspec.get("name");
+				}
+				if (kernelspec.containsKey("display_name")) {
+					return "kernelspec:display_name:" + kernelspec.get("display_name");
+				}
+			}
+			if (metadata.containsKey("language_info")) {
+				JSONObject languageinfo = (JSONObject)notebook.get("language_info");
+				if (languageinfo.containsKey("name")) {
+					return "language_info:name:" + languageinfo.get("name");
+				}
+				if (languageinfo.containsKey("version")) {
+					return "language_info:version:" + languageinfo.get("version");
+				}
+			}
+			if (metadata.containsKey("language")) {
+				return "language:" + metadata.get("language");
+			}
+			System.err.println("No language found in " + this.path);
+		} else {
+			System.err.println("No metadata in " + this.path);
+		}
+		return "unknown";
+	}
+	
 	/**
 	 * @return Total lines of code for all code cells in the notebook
 	 * @throws NotebookException if the notebook file could not be parsed
