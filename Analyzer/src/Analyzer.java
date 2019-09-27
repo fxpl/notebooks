@@ -2,6 +2,8 @@ import java.io.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.*;
 
 /**
@@ -53,6 +55,29 @@ public class Analyzer {
 	 */
 	public void shutDown() {
 		executor.shutdown();
+	}
+	
+	public void languages() throws IOException {
+		Map<String, Integer> languages = new HashMap<String, Integer>();
+		for (int i=0; i<notebooks.size(); i++) {
+			String language;
+			try {
+				language = notebooks.get(i).language();
+			} catch (NotebookException e) {
+				System.err.println("Notebook exception: " + e);
+				language = "unparsed";
+			}
+			if (languages.containsKey(language)) {
+				languages.put(language, languages.get(language) + 1);
+			} else {
+				languages.put(language, 1);
+			}
+		}
+		
+		System.out.println("\n\n LANGUAGES \n");
+		for (String language: languages.keySet()) {
+			System.out.println(language + " (" + languages.get(language) + ")");
+		}
 	}
 	
 	/**
@@ -170,6 +195,14 @@ public class Analyzer {
 				} catch (IOException e) {
 					System.err.println("I/O errors on handling output file for snippet counts." +
 							"Snippets not counted!");
+				}
+				break;
+			case "-lang":				
+				try {
+					this.languages();
+				} catch (IOException e) {
+					System.err.println("Exception: " + e);
+					e.printStackTrace();
 				}
 				break;
 			case "-loc":
