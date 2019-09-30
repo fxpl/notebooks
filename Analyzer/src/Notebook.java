@@ -8,11 +8,6 @@ import org.json.simple.parser.*;
  * A Jupyter notebook.
  */
 public class Notebook {
-	// Enum for language
-	private enum Language {
-		PYTHON, JULIA, R, SCALA, OTHER, UNKNOWN
-	}
-	
 	private String path;
 	private int locTotal;		// Total number of lines of code
 	private int locBlank;		// Number of empty code lines
