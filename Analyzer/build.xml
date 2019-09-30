@@ -1,8 +1,6 @@
 <project>
 
 	<!-- NB: These variables may need to be changed! -->
-	<property name="bin" value="./bin"/>
-	<property name="json.path" value="./external/json-simple-1.1.1.jar"/>
 	<!-- UPPMAX: -->
 	<property name="junit.path" value="/home/maka4186/bin/junit/junit.jar"/>
 	<property name="hamcrest.path" value="/home/maka4186/bin/junit/hamcrest.jar"/>
@@ -10,9 +8,13 @@
 	<!--<property name="junit.path" value="/usr/share/java/junit4.jar"/>
 	<property name="junit.path" value="/usr/share/java/hamcrest-all.jar"/>-->
 
+	<property name="json.path" value="./external/json-simple-1.1.1.jar"/>
+	<property name="bin" value="./bin"/>
+	<property name="dbg" value="on"/>
+
 	<target name="build">
 		<mkdir dir="${bin}"/>
-		<javac includeantruntime="false" srcdir="src" destdir="${bin}">
+		<javac debug="${dbg}" includeantruntime="false" srcdir="src" destdir="${bin}">
 			<classpath>
 				<pathelement location = "${json.path}"/>
 			</classpath>
@@ -21,7 +23,7 @@
 
 	<target name="buildTest" depends="build">
 		<mkdir dir="${bin}"/>
-		<javac includeantruntime="false" srcdir="test" destdir="${bin}">
+		<javac debug="${dbg}" includeantruntime="false" srcdir="test" destdir="${bin}">
 			<classpath>
 				<pathelement location="${junit.path}"/>
 				<pathelement location="${hamcrest.path}"/>
@@ -45,6 +47,10 @@
 				<fileset dir="test"/>
 			</batchtest>
 		</junit>
+	</target>
+
+	<target name="clean">
+		<delete dir="${bin}"/>
 	</target>
 
 </project>
