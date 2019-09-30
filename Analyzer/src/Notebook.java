@@ -194,7 +194,7 @@ public class Notebook {
 		}
 		try {
 			result = (JSONObject)new JSONParser().parse(reader);
-		} catch (IOException | ParseException e) {
+		} catch (Exception e) {
 			throw new NotebookException("Could not parse " + this.path + ": " + e.toString());
 		}
 		try {
