@@ -26,7 +26,7 @@ public class AnalyzerTest {
 	@Test
 	public void testLOC_total() throws IOException {
 		analyzer.initializeNotebooksFrom("test/data/loc");
-		assertEquals("Wrong LOC!", 26, analyzer.LOC());
+		assertEquals("Wrong LOC!", 49, analyzer.LOC());
 		lastLOCFile().delete();
 	}
 	

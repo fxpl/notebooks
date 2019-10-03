@@ -12,8 +12,9 @@ public class NotebookTest {
 		String dataDir = "test/data/loc";
 		String[] files = {"markdownCells.ipynb", "one_codeCell_6loc.ipynb",
 				"two_codeCells_13loc.ipynb", "three_codeCells_2loc.ipynb",
-				"code_and_md_3loc.ipynb", "missing_source.ipynb"};
-		int[] LOC = {0, 6, 13, 2, 3, 2};
+				"code_and_md_3loc.ipynb", "missing_source.ipynb",
+				"two_codeCells_26loc_worksheet.ipynb"};
+		int[] LOC = {0, 6, 13, 2, 3, 2, 23};
 		for (int i=0; i<files.length; i++) {
 			String fileName = files[i];
 			Notebook notebook = new Notebook(dataDir + "/" + fileName);
@@ -63,7 +64,7 @@ public class NotebookTest {
 		Notebook notebook = new Notebook("test/data/loc/two_codeCells_13loc.ipynb");
 		try {
 			assertEquals("Wrong LOC!", 13, notebook.LOC());
-			assertEquals("Wrong LOC!", 13, notebook.LOC());
+			assertEquals("Wrong second LOC!", 13, notebook.LOC());
 			assertEquals("Wrong number of blank lines!", 2, notebook.LOCBlank());
 			assertEquals("Wrong number of non-blank lines!", 11, notebook.LOCNonBlank());
 		} catch (NotebookException e) {

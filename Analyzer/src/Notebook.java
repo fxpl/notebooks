@@ -121,8 +121,15 @@ public class Notebook {
 		List<JSONObject> codeCells = getCodeCells(notebook);
 		locTotal = 0;
 		for (JSONObject cell: codeCells) {
+			// Get source code
+			JSONArray source = null;
 			if (cell.containsKey("source")) {
-				JSONArray source = (JSONArray) cell.get("source");
+				source = (JSONArray) cell.get("source");
+			} else if (cell.containsKey("input")) {
+				source = (JSONArray) cell.get("input");
+			}
+			// If source code exists, count lines
+			if (null != source) {
 				locTotal += source.size();
 				for (int i=0; i<source.size(); i++) {
 					String line = ((String)source.get(i)).trim();
