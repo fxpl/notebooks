@@ -133,8 +133,7 @@ public class Notebook {
 					}
 				}
 			} else {
-				System.err.println("Key \"source\" is missing in a cell in "
-						+ notebook.toString() + " (" + this.path + ")!");
+				System.err.println("Key \"source\" is missing in a cell in " + this.path);
 			}
 		}
 		locCounted = true;
@@ -162,8 +161,7 @@ public class Notebook {
 					cells.addAll(worksSheetCells);
 				}
 			} else {
-				System.err.println("No cells found in " + notebook.toString() +
-						" (" + this.path + ")!");
+				System.err.println("No cells found in " + this.path);
 			}
 		}
 		return cells;
@@ -184,8 +182,7 @@ public class Notebook {
 					result.add(cell);
 				}
 			} else {
-				System.err.println("Key \"cell_type\" is missing in a cell in "
-						+ notebook.toString() + " (" + this.path + ")!");
+				System.err.println("Key \"cell_type\" is missing in a cell in " + this.path);
 			}
 		}
 		return result;
