@@ -19,7 +19,7 @@ public class Notebook {
 	}
 	
 	public String getPath() {
-		// TODO: Make ClassCastException Notebook exception instead (after cleaning langage)
+		// TODO: Make ClassCastException Notebook exception instead (after cleaning language)
 		return this.path;
 	}
 	
@@ -145,7 +145,7 @@ public class Notebook {
 					}
 				}
 			} else {
-				System.err.println("Key \"source\" is missing in a cell in " + this.path);
+				System.err.println("Keys \"source\" and \"input\" are missing in a cell in " + this.path);
 			}
 		}
 		locCounted = true;
