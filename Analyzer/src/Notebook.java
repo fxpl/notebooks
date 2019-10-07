@@ -40,7 +40,7 @@ public class Notebook {
 				}
 			}
 			if (null!=metadata && metadata.containsKey("language_info")) {
-				JSONObject languageinfo = (JSONObject)notebook.get("language_info");
+				JSONObject languageinfo = (JSONObject)metadata.get("language_info");
 				if (null != languageinfo && languageinfo.containsKey("name")) {
 					return "language_info:name:" + languageinfo.get("name");
 				}
