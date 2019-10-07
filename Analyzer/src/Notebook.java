@@ -46,26 +46,26 @@ public class Notebook {
 			if (null != metadata && metadata.containsKey("language")) {
 				return "language:" + metadata.get("language");
 			}
-			List<JSONObject> codeCells = this.getCodeCells(notebook);
-			if (0 < codeCells.size()) {
-				String language = "";
-				JSONObject cell = codeCells.get(0);
-				if (null != cell && cell.containsKey("language")) {
-					language = (String) cell.get("language");
-					for (int i=1; i< codeCells.size(); i++) {
-						cell = codeCells.get(i);
-						if (!cell.containsKey("language") || !((String)cell.get("language")).equals(language)) {
-							System.err.println("Ambiguous language in " + this.path);
-							return "unknown";
-						}
-					}
-					return "codecells:language:" + language;
-				}
-			}
-			System.err.println("No language found in " + this.path);
 		} else {
 			System.err.println("No metadata in " + this.path);
 		}
+		List<JSONObject> codeCells = this.getCodeCells(notebook);
+		if (0 < codeCells.size()) {
+			String language = "";
+			JSONObject cell = codeCells.get(0);
+			if (null != cell && cell.containsKey("language")) {
+				language = (String) cell.get("language");
+				for (int i=1; i< codeCells.size(); i++) {
+					cell = codeCells.get(i);
+					if (!cell.containsKey("language") || !((String)cell.get("language")).equals(language)) {
+						System.err.println("Ambiguous language in " + this.path);
+						return "unknown";
+					}
+				}
+				return "codecells:language:" + language;
+			}
+		}
+		System.err.println("No language found in " + this.path);
 		return "unknown";
 	}
 	
