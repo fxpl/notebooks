@@ -66,6 +66,9 @@ public class Analyzer {
 			} catch (NotebookException e) {
 				System.err.println("Notebook exception: " + e);
 				language = "unparsed";
+			} catch (ClassCastException e) {
+				System.err.println("ClassCastException when searching for language in " + notebooks.get(i).getPath() + ": " + e);
+				language = "unparsed";
 			}
 			if (languages.containsKey(language)) {
 				languages.put(language, languages.get(language) + 1);
