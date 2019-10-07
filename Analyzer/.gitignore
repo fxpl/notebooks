@@ -7,3 +7,6 @@ bin
 
 # Test reports
 reports
+
+# Slurm output
+logs
