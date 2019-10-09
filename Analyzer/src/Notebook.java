@@ -18,11 +18,6 @@ public class Notebook {
 		this.path = path;
 	}
 	
-	public String getPath() {
-		// TODO: Make ClassCastException Notebook exception instead (after cleaning language)
-		return this.path;
-	}
-	
 	public String language() throws NotebookException {
 		JSONObject notebook = this.getNotebook();
 		if (null != notebook && notebook.containsKey("metadata")) {
@@ -216,6 +211,9 @@ public class Notebook {
 			result = (JSONObject)new JSONParser().parse(reader);
 		} catch (IOException | ParseException e) {
 			throw new NotebookException("Could not parse " + this.path + ": " + e.toString());
+		} catch (RuntimeException e) {
+			// TODO: Test för detta!
+			throw new NotebookException("Runtime exception when parsing " + this.path + ": " + e.toString());
 		}
 		try {
 			reader.close();
