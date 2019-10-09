@@ -81,8 +81,8 @@ public class NotebookTest {
 		String[] files = {"zero.ipynb", "one.ipynb", "two.ipynb",
 				"three_with_md.ipynb", "three_in_worksheets.ipynb",
 				"missing_cells.ipynb", "missing_cells_in_worksheet.ipynb",
-				"missing_cell_type.ipynb"};
-		int[] numCodeCells = {0, 1, 2, 3, 3, 0, 0, 2};
+				"missing_cell_type.ipynb", "four_cells_and_worksheets.ipynb"};
+		int[] numCodeCells = {0, 1, 2, 3, 3, 0, 0, 2, 4};
 		for (int i=0; i<files.length; i++) {
 			String fileName = files[i];
 			Notebook notebook = new Notebook(dataDir + "/" + fileName);

@@ -25,7 +25,7 @@ public class Notebook {
 			if (null != metadata && metadata.containsKey("kernelspec")) {
 				JSONObject kernelspec = (JSONObject)metadata.get("kernelspec");
 				if (null != kernelspec && kernelspec.containsKey("language")) {
-					return "kenelspec:language:" + kernelspec.get("language");
+					return "kernelspec:language:" + kernelspec.get("language");
 				}
 				if (null != kernelspec && kernelspec.containsKey("name")) {
 					return "kernelspec:name:" + kernelspec.get("name");
@@ -160,16 +160,17 @@ public class Notebook {
 			cells = (JSONArray) notebook.get("cells");
 		} else {
 			cells = new JSONArray();
-			if(notebook.containsKey("worksheets")) {
-				// Not according to spec, but occuring
-				JSONArray worksheets = (JSONArray) notebook.get("worksheets");
-				for (int i=0; i<worksheets.size(); i++) {
-					JSONArray worksSheetCells = getCellArray((JSONObject) worksheets.get(i));
-					cells.addAll(worksSheetCells);
-				}
-			} else {
-				System.err.println("No cells found in " + this.path);
+		}
+		if(notebook.containsKey("worksheets")) {
+			// Not according to spec, but occuring
+			JSONArray worksheets = (JSONArray) notebook.get("worksheets");
+			for (int i=0; i<worksheets.size(); i++) {
+				JSONArray worksSheetCells = getCellArray((JSONObject) worksheets.get(i));
+				cells.addAll(worksSheetCells);
 			}
+		}
+		if (0 == cells.size()) {
+			System.err.println("No cells found in " + this.path);
 		}
 		return cells;
 	}

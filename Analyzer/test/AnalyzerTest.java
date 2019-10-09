@@ -72,7 +72,7 @@ public class AnalyzerTest {
 	@Test
 	public void testNumCodeCells_total() throws IOException {
 		analyzer.initializeNotebooksFrom("test/data/count");
-		assertEquals("Wrong number of cells found in notebooks!", 11, analyzer.numCodeCells());
+		assertEquals("Wrong number of cells found in notebooks!", 15, analyzer.numCodeCells());
 		lastSnippetFile().delete();
 	}
 	
@@ -113,7 +113,7 @@ public class AnalyzerTest {
 	@Test
 	public void testNumNotebooks() {
 		analyzer.initializeNotebooksFrom("test/data/count");
-		assertEquals("Wrong number of notebooks found:", 11, analyzer.numNotebooks());
+		assertEquals("Wrong number of notebooks found:", 12, analyzer.numNotebooks());
 	}
 	
 	// TODO: Mer generell metod for outputfiler!
