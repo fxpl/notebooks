@@ -60,13 +60,8 @@ public class Analyzer {
 	public void languages() throws IOException {
 		Map<String, Integer> languages = new HashMap<String, Integer>();
 		for (int i=0; i<notebooks.size(); i++) {
-			String language;
-			try {
-				language = notebooks.get(i).language();
-			} catch (NotebookException e) {
-				System.err.println("Notebook exception: " + e);
-				language = "unparsed";
-			}
+			String language = employ(new LanguageExtractor(notebooks.get(i)));
+			
 			if (languages.containsKey(language)) {
 				languages.put(language, languages.get(language) + 1);
 			} else {
@@ -77,6 +72,22 @@ public class Analyzer {
 		System.out.println("\n\n LANGUAGES \n");
 		for (String language: languages.keySet()) {
 			System.out.println(language + " (" + languages.get(language) + ")");
+		}
+	}
+	
+	private class LanguageExtractor extends Worker<String> {
+		public LanguageExtractor(Notebook notebook) {
+			super(notebook);
+		}
+		
+		@Override
+		public String call() throws Exception {
+			return notebook.language();
+		}
+
+		@Override
+		protected String defaultValue() {
+			return "unparsed";
 		}
 	}
 	
