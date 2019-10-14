@@ -108,7 +108,7 @@ public class Analyzer {
 		return totalLOC;
 	}
 	
-	private class TotalLOCCounter extends Worker {
+	private class TotalLOCCounter extends IntegerWorker {
 		public TotalLOCCounter(Notebook notebook) {
 			super(notebook);
 		}
@@ -119,7 +119,7 @@ public class Analyzer {
 		}
 	}
 	
-	private class NonBlankLOCCounter extends Worker {
+	private class NonBlankLOCCounter extends IntegerWorker {
 		public NonBlankLOCCounter(Notebook notebook) {
 			super(notebook);
 		}
@@ -130,7 +130,7 @@ public class Analyzer {
 		}
 	}
 	
-	private class BlankLOCCounter extends Worker {
+	private class BlankLOCCounter extends IntegerWorker {
 		public BlankLOCCounter(Notebook notebook) {
 			super(notebook);
 		}
@@ -165,7 +165,7 @@ public class Analyzer {
 		return totalNumCodeCells;
 	}
 	
-	private class CodeCellCounter extends Worker {
+	private class CodeCellCounter extends IntegerWorker {
 		public CodeCellCounter(Notebook notebook) {
 			super(notebook);
 		}
@@ -220,21 +220,36 @@ public class Analyzer {
 		}
 	}
 	
-	private abstract class Worker implements Callable<Integer>{
+	private abstract class Worker<T> implements Callable<T> {
 		protected Notebook notebook;
 		
 		Worker(Notebook notebook) {
 			this.notebook = notebook;
 		}
+		
+		/**
+		 * @return The value to return on failure.
+		 */
+		protected abstract T defaultValue();
 	}
 	
-	private int employ(Worker worker) {
+	private abstract class IntegerWorker extends Worker<Integer> {
+		public IntegerWorker(Notebook notebook) {
+			super(notebook);
+		}
+		
+		public Integer defaultValue() {
+			return 0;
+		}
+	}
+	
+	private <T> T employ(Worker<T> worker) {
 		try {
-			Future<Integer> result = executor.submit(worker);
+			Future<T> result = executor.submit(worker);
 			return result.get();
 		} catch (ExecutionException e) {
 			System.err.println(e.getMessage() + " Skipping!");
-			return 0;
+			return worker.defaultValue();
 		} catch (InterruptedException e) {
 			System.err.println("A thread was interrupted: " +
 					e.getMessage() + " Trying again!");

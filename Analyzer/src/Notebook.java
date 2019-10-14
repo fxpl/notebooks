@@ -18,6 +18,9 @@ public class Notebook {
 		this.path = path;
 	}
 	
+	/**
+	 * @return The file name of the notebook, without preceding path
+	 */
 	public String getName() {
 		int namePos = path.lastIndexOf('/') + 1;
 		return path.substring(namePos);
@@ -214,9 +217,6 @@ public class Notebook {
 			result = (JSONObject)new JSONParser().parse(reader);
 		} catch (IOException | ParseException e) {
 			throw new NotebookException("Could not parse " + this.path + ": " + e.toString());
-		} catch (RuntimeException e) {
-			// TODO: Test för detta!
-			throw new NotebookException("Runtime exception when parsing " + this.path + ": " + e.toString());
 		}
 		try {
 			reader.close();

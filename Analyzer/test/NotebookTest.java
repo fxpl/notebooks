@@ -125,5 +125,4 @@ public class NotebookTest {
 		Notebook notebook = new Notebook("nonexistent_file.txt");
 		notebook.numCodeCells();
 	}
-
 }
