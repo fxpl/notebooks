@@ -162,15 +162,12 @@ public class Notebook {
 			cells = new JSONArray();
 		}
 		if(notebook.containsKey("worksheets")) {
-			// Not according to spec, but occuring
+			// Not according to spec, but occurring
 			JSONArray worksheets = (JSONArray) notebook.get("worksheets");
 			for (int i=0; i<worksheets.size(); i++) {
 				JSONArray worksSheetCells = getCellArray((JSONObject) worksheets.get(i));
 				cells.addAll(worksSheetCells);
 			}
-		}
-		if (0 == cells.size()) {
-			System.err.println("No cells found in " + this.path);
 		}
 		return cells;
 	}
