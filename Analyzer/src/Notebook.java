@@ -18,6 +18,11 @@ public class Notebook {
 		this.path = path;
 	}
 	
+	public String getName() {
+		int namePos = path.lastIndexOf('/') + 1;
+		return path.substring(namePos);
+	}
+	
 	public String language() throws NotebookException {
 		JSONObject notebook = this.getNotebook();
 		if (null != notebook && notebook.containsKey("metadata")) {

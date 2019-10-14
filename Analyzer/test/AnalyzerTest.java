@@ -54,7 +54,7 @@ public class AnalyzerTest {
 				new FileReader(outputFile));
 		assertEquals("Header missing in LOC csv!", "total, non-blank, blank", outputReader.readLine());
 		for (int i=0; i<LOC.length; i++) {
-			String expectedLine = LOC[i] + ", " + (LOC[i]-emptyLOC[i]) + ", " + emptyLOC[i];
+			String expectedLine = files[i] + ", " + LOC[i] + ", " + (LOC[i]-emptyLOC[i]) + ", " + emptyLOC[i];
 			assertEquals("Wrong LOC written to output file:",
 					"" + expectedLine , outputReader.readLine());
 		}
@@ -97,9 +97,9 @@ public class AnalyzerTest {
 		BufferedReader outputReader = new BufferedReader(
 				new FileReader(outputFile));
 		assertEquals("Header missing in snippets csv!", "snippets", outputReader.readLine());
-		for (int expectedCells: numCodeCells) {
-			assertEquals("Wrong number of snippets written to output file:",
-					"" + expectedCells , outputReader.readLine());
+		for (int i =0; i<numCodeCells.length; i++) {
+			assertEquals("Wrong output i snippets file:",
+					files[i] + ", " + numCodeCells[i], outputReader.readLine());
 		}
 		
 		// Clean up

@@ -100,7 +100,8 @@ public class Analyzer {
 			int LOC = employ(new TotalLOCCounter(notebooks.get(i)));
 			int LOCNonBlank = employ(new NonBlankLOCCounter(notebooks.get(i)));
 			int LOCBlank = employ(new BlankLOCCounter(notebooks.get(i)));
-			writer.write(LOC + ", " + LOCNonBlank + ", " + LOCBlank + "\n");
+			String name = notebooks.get(i).getName();
+			writer.write(name + ", " + LOC + ", " + LOCNonBlank + ", " + LOCBlank + "\n");
 			totalLOC += LOC;
 		}
 		writer.close();
@@ -157,7 +158,7 @@ public class Analyzer {
 				System.out.println(totalNumCodeCells + " code cells found so far.");
 			}
 			int numCodeCells = employ(new CodeCellCounter(notebooks.get(i)));
-			writer.write(numCodeCells + "\n");
+			writer.write(notebooks.get(i).getName() + ", "+ numCodeCells + "\n");
 			totalNumCodeCells += numCodeCells;
 		}
 		writer.close();

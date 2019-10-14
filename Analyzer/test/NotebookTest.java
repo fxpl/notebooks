@@ -5,10 +5,21 @@ import org.junit.Test;
 public class NotebookTest {
 	
 	/**
+	 * Verify that getName returns the name of the notebook (without preceding
+	 * path).
+	 */
+	@Test
+	public void testGetName() {
+		Notebook notebook = new Notebook("made/up/path/empty.ipynb");
+		assertEquals("Wrong name of notebook!" , "empty.ipynb", notebook.getName());
+	}
+	
+	/**
 	 * Verify that the correct total number of lines of code are found in JSON
 	 * files.
 	 */
-	@Test public void testLOCTotal() {
+	@Test
+	public void testLOCTotal() {
 		String dataDir = "test/data/loc";
 		String[] files = {"markdownCells.ipynb", "one_codeCell_6loc.ipynb",
 				"two_codeCells_13loc.ipynb", "three_codeCells_2loc.ipynb",
