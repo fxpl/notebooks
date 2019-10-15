@@ -15,6 +15,37 @@ public class NotebookTest {
 	}
 	
 	/**
+	 * Verify that language is extracted correctly from notebooks.
+	 */
+	@Test
+	public void testLanguage() {
+		String dataDir = "test/data/lang";
+		String[] files = {"empty.ipynb", "empty_metadata.ipynb", "k_l_cpp.ipynb",
+				"k_l_python.ipynb", "k_l_python3.ipynb", "k_l_julia.ipynb",
+				"k_l_R.ipynb", "k_l_r.ipynb",
+				"k_l_scala.ipynb", "k_l_scala210.ipynb", "k_n_python.ipynb",
+				"l_julia.ipynb", "l_Julia.ipynb", "l_Python.ipynb", "l_Scala.ipynb",
+				"li_n_python.ipynb", "code_cells_amb.ipynb", "code_cells_amb2.ipynb",
+				"code_cells_nolang.ipynb", "code_cells_python.ipynb"};
+		Language[] languages = {Language.UNKNOWN, Language.UNKNOWN, Language.OTHER,
+				Language.PYTHON, Language.PYTHON, Language.JULIA,
+				Language.R, Language.R,
+				Language.SCALA, Language.SCALA, Language.PYTHON,
+				Language.JULIA, Language.JULIA, Language.PYTHON, Language.SCALA,
+				Language.PYTHON, Language.UNKNOWN, Language.UNKNOWN,
+				Language.UNKNOWN, Language.PYTHON};
+		for (int i=0; i<files.length; i++) {
+			String fileName = files[i];
+			Notebook notebook = new Notebook(dataDir + "/" + fileName);
+			try {
+				assertEquals("Wrong language:", languages[i], notebook.language());
+			} catch(NotebookException e) {
+				fail("Could not extract language: " + e.getMessage());
+			}
+		}
+	}
+	
+	/**
 	 * Verify that the correct total number of lines of code are found in JSON
 	 * files.
 	 */

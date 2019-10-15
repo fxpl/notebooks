@@ -82,7 +82,7 @@ public class Analyzer {
 		
 		@Override
 		public String call() throws Exception {
-			return notebook.language();
+			return notebook.language().toString();
 		}
 
 		@Override

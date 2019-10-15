@@ -26,33 +26,42 @@ public class Notebook {
 		return path.substring(namePos);
 	}
 	
-	public String language() throws NotebookException {
+	private Language getLanguage(String spec) {
+		if (spec.equals("julia") || spec.equals("Julia")) {
+			return Language.JULIA;
+		} else if (spec.startsWith("python") || spec.startsWith("Python")) {
+			return Language.PYTHON;
+		} else if (spec.equals("R") || spec.equals("r")) {
+			return Language.R;
+		} else if (spec.startsWith("scala") || spec.startsWith("Scala")) {
+			return Language.SCALA;
+		} else {
+			return Language.OTHER;
+		}
+	}
+	
+	public Language language() throws NotebookException {
 		JSONObject notebook = this.getNotebook();
-		if (null != notebook && notebook.containsKey("metadata")) {
+		if (notebook.containsKey("metadata")) {
+			// TODO: Extract method!
 			JSONObject metadata = (JSONObject) notebook.get("metadata");
-			if (null != metadata && metadata.containsKey("kernelspec")) {
-				JSONObject kernelspec = (JSONObject)metadata.get("kernelspec");
-				if (null != kernelspec && kernelspec.containsKey("language")) {
-					return "kernelspec:language:" + kernelspec.get("language");
-				}
-				if (null != kernelspec && kernelspec.containsKey("name")) {
-					return "kernelspec:name:" + kernelspec.get("name");
-				}
-				if (null != kernelspec && kernelspec.containsKey("display_name")) {
-					return "kernelspec:display_name:" + kernelspec.get("display_name");
-				}
+			if (metadata.containsKey("language")) {
+				return getLanguage((String)metadata.get("language"));
 			}
-			if (null!=metadata && metadata.containsKey("language_info")) {
+			if (metadata.containsKey("language_info")) {
 				JSONObject languageinfo = (JSONObject)metadata.get("language_info");
-				if (null != languageinfo && languageinfo.containsKey("name")) {
-					return "language_info:name:" + languageinfo.get("name");
-				}
-				if (null!= languageinfo && languageinfo.containsKey("version")) {
-					return "language_info:version:" + languageinfo.get("version");
+				if (languageinfo.containsKey("name")) {
+					return getLanguage((String)languageinfo.get("name"));
 				}
 			}
-			if (null != metadata && metadata.containsKey("language")) {
-				return "language:" + metadata.get("language");
+			if (metadata.containsKey("kernelspec")) {
+				JSONObject kernelspec = (JSONObject)metadata.get("kernelspec");
+				if (kernelspec.containsKey("language")) {
+					return getLanguage((String) kernelspec.get("language"));
+				}
+				if (kernelspec.containsKey("name")) {
+					return getLanguage((String)kernelspec.get("name"));
+				}
 			}
 		} else {
 			System.err.println("No metadata in " + this.path);
@@ -61,20 +70,20 @@ public class Notebook {
 		if (0 < codeCells.size()) {
 			String language = "";
 			JSONObject cell = codeCells.get(0);
-			if (null != cell && cell.containsKey("language")) {
+			if (cell.containsKey("language")) {
 				language = (String) cell.get("language");
-				for (int i=1; i< codeCells.size(); i++) {
+				for (int i=1; i<codeCells.size(); i++) {
 					cell = codeCells.get(i);
 					if (!cell.containsKey("language") || !((String)cell.get("language")).equals(language)) {
 						System.err.println("Ambiguous language in " + this.path);
-						return "unknown";
+						return Language.UNKNOWN;
 					}
 				}
-				return "codecells:language:" + language;
+				return getLanguage(language);
 			}
 		}
 		System.err.println("No language found in " + this.path);
-		return "unknown";
+		return Language.UNKNOWN;
 	}
 	
 	/**
