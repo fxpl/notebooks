@@ -62,10 +62,18 @@ public class Analyzer {
 		for (Language language: Language.values()) {
 			languages.put(language, 0);
 		}
+		Writer writer = new FileWriter("languages" + LocalDateTime.now() + ".csv");
+		writer.write("file, language\n");
 		for (int i=0; i<notebooks.size(); i++) {
+			if (0 == i%10000) {
+				System.out.println("Extracting language from notebook " + i);
+			}
 			Language language = employ(new LanguageExtractor(notebooks.get(i)));
 			languages.put(language, languages.get(language) + 1);
+			String name = notebooks.get(i).getName();
+			writer.write(name + ", " + language + "\n");
 		}
+		writer.close();
 		return languages;
 	}
 	

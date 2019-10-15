@@ -22,6 +22,10 @@ public class AnalyzerTest {
 	
 	// TODO: mappar i andra test, mindre kodduplicering!
 	
+	/**
+	 * Verify that the right languages are found in the notebooks.
+	 * @throws IOException
+	 */
 	@Test
 	public void testLanguage_total() throws IOException {
 		analyzer.initializeNotebooksFrom("test/data/lang");
@@ -36,9 +40,36 @@ public class AnalyzerTest {
 		assertEquals("Error in language extraction:", expected, actual);
 	}
 	
+	/**
+	 * Verify that the output file languages<current-date-time>.csv is created
+	 * and filled correctly when the languages are extracted.
+	 * @throws IOException
+	 */
 	@Test
-	public void testLanguage_csv() {
-		// TODO
+	public void testLanguage_csv() throws IOException {
+		// Analyze files
+		String dataDir = "test/data/lang";
+		String[] files = {"k_l_cpp.ipynb", "k_l_R.ipynb", "li_n_python.ipynb"};
+		Language[] languages = {Language.OTHER, Language.R, Language.PYTHON};
+		for (String file: files) {
+			analyzer.initializeNotebooksFrom(dataDir + "/" + file);
+		}
+		analyzer.languages();
+		
+		// Check results
+		File outputFile = lastLanguageFile();
+		BufferedReader outputReader = new BufferedReader(
+				new FileReader(outputFile));
+		assertEquals("Header missing in language csv!", "file, language", outputReader.readLine());
+		for (int i=0; i<languages.length; i++) {
+			String expectedLine = files[i] + ", " + languages[i];;
+			assertEquals("Wrong language written to output file:",
+					"" + expectedLine , outputReader.readLine());
+		}
+		
+		// Clean up
+		outputReader.close();
+		outputFile.delete();
 	}
 	
 	/**
@@ -75,6 +106,7 @@ public class AnalyzerTest {
 		File outputFile = lastLOCFile();
 		BufferedReader outputReader = new BufferedReader(
 				new FileReader(outputFile));
+		// TODO: Varför failar inte den här när vi har lagt till filnamn?!
 		assertEquals("Header missing in LOC csv!", "total, non-blank, blank", outputReader.readLine());
 		for (int i=0; i<LOC.length; i++) {
 			String expectedLine = files[i] + ", " + LOC[i] + ", " + (LOC[i]-emptyLOC[i]) + ", " + emptyLOC[i];
@@ -138,6 +170,15 @@ public class AnalyzerTest {
 		analyzer.initializeNotebooksFrom("test/data/count");
 		assertEquals("Wrong number of notebooks found:", 12, analyzer.numNotebooks());
 	}
+	
+	/**
+	 * @return File handler to the language output file with greatest (latest)
+	 * file name
+	 */
+	private File lastLanguageFile() {
+		return lastFile("languages");
+	}
+	
 	
 	/**
 	 * @return File handler to the LOC output file with greatest (latest) file name
