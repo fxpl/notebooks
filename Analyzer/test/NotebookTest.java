@@ -36,8 +36,7 @@ public class NotebookTest {
 				Language.PYTHON, Language.UNKNOWN, Language.UNKNOWN,
 				Language.UNKNOWN, Language.PYTHON};
 		for (int i=0; i<files.length; i++) {
-			String fileName = files[i];
-			Notebook notebook = new Notebook(dataDir + "/" + fileName);
+			Notebook notebook = new Notebook(dataDir + "/" + files[i]);
 			assertEquals("Wrong language:", languages[i], notebook.language());
 		}
 	}
@@ -54,8 +53,7 @@ public class NotebookTest {
 				LangSpec.METADATA_KERNELSPEC_NAME, LangSpec.METADATA_LANGUAGE,
 				LangSpec.METADATA_LANGUAGEINFO_NAME, LangSpec.CODE_CELLS, LangSpec.CODE_CELLS};
 		for (int i=0; i<files.length; i++) {
-			String fileName = files[i];
-			Notebook notebook = new Notebook(dataDir + "/" + fileName);
+			Notebook notebook = new Notebook(dataDir + "/" + files[i]);
 			assertEquals("Wrong language specification location:", langSpecs[i], notebook.langSpec());
 		}
 	}
@@ -74,8 +72,7 @@ public class NotebookTest {
 				"two_codeCells_26loc_worksheet.ipynb"};
 		int[] LOC = {0, 6, 13, 2, 3, 2, 23};
 		for (int i=0; i<files.length; i++) {
-			String fileName = files[i];
-			Notebook notebook = new Notebook(dataDir + "/" + fileName);
+			Notebook notebook = new Notebook(dataDir + "/" + files[i]);
 			assertEquals("Wrong LOC!", LOC[i], notebook.LOC());
 		}
 	}
@@ -129,8 +126,7 @@ public class NotebookTest {
 				"missing_cell_type.ipynb", "four_cells_and_worksheets.ipynb"};
 		int[] numCodeCells = {0, 1, 2, 3, 3, 0, 0, 2, 4};
 		for (int i=0; i<files.length; i++) {
-			String fileName = files[i];
-			Notebook notebook = new Notebook(dataDir + "/" + fileName);
+			Notebook notebook = new Notebook(dataDir + "/" + files[i]);
 			assertEquals("Wrong number of code cells!",
 					numCodeCells[i], notebook.numCodeCells());
 		}
