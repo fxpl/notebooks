@@ -42,6 +42,24 @@ public class NotebookTest {
 		}
 	}
 	
+	@Test
+	public void testLangSpec() throws NotebookException {
+		String dataDir = "test/data/lang";
+		String[] files = {"empty.ipynb", "empty_metadata.ipynb",
+				"k_l_cpp.ipynb", "k_l_python.ipynb",
+				"k_n_python.ipynb", "l_julia.ipynb",
+				"li_n_python.ipynb", "code_cells_amb.ipynb", "code_cells_python.ipynb"};
+		LangSpec[] langSpecs = {LangSpec.NONE, LangSpec.NONE,
+				LangSpec.METADATA_KERNELSPEC_LANGUAGE, LangSpec.METADATA_KERNELSPEC_LANGUAGE,
+				LangSpec.METADATA_KERNELSPEC_NAME, LangSpec.METADATA_LANGUAGE,
+				LangSpec.METADATA_LANGUAGEINFO_NAME, LangSpec.CODE_CELLS, LangSpec.CODE_CELLS};
+		for (int i=0; i<files.length; i++) {
+			String fileName = files[i];
+			Notebook notebook = new Notebook(dataDir + "/" + fileName);
+			assertEquals("Wrong language specification location:", langSpecs[i], notebook.langSpec());
+		}
+	}
+	
 	/**
 	 * Verify that the correct total number of lines of code are found in JSON
 	 * files.

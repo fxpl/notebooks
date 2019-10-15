@@ -13,6 +13,7 @@ public class Notebook {
 	private int locBlank;		// Number of empty code lines
 	private int locContents;	// Number of non-empty code lines
 	private boolean locCounted = false;
+	private LangSpec languageSpecIn;
 	
 	public Notebook(String path) {
 		this.path = path;
@@ -31,6 +32,7 @@ public class Notebook {
 	 */
 	public Language language() throws NotebookException {
 		JSONObject notebook = this.getNotebook();
+		this.languageSpecIn = LangSpec.NONE;
 		Language language = getLanguageFromMetadata(notebook);
 		if (Language.UNKNOWN == language) {
 			language = getLanguageFromCodeCells(notebook);
@@ -39,6 +41,16 @@ public class Notebook {
 			System.err.println("No language found in " + this.path);
 		}
 		return language;
+	}
+	
+	/**
+	 * @return Identifier of the location from which the language is extracted
+	 */
+	public LangSpec langSpec() throws NotebookException {
+		if (null == languageSpecIn) {
+			language();
+		}
+		return languageSpecIn;
 	}
 	
 	/**
@@ -194,6 +206,7 @@ public class Notebook {
 			String language = "";
 			JSONObject cell = codeCells.get(0);
 			if (cell.containsKey("language")) {
+				languageSpecIn = LangSpec.CODE_CELLS;
 				language = (String) cell.get("language");
 				for (int i=1; i<codeCells.size(); i++) {
 					cell = codeCells.get(i);
@@ -237,9 +250,11 @@ public class Notebook {
 		if (metadata.containsKey("kernelspec")) {
 			JSONObject kernelspec = (JSONObject)metadata.get("kernelspec");
 			if (kernelspec.containsKey("language")) {
+				languageSpecIn = LangSpec.METADATA_KERNELSPEC_LANGUAGE;
 				return getLanguage((String) kernelspec.get("language"));
 			}
 			if (kernelspec.containsKey("name")) {
+				languageSpecIn = LangSpec.METADATA_KERNELSPEC_NAME;
 				return getLanguage((String)kernelspec.get("name"));
 			}
 		}
@@ -252,6 +267,7 @@ public class Notebook {
 	 */
 	private Language getLanguageFromLanguage(JSONObject metadata) {
 		if (metadata.containsKey("language")) {
+			languageSpecIn = LangSpec.METADATA_LANGUAGE;
 			return getLanguage((String)metadata.get("language"));
 		}
 		return Language.UNKNOWN;
@@ -265,6 +281,7 @@ public class Notebook {
 		if (metadata.containsKey("language_info")) {
 			JSONObject languageinfo = (JSONObject)metadata.get("language_info");
 			if (languageinfo.containsKey("name")) {
+				languageSpecIn = LangSpec.METADATA_LANGUAGEINFO_NAME;
 				return getLanguage((String)languageinfo.get("name"));
 			}
 		}
