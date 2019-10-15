@@ -139,30 +139,31 @@ public class AnalyzerTest {
 		assertEquals("Wrong number of notebooks found:", 12, analyzer.numNotebooks());
 	}
 	
-	// TODO: Mer generell metod for outputfiler!
 	/**
 	 * @return File handler to the LOC output file with greatest (latest) file name
 	 */
 	private File lastLOCFile() {
-		File directory = new File(".");
-		String outputFileName = "loc.csv";
-		for (String currentFileName: directory.list()) {
-			if (currentFileName.matches("loc\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}\\.csv")
-					&& currentFileName.compareTo(outputFileName) > 0) {
-				outputFileName = currentFileName;
-			}
-		}
-		return new File(outputFileName);
+		return lastFile("loc");
 	}
 	
 	/**
 	 * @return File handler to the snippet output file with greatest (latest) file name
 	 */
 	private File lastSnippetFile() {
+		return lastFile("snippets");
+	}
+	
+	/**
+	 * Find the output file <prefix><timestamp>.csv with the greatest (latest)
+	 * time stamp.
+	 * @param prefix First part of the output file
+	 * @return Output file described above 
+	 */
+	private File lastFile(String prefix) {
 		File directory = new File(".");
-		String outputFileName = "snippets.csv";
+		String outputFileName = prefix + ".csv";
 		for (String currentFileName: directory.list()) {
-			if (currentFileName.matches("snippets\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}\\.csv")
+			if (currentFileName.matches(prefix + "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}\\.csv")
 					&& currentFileName.compareTo(outputFileName) > 0) {
 				outputFileName = currentFileName;
 			}
