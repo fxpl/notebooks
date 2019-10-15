@@ -16,9 +16,10 @@ public class NotebookTest {
 	
 	/**
 	 * Verify that language is extracted correctly from notebooks.
+	 * @throws NotebookException 
 	 */
 	@Test
-	public void testLanguage() {
+	public void testLanguage() throws NotebookException {
 		String dataDir = "test/data/lang";
 		String[] files = {"empty.ipynb", "empty_metadata.ipynb", "k_l_cpp.ipynb",
 				"k_l_python.ipynb", "k_l_python3.ipynb", "k_l_julia.ipynb",
@@ -37,20 +38,17 @@ public class NotebookTest {
 		for (int i=0; i<files.length; i++) {
 			String fileName = files[i];
 			Notebook notebook = new Notebook(dataDir + "/" + fileName);
-			try {
-				assertEquals("Wrong language:", languages[i], notebook.language());
-			} catch(NotebookException e) {
-				fail("Could not extract language: " + e.getMessage());
-			}
+			assertEquals("Wrong language:", languages[i], notebook.language());
 		}
 	}
 	
 	/**
 	 * Verify that the correct total number of lines of code are found in JSON
 	 * files.
+	 * @throws NotebookException 
 	 */
 	@Test
-	public void testLOCTotal() {
+	public void testLOCTotal() throws NotebookException {
 		String dataDir = "test/data/loc";
 		String[] files = {"markdownCells.ipynb", "one_codeCell_6loc.ipynb",
 				"two_codeCells_13loc.ipynb", "three_codeCells_2loc.ipynb",
@@ -60,65 +58,52 @@ public class NotebookTest {
 		for (int i=0; i<files.length; i++) {
 			String fileName = files[i];
 			Notebook notebook = new Notebook(dataDir + "/" + fileName);
-			try {
-				assertEquals("Wrong LOC!", LOC[i], notebook.LOC());
-			} catch (NotebookException e) {
-				fail("Could not count LOC: " + e.getMessage());
-			}
+			assertEquals("Wrong LOC!", LOC[i], notebook.LOC());
 		}
 	}
 	
 	/**
 	 * Verify that the correct total number of blank code lines are found in
 	 * JSON files.
+	 * @throws NotebookException 
 	 */
 	@Test
-	public void testLOCBlank() {
+	public void testLOCBlank() throws NotebookException {
 		Notebook notebook = new Notebook("test/data/loc/two_codeCells_13loc.ipynb");
-		try {
-			assertEquals("Wrong number of blank lines!", 2, notebook.LOCBlank());
-		} catch(NotebookException e) {
-			fail("Could not count blank LOC: " + e.getMessage());
-		}
+		assertEquals("Wrong number of blank lines!", 2, notebook.LOCBlank());
 	}
 	
 	/**
 	 * Verify that the correct total number of non-blank code lines are found
 	 * in JSON files.
+	 * @throws NotebookException 
 	 */
 	@Test
-	public void testLOCNonBlank() {
+	public void testLOCNonBlank() throws NotebookException {
 		Notebook notebook = new Notebook("test/data/loc/two_codeCells_13loc.ipynb");
-		try {
-			assertEquals("Wrong number of non-blank lines!", 11, notebook.LOCNonBlank());
-		} catch (NotebookException e) {
-			fail("Could not count non-blank LOC: " + e.getMessage());
-		}
-		
+		assertEquals("Wrong number of non-blank lines!", 11, notebook.LOCNonBlank());
 	}
 	
 	/**
 	 * Verify that all kinds of lines of code are counted correctly, also when
 	 * the methods are called after each other.
+	 * @throws NotebookException 
 	 */
 	@Test
-	public void testLOCAll() {
+	public void testLOCAll() throws NotebookException {
 		Notebook notebook = new Notebook("test/data/loc/two_codeCells_13loc.ipynb");
-		try {
-			assertEquals("Wrong LOC!", 13, notebook.LOC());
-			assertEquals("Wrong second LOC!", 13, notebook.LOC());
-			assertEquals("Wrong number of blank lines!", 2, notebook.LOCBlank());
-			assertEquals("Wrong number of non-blank lines!", 11, notebook.LOCNonBlank());
-		} catch (NotebookException e) {
-			fail("Could not count code lines: " + e.getMessage());
-		}
+		assertEquals("Wrong LOC!", 13, notebook.LOC());
+		assertEquals("Wrong second LOC!", 13, notebook.LOC());
+		assertEquals("Wrong number of blank lines!", 2, notebook.LOCBlank());
+		assertEquals("Wrong number of non-blank lines!", 11, notebook.LOCNonBlank());
 	}
 	
 	/**
 	 * Verify that the correct number of code cells are found in JSON files.
+	 * @throws NotebookException 
 	 */
 	@Test
-	public void testNumCodeCells() {
+	public void testNumCodeCells() throws NotebookException {
 		String dataDir = "test/data/count";
 		String[] files = {"zero.ipynb", "one.ipynb", "two.ipynb",
 				"three_with_md.ipynb", "three_in_worksheets.ipynb",
@@ -128,12 +113,8 @@ public class NotebookTest {
 		for (int i=0; i<files.length; i++) {
 			String fileName = files[i];
 			Notebook notebook = new Notebook(dataDir + "/" + fileName);
-			try {
-				assertEquals("Wrong number of code cells!",
-						numCodeCells[i], notebook.numCodeCells());
-			} catch (NotebookException e) {
-				fail("Could not count code cells: " + e.getMessage());
-			}
+			assertEquals("Wrong number of code cells!",
+					numCodeCells[i], notebook.numCodeCells());
 		}
 	}
 
