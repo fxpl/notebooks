@@ -62,7 +62,7 @@ public class AnalyzerTest {
 		File outputFile = lastLanguageFile();
 		BufferedReader outputReader = new BufferedReader(
 				new FileReader(outputFile));
-		assertEquals("Header missing in language csv!", "file, language", outputReader.readLine());
+		assertEquals("Wrong header in language csv!", "file, language", outputReader.readLine());
 		for (int i=0; i<languages.length; i++) {
 			String expectedLine = files[i] + ", " + languages[i] + ", " + langSpecs[i];
 			assertEquals("Wrong language written to output file:",
@@ -109,7 +109,7 @@ public class AnalyzerTest {
 		BufferedReader outputReader = new BufferedReader(
 				new FileReader(outputFile));
 		// TODO: Varför failar inte den här när vi har lagt till filnamn?!
-		assertEquals("Header missing in LOC csv!", "total, non-blank, blank", outputReader.readLine());
+		assertEquals("Wrong header in LOC csv!", "file, total, non-blank, blank", outputReader.readLine());
 		for (int i=0; i<LOC.length; i++) {
 			String expectedLine = files[i] + ", " + LOC[i] + ", " + (LOC[i]-emptyLOC[i]) + ", " + emptyLOC[i];
 			assertEquals("Wrong LOC written to output file:",
@@ -153,7 +153,7 @@ public class AnalyzerTest {
 		File outputFile = lastSnippetFile();
 		BufferedReader outputReader = new BufferedReader(
 				new FileReader(outputFile));
-		assertEquals("Header missing in snippets csv!", "snippets", outputReader.readLine());
+		assertEquals("Wrong header in snippets csv!", "file, snippets", outputReader.readLine());
 		for (int i =0; i<numCodeCells.length; i++) {
 			assertEquals("Wrong output i snippets file:",
 					files[i] + ", " + numCodeCells[i], outputReader.readLine());
