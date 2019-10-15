@@ -26,64 +26,19 @@ public class Notebook {
 		return path.substring(namePos);
 	}
 	
-	private Language getLanguage(String spec) {
-		if (spec.equals("julia") || spec.equals("Julia")) {
-			return Language.JULIA;
-		} else if (spec.startsWith("python") || spec.startsWith("Python")) {
-			return Language.PYTHON;
-		} else if (spec.equals("R") || spec.equals("r")) {
-			return Language.R;
-		} else if (spec.startsWith("scala") || spec.startsWith("Scala")) {
-			return Language.SCALA;
-		} else {
-			return Language.OTHER;
-		}
-	}
-	
+	/**
+	 * @return The language of the notebook
+	 */
 	public Language language() throws NotebookException {
 		JSONObject notebook = this.getNotebook();
-		if (notebook.containsKey("metadata")) {
-			// TODO: Extract method!
-			JSONObject metadata = (JSONObject) notebook.get("metadata");
-			if (metadata.containsKey("language")) {
-				return getLanguage((String)metadata.get("language"));
-			}
-			if (metadata.containsKey("language_info")) {
-				JSONObject languageinfo = (JSONObject)metadata.get("language_info");
-				if (languageinfo.containsKey("name")) {
-					return getLanguage((String)languageinfo.get("name"));
-				}
-			}
-			if (metadata.containsKey("kernelspec")) {
-				JSONObject kernelspec = (JSONObject)metadata.get("kernelspec");
-				if (kernelspec.containsKey("language")) {
-					return getLanguage((String) kernelspec.get("language"));
-				}
-				if (kernelspec.containsKey("name")) {
-					return getLanguage((String)kernelspec.get("name"));
-				}
-			}
-		} else {
-			System.err.println("No metadata in " + this.path);
+		Language language = getLanguageFromMetadata(notebook);
+		if (Language.UNKNOWN == language) {
+			language = getLanguageFromCodeCells(notebook);
 		}
-		List<JSONObject> codeCells = this.getCodeCells(notebook);
-		if (0 < codeCells.size()) {
-			String language = "";
-			JSONObject cell = codeCells.get(0);
-			if (cell.containsKey("language")) {
-				language = (String) cell.get("language");
-				for (int i=1; i<codeCells.size(); i++) {
-					cell = codeCells.get(i);
-					if (!cell.containsKey("language") || !((String)cell.get("language")).equals(language)) {
-						System.err.println("Ambiguous language in " + this.path);
-						return Language.UNKNOWN;
-					}
-				}
-				return getLanguage(language);
-			}
+		if (Language.UNKNOWN == language) {
+			System.err.println("No language found in " + this.path);
 		}
-		System.err.println("No language found in " + this.path);
-		return Language.UNKNOWN;
+		return language;
 	}
 	
 	/**
@@ -208,6 +163,112 @@ public class Notebook {
 			}
 		}
 		return result;
+	}
+	
+	/**
+	 * Translate a string specifying the language to a Language value.
+	 * @param spec String specifying the language
+	 * @return The corresponding Language
+	 */
+	private Language getLanguage(String spec) {
+		if (spec.equals("julia") || spec.equals("Julia")) {
+			return Language.JULIA;
+		} else if (spec.startsWith("python") || spec.startsWith("Python")) {
+			return Language.PYTHON;
+		} else if (spec.equals("R") || spec.equals("r")) {
+			return Language.R;
+		} else if (spec.startsWith("scala") || spec.startsWith("Scala")) {
+			return Language.SCALA;
+		} else {
+			return Language.OTHER;
+		}
+	}
+
+	/**
+	 * @param notebook Notebook to extract language from
+	 * @return The language specified in code cells, if it exists and is consistent. UNKNOWN otherwise.
+	 */
+	private Language getLanguageFromCodeCells(JSONObject notebook) {
+		List<JSONObject> codeCells = this.getCodeCells(notebook);
+		if (0 < codeCells.size()) {
+			String language = "";
+			JSONObject cell = codeCells.get(0);
+			if (cell.containsKey("language")) {
+				language = (String) cell.get("language");
+				for (int i=1; i<codeCells.size(); i++) {
+					cell = codeCells.get(i);
+					if (!cell.containsKey("language") || !((String)cell.get("language")).equals(language)) {
+						System.err.println("Ambiguous language in " + this.path);
+						return Language.UNKNOWN;
+					}
+				}
+				return getLanguage(language);
+			}
+		}
+		return Language.UNKNOWN;
+	}
+
+	/**
+	 * @param notebook Notebook to extract language from
+	 * @return The language specified in metadata, if any. UNKNOWN otherwise.
+	 */
+	private Language getLanguageFromMetadata(JSONObject notebook) {
+		Language language = Language.UNKNOWN;
+		if (notebook.containsKey("metadata")) {
+			JSONObject metadata = (JSONObject) notebook.get("metadata");
+			language = getLanguageFromLanguage(metadata);
+			if (Language.UNKNOWN == language) {
+				language = getLanguageFromLanguageinfo(metadata);
+			}
+			if (Language.UNKNOWN == language) {
+				language = getLanguageFromKernelspec(metadata);
+			}
+		} else {
+			System.err.println("No metadata in " + this.path);
+		}
+		return language;
+	}
+
+	/**
+	 * @param metadata Metadata to analyze
+	 * @return The language specified in metadata->kernelspec. UNKNOWN otherwise.
+	 */
+	private Language getLanguageFromKernelspec(JSONObject metadata) {
+		if (metadata.containsKey("kernelspec")) {
+			JSONObject kernelspec = (JSONObject)metadata.get("kernelspec");
+			if (kernelspec.containsKey("language")) {
+				return getLanguage((String) kernelspec.get("language"));
+			}
+			if (kernelspec.containsKey("name")) {
+				return getLanguage((String)kernelspec.get("name"));
+			}
+		}
+		return Language.UNKNOWN;
+	}
+	
+	/**
+	 * @param metadata Metadata to analyze
+	 * @return The language specified in metadata->language, if any. UNKNOWN otherwise.
+	 */
+	private Language getLanguageFromLanguage(JSONObject metadata) {
+		if (metadata.containsKey("language")) {
+			return getLanguage((String)metadata.get("language"));
+		}
+		return Language.UNKNOWN;
+	}
+	
+	/**
+	 * @param metadata Metadata to analyze
+	 * @return The language specified in metadata->language_info, if any. UNKNOWN otherwise.
+	 */
+	private Language getLanguageFromLanguageinfo(JSONObject metadata) {
+		if (metadata.containsKey("language_info")) {
+			JSONObject languageinfo = (JSONObject)metadata.get("language_info");
+			if (languageinfo.containsKey("name")) {
+				return getLanguage((String)languageinfo.get("name"));
+			}
+		}
+		return Language.UNKNOWN;
 	}
 	
 	/**
