@@ -38,7 +38,7 @@ public class AnalyzerTest {
 		expected.put(Language.UNKNOWN, 6);
 		Map<Language, Integer> actual = analyzer.languages();
 		assertEquals("Error in language extraction:", expected, actual);
-		lastLanguageFile().delete();
+		lastOutputFile("languages").delete();
 	}
 	
 	/**
@@ -59,7 +59,7 @@ public class AnalyzerTest {
 		analyzer.languages();
 		
 		// Check results
-		File outputFile = lastLanguageFile();
+		File outputFile = lastOutputFile("languages");
 		BufferedReader outputReader = new BufferedReader(
 				new FileReader(outputFile));
 		assertEquals("Wrong header in language csv!", "file, language", outputReader.readLine());
@@ -83,7 +83,7 @@ public class AnalyzerTest {
 	public void testLOC_total() throws IOException {
 		analyzer.initializeNotebooksFrom("test/data/loc");
 		assertEquals("Wrong LOC!", 49, analyzer.LOC());
-		lastLOCFile().delete();
+		lastOutputFile("loc").delete();
 	}
 	
 	/** TODO: Extract methods to reduce code duplication!
@@ -105,10 +105,9 @@ public class AnalyzerTest {
 		analyzer.LOC();
 		
 		// Check results
-		File outputFile = lastLOCFile();
+		File outputFile = lastOutputFile("loc");
 		BufferedReader outputReader = new BufferedReader(
 				new FileReader(outputFile));
-		// TODO: Varför failar inte den här när vi har lagt till filnamn?!
 		assertEquals("Wrong header in LOC csv!", "file, total, non-blank, blank", outputReader.readLine());
 		for (int i=0; i<LOC.length; i++) {
 			String expectedLine = files[i] + ", " + LOC[i] + ", " + (LOC[i]-emptyLOC[i]) + ", " + emptyLOC[i];
@@ -130,7 +129,7 @@ public class AnalyzerTest {
 	public void testNumCodeCells_total() throws IOException {
 		analyzer.initializeNotebooksFrom("test/data/count");
 		assertEquals("Wrong number of cells found in notebooks!", 15, analyzer.numCodeCells());
-		lastSnippetFile().delete();
+		lastOutputFile("snippets").delete();
 	}
 	
 	/**
@@ -150,7 +149,7 @@ public class AnalyzerTest {
 		analyzer.numCodeCells();
 		
 		// Check results
-		File outputFile = lastSnippetFile();
+		File outputFile = lastOutputFile("snippets");
 		BufferedReader outputReader = new BufferedReader(
 				new FileReader(outputFile));
 		assertEquals("Wrong header in snippets csv!", "file, snippets", outputReader.readLine());
@@ -174,35 +173,12 @@ public class AnalyzerTest {
 	}
 	
 	/**
-	 * @return File handler to the language output file with greatest (latest)
-	 * file name
-	 */
-	private File lastLanguageFile() {
-		return lastFile("languages");
-	}
-	
-	
-	/**
-	 * @return File handler to the LOC output file with greatest (latest) file name
-	 */
-	private File lastLOCFile() {
-		return lastFile("loc");
-	}
-	
-	/**
-	 * @return File handler to the snippet output file with greatest (latest) file name
-	 */
-	private File lastSnippetFile() {
-		return lastFile("snippets");
-	}
-	
-	/**
 	 * Find the output file <prefix><timestamp>.csv with the greatest (latest)
 	 * time stamp.
 	 * @param prefix First part of the output file
 	 * @return Output file described above 
 	 */
-	private File lastFile(String prefix) {
+	private File lastOutputFile(String prefix) {
 		File directory = new File(".");
 		String outputFileName = prefix + ".csv";
 		for (String currentFileName: directory.list()) {
