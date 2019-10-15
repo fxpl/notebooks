@@ -57,37 +57,31 @@ public class Analyzer {
 		executor.shutdown();
 	}
 	
-	public void languages() throws IOException {
-		Map<String, Integer> languages = new HashMap<String, Integer>();
+	public Map<Language, Integer> languages() throws IOException {
+		Map<Language, Integer> languages = new HashMap<Language, Integer>();
+		for (Language language: Language.values()) {
+			languages.put(language, 0);
+		}
 		for (int i=0; i<notebooks.size(); i++) {
-			String language = employ(new LanguageExtractor(notebooks.get(i)));
-			
-			if (languages.containsKey(language)) {
-				languages.put(language, languages.get(language) + 1);
-			} else {
-				languages.put(language, 1);
-			}
+			Language language = employ(new LanguageExtractor(notebooks.get(i)));
+			languages.put(language, languages.get(language) + 1);
 		}
-		
-		System.out.println("\n\n LANGUAGES \n");
-		for (String language: languages.keySet()) {
-			System.out.println(language + " (" + languages.get(language) + ")");
-		}
+		return languages;
 	}
 	
-	private class LanguageExtractor extends Worker<String> {
+	private class LanguageExtractor extends Worker<Language> {
 		public LanguageExtractor(Notebook notebook) {
 			super(notebook);
 		}
 		
 		@Override
-		public String call() throws Exception {
-			return notebook.language().toString();
+		public Language call() throws Exception {
+			return notebook.language();
 		}
 
 		@Override
-		protected String defaultValue() {
-			return "unparsed";
+		protected Language defaultValue() {
+			return Language.UNKNOWN;
 		}
 	}
 	
@@ -211,7 +205,12 @@ public class Analyzer {
 				break;
 			case "-lang":				
 				try {
-					this.languages();
+					Map<Language, Integer> languages = this.languages();
+					System.out.println("\nLANGUAGES:");
+					for (Language language: languages.keySet()) {
+						System.out.println(language + ": " + languages.get(language));
+					}
+					System.out.println("");
 				} catch (IOException e) {
 					System.err.println("Exception: " + e);
 					e.printStackTrace();

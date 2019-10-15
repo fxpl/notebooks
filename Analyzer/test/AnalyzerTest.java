@@ -1,6 +1,8 @@
 import static org.junit.Assert.*;
 
 import java.io.*;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.*;
 
@@ -16,6 +18,27 @@ public class AnalyzerTest {
 	@After
 	public void tearDown() {
 		analyzer.shutDown();
+	}
+	
+	// TODO: mappar i andra test, mindre kodduplicering!
+	
+	@Test
+	public void testLanguage_total() throws IOException {
+		analyzer.initializeNotebooksFrom("test/data/lang");
+		Map<Language, Integer> expected = new HashMap<Language, Integer>();
+		expected.put(Language.PYTHON, 6);
+		expected.put(Language.JULIA, 3);
+		expected.put(Language.R, 2);
+		expected.put(Language.SCALA, 3);
+		expected.put(Language.OTHER, 1);
+		expected.put(Language.UNKNOWN, 5);
+		Map<Language, Integer> actual = analyzer.languages();
+		assertEquals("Error in language extraction:", expected, actual);
+	}
+	
+	@Test
+	public void testLanguage_csv() {
+		// TODO
 	}
 	
 	/**
