@@ -31,7 +31,7 @@ public class AnalyzerTest {
 		expected.put(Language.R, 2);
 		expected.put(Language.SCALA, 3);
 		expected.put(Language.OTHER, 1);
-		expected.put(Language.UNKNOWN, 5);
+		expected.put(Language.UNKNOWN, 6);
 		Map<Language, Integer> actual = analyzer.languages();
 		assertEquals("Error in language extraction:", expected, actual);
 	}
