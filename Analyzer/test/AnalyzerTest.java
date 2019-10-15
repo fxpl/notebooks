@@ -51,6 +51,7 @@ public class AnalyzerTest {
 		String dataDir = "test/data/lang";
 		String[] files = {"k_l_cpp.ipynb", "k_l_R.ipynb", "li_n_python.ipynb"};
 		Language[] languages = {Language.OTHER, Language.R, Language.PYTHON};
+		LangSpec[] langSpecs = {LangSpec.METADATA_KERNELSPEC_LANGUAGE, LangSpec.METADATA_KERNELSPEC_LANGUAGE, LangSpec.METADATA_LANGUAGEINFO_NAME};
 		for (String file: files) {
 			analyzer.initializeNotebooksFrom(dataDir + "/" + file);
 		}
@@ -62,7 +63,7 @@ public class AnalyzerTest {
 				new FileReader(outputFile));
 		assertEquals("Header missing in language csv!", "file, language", outputReader.readLine());
 		for (int i=0; i<languages.length; i++) {
-			String expectedLine = files[i] + ", " + languages[i];;
+			String expectedLine = files[i] + ", " + languages[i] + ", " + langSpecs[i];
 			assertEquals("Wrong language written to output file:",
 					"" + expectedLine , outputReader.readLine());
 		}

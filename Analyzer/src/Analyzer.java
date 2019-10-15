@@ -70,8 +70,9 @@ public class Analyzer {
 			}
 			Language language = employ(new LanguageExtractor(notebooks.get(i)));
 			languages.put(language, languages.get(language) + 1);
+			LangSpec langSpec = employ(new LangSpecExtractor(notebooks.get(i)));
 			String name = notebooks.get(i).getName();
-			writer.write(name + ", " + language + "\n");
+			writer.write(name + ", " + language + ", " + langSpec + "\n");
 		}
 		writer.close();
 		return languages;
@@ -90,6 +91,22 @@ public class Analyzer {
 		@Override
 		protected Language defaultValue() {
 			return Language.UNKNOWN;
+		}
+	}
+	
+	private class LangSpecExtractor extends Worker<LangSpec> {
+		public LangSpecExtractor(Notebook notebook) {
+			super(notebook);
+		}
+		
+		@Override
+		public LangSpec call() throws Exception {
+			return notebook.langSpec();
+		}
+		
+		@Override
+		protected LangSpec defaultValue() {
+			return LangSpec.NONE;
 		}
 	}
 	
