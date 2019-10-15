@@ -38,6 +38,7 @@ public class AnalyzerTest {
 		expected.put(Language.UNKNOWN, 6);
 		Map<Language, Integer> actual = analyzer.languages();
 		assertEquals("Error in language extraction:", expected, actual);
+		lastLanguageFile().delete();
 	}
 	
 	/**
