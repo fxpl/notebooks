@@ -10,7 +10,7 @@ import java.util.concurrent.*;
  * Analyzer for Jupyter notebooks.
  */
 public class Analyzer {
-	ExecutorService executor;
+	private ExecutorService executor;
 	private ArrayList<Notebook> notebooks;
 	
 	/**

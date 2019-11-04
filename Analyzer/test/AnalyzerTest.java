@@ -8,7 +8,7 @@ import org.junit.*;
 
 public class AnalyzerTest {
 	
-	Analyzer analyzer;
+	private Analyzer analyzer;
 	
 	@Before
 	public void setUp() {
