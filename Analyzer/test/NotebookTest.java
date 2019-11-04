@@ -1,5 +1,9 @@
 import static org.junit.Assert.*;
 
+import java.security.NoSuchAlgorithmException;
+
+import javax.xml.bind.DatatypeConverter;
+
 import org.junit.Test;
 
 public class NotebookTest {
@@ -12,6 +16,30 @@ public class NotebookTest {
 	public void testGetName() {
 		Notebook notebook = new Notebook("made/up/path/empty.ipynb");
 		assertEquals("Wrong name of notebook!" , "empty.ipynb", notebook.getName());
+	}
+	
+	/**
+	 * Verify that code snippets are hashed correctly.
+	 */
+	@Test
+	public void testHashes() throws NotebookException, NoSuchAlgorithmException {
+		String dataDir = "test/data/hash";
+		String[] files = {"empty_code_string.ipynb", "empty_code_strings.ipynb",
+				"single_import.ipynb", "two_import_cells.ipynb"};
+		String[][] expectedHashStrings = {
+				{"D41D8CD98F00B204E9800998ECF8427E"},
+				{"D41D8CD98F00B204E9800998ECF8427E"},
+				{"33BE8D72467938FBB23EF42CF8C9E85F"},
+				{"33BE8D72467938FBB23EF42CF8C9E85F", "6CABFDBC20F69189D4B8894A06C78F49"}
+		};
+		for (int i=0; i<files.length; i++) {
+			Notebook notebook = new Notebook(dataDir + "/" + files[i]);
+			byte[][] hashes = notebook.hashes();
+			for (int j=0; j<expectedHashStrings[i].length; j++) {
+				String hashString = DatatypeConverter.printHexBinary(hashes[j]);
+				assertEquals("Wrong hash:", expectedHashStrings[i][j], hashString);
+			}
+		}
 	}
 	
 	/**

@@ -1,4 +1,6 @@
 import java.io.*;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
 import org.json.simple.*;
@@ -25,6 +27,26 @@ public class Notebook {
 	public String getName() {
 		int namePos = path.lastIndexOf('/') + 1;
 		return path.substring(namePos);
+	}
+
+	/**
+	 * @return Array containing the hash of the source code stored in each code cell
+	 */
+	public byte[][] hashes() throws NotebookException, NoSuchAlgorithmException {
+		MessageDigest hasher = MessageDigest.getInstance("MD5");
+		List<JSONObject> codeCells = getCodeCells();
+		int numSnippets = codeCells.size();
+		byte[][] hashes = new byte[numSnippets][];
+		for (int i=0; i<numSnippets; i++) {
+			String snippet = "";
+			JSONArray lines = getSource(codeCells.get(i));
+			for (int j=0; j<lines.size(); j++) {
+				snippet += lines.get(j);
+			}
+			snippet = snippet.replaceAll("\\s", "");
+			hashes[i] = hasher.digest(snippet.getBytes());
+		}
+		return hashes;
 	}
 	
 	/**
@@ -104,13 +126,9 @@ public class Notebook {
 		locTotal = 0;
 		for (JSONObject cell: codeCells) {
 			// Get source code
-			JSONArray source = null;
-			if (cell.containsKey("source")) {
-				source = (JSONArray) cell.get("source");
-			} else if (cell.containsKey("input")) {
-				source = (JSONArray) cell.get("input");
-			}
+			JSONArray source = getSource(cell);
 			// If source code exists, count lines
+			// TODO: Extract method(?)
 			if (null != source) {
 				locTotal += source.size();
 				for (int i=0; i<source.size(); i++) {
@@ -317,5 +335,19 @@ public class Notebook {
 			System.err.println("Warning: Could not close reader of " + this.path + ": " + e.toString());
 		}
 		return result;
+	}
+	
+	/**
+	 * @param cell Code cell to fetch source code from
+	 * @return The source code stored in cell (with each line as a separate element), null if source code is missing 
+	 */
+	private static JSONArray getSource(JSONObject cell) {
+		JSONArray source = null;
+		if (cell.containsKey("source")) {
+			source = (JSONArray) cell.get("source");
+		} else if (cell.containsKey("input")) {
+			source = (JSONArray) cell.get("input");
+		}
+		return source;
 	}
 }
