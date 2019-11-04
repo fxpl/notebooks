@@ -91,8 +91,7 @@ public class Notebook {
 	 * @throws NotebookException if the file could not be parsed
 	 */
 	public int numCodeCells() throws NotebookException {
-		JSONObject notebook = this.getNotebook();
-		return getCodeCells(notebook).size();
+		return getCodeCells().size();
 	}
 	
 	
@@ -101,8 +100,7 @@ public class Notebook {
 	 * @throws NotebookException if the file could not be parsed
 	 */
 	private void countLines() throws NotebookException {
-		JSONObject notebook = this.getNotebook();
-		List<JSONObject> codeCells = getCodeCells(notebook);
+		List<JSONObject> codeCells = getCodeCells();
 		locTotal = 0;
 		for (JSONObject cell: codeCells) {
 			// Get source code
@@ -137,7 +135,7 @@ public class Notebook {
 	 * @return Array containing all cells of the notebook
 	 */
 	@SuppressWarnings("unchecked")	// The JSON library uses raw types internally
-	private JSONArray getCellArray(JSONObject notebook) {
+	private static JSONArray getCellArray(JSONObject notebook) {
 		JSONArray cells;
 		if (notebook.containsKey("cells")) {
 			// According to spec
@@ -154,6 +152,14 @@ public class Notebook {
 			}
 		}
 		return cells;
+	}
+	
+	/**
+	 * @return A list containing all code cells in the notebook represented by this object
+	 */
+	private List<JSONObject> getCodeCells() throws NotebookException {
+		JSONObject notebook = this.getNotebook();
+		return getCodeCells(notebook);
 	}
 	
 	/**
@@ -182,7 +188,7 @@ public class Notebook {
 	 * @param spec String specifying the language
 	 * @return The corresponding Language
 	 */
-	private Language getLanguage(String spec) {
+	private static Language getLanguage(String spec) {
 		if (spec.equals("julia") || spec.equals("Julia")) {
 			return Language.JULIA;
 		} else if (spec.startsWith("python") || spec.startsWith("Python")) {
@@ -201,7 +207,7 @@ public class Notebook {
 	 * @return The language specified in code cells, if it exists and is consistent. UNKNOWN otherwise.
 	 */
 	private Language getLanguageFromCodeCells(JSONObject notebook) {
-		List<JSONObject> codeCells = this.getCodeCells(notebook);
+		List<JSONObject> codeCells = getCodeCells(notebook);
 		if (0 < codeCells.size()) {
 			String language = "";
 			JSONObject cell = codeCells.get(0);
