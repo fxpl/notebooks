@@ -2,8 +2,6 @@ import static org.junit.Assert.*;
 
 import java.security.NoSuchAlgorithmException;
 
-import javax.xml.bind.DatatypeConverter;
-
 import org.junit.Test;
 
 public class NotebookTest {
@@ -34,10 +32,9 @@ public class NotebookTest {
 		};
 		for (int i=0; i<files.length; i++) {
 			Notebook notebook = new Notebook(dataDir + "/" + files[i]);
-			byte[][] hashes = notebook.hashes();
+			String[] hashes = notebook.hashes();
 			for (int j=0; j<expectedHashStrings[i].length; j++) {
-				String hashString = DatatypeConverter.printHexBinary(hashes[j]);
-				assertEquals("Wrong hash:", expectedHashStrings[i][j], hashString);
+				assertEquals("Wrong hash:", expectedHashStrings[i][j], hashes[j]);
 			}
 		}
 	}

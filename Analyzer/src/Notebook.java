@@ -3,6 +3,8 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
+import javax.xml.bind.DatatypeConverter;
+
 import org.json.simple.*;
 import org.json.simple.parser.*;
 
@@ -32,11 +34,11 @@ public class Notebook {
 	/**
 	 * @return Array containing the hash of the source code stored in each code cell
 	 */
-	public byte[][] hashes() throws NotebookException, NoSuchAlgorithmException {
+	public String[] hashes() throws NotebookException, NoSuchAlgorithmException {
 		MessageDigest hasher = MessageDigest.getInstance("MD5");
 		List<JSONObject> codeCells = getCodeCells();
 		int numSnippets = codeCells.size();
-		byte[][] hashes = new byte[numSnippets][];
+		String[] hashes = new String[numSnippets];
 		for (int i=0; i<numSnippets; i++) {
 			String snippet = "";
 			JSONArray lines = getSource(codeCells.get(i));
@@ -44,7 +46,7 @@ public class Notebook {
 				snippet += lines.get(j);
 			}
 			snippet = snippet.replaceAll("\\s", "");
-			hashes[i] = hasher.digest(snippet.getBytes());
+			hashes[i] = DatatypeConverter.printHexBinary(hasher.digest(snippet.getBytes()));
 		}
 		return hashes;
 	}
