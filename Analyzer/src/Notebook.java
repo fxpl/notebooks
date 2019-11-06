@@ -34,8 +34,14 @@ public class Notebook {
 	/**
 	 * @return Array containing the hash of the source code stored in each code cell
 	 */
-	public String[] hashes() throws NotebookException, NoSuchAlgorithmException {
-		MessageDigest hasher = MessageDigest.getInstance("MD5");
+	public String[] hashes() throws NotebookException {
+		MessageDigest hasher;
+		try {
+			hasher = MessageDigest.getInstance("MD5");
+		} catch (NoSuchAlgorithmException e) {
+			System.err.println("MessageDigest cannot hash using MD5!");
+			return null;
+		}
 		List<JSONObject> codeCells = getCodeCells();
 		int numSnippets = codeCells.size();
 		String[] hashes = new String[numSnippets];
