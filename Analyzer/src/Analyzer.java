@@ -3,6 +3,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.*;
 
@@ -11,7 +12,7 @@ import java.util.concurrent.*;
  */
 public class Analyzer {
 	private ExecutorService executor;
-	private ArrayList<Notebook> notebooks;
+	private List<Notebook> notebooks;
 	
 	/**
 	 * Note that when you are done with this Analyzer, you must call the method
@@ -57,6 +58,70 @@ public class Analyzer {
 		executor.shutdown();
 	}
 	
+	/**
+	 * Compute the MD5 hash of each snippet in each notebook. Return a map with
+	 * the key being the hashes and the values being lists of all snippets
+	 * containing the corresponding code.
+	 * Print each hash and the corresponding snippets (name, index) on a
+	 * separate line in the file clones<current-date-time>.csv. Start the csv
+	 * file with a header.
+	 * @return The map described above
+	 * @throws IOException On problems handling the output file.
+	 */
+	public Map<String, List<Snippet>> clones() throws IOException {
+		// Identify clones
+		Map<String, List<Snippet>> clones = new HashMap<String, List<Snippet>>();
+		for (int i=0; i<notebooks.size(); i++) {
+			Notebook currentNotebook = notebooks.get(i);
+			String fileName = currentNotebook.getName();
+			if (0 == i%10000) {
+				System.out.println("Looking for clones in notebook " + i);
+			}
+			String[] hashes = employ(new HashExtractor(currentNotebook));
+			for (int j=0; j<hashes.length; j++) {
+				if (clones.containsKey(hashes[j])) {
+					clones.get(hashes[j]).add(new Snippet(fileName, j));
+				} else {
+					List<Snippet> snippets = new ArrayList<Snippet>();
+					snippets.add(new Snippet(fileName, j));
+					clones.put(hashes[j], snippets);
+				}
+			}
+		}
+		
+		// Print to file
+		Writer writer = new FileWriter("clones" + LocalDateTime.now() + ".csv");
+		writer.write("hash, file, index, ...\n");
+		for (String hash: clones.keySet()) {
+			writer.write(hash);
+			for (Snippet s: clones.get(hash)) {
+				writer.write(", " + s);
+			}
+			writer.write("\n");
+		}
+		writer.close();
+		return clones;
+	}
+	
+	private class HashExtractor extends Worker<String[]> {
+		public HashExtractor(Notebook notebook) {
+			super(notebook);
+		}
+		
+		@Override
+		public String[] call() throws Exception {
+			return notebook.hashes();
+		}
+
+		@Override
+		protected String[] defaultValue() {
+			return null;
+		}
+	}
+	
+	/**
+	 * TODO
+	 */
 	public Map<Language, Integer> languages() throws IOException {
 		Map<Language, Integer> languages = new HashMap<Language, Integer>();
 		for (Language language: Language.values()) {
@@ -248,6 +313,9 @@ public class Analyzer {
 					System.err.println("I/O errors on handling output file for LOC counts." +
 							"LOC not counted!");
 				}
+				break;
+			case "-clones":
+				// TODO
 				break;
 			default:
 				System.err.println("Unknown argument: " + arg);

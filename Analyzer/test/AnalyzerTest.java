@@ -1,7 +1,9 @@
 import static org.junit.Assert.*;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.*;
@@ -23,6 +25,99 @@ public class AnalyzerTest {
 	// TODO: mappar i andra test, mindre kodduplicering!
 	
 	/**
+	 * Verify that snippets are stored correctly in the clone hash map.
+	 * @throws IOException 
+	 */
+	@Test
+	public void testClones() throws IOException {
+		analyzer.initializeNotebooksFrom("test/data/hash");
+		// Expected values
+		Map<String, List<Snippet>> expectedClones = new HashMap<String, List<Snippet>>();
+		List<Snippet> emptySnippets = new ArrayList<Snippet>(2);
+		emptySnippets.add(new Snippet("empty_code_string.ipynb", 0));
+		emptySnippets.add(new Snippet("empty_code_strings.ipynb", 0));
+		expectedClones.put("D41D8CD98F00B204E9800998ECF8427E", emptySnippets);	// Empty
+		List<Snippet> numpy = new ArrayList<Snippet>(2);
+		numpy.add(new Snippet("single_import.ipynb", 0));
+		numpy.add(new Snippet("two_import_cells.ipynb", 0));
+		expectedClones.put("33BE8D72467938FBB23EF42CF8C9E85F", numpy); // import numpy
+		List<Snippet> pandas = new ArrayList<Snippet>(1);
+		pandas.add(new Snippet("two_import_cells.ipynb", 1));
+		expectedClones.put("6CABFDBC20F69189D4B8894A06C78F49", pandas); // import pandas
+		
+		// Actual values
+		Map<String, List<Snippet>> clones = analyzer.clones();
+		
+		// Check values
+		assertTrue(expectedClones.keySet().equals(clones.keySet()));
+		for (String hash: expectedClones.keySet()) {
+			List<Snippet> expectedSnippets = expectedClones.get(hash);
+			List<Snippet> actualSnippets = clones.get(hash);
+			assertEquals("Wrong number of snippets stored for " + hash + ":", expectedSnippets.size(), actualSnippets.size());
+			assertTrue("Wrong snippets stored for " + hash, actualSnippets.containsAll(expectedSnippets));
+		}
+		lastOutputFile("clones").delete();
+	}
+	
+	/**
+	 * Verify that the output file clones<current-date-time>.csv has the right
+	 * header after clone analysis.
+	 * @throws IOException
+	 */
+	@Test
+	public void testClones_csv_header() throws IOException {
+		String expectedHeader = "hash, file, index, ...";
+		analyzer.clones();
+		File outputFile = lastOutputFile("clones");
+		BufferedReader outputReader = new BufferedReader(new FileReader(outputFile));
+		assertEquals("Wrong header in clone csv!", expectedHeader, outputReader.readLine());
+		outputReader.close();
+		outputFile.delete();
+	}
+	
+	/**
+	 * Verify that the output file clones<current-date-time>.csv has the right
+	 * content after clone analysis of a notebook with a single snippet.
+	 * @throws IOException
+	 */
+	@Test
+	public void testClones_csv_singleSnippet() throws IOException {
+		analyzer.initializeNotebooksFrom("test/data/hash/single_import.ipynb");
+		String expectedLine = "33BE8D72467938FBB23EF42CF8C9E85F";
+		expectedLine += ", single_import.ipynb, 0";
+		analyzer.clones();
+		
+		File outputFile = lastOutputFile("clones");
+		BufferedReader outputReader = new BufferedReader(new FileReader(outputFile));
+		outputReader.readLine();	// Skip header
+		assertEquals("Wrong line for import snippet!", expectedLine, outputReader.readLine());
+		outputReader.close();
+		outputFile.delete();
+	}
+	
+	/**
+	 * Verify that the output file clones<current-date-time>.csv has the right
+	 * content after clone analysis of a two notebooks with a clone.
+	 * @throws IOException
+	 */
+	@Test
+	public void testClones_csv_emptySnippets() throws IOException {
+		analyzer.initializeNotebooksFrom("test/data/hash/empty_code_string.ipynb");
+		analyzer.initializeNotebooksFrom("test/data/hash/empty_code_strings.ipynb");
+		String expectedLine = "D41D8CD98F00B204E9800998ECF8427E";
+		expectedLine += ", empty_code_string.ipynb, 0";
+		expectedLine += ", empty_code_strings.ipynb, 0";
+		analyzer.clones();
+		
+		File outputFile = lastOutputFile("clones");
+		BufferedReader outputReader = new BufferedReader(new FileReader(outputFile));
+		outputReader.readLine();	// Skip header
+		assertEquals("Wrong line for empty snippets!", expectedLine, outputReader.readLine());
+		outputReader.close();
+		outputFile.delete();
+	}
+	
+	/** TODO: Bättre namn
 	 * Verify that the right languages are found in the notebooks.
 	 * @throws IOException
 	 */
@@ -60,8 +155,7 @@ public class AnalyzerTest {
 		
 		// Check results
 		File outputFile = lastOutputFile("languages");
-		BufferedReader outputReader = new BufferedReader(
-				new FileReader(outputFile));
+		BufferedReader outputReader = new BufferedReader(new FileReader(outputFile));
 		assertEquals("Wrong header in language csv!", "file, language", outputReader.readLine());
 		for (int i=0; i<languages.length; i++) {
 			String expectedLine = files[i] + ", " + languages[i] + ", " + langSpecs[i];
