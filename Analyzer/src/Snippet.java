@@ -8,11 +8,16 @@ public class Snippet {
 		this.snippetIndex = snippetIndex;
 	}
 	
-	public boolean equals(Snippet other) {
-		return other.toString().equals(this.toString());		
+	public boolean equals(Object other) {
+		if (other.getClass() != this.getClass()) {
+			return false;
+		}
+		Snippet otherSnippet = (Snippet)other;
+		return otherSnippet.fileName.equals(this.fileName)
+				&& otherSnippet.snippetIndex == this.snippetIndex;
 	}
 	
 	public String toString() {
-		return fileName + "," + snippetIndex;
+		return fileName + ", " + snippetIndex;
 	}
 }

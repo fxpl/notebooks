@@ -33,8 +33,14 @@ public class SnippetTest {
 	}
 	
 	@Test
+	public void testEquals_diffType() {
+		Notebook different = new Notebook("");
+		assertFalse("Snippet and notebook considered equal!", snippet.equals(different));
+	}
+	
+	@Test
 	public void testToString() {
-		String expected = name + "," + index;
+		String expected = name + ", " + index;
 		assertEquals("Wrong string representation of snippet:", expected, snippet.toString());
 	}
 }
