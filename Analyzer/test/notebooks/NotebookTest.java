@@ -1,8 +1,14 @@
+package notebooks;
 import static org.junit.Assert.*;
 
 import java.security.NoSuchAlgorithmException;
 
 import org.junit.Test;
+
+import notebooks.LangSpec;
+import notebooks.Language;
+import notebooks.Notebook;
+import notebooks.NotebookException;
 
 public class NotebookTest {
 	

@@ -1,3 +1,4 @@
+package notebooks;
 
 public enum Language {
 	PYTHON,

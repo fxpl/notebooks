@@ -1,3 +1,4 @@
+package notebooks;
 
 public class Snippet {
 	private String fileName;

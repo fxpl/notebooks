@@ -1,3 +1,4 @@
+package notebooks;
 import static org.junit.Assert.*;
 
 import java.io.*;
@@ -7,6 +8,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.*;
+
+import notebooks.Analyzer;
+import notebooks.LangSpec;
+import notebooks.Language;
+import notebooks.Snippet;
 
 public class AnalyzerTest {
 	

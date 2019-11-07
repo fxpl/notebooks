@@ -1,7 +1,11 @@
+package notebooks;
 import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import notebooks.Notebook;
+import notebooks.Snippet;
 
 public class SnippetTest {
 	private Snippet snippet;
