@@ -75,15 +75,16 @@ public class AnalyzerTest {
 	 */
 	@Test
 	public void testClones_csv_singleSnippet() throws IOException {
+		String dataDir = "test/data/hash/";
 		String fileName = "single_import.ipynb";
-		analyzer.initializeNotebooksFrom("test/data/hash/" + fileName);
 		String hash = "33BE8D72467938FBB23EF42CF8C9E85F";
 		String[] expectedClonesLines = {hash + ", " + fileName + ", 0"};
-		String[] expectedSnippetsLines = {fileName + ", " + hash};
+		String[] expectedSnippetLines = {fileName + ", " + hash};
 		
+		analyzer.initializeNotebooksFrom(dataDir + fileName);
 		analyzer.clones();
 		
-		checkCsv("snippets", "file, snippets", expectedSnippetsLines);
+		checkCsv("snippets", "file, snippets", expectedSnippetLines);
 		checkCsv("clones", "hash, file, index, ...", expectedClonesLines);
 		
 		lastOutputFile("snippets").delete();
@@ -98,10 +99,9 @@ public class AnalyzerTest {
 	 */
 	@Test
 	public void testClones_csv_emptySnippets() throws IOException {
+		String dataDir = "test/data/hash/";
 		String fileName1 = "empty_code_string.ipynb";
 		String fileName2 = "empty_code_strings.ipynb";
-		analyzer.initializeNotebooksFrom("test/data/hash/" + fileName1);
-		analyzer.initializeNotebooksFrom("test/data/hash/" + fileName2);
 		String hash = "D41D8CD98F00B204E9800998ECF8427E";
 		String[] expectedSnippetLines = {
 				fileName1 + ", " + hash,
@@ -111,6 +111,8 @@ public class AnalyzerTest {
 				hash + ", " + fileName1 + ", 0, " + fileName2 + ", 0"
 		};
 		
+		analyzer.initializeNotebooksFrom(dataDir + fileName1);
+		analyzer.initializeNotebooksFrom(dataDir + fileName2);
 		analyzer.clones();
 		
 		checkCsv("snippets", "file, snippets", expectedSnippetLines);
@@ -146,29 +148,23 @@ public class AnalyzerTest {
 	 */
 	@Test
 	public void testLanguage_csv() throws IOException {
-		// Analyze files
 		String dataDir = "test/data/lang";
 		String[] files = {"k_l_cpp.ipynb", "k_l_R.ipynb", "li_n_python.ipynb"};
 		Language[] languages = {Language.OTHER, Language.R, Language.PYTHON};
 		LangSpec[] langSpecs = {LangSpec.METADATA_KERNELSPEC_LANGUAGE, LangSpec.METADATA_KERNELSPEC_LANGUAGE, LangSpec.METADATA_LANGUAGEINFO_NAME};
+		String[] expectedLines = new String[languages.length];
+		for (int i=0; i<languages.length; i++) {
+			expectedLines[i] = files[i] + ", " + languages[i] + ", " + langSpecs[i];
+		}
+		
 		for (String file: files) {
 			analyzer.initializeNotebooksFrom(dataDir + "/" + file);
 		}
 		analyzer.languages();
 		
-		// Check results
-		File outputFile = lastOutputFile("languages");
-		BufferedReader outputReader = new BufferedReader(new FileReader(outputFile));
-		assertEquals("Wrong header in language csv!", "file, language", outputReader.readLine());
-		for (int i=0; i<languages.length; i++) {
-			String expectedLine = files[i] + ", " + languages[i] + ", " + langSpecs[i];
-			assertEquals("Wrong language written to output file:",
-					"" + expectedLine , outputReader.readLine());
-		}
+		checkCsv("languages", "file, language", expectedLines);
 		
-		// Clean up
-		outputReader.close();
-		outputFile.delete();
+		lastOutputFile("languages").delete();
 	}
 	
 	/**
@@ -183,37 +179,31 @@ public class AnalyzerTest {
 		lastOutputFile("loc").delete();
 	}
 	
-	/** TODO: Extract methods to reduce code duplication!
+	/**
 	 * Verify that the output file loc<current-date-time>.csv is created and
 	 * filled correctly when the number of LOC are counted.
 	 * @throws IOException on errors when handling output file
 	 */
 	@Test
 	public void testLOC_csv() throws IOException {
-		// Analyze files
 		String dataDir = "test/data/loc";
 		String[] files = {"code_and_md_3loc.ipynb", "markdownCells.ipynb",
 				"two_codeCells_13loc.ipynb"};
 		int[] LOC = {3, 0, 13};
 		int[] emptyLOC = {0, 0, 2};
+		String[] expectedLines = new String[LOC.length];
+		for (int i=0; i<LOC.length; i++) {
+			expectedLines[i] = files[i] + ", " + LOC[i] + ", " + (LOC[i]-emptyLOC[i]) + ", " + emptyLOC[i];
+		}
+		
 		for (String file: files) {
 			analyzer.initializeNotebooksFrom(dataDir + "/" + file);
 		}
 		analyzer.LOC();
 		
-		// Check results
-		File outputFile = lastOutputFile("loc");
-		BufferedReader outputReader = new BufferedReader(new FileReader(outputFile));
-		assertEquals("Wrong header in LOC csv!", "file, total, non-blank, blank", outputReader.readLine());
-		for (int i=0; i<LOC.length; i++) {
-			String expectedLine = files[i] + ", " + LOC[i] + ", " + (LOC[i]-emptyLOC[i]) + ", " + emptyLOC[i];
-			assertEquals("Wrong LOC written to output file:",
-					"" + expectedLine , outputReader.readLine());
-		}
-		
-		// Clean up
-		outputReader.close();
-		outputFile.delete();
+		checkCsv("loc", "file, total, non-blank, blank", expectedLines);	
+
+		lastOutputFile("loc").delete();
 	}
 	
 	/**
@@ -235,28 +225,22 @@ public class AnalyzerTest {
 	 */
 	@Test
 	public void testNumCodeCells_csv() throws IOException {
-		// Anlayze files
 		String dataDir = "test/data/count";
 		String[] files = {"zero.ipynb", "one.ipynb", "three_with_md.ipynb"};
 		int[] numCodeCells = {0, 1, 3};
+		String[] expectedLines = new String[numCodeCells.length];
+		for (int i=0; i<numCodeCells.length; i++) {
+			expectedLines[i] = files[i] + ", " + numCodeCells[i];
+		}
+		
 		for (String file: files) {
 			analyzer.initializeNotebooksFrom(dataDir + "/" + file);
 		}
 		analyzer.numCodeCells();
 		
-		// Check results
-		File outputFile = lastOutputFile("num_snippets");
-		BufferedReader outputReader = new BufferedReader(
-				new FileReader(outputFile));
-		assertEquals("Wrong header in number of snippets csv!", "file, snippets", outputReader.readLine());
-		for (int i =0; i<numCodeCells.length; i++) {
-			assertEquals("Wrong output in number of snippets file:",
-					files[i] + ", " + numCodeCells[i], outputReader.readLine());
-		}
+		checkCsv("num_snippets", "file, snippets", expectedLines);
 		
-		// Clean up
-		outputReader.close();
-		outputFile.delete();
+		lastOutputFile("num_snippets").delete();
 	}
 
 	/**
@@ -275,6 +259,7 @@ public class AnalyzerTest {
 	 * @param expectedLines Array of the lines expected to be found in the file
 	 */
 	private void checkCsv(String prefix, String expectedHeader, String[] expectedLines) throws IOException {
+		// TODO: Lägg headern i arrayen!
 		File outputFile = lastOutputFile(prefix);
 		BufferedReader outputReader = new BufferedReader(new FileReader(outputFile));
 		assertEquals("Wrong header in " + prefix + " csv!", expectedHeader, outputReader.readLine());
@@ -283,7 +268,6 @@ public class AnalyzerTest {
 			assertEquals("Wrong line number " + (i+2) + " for " + prefix + " csv!", expectedLine, outputReader.readLine());
 		}
 		outputReader.close();
-		
 	}
 	
 	/**
