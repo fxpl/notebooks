@@ -69,20 +69,6 @@ public class AnalyzerTest {
 	
 	/**
 	 * Verify that the output files snippets<current-date-time>.csv and
-	 * clones<current-date-time>.csv have the right headers after clone analysis.
-	 * @throws IOException
-	 */
-	@Test
-	public void testClones_csv_headers() throws IOException {
-		analyzer.clones();
-		checkHeader("snippets", "file, snippets");
-		checkHeader("clones", "hash, file, index, ...");
-		lastOutputFile("snippets").delete();
-		lastOutputFile("clones").delete();
-	}
-	
-	/**
-	 * Verify that the output files snippets<current-date-time>.csv and
 	 * clones<current-date-time>.csv have the right content after clone analysis
 	 * of a notebook with a single snippet.
 	 * @throws IOException
@@ -97,10 +83,11 @@ public class AnalyzerTest {
 		
 		analyzer.clones();
 		
-		checkLines("clones", expectedClonesLines);
-		checkLines("snippets", expectedSnippetsLines);
-		lastOutputFile("clones").delete();
+		checkCsv("snippets", "file, snippets", expectedSnippetsLines);
+		checkCsv("clones", "hash, file, index, ...", expectedClonesLines);
+		
 		lastOutputFile("snippets").delete();
+		lastOutputFile("clones").delete();
 	}
 	
 	/**
@@ -126,8 +113,8 @@ public class AnalyzerTest {
 		
 		analyzer.clones();
 		
-		checkLines("snippets", expectedSnippetLines);
-		checkLines("clones", expectedClonesLines);
+		checkCsv("snippets", "file, snippets", expectedSnippetLines);
+		checkCsv("clones", "hash, file, index, ...", expectedClonesLines);
 		
 		lastOutputFile("snippets").delete();
 		lastOutputFile("clones").delete();
@@ -283,33 +270,20 @@ public class AnalyzerTest {
 	
 	/**
 	 * Check that the most recent file <prefix><timestamp>.csv has the right
-	 * content (except header).
+	 * content.
 	 * @param prefix First part of name of file to be analyzed (see above)
 	 * @param expectedLines Array of the lines expected to be found in the file
 	 */
-	private void checkLines(String prefix, String[] expectedLines) throws IOException {
-		File outputFile = lastOutputFile(prefix);
-		BufferedReader outputReader = new BufferedReader(new FileReader(outputFile));
-		outputReader.readLine();	// Skip header
-		for (int i=0; i<expectedLines.length; i++) {
-			String expectedLine = expectedLines[i];
-			assertEquals("Wrong line number " + (i+1) + " for " + prefix + " csv!", expectedLine, outputReader.readLine());
-		}
-		outputReader.close();
-		
-	}
-	
-	/**
-	 * Check that the most recent file <prefix><timestamp>.csv contains the
-	 * right header.
-	 * @param prefix First part of name of file to be analyzed (see above)
-	 * @param expectedHeader Expected header of the file
-	 */
-	private void checkHeader(String prefix, String expectedHeader) throws IOException {
+	private void checkCsv(String prefix, String expectedHeader, String[] expectedLines) throws IOException {
 		File outputFile = lastOutputFile(prefix);
 		BufferedReader outputReader = new BufferedReader(new FileReader(outputFile));
 		assertEquals("Wrong header in " + prefix + " csv!", expectedHeader, outputReader.readLine());
+		for (int i=0; i<expectedLines.length; i++) {
+			String expectedLine = expectedLines[i];
+			assertEquals("Wrong line number " + (i+2) + " for " + prefix + " csv!", expectedLine, outputReader.readLine());
+		}
 		outputReader.close();
+		
 	}
 	
 	/**
