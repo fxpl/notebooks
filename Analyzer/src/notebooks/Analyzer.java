@@ -64,28 +64,35 @@ public class Analyzer {
 	 * Compute the MD5 hash of each snippet in each notebook. Return a map with
 	 * the key being the hashes and the values being lists of all snippets
 	 * containing the corresponding code.
+	 * For each notebook, print the name of the notebook followed by a list of
+	 * the hash of each snippet in the notebook to the file 
+	 * snippets<current-date-time>.csv.
 	 * Print each hash and the corresponding snippets (name, index) on a
 	 * separate line in the file clones<current-date-time>.csv. Start the csv
-	 * file with a header.
+	 * files with a header.
 	 * @return The map described above
 	 * @throws IOException On problems handling the output file.
 	 */
 	public Map<String, List<Snippet>> clones() throws IOException {
-		Map<String, List<Snippet>> clones = findClones();
+		Map<String, List<Snippet>> clones = getAndDumpHashes();
 		printClonesFile(clones);
 		return clones;
 	}
 
-	private Map<String, List<Snippet>> findClones() {
+	private Map<String, List<Snippet>> getAndDumpHashes() throws IOException {
 		Map<String, List<Snippet>> clones = new HashMap<String, List<Snippet>>();
+		Writer writer = new FileWriter("snippets" + LocalDateTime.now() + ".csv");
+		writer.write("file, snippets\n");
 		for (int i=0; i<notebooks.size(); i++) {
-			Notebook currentNotebook = notebooks.get(i);
-			String fileName = currentNotebook.getName();
 			if (0 == i%10000) {
 				System.out.println("Looking for clones in notebook " + i);
 			}
+			Notebook currentNotebook = notebooks.get(i);
+			String fileName = currentNotebook.getName();
+			writer.write(fileName);
 			String[] hashes = employ(new HashExtractor(currentNotebook));
 			for (int j=0; j<hashes.length; j++) {
+				writer.write(", " + hashes[j]);
 				if (clones.containsKey(hashes[j])) {
 					clones.get(hashes[j]).add(new Snippet(fileName, j));
 				} else {
@@ -94,7 +101,9 @@ public class Analyzer {
 					clones.put(hashes[j], snippets);
 				}
 			}
+			writer.write("\n");
 		}
+		writer.close();
 		return clones;
 	}
 

@@ -63,65 +63,74 @@ public class AnalyzerTest {
 			assertEquals("Wrong number of snippets stored for " + hash + ":", expectedSnippets.size(), actualSnippets.size());
 			assertTrue("Wrong snippets stored for " + hash, actualSnippets.containsAll(expectedSnippets));
 		}
+		lastOutputFile("snippets").delete();
 		lastOutputFile("clones").delete();
 	}
 	
 	/**
-	 * Verify that the output file clones<current-date-time>.csv has the right
-	 * header after clone analysis.
+	 * Verify that the output files snippets<current-date-time>.csv and
+	 * clones<current-date-time>.csv have the right headers after clone analysis.
 	 * @throws IOException
 	 */
 	@Test
-	public void testClones_csv_header() throws IOException {
-		String expectedHeader = "hash, file, index, ...";
+	public void testClones_csv_headers() throws IOException {
 		analyzer.clones();
-		File outputFile = lastOutputFile("clones");
-		BufferedReader outputReader = new BufferedReader(new FileReader(outputFile));
-		assertEquals("Wrong header in clone csv!", expectedHeader, outputReader.readLine());
-		outputReader.close();
-		outputFile.delete();
+		checkHeader("snippets", "file, snippets");
+		checkHeader("clones", "hash, file, index, ...");
+		lastOutputFile("snippets").delete();
+		lastOutputFile("clones").delete();
 	}
 	
 	/**
-	 * Verify that the output file clones<current-date-time>.csv has the right
-	 * content after clone analysis of a notebook with a single snippet.
+	 * Verify that the output files snippets<current-date-time>.csv and
+	 * clones<current-date-time>.csv have the right content after clone analysis
+	 * of a notebook with a single snippet.
 	 * @throws IOException
 	 */
 	@Test
 	public void testClones_csv_singleSnippet() throws IOException {
-		analyzer.initializeNotebooksFrom("test/data/hash/single_import.ipynb");
-		String expectedLine = "33BE8D72467938FBB23EF42CF8C9E85F";
-		expectedLine += ", single_import.ipynb, 0";
+		String fileName = "single_import.ipynb";
+		analyzer.initializeNotebooksFrom("test/data/hash/" + fileName);
+		String hash = "33BE8D72467938FBB23EF42CF8C9E85F";
+		String[] expectedClonesLines = {hash + ", " + fileName + ", 0"};
+		String[] expectedSnippetsLines = {fileName + ", " + hash};
+		
 		analyzer.clones();
 		
-		File outputFile = lastOutputFile("clones");
-		BufferedReader outputReader = new BufferedReader(new FileReader(outputFile));
-		outputReader.readLine();	// Skip header
-		assertEquals("Wrong line for import snippet!", expectedLine, outputReader.readLine());
-		outputReader.close();
-		outputFile.delete();
+		checkLines("clones", expectedClonesLines);
+		checkLines("snippets", expectedSnippetsLines);
+		lastOutputFile("clones").delete();
+		lastOutputFile("snippets").delete();
 	}
 	
 	/**
-	 * Verify that the output file clones<current-date-time>.csv has the right
-	 * content after clone analysis of a two notebooks with a clone.
+	 * Verify that the output files snippets<current-date-time>.csv and
+	 * clones<current-date-time>.csv have the right content after clone 
+	 * analysis of a two notebooks with a clone.
 	 * @throws IOException
 	 */
 	@Test
 	public void testClones_csv_emptySnippets() throws IOException {
-		analyzer.initializeNotebooksFrom("test/data/hash/empty_code_string.ipynb");
-		analyzer.initializeNotebooksFrom("test/data/hash/empty_code_strings.ipynb");
-		String expectedLine = "D41D8CD98F00B204E9800998ECF8427E";
-		expectedLine += ", empty_code_string.ipynb, 0";
-		expectedLine += ", empty_code_strings.ipynb, 0";
+		String fileName1 = "empty_code_string.ipynb";
+		String fileName2 = "empty_code_strings.ipynb";
+		analyzer.initializeNotebooksFrom("test/data/hash/" + fileName1);
+		analyzer.initializeNotebooksFrom("test/data/hash/" + fileName2);
+		String hash = "D41D8CD98F00B204E9800998ECF8427E";
+		String[] expectedSnippetLines = {
+				fileName1 + ", " + hash,
+				fileName2 + ", " + hash
+		};
+		String[] expectedClonesLines = {
+				hash + ", " + fileName1 + ", 0, " + fileName2 + ", 0"
+		};
+		
 		analyzer.clones();
 		
-		File outputFile = lastOutputFile("clones");
-		BufferedReader outputReader = new BufferedReader(new FileReader(outputFile));
-		outputReader.readLine();	// Skip header
-		assertEquals("Wrong line for empty snippets!", expectedLine, outputReader.readLine());
-		outputReader.close();
-		outputFile.delete();
+		checkLines("snippets", expectedSnippetLines);
+		checkLines("clones", expectedClonesLines);
+		
+		lastOutputFile("snippets").delete();
+		lastOutputFile("clones").delete();
 	}
 	
 	/**
@@ -270,6 +279,37 @@ public class AnalyzerTest {
 	public void testNumNotebooks() {
 		analyzer.initializeNotebooksFrom("test/data/count");
 		assertEquals("Wrong number of notebooks found:", 12, analyzer.numNotebooks());
+	}
+	
+	/**
+	 * Check that the most recent file <prefix><timestamp>.csv has the right
+	 * content (except header).
+	 * @param prefix First part of name of file to be analyzed (see above)
+	 * @param expectedLines Array of the lines expected to be found in the file
+	 */
+	private void checkLines(String prefix, String[] expectedLines) throws IOException {
+		File outputFile = lastOutputFile(prefix);
+		BufferedReader outputReader = new BufferedReader(new FileReader(outputFile));
+		outputReader.readLine();	// Skip header
+		for (int i=0; i<expectedLines.length; i++) {
+			String expectedLine = expectedLines[i];
+			assertEquals("Wrong line number " + (i+1) + " for " + prefix + " csv!", expectedLine, outputReader.readLine());
+		}
+		outputReader.close();
+		
+	}
+	
+	/**
+	 * Check that the most recent file <prefix><timestamp>.csv contains the
+	 * right header.
+	 * @param prefix First part of name of file to be analyzed (see above)
+	 * @param expectedHeader Expected header of the file
+	 */
+	private void checkHeader(String prefix, String expectedHeader) throws IOException {
+		File outputFile = lastOutputFile(prefix);
+		BufferedReader outputReader = new BufferedReader(new FileReader(outputFile));
+		assertEquals("Wrong header in " + prefix + " csv!", expectedHeader, outputReader.readLine());
+		outputReader.close();
 	}
 	
 	/**
