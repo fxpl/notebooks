@@ -69,6 +69,7 @@ public class Analyzer {
 	 * @throws IOException On problems handling the output file.
 	 */
 	public Map<String, List<Snippet>> clones() throws IOException {
+		// TODO: Extract methods
 		// Identify clones
 		Map<String, List<Snippet>> clones = new HashMap<String, List<Snippet>>();
 		for (int i=0; i<notebooks.size(); i++) {
@@ -88,6 +89,7 @@ public class Analyzer {
 				}
 			}
 		}
+		// TODO(?): Mapping from file to snippets/#clones
 		
 		// Print to file
 		Writer writer = new FileWriter("clones" + LocalDateTime.now() + ".csv");
@@ -289,7 +291,7 @@ public class Analyzer {
 				try {
 					System.out.println("Code snippets: " + this.numCodeCells());
 				} catch (IOException e) {
-					System.err.println("I/O errors on handling output file for snippet counts." +
+					System.err.println("I/O error on handling output file for snippet counts." +
 							"Snippets not counted!");
 				}
 				break;
@@ -310,12 +312,18 @@ public class Analyzer {
 				try {
 					System.out.println("Lines of code: " + this.LOC());
 				} catch(IOException e) {
-					System.err.println("I/O errors on handling output file for LOC counts." +
+					System.err.println("I/O error on handling output file for LOC counts." +
 							"LOC not counted!");
 				}
 				break;
 			case "-clones":
-				// TODO
+				try {
+					this.clones();
+					System.out.println("Clone file created!");
+				} catch (IOException e) {
+					System.err.println("I/O error on handling output file for clones." +
+							"Output file not created!");
+				}
 				break;
 			default:
 				System.err.println("Unknown argument: " + arg);
