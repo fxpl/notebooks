@@ -78,14 +78,20 @@ public class AnalyzerTest {
 		String dataDir = "test/data/hash/";
 		String fileName = "single_import.ipynb";
 		String hash = "33BE8D72467938FBB23EF42CF8C9E85F";
-		String[] expectedClonesLines = {hash + ", " + fileName + ", 0"};
-		String[] expectedSnippetLines = {fileName + ", " + hash};
+		String[] expectedSnippetLines = {
+				"file, snippets",
+				fileName + ", " + hash
+		};
+		String[] expectedClonesLines = {
+				"hash, file, index, ...",
+				hash + ", " + fileName + ", 0"
+		};
 		
 		analyzer.initializeNotebooksFrom(dataDir + fileName);
 		analyzer.clones();
 		
-		checkCsv("snippets", "file, snippets", expectedSnippetLines);
-		checkCsv("clones", "hash, file, index, ...", expectedClonesLines);
+		checkCsv("snippets", expectedSnippetLines);
+		checkCsv("clones", expectedClonesLines);
 		
 		lastOutputFile("snippets").delete();
 		lastOutputFile("clones").delete();
@@ -104,10 +110,12 @@ public class AnalyzerTest {
 		String fileName2 = "empty_code_strings.ipynb";
 		String hash = "D41D8CD98F00B204E9800998ECF8427E";
 		String[] expectedSnippetLines = {
+				"file, snippets",
 				fileName1 + ", " + hash,
 				fileName2 + ", " + hash
 		};
 		String[] expectedClonesLines = {
+				"hash, file, index, ...",
 				hash + ", " + fileName1 + ", 0, " + fileName2 + ", 0"
 		};
 		
@@ -115,8 +123,8 @@ public class AnalyzerTest {
 		analyzer.initializeNotebooksFrom(dataDir + fileName2);
 		analyzer.clones();
 		
-		checkCsv("snippets", "file, snippets", expectedSnippetLines);
-		checkCsv("clones", "hash, file, index, ...", expectedClonesLines);
+		checkCsv("snippets", expectedSnippetLines);
+		checkCsv("clones", expectedClonesLines);
 		
 		lastOutputFile("snippets").delete();
 		lastOutputFile("clones").delete();
@@ -152,9 +160,10 @@ public class AnalyzerTest {
 		String[] files = {"k_l_cpp.ipynb", "k_l_R.ipynb", "li_n_python.ipynb"};
 		Language[] languages = {Language.OTHER, Language.R, Language.PYTHON};
 		LangSpec[] langSpecs = {LangSpec.METADATA_KERNELSPEC_LANGUAGE, LangSpec.METADATA_KERNELSPEC_LANGUAGE, LangSpec.METADATA_LANGUAGEINFO_NAME};
-		String[] expectedLines = new String[languages.length];
+		String[] expectedLines = new String[languages.length+1];
+		expectedLines[0] = "file, language";
 		for (int i=0; i<languages.length; i++) {
-			expectedLines[i] = files[i] + ", " + languages[i] + ", " + langSpecs[i];
+			expectedLines[i+1] = files[i] + ", " + languages[i] + ", " + langSpecs[i];
 		}
 		
 		for (String file: files) {
@@ -162,7 +171,7 @@ public class AnalyzerTest {
 		}
 		analyzer.languages();
 		
-		checkCsv("languages", "file, language", expectedLines);
+		checkCsv("languages", expectedLines);
 		
 		lastOutputFile("languages").delete();
 	}
@@ -191,9 +200,10 @@ public class AnalyzerTest {
 				"two_codeCells_13loc.ipynb"};
 		int[] LOC = {3, 0, 13};
 		int[] emptyLOC = {0, 0, 2};
-		String[] expectedLines = new String[LOC.length];
+		String[] expectedLines = new String[LOC.length+1];
+		expectedLines[0] = "file, total, non-blank, blank"; // header
 		for (int i=0; i<LOC.length; i++) {
-			expectedLines[i] = files[i] + ", " + LOC[i] + ", " + (LOC[i]-emptyLOC[i]) + ", " + emptyLOC[i];
+			expectedLines[i+1] = files[i] + ", " + LOC[i] + ", " + (LOC[i]-emptyLOC[i]) + ", " + emptyLOC[i];
 		}
 		
 		for (String file: files) {
@@ -201,7 +211,7 @@ public class AnalyzerTest {
 		}
 		analyzer.LOC();
 		
-		checkCsv("loc", "file, total, non-blank, blank", expectedLines);	
+		checkCsv("loc", expectedLines);	
 
 		lastOutputFile("loc").delete();
 	}
@@ -228,9 +238,10 @@ public class AnalyzerTest {
 		String dataDir = "test/data/count";
 		String[] files = {"zero.ipynb", "one.ipynb", "three_with_md.ipynb"};
 		int[] numCodeCells = {0, 1, 3};
-		String[] expectedLines = new String[numCodeCells.length];
+		String[] expectedLines = new String[numCodeCells.length+1];
+		expectedLines[0] = "file, snippets";
 		for (int i=0; i<numCodeCells.length; i++) {
-			expectedLines[i] = files[i] + ", " + numCodeCells[i];
+			expectedLines[i+1] = files[i] + ", " + numCodeCells[i];
 		}
 		
 		for (String file: files) {
@@ -238,7 +249,7 @@ public class AnalyzerTest {
 		}
 		analyzer.numCodeCells();
 		
-		checkCsv("num_snippets", "file, snippets", expectedLines);
+		checkCsv("num_snippets", expectedLines);
 		
 		lastOutputFile("num_snippets").delete();
 	}
@@ -258,14 +269,12 @@ public class AnalyzerTest {
 	 * @param prefix First part of name of file to be analyzed (see above)
 	 * @param expectedLines Array of the lines expected to be found in the file
 	 */
-	private void checkCsv(String prefix, String expectedHeader, String[] expectedLines) throws IOException {
-		// TODO: Lägg headern i arrayen!
+	private void checkCsv(String prefix, String[] expectedLines) throws IOException {
 		File outputFile = lastOutputFile(prefix);
 		BufferedReader outputReader = new BufferedReader(new FileReader(outputFile));
-		assertEquals("Wrong header in " + prefix + " csv!", expectedHeader, outputReader.readLine());
 		for (int i=0; i<expectedLines.length; i++) {
 			String expectedLine = expectedLines[i];
-			assertEquals("Wrong line number " + (i+2) + " for " + prefix + " csv!", expectedLine, outputReader.readLine());
+			assertEquals("Wrong line number " + (i+1) + " for " + prefix + " csv!", expectedLine, outputReader.readLine());
 		}
 		outputReader.close();
 	}
