@@ -1,4 +1,5 @@
 package notebooks;
+
 import java.io.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -111,22 +112,6 @@ public class Analyzer {
 		writer.close();
 	}
 	
-	private class HashExtractor extends Worker<String[]> {
-		public HashExtractor(Notebook notebook) {
-			super(notebook);
-		}
-		
-		@Override
-		public String[] call() throws Exception {
-			return notebook.hashes();
-		}
-
-		@Override
-		protected String[] defaultValue() {
-			return null;
-		}
-	}
-	
 	/**
 	 * Create a file languages<current-date-time>.csv with a header line
 	 * followed by the language and the element from which is was extracted
@@ -155,40 +140,7 @@ public class Analyzer {
 		writer.close();
 		return languages;
 	}
-	
-	// TODO: Extract inner classes(?)
-	private class LanguageExtractor extends Worker<Language> {
-		public LanguageExtractor(Notebook notebook) {
-			super(notebook);
-		}
-		
-		@Override
-		public Language call() throws Exception {
-			return notebook.language();
-		}
 
-		@Override
-		protected Language defaultValue() {
-			return Language.UNKNOWN;
-		}
-	}
-	
-	private class LangSpecExtractor extends Worker<LangSpec> {
-		public LangSpecExtractor(Notebook notebook) {
-			super(notebook);
-		}
-		
-		@Override
-		public LangSpec call() throws Exception {
-			return notebook.langSpec();
-		}
-		
-		@Override
-		protected LangSpec defaultValue() {
-			return LangSpec.NONE;
-		}
-	}
-	
 	/**
 	 * Create a file loc<current-date-time>.csv with the header line
 	 * followed by the number of lines of code for each notebook on the format
@@ -217,39 +169,6 @@ public class Analyzer {
 		return totalLOC;
 	}
 	
-	private class TotalLOCCounter extends IntegerWorker {
-		public TotalLOCCounter(Notebook notebook) {
-			super(notebook);
-		}
-
-		@Override
-		public Integer call() throws Exception {
-			return notebook.LOC();
-		}
-	}
-	
-	private class NonBlankLOCCounter extends IntegerWorker {
-		public NonBlankLOCCounter(Notebook notebook) {
-			super(notebook);
-		}
-		
-		@Override
-		public Integer call() throws Exception {
-			return notebook.LOCNonBlank();
-		}
-	}
-	
-	private class BlankLOCCounter extends IntegerWorker {
-		public BlankLOCCounter(Notebook notebook) {
-			super(notebook);
-		}
-		
-		@Override
-		public Integer call() throws Exception {
-			return notebook.LOCBlank();
-		}
-	}
-	
 	/**
 	 * Count the number of code cells in each notebook. Print each value on a
 	 * separate line in the file snippets<current-date-time>.csv. Start the csv
@@ -272,17 +191,6 @@ public class Analyzer {
 		}
 		writer.close();
 		return totalNumCodeCells;
-	}
-	
-	private class CodeCellCounter extends IntegerWorker {
-		public CodeCellCounter(Notebook notebook) {
-			super(notebook);
-		}
-
-		@Override
-		public Integer call() throws Exception {
-			return notebook.numCodeCells();
-		}
 	}
 	
 	/**
@@ -340,29 +248,6 @@ public class Analyzer {
 			default:
 				System.err.println("Unknown argument: " + arg);
 			}
-		}
-	}
-	
-	private abstract class Worker<T> implements Callable<T> {
-		protected Notebook notebook;
-		
-		Worker(Notebook notebook) {
-			this.notebook = notebook;
-		}
-		
-		/**
-		 * @return The value to return on failure.
-		 */
-		protected abstract T defaultValue();
-	}
-	
-	private abstract class IntegerWorker extends Worker<Integer> {
-		public IntegerWorker(Notebook notebook) {
-			super(notebook);
-		}
-		
-		public Integer defaultValue() {
-			return 0;
 		}
 	}
 	
