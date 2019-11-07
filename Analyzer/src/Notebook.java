@@ -133,25 +133,29 @@ public class Notebook {
 		List<JSONObject> codeCells = getCodeCells();
 		locTotal = 0;
 		for (JSONObject cell: codeCells) {
-			// Get source code
 			JSONArray source = getSource(cell);
-			// If source code exists, count lines
-			// TODO: Extract method(?)
-			if (null != source) {
-				locTotal += source.size();
-				for (int i=0; i<source.size(); i++) {
-					String line = ((String)source.get(i)).trim();
-					if ("".equals(line)) {
-						locBlank++;
-					} else {
-						locContents++;
-					}
-				}
-			} else {
-				System.err.println("Keys \"source\" and \"input\" are missing in a cell in " + this.path);
-			}
+			contLines(source);
 		}
 		locCounted = true;
+	}
+
+	/**
+	 * Count lines if source exists (!= null) 
+	 */
+	private void contLines(JSONArray source) {
+		if (null != source) {
+			locTotal += source.size();
+			for (int i=0; i<source.size(); i++) {
+				String line = ((String)source.get(i)).trim();
+				if ("".equals(line)) {
+					locBlank++;
+				} else {
+					locContents++;
+				}
+			}
+		} else {
+			System.err.println("Keys \"source\" and \"input\" are missing in a cell in " + this.path);
+		}
 	}
 	
 	/**
@@ -276,7 +280,7 @@ public class Notebook {
 
 	/**
 	 * @param metadata Metadata to analyze
-	 * @return The language specified in metadata->kernelspec. UNKNOWN otherwise.
+	 * @return The language specified in Get source codemetadata->kernelspec. UNKNOWN otherwise.
 	 */
 	private Language getLanguageFromKernelspec(JSONObject metadata) {
 		if (metadata.containsKey("kernelspec")) {

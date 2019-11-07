@@ -69,8 +69,12 @@ public class Analyzer {
 	 * @throws IOException On problems handling the output file.
 	 */
 	public Map<String, List<Snippet>> clones() throws IOException {
-		// TODO: Extract methods
-		// Identify clones
+		Map<String, List<Snippet>> clones = findClones();
+		printClonesFile(clones);
+		return clones;
+	}
+
+	private Map<String, List<Snippet>> findClones() {
 		Map<String, List<Snippet>> clones = new HashMap<String, List<Snippet>>();
 		for (int i=0; i<notebooks.size(); i++) {
 			Notebook currentNotebook = notebooks.get(i);
@@ -89,9 +93,11 @@ public class Analyzer {
 				}
 			}
 		}
-		// TODO(?): Mapping from file to snippets/#clones
-		
-		// Print to file
+		return clones;
+	}
+
+	private void printClonesFile(Map<String, List<Snippet>> clones)
+			throws IOException {
 		Writer writer = new FileWriter("clones" + LocalDateTime.now() + ".csv");
 		writer.write("hash, file, index, ...\n");
 		for (String hash: clones.keySet()) {
@@ -102,7 +108,6 @@ public class Analyzer {
 			writer.write("\n");
 		}
 		writer.close();
-		return clones;
 	}
 	
 	private class HashExtractor extends Worker<String[]> {
@@ -122,7 +127,12 @@ public class Analyzer {
 	}
 	
 	/**
-	 * TODO
+	 * Create a file languages<current-date-time>.csv with a header line
+	 * followed by the language and the element from which is was extracted
+	 * from the notebook file. The file contains one line per notebook, on the
+	 * format <filename><language><location of language>.
+	 * @return A map with the different languages as keys and the number of files written in this language as value
+	 * @throws IOException On problems with handling the output file
 	 */
 	public Map<Language, Integer> languages() throws IOException {
 		Map<Language, Integer> languages = new HashMap<Language, Integer>();
@@ -145,6 +155,7 @@ public class Analyzer {
 		return languages;
 	}
 	
+	// TODO: Extract inner classes(?)
 	private class LanguageExtractor extends Worker<Language> {
 		public LanguageExtractor(Notebook notebook) {
 			super(notebook);
@@ -281,7 +292,7 @@ public class Analyzer {
 	}
 	
 	/**
-	 * Parse command line arguments and performs actions accordingly.
+	 * Parse command line arguments and perform actions accordingly.
 	 */
 	private void analyze(String[] args) {
 		for (String arg: args) {

@@ -117,12 +117,12 @@ public class AnalyzerTest {
 		outputFile.delete();
 	}
 	
-	/** TODO: Bättre namn
+	/**
 	 * Verify that the right languages are found in the notebooks.
 	 * @throws IOException
 	 */
 	@Test
-	public void testLanguage_total() throws IOException {
+	public void testLanguage_values() throws IOException {
 		analyzer.initializeNotebooksFrom("test/data/lang");
 		Map<Language, Integer> expected = new HashMap<Language, Integer>();
 		expected.put(Language.PYTHON, 6);
@@ -200,8 +200,7 @@ public class AnalyzerTest {
 		
 		// Check results
 		File outputFile = lastOutputFile("loc");
-		BufferedReader outputReader = new BufferedReader(
-				new FileReader(outputFile));
+		BufferedReader outputReader = new BufferedReader(new FileReader(outputFile));
 		assertEquals("Wrong header in LOC csv!", "file, total, non-blank, blank", outputReader.readLine());
 		for (int i=0; i<LOC.length; i++) {
 			String expectedLine = files[i] + ", " + LOC[i] + ", " + (LOC[i]-emptyLOC[i]) + ", " + emptyLOC[i];
