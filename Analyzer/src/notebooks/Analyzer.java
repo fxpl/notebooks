@@ -171,14 +171,14 @@ public class Analyzer {
 	
 	/**
 	 * Count the number of code cells in each notebook. Print each value on a
-	 * separate line in the file snippets<current-date-time>.csv. Start the csv
-	 * file with the header "snippets".
+	 * separate line in the file num_snippets<current-date-time>.csv. Start the
+	 * csv file with the header "file, snippets".
 	 * @return Total number of code cells in notebooks stored in analyzer
 	 * @throws IOException On problems with handling the output file
 	 */
 	public int numCodeCells() throws IOException {
 		int totalNumCodeCells = 0;
-		Writer writer = new FileWriter("snippets" + LocalDateTime.now() + ".csv");
+		Writer writer = new FileWriter("num_snippets" + LocalDateTime.now() + ".csv");
 		writer.write("file, snippets\n");
 		for (int i=0; i<notebooks.size(); i++) {
 			if (0 == i%10000) {

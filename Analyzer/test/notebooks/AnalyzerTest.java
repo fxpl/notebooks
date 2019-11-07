@@ -229,12 +229,12 @@ public class AnalyzerTest {
 	public void testNumCodeCells_total() throws IOException {
 		analyzer.initializeNotebooksFrom("test/data/count");
 		assertEquals("Wrong number of cells found in notebooks!", 15, analyzer.numCodeCells());
-		lastOutputFile("snippets").delete();
+		lastOutputFile("num_snippets").delete();
 	}
 	
 	/**
-	 * Verify that the output file snippets<current-date-time>.csv is created
-	 * and filled correctly when the number of cells are counted.
+	 * Verify that the output file num_snippets<current-date-time>.csv is
+	 * created and filled correctly when the number of cells are counted.
 	 * @throws IOException on errors when handling output file
 	 */
 	@Test
@@ -249,12 +249,12 @@ public class AnalyzerTest {
 		analyzer.numCodeCells();
 		
 		// Check results
-		File outputFile = lastOutputFile("snippets");
+		File outputFile = lastOutputFile("num_snippets");
 		BufferedReader outputReader = new BufferedReader(
 				new FileReader(outputFile));
-		assertEquals("Wrong header in snippets csv!", "file, snippets", outputReader.readLine());
+		assertEquals("Wrong header in number of snippets csv!", "file, snippets", outputReader.readLine());
 		for (int i =0; i<numCodeCells.length; i++) {
-			assertEquals("Wrong output i snippets file:",
+			assertEquals("Wrong output in number of snippets file:",
 					files[i] + ", " + numCodeCells[i], outputReader.readLine());
 		}
 		
