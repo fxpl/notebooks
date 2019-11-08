@@ -14,6 +14,6 @@ class HashExtractor extends Worker<String[]> {
 
 	@Override
 	protected String[] defaultValue() {
-		return null;
+		return new String[0];
 	}
 }
