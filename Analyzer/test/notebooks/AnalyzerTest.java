@@ -63,14 +63,14 @@ public class AnalyzerTest {
 			assertEquals("Wrong number of snippets stored for " + hash + ":", expectedSnippets.size(), actualSnippets.size());
 			assertTrue("Wrong snippets stored for " + hash, actualSnippets.containsAll(expectedSnippets));
 		}
-		lastOutputFile("snippets").delete();
-		lastOutputFile("clones").delete();
+		lastOutputFile("file2hashes").delete();
+		lastOutputFile("hash2files").delete();
 	}
 	
 	/**
-	 * Verify that the output files snippets<current-date-time>.csv and
-	 * clones<current-date-time>.csv have the right content after clone analysis
-	 * of a notebook with a single snippet.
+	 * Verify that the output files file2hashes<current-date-time>.csv and
+	 * hash2files<current-date-time>.csv have the right content after clone
+	 * analysis of a notebook with a single snippet.
 	 * @throws IOException
 	 */
 	@Test
@@ -90,16 +90,16 @@ public class AnalyzerTest {
 		analyzer.initializeNotebooksFrom(dataDir + fileName);
 		analyzer.clones();
 		
-		checkCsv("snippets", expectedSnippetLines);
-		checkCsv("clones", expectedClonesLines);
+		checkCsv("file2hashes", expectedSnippetLines);
+		checkCsv("hash2files", expectedClonesLines);
 		
-		lastOutputFile("snippets").delete();
-		lastOutputFile("clones").delete();
+		lastOutputFile("file2hashes").delete();
+		lastOutputFile("hash2files").delete();
 	}
 	
 	/**
-	 * Verify that the output files snippets<current-date-time>.csv and
-	 * clones<current-date-time>.csv have the right content after clone 
+	 * Verify that the output files file2hashes<current-date-time>.csv and
+	 * hash2files<current-date-time>.csv have the right content after clone
 	 * analysis of a two notebooks with a clone.
 	 * @throws IOException
 	 */
@@ -123,11 +123,11 @@ public class AnalyzerTest {
 		analyzer.initializeNotebooksFrom(dataDir + fileName2);
 		analyzer.clones();
 		
-		checkCsv("snippets", expectedSnippetLines);
-		checkCsv("clones", expectedClonesLines);
+		checkCsv("file2hashes", expectedSnippetLines);
+		checkCsv("hash2files", expectedClonesLines);
 		
-		lastOutputFile("snippets").delete();
-		lastOutputFile("clones").delete();
+		lastOutputFile("file2hashes").delete();
+		lastOutputFile("hash2files").delete();
 	}
 	
 	/**
@@ -225,11 +225,11 @@ public class AnalyzerTest {
 	public void testNumCodeCells_total() throws IOException {
 		analyzer.initializeNotebooksFrom("test/data/count");
 		assertEquals("Wrong number of cells found in notebooks!", 15, analyzer.numCodeCells());
-		lastOutputFile("num_snippets").delete();
+		lastOutputFile("snippets").delete();
 	}
 	
 	/**
-	 * Verify that the output file num_snippets<current-date-time>.csv is
+	 * Verify that the output file snippets<current-date-time>.csv is
 	 * created and filled correctly when the number of cells are counted.
 	 * @throws IOException on errors when handling output file
 	 */
@@ -249,9 +249,9 @@ public class AnalyzerTest {
 		}
 		analyzer.numCodeCells();
 		
-		checkCsv("num_snippets", expectedLines);
+		checkCsv("snippets", expectedLines);
 		
-		lastOutputFile("num_snippets").delete();
+		lastOutputFile("snippets").delete();
 	}
 
 	/**

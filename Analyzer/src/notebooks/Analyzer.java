@@ -66,10 +66,10 @@ public class Analyzer {
 	 * containing the corresponding code.
 	 * For each notebook, print the name of the notebook followed by a list of
 	 * the hash of each snippet in the notebook to the file 
-	 * snippets<current-date-time>.csv.
+	 * file2hashes<current-date-time>.csv.
 	 * Print each hash and the corresponding snippets (name, index) on a
-	 * separate line in the file clones<current-date-time>.csv. Start the csv
-	 * files with a header.
+	 * separate line in the file hash2files<current-date-time>.csv. Start the
+	 * csv files with a header.
 	 * @return The map described above
 	 * @throws IOException On problems handling the output file.
 	 */
@@ -81,7 +81,7 @@ public class Analyzer {
 
 	private Map<String, List<Snippet>> getAndDumpHashes() throws IOException {
 		Map<String, List<Snippet>> clones = new HashMap<String, List<Snippet>>();
-		Writer writer = new FileWriter("snippets" + LocalDateTime.now() + ".csv");
+		Writer writer = new FileWriter("file2hashes" + LocalDateTime.now() + ".csv");
 		writer.write("file, snippets\n");
 		for (int i=0; i<notebooks.size(); i++) {
 			if (0 == i%10000) {
@@ -109,7 +109,7 @@ public class Analyzer {
 
 	private void printClonesFile(Map<String, List<Snippet>> clones)
 			throws IOException {
-		Writer writer = new FileWriter("clones" + LocalDateTime.now() + ".csv");
+		Writer writer = new FileWriter("hash2files" + LocalDateTime.now() + ".csv");
 		writer.write("hash, file, index, ...\n");
 		for (String hash: clones.keySet()) {
 			writer.write(hash);
@@ -180,14 +180,14 @@ public class Analyzer {
 	
 	/**
 	 * Count the number of code cells in each notebook. Print each value on a
-	 * separate line in the file num_snippets<current-date-time>.csv. Start the
+	 * separate line in the file snippets<current-date-time>.csv. Start the
 	 * csv file with the header "file, snippets".
 	 * @return Total number of code cells in notebooks stored in analyzer
 	 * @throws IOException On problems with handling the output file
 	 */
 	public int numCodeCells() throws IOException {
 		int totalNumCodeCells = 0;
-		Writer writer = new FileWriter("num_snippets" + LocalDateTime.now() + ".csv");
+		Writer writer = new FileWriter("snippets" + LocalDateTime.now() + ".csv");
 		writer.write("file, snippets\n");
 		for (int i=0; i<notebooks.size(); i++) {
 			if (0 == i%10000) {
@@ -209,7 +209,7 @@ public class Analyzer {
 		return this.notebooks.size();
 	}
 	
-	/**
+	/** TODO: Skriv ut meddelandet från undantagen!
 	 * Parse command line arguments and perform actions accordingly.
 	 */
 	private void analyze(String[] args) {
