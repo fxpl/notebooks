@@ -51,6 +51,10 @@ public class AnalyzerTest {
 		List<Snippet> pandas = new ArrayList<Snippet>(1);
 		pandas.add(new Snippet("two_import_cells.ipynb", 1));
 		expectedClones.put("6CABFDBC20F69189D4B8894A06C78F49", pandas); // import pandas
+		List<Snippet> kossa = new ArrayList<Snippet>(2);
+		kossa.add(new Snippet("intra_clones.ipynb", 0));
+		kossa.add(new Snippet("intra_clones.ipynb", 1));
+		expectedClones.put("0120F99AA7C49E1CD5F4EE4A6BB1CC4A", kossa);
 		
 		// Actual values
 		Map<String, List<Snippet>> clones = analyzer.clones();
@@ -100,31 +104,28 @@ public class AnalyzerTest {
 	/**
 	 * Verify that the output files file2hashes<current-date-time>.csv and
 	 * hash2files<current-date-time>.csv have the right content after clone
-	 * analysis of a two notebooks with a clone.
+	 * analysis of a notebooks with a clone.
 	 * @throws IOException
 	 */
 	@Test
-	public void testClones_csv_emptySnippets() throws IOException {
+	public void testClones_csv_intraClone() throws IOException {
 		String dataDir = "test/data/hash/";
-		String fileName1 = "empty_code_string.ipynb";
-		String fileName2 = "empty_code_strings.ipynb";
-		String hash = "D41D8CD98F00B204E9800998ECF8427E";
-		String[] expectedSnippetLines = {
+		String fileName = "intra_clones.ipynb";
+		String hash = "0120F99AA7C49E1CD5F4EE4A6BB1CC4A";
+		String[] expectedFile2HashesLines = {
 				"file, snippets",
-				fileName1 + ", " + hash,
-				fileName2 + ", " + hash
+				fileName + ", " + hash + ", " + hash
 		};
-		String[] expectedClonesLines = {
+		String[] expectedHash2FileLines = {
 				"hash, file, index, ...",
-				hash + ", " + fileName1 + ", 0, " + fileName2 + ", 0"
+				hash + ", " + fileName + ", 0, " + fileName + ", 1"
 		};
 		
-		analyzer.initializeNotebooksFrom(dataDir + fileName1);
-		analyzer.initializeNotebooksFrom(dataDir + fileName2);
+		analyzer.initializeNotebooksFrom(dataDir + fileName);
 		analyzer.clones();
 		
-		checkCsv("file2hashes", expectedSnippetLines);
-		checkCsv("hash2files", expectedClonesLines);
+		checkCsv("file2hashes", expectedFile2HashesLines);
+		checkCsv("hash2files", expectedHash2FileLines);
 		
 		lastOutputFile("file2hashes").delete();
 		lastOutputFile("hash2files").delete();

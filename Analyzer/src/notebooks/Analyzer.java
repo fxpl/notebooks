@@ -74,25 +74,42 @@ public class Analyzer {
 	 * @throws IOException On problems handling the output file.
 	 */
 	public Map<String, List<Snippet>> clones() throws IOException {
-		Map<String, List<Snippet>> clones = getAndDumpHashes();
-		printClonesFile(clones);
+		Map<String, String[]> hashes = getHashes();
+		Map<String, List<Snippet>> clones = getClones(hashes);
+		printFile2Hashes(hashes);
+		printHash2Files(clones);
 		return clones;
 	}
 
-	private Map<String, List<Snippet>> getAndDumpHashes() throws IOException {
-		Map<String, List<Snippet>> clones = new HashMap<String, List<Snippet>>();
-		Writer writer = new FileWriter("file2hashes" + LocalDateTime.now() + ".csv");
-		writer.write("file, snippets\n");
+	/**
+	 * @return A map from file names to hashes (snippets)
+	 */
+	private Map<String, String[]> getHashes() throws IOException {
+		Map<String, String[]> hashes = new HashMap<String, String[]>();
 		for (int i=0; i<notebooks.size(); i++) {
 			if (0 == i%10000) {
-				System.out.println("Looking for clones in notebook " + i);
+				System.out.println("Hashing snippets in notebook " + i);
 			}
 			Notebook currentNotebook = notebooks.get(i);
 			String fileName = currentNotebook.getName();
-			writer.write(fileName);
-			String[] hashes = employ(new HashExtractor(currentNotebook));
+			String[] hashesInNotebook = employ(new HashExtractor(currentNotebook));
+			hashes.put(fileName, hashesInNotebook);
+		}
+		return hashes;
+	}
+	
+	/**
+	 * return A map from hashes (snippets) to files
+	 */
+	private Map<String, List<Snippet>> getClones(Map<String, String[]> fileMap) throws IOException {
+		int numAnalyzed = 0;
+		Map<String, List<Snippet>> clones = new HashMap<String, List<Snippet>>();
+		for (String fileName: fileMap.keySet()) {
+			if (0 == numAnalyzed%10000) {
+				System.out.println("Finding clones in notebook " + numAnalyzed);
+			}
+			String[] hashes = fileMap.get(fileName);
 			for (int j=0; j<hashes.length; j++) {
-				writer.write(", " + hashes[j]);
 				if (clones.containsKey(hashes[j])) {
 					clones.get(hashes[j]).add(new Snippet(fileName, j));
 				} else {
@@ -101,20 +118,33 @@ public class Analyzer {
 					clones.put(hashes[j], snippets);
 				}
 			}
-			writer.write("\n");
+			numAnalyzed++;
 		}
-		writer.close();
 		return clones;
 	}
 
-	private void printClonesFile(Map<String, List<Snippet>> clones)
-			throws IOException {
+	private void printHash2Files(Map<String, List<Snippet>> clones) throws IOException {
 		Writer writer = new FileWriter("hash2files" + LocalDateTime.now() + ".csv");
 		writer.write("hash, file, index, ...\n");
 		for (String hash: clones.keySet()) {
 			writer.write(hash);
 			for (Snippet s: clones.get(hash)) {
 				writer.write(", " + s);
+			}
+			writer.write("\n");
+		}
+		writer.close();
+	}
+	
+	private void printFile2Hashes(Map<String, String[]> clones) throws IOException {
+		// TODO: Skriv klonfrekvensfil här (eller i egen metod)!
+		Writer writer = new FileWriter("file2hashes" + LocalDateTime.now() + ".csv");
+		writer.write("file, snippets\n");
+		for (String fileName: clones.keySet()) {
+			writer.write(fileName);
+			String[] hashes = clones.get(fileName);
+			for (String hash: hashes) {
+				writer.write(", " + hash);
 			}
 			writer.write("\n");
 		}
