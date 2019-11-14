@@ -18,7 +18,7 @@ public class Notebook {
 	private int locTotal;		// Total number of lines of code
 	private int locBlank;		// Number of empty code lines
 	private int locContents;	// Number of non-empty code lines
-	private boolean locCounted = false;
+	private volatile boolean locCounted = false;
 	private LangSpec languageSpecIn;
 	
 	public Notebook(String path) {
@@ -60,6 +60,9 @@ public class Notebook {
 	}
 	
 	/**
+	 * This updates instance variables, but it will always set the same values
+	 * for a given object, so it doesn't have to be synchronized. (The same
+	 * holds for its private helper methods.) 
 	 * @return The language of the notebook
 	 */
 	public Language language() throws NotebookException {
@@ -90,9 +93,7 @@ public class Notebook {
 	 * @throws NotebookException if the notebook file could not be parsed
 	 */
 	public int LOC() throws NotebookException {
-		if (!locCounted) {
-			countLines();
-		}
+		countLinesIfNotDone();
 		return locTotal;
 	}
 	
@@ -101,9 +102,7 @@ public class Notebook {
 	 * @throws NotebookException if the notebook file could not be parsed
 	 */
 	public int LOCBlank() throws NotebookException {
-		if (!locCounted) {
-			countLines();
-		}
+		countLinesIfNotDone();
 		return locBlank;
 	}
 	
@@ -112,9 +111,7 @@ public class Notebook {
 	 * @throws NotebookException if the notebook file could not be parsed
 	 */
 	public int LOCNonBlank() throws NotebookException {
-		if(!locCounted) {
-			countLines();
-		}
+		countLinesIfNotDone();
 		return locContents;
 	}
 	
@@ -131,20 +128,24 @@ public class Notebook {
 	 * Count lines of code and set all loc variables.
 	 * @throws NotebookException if the file could not be parsed
 	 */
-	private void countLines() throws NotebookException {
-		List<JSONObject> codeCells = getCodeCells();
-		locTotal = 0;
-		for (JSONObject cell: codeCells) {
-			JSONArray source = getSource(cell);
-			countLines(source);
+	private synchronized void countLinesIfNotDone() throws NotebookException {
+		if (!locCounted) {
+			locTotal = 0;	// May have been partly counted before.
+			locBlank = 0;
+			locContents = 0;
+			List<JSONObject> codeCells = getCodeCells();
+			for (JSONObject cell: codeCells) {
+				JSONArray source = getSource(cell);
+				countLines(source);
+			}
+			locCounted = true;
 		}
-		locCounted = true;
 	}
 
 	/**
 	 * Count lines in source.
 	 */
-	private void countLines(JSONArray source) {
+	private synchronized void countLines(JSONArray source) {
 		locTotal += source.size();
 		for (int i=0; i<source.size(); i++) {
 			String line = ((String)source.get(i)).trim();
@@ -373,7 +374,6 @@ public class Notebook {
 			}
 			return result;
 		} else {
-			System.out.println("Unknown source type in " + this.path + ": " + source.getClass() + "!");
 			throw new NotebookException("Unknown source type in " + this.path
 					+ ": " + source.getClass() + "!");
 		}
