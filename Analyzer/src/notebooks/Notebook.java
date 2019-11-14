@@ -136,27 +136,23 @@ public class Notebook {
 		locTotal = 0;
 		for (JSONObject cell: codeCells) {
 			JSONArray source = getSource(cell);
-			contLines(source);
+			countLines(source);
 		}
 		locCounted = true;
 	}
 
 	/**
-	 * Count lines if source exists (!= null) 
+	 * Count lines in source.
 	 */
-	private void contLines(JSONArray source) {
-		if (null != source) {
-			locTotal += source.size();
-			for (int i=0; i<source.size(); i++) {
-				String line = ((String)source.get(i)).trim();
-				if ("".equals(line)) {
-					locBlank++;
-				} else {
-					locContents++;
-				}
+	private void countLines(JSONArray source) {
+		locTotal += source.size();
+		for (int i=0; i<source.size(); i++) {
+			String line = ((String)source.get(i)).trim();
+			if ("".equals(line)) {
+				locBlank++;
+			} else {
+				locContents++;
 			}
-		} else {
-			System.err.println("Keys \"source\" and \"input\" are missing in a cell in " + this.path);
 		}
 	}
 	
@@ -353,15 +349,33 @@ public class Notebook {
 	
 	/**
 	 * @param cell Code cell to fetch source code from
-	 * @return The source code stored in cell (with each line as a separate element), null if source code is missing 
+	 * @return The source code stored in cell (with each line as a separate element), empty array if source code is missing 
+	 * @throws NotebookException When source is stored on an unknown format
 	 */
-	private static JSONArray getSource(JSONObject cell) {
-		JSONArray source = null;
+	@SuppressWarnings("unchecked")	// The JSON library uses raw types internally
+	private JSONArray getSource(JSONObject cell) throws NotebookException {
+		Object source = null;
 		if (cell.containsKey("source")) {
-			source = (JSONArray) cell.get("source");
+			source = cell.get("source");
 		} else if (cell.containsKey("input")) {
-			source = (JSONArray) cell.get("input");
+			source = cell.get("input");
+		} else {
+			System.err.println("Keys \"source\" and \"input\" are missing in a cell in " + this.path);
+			source = new JSONArray();
 		}
-		return source;
+		if (source instanceof JSONArray) {
+			return (JSONArray) source;
+		} else if (source instanceof String) {
+			JSONArray result = new JSONArray();
+			String[] lines = ((String) source).split("\\n");
+			for (String line: lines) {
+				result.add(line);
+			}
+			return result;
+		} else {
+			System.out.println("Unknown source type in " + this.path + ": " + source.getClass() + "!");
+			throw new NotebookException("Unknown source type in " + this.path
+					+ ": " + source.getClass() + "!");
+		}
 	}
 }

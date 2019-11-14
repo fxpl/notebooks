@@ -98,11 +98,11 @@ public class NotebookTest {
 	@Test
 	public void testLOCTotal() throws NotebookException {
 		String dataDir = "test/data/loc";
-		String[] files = {"markdownCells.ipynb", "one_codeCell_6loc.ipynb",
-				"two_codeCells_13loc.ipynb", "three_codeCells_2loc.ipynb",
-				"code_and_md_3loc.ipynb", "missing_source.ipynb",
-				"two_codeCells_26loc_worksheet.ipynb"};
-		int[] LOC = {0, 6, 13, 2, 3, 2, 23};
+		String[] files = {"markdownCells.ipynb", "one_codeCell_6loc_arr.ipynb",
+				"one_codeCell_6loc_str.ipynb", "two_codeCells_13loc.ipynb",
+				"three_codeCells_2loc.ipynb", "code_and_md_3loc.ipynb",
+				"missing_source.ipynb", "two_codeCells_26loc_worksheet.ipynb"};
+		int[] LOC = {0, 6, 6, 13, 2, 3, 2, 23};
 		for (int i=0; i<files.length; i++) {
 			Notebook notebook = new Notebook(dataDir + "/" + files[i]);
 			assertEquals("Wrong LOC!", LOC[i], notebook.LOC());
@@ -162,6 +162,16 @@ public class NotebookTest {
 			assertEquals("Wrong number of code cells!",
 					numCodeCells[i], notebook.numCodeCells());
 		}
+	}
+	
+	/**
+	 * Verify that a NotebookException is thrown if we try to extract a source
+	 * value that is not a string or an array.
+	 */
+	@Test (expected=NotebookException.class)
+	public void testParsingUnknownSourceType() throws NotebookException {
+		Notebook notebook = new Notebook("test/data/loc/unknown_source_type.ipynb");
+		notebook.LOC();
 	}
 
 	/**
