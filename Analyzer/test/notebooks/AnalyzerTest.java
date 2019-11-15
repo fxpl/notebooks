@@ -28,16 +28,18 @@ public class AnalyzerTest {
 	public void tearDown() {
 		analyzer.shutDown();
 	}
-	
-	// TODO: mappar i andra test, mindre kodduplicering!
-	
+
 	/**
 	 * Verify that snippets are stored correctly in the clone hash map.
 	 * @throws IOException 
 	 */
 	@Test
 	public void testClones() throws IOException {
-		analyzer.initializeNotebooksFrom("test/data/hash");
+		String dataDir = "test/data/hash";
+		String[] files = {"empty_code_string.ipynb", "empty_code_strings.ipynb",
+				"single_import.ipynb", "two_import_cells.ipynb",
+				"intra_clones.ipynb", "intra_clones_and_unique.ipynb"
+		};
 		// Expected values
 		Map<String, List<Snippet>> expectedClones = new HashMap<String, List<Snippet>>();
 		List<Snippet> emptySnippets = new ArrayList<Snippet>(2);
@@ -51,12 +53,21 @@ public class AnalyzerTest {
 		List<Snippet> pandas = new ArrayList<Snippet>(1);
 		pandas.add(new Snippet("two_import_cells.ipynb", 1));
 		expectedClones.put("6CABFDBC20F69189D4B8894A06C78F49", pandas); // import pandas
-		List<Snippet> kossa = new ArrayList<Snippet>(2);
+		List<Snippet> kossa = new ArrayList<Snippet>(4);
 		kossa.add(new Snippet("intra_clones.ipynb", 0));
 		kossa.add(new Snippet("intra_clones.ipynb", 1));
+		kossa.add(new Snippet("intra_clones_and_unique.ipynb", 0));
+		kossa.add(new Snippet("intra_clones_and_unique.ipynb", 2));
 		expectedClones.put("0120F99AA7C49E1CD5F4EE4A6BB1CC4A", kossa);
+		List<Snippet> unique = new ArrayList<Snippet>(1);
+		unique.add(new Snippet("intra_clones_and_unique.ipynb", 1));
+		expectedClones.put("A2D53E3DA394A52271CF00632C961D2A", unique);
 		
 		// Actual values
+		for (String file: files) {
+			analyzer.initializeNotebooksFrom(dataDir + "/" + file);
+		}
+		analyzer.initializeNotebooksFrom("test/data/hash");
 		Map<String, List<Snippet>> clones = analyzer.clones();
 		
 		// Check values
@@ -67,19 +78,19 @@ public class AnalyzerTest {
 			assertEquals("Wrong number of snippets stored for " + hash + ":", expectedSnippets.size(), actualSnippets.size());
 			assertTrue("Wrong snippets stored for " + hash, actualSnippets.containsAll(expectedSnippets));
 		}
-		lastOutputFile("file2hashes").delete();
-		lastOutputFile("hash2files").delete();
+		deleteCloneCsvs();
 	}
 	
 	/**
-	 * Verify that the output files file2hashes<current-date-time>.csv and
-	 * hash2files<current-date-time>.csv have the right content after clone
-	 * analysis of a notebook with a single snippet.
+	 * Verify that the output files file2hashes<current-date-time>.csv,
+	 * hash2files<current-date-time>.csv and cloneFrequency<current-date-time>.csv
+	 * have the right content after clone analysis of a notebook with a single
+	 * snippet.
 	 * @throws IOException
 	 */
 	@Test
 	public void testClones_csv_singleSnippet() throws IOException {
-		String dataDir = "test/data/hash/";
+		String dataDir = "test/data/hash";
 		String fileName = "single_import.ipynb";
 		String hash = "33BE8D72467938FBB23EF42CF8C9E85F";
 		String[] expectedSnippetLines = {
@@ -90,26 +101,31 @@ public class AnalyzerTest {
 				"hash, file, index, ...",
 				hash + ", " + fileName + ", 0"
 		};
+		String[] expectedFrequencyLiens = {
+				"file, clones, unique, clone frequency",
+				fileName + ", 0, 1, 0.0000"
+		};
 		
-		analyzer.initializeNotebooksFrom(dataDir + fileName);
+		// Actual values
+		analyzer.initializeNotebooksFrom(dataDir + "/" + fileName);
 		analyzer.clones();
 		
 		checkCsv("file2hashes", expectedSnippetLines);
 		checkCsv("hash2files", expectedClonesLines);
+		checkCsv("cloneFrequency", expectedFrequencyLiens);
 		
-		lastOutputFile("file2hashes").delete();
-		lastOutputFile("hash2files").delete();
+		deleteCloneCsvs();
 	}
 	
 	/**
-	 * Verify that the output files file2hashes<current-date-time>.csv and
-	 * hash2files<current-date-time>.csv have the right content after clone
-	 * analysis of a notebooks with a clone.
+	 * Verify that the output files file2hashes<current-date-time>.csv, 
+	 * hash2files<current-date-time>.csv and cloneFrequency<current-date-time>.csv
+	 * have the right content after clone analysis of a notebooks with a clone.
 	 * @throws IOException
 	 */
 	@Test
 	public void testClones_csv_intraClone() throws IOException {
-		String dataDir = "test/data/hash/";
+		String dataDir = "test/data/hash";
 		String fileName = "intra_clones.ipynb";
 		String hash = "0120F99AA7C49E1CD5F4EE4A6BB1CC4A";
 		String[] expectedFile2HashesLines = {
@@ -120,16 +136,54 @@ public class AnalyzerTest {
 				"hash, file, index, ...",
 				hash + ", " + fileName + ", 0, " + fileName + ", 1"
 		};
+		String[] expectedFrequencyLines = {
+				"file, clones, unique, clone frequency",
+				fileName + ", 2, 0, 1.0000"
+		};
 		
-		analyzer.initializeNotebooksFrom(dataDir + fileName);
+		// Actual values
+		analyzer.initializeNotebooksFrom(dataDir + "/" + fileName);
 		analyzer.clones();
 		
 		checkCsv("file2hashes", expectedFile2HashesLines);
 		checkCsv("hash2files", expectedHash2FileLines);
+		checkCsv("cloneFrequency", expectedFrequencyLines);
 		
-		lastOutputFile("file2hashes").delete();
-		lastOutputFile("hash2files").delete();
+		deleteCloneCsvs();
 	}
+	
+	/**
+	 * Verify that the output files file2hashes<current-date-time>.csv and
+	 * cloneFrequency<current-date-time>.csv have the right content after clone
+	 * analysis of a notebooks with both clones and a unique snippet.
+	 * @throws IOException
+	 */
+	@Test
+	public void testClones_csv_mixed() throws IOException {
+		String dataDir = "test/data/hash";
+		String fileName = "intra_clones_and_unique.ipynb";
+		String kossaHash = "0120F99AA7C49E1CD5F4EE4A6BB1CC4A";
+		String uniqueHash = "A2D53E3DA394A52271CF00632C961D2A";
+		String[] expectedFile2HashesLines = {
+			"file, snippets",
+			fileName + ", " + kossaHash + ", " + uniqueHash + ", " + kossaHash
+		};
+		// hash2Files is hard to test since we don't know in which order the hashes are stored
+		String[] expectedFrequencyLines = {
+			"file, clones, unique, clone frequency",
+			fileName + ", 2, 1, 0.6667"
+		};
+		
+		// Actual values
+		analyzer.initializeNotebooksFrom(dataDir + "/" + fileName);
+		analyzer.clones();
+		
+		checkCsv("file2hashes", expectedFile2HashesLines);
+		checkCsv("cloneFrequency", expectedFrequencyLines);
+		
+		deleteCloneCsvs();
+	}
+	
 	
 	/**
 	 * Verify that the right languages are found in the notebooks.
@@ -278,6 +332,15 @@ public class AnalyzerTest {
 			assertEquals("Wrong line number " + (i+1) + " for " + prefix + " csv!", expectedLine, outputReader.readLine());
 		}
 		outputReader.close();
+	}
+	
+	/**
+	 * Delete all CSV files created by the clone analysis. 
+	 */
+	private void deleteCloneCsvs() {
+		lastOutputFile("file2hashes").delete();
+		lastOutputFile("hash2files").delete();
+		lastOutputFile("cloneFrequency").delete();
 	}
 	
 	/**

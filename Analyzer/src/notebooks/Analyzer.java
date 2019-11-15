@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.*;
 
@@ -78,6 +79,7 @@ public class Analyzer {
 		Map<String, List<Snippet>> clones = getClones(hashes);
 		printFile2Hashes(hashes);
 		printHash2Files(clones);
+		printCloneFrequencies(hashes, clones);
 		return clones;
 	}
 
@@ -137,7 +139,6 @@ public class Analyzer {
 	}
 	
 	private void printFile2Hashes(Map<String, String[]> clones) throws IOException {
-		// TODO: Skriv klonfrekvensfil här (eller i egen metod)!
 		Writer writer = new FileWriter("file2hashes" + LocalDateTime.now() + ".csv");
 		writer.write("file, snippets\n");
 		for (String fileName: clones.keySet()) {
@@ -151,6 +152,37 @@ public class Analyzer {
 		writer.close();
 	}
 	
+	private void printCloneFrequencies(Map<String, String[]> file2Hashes,
+			Map<String, List<Snippet>> hash2Files) throws IOException {
+		Writer writer = new FileWriter("cloneFrequency" + LocalDateTime.now() + ".csv");
+		writer.write("file, clones, unique, clone frequency\n");
+		for (String fileName: file2Hashes.keySet()) {
+			int numClones = 0, numUnique = 0;
+			String[] hashes = file2Hashes.get(fileName);
+			for (String hash: hashes) {
+				if(isClone(hash, hash2Files)) {
+					numClones++;
+				} else {
+					numUnique++;
+				}
+			}
+			double cloneFrequency = (double)numClones / (numClones + numUnique);
+			writer.write(fileName + ", " + numClones + ", " + numUnique + ", "
+			+ String.format(Locale.US, "%.4f", cloneFrequency) + "\n");
+		}
+		writer.close();
+	}
+	
+	/**
+	 * Look in clones to decide whether hash is the hash of a clone or a unique
+	 * snippet (that is, if the list of snippets is at least 2).
+	 * @return true if hash is a clone, false otherwise
+	 */
+	private boolean isClone(String hash, Map<String, List<Snippet>> clones) {
+		List<Snippet> snippets = clones.get(hash);
+		return snippets.size() >= 2;
+	}
+
 	/**
 	 * Create a file languages<current-date-time>.csv with a header line
 	 * followed by the language and the element from which is was extracted
