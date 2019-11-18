@@ -2,6 +2,9 @@
 .classpath
 .project
 
+# Understand file
+NotebookAnalyzer.udb
+
 # Binaries
 bin
 

@@ -5,6 +5,4 @@
 #SBATCH -p core -n 4
 #SBATCH -J notebook_analyzer
 
-# TODO: Sätt upp minnesåtgången; skriv ut minnesanvändning!
-
 java -XX:+UseParallelGC -cp bin:./external/json-simple-1.1.1.jar notebooks.Analyzer /proj/uppstore2019098/notebooks -count
