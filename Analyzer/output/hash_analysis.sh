@@ -8,7 +8,7 @@
 
 clonesFile="clones2019-11-10T18:21:42.078.csv"
 snippetsFile="snippets2019-11-08T16:29:42.901.csv"
-
+frequencyFile="fractionClones.csv"
 
 # Most clones snippets
 sortedCloneCount=`grep -o ',' -n $clonesFile | uniq -c | sort -n`
@@ -56,53 +56,10 @@ echo "Fraction clones: $fraction"
 exit
 
 
-# TODO: Det här kommer inte att terminera inom rimlig tid! Skapa fractionClones i Javaprogrammet istället!?
-# Create a file (clonesInFiles.csv) where each line contains the name of a
-# notebook file, followed by a list of its snippets, marked by "K" if it is a
-# clone and marked by "U" if it is unique.
-cp $snippetsFile clonesInFiles.csv
-cat numCommas.txt | while read line
-do
-    hash=`echo $line | cut -d' ' -f1`
-    num=`echo $line | cut -d' ' -f2`
-    if [ $num -gt 2 ] 
-    then
-        type="K"
-    else
-        type="U"
-    fi  
-    sed -Ei "s/$hash/$type/" clonesInFiles.csv
-done
-
-# Create a file (fractionClones.csv) with 1 line per notebook and 4 columns:
-# file name, #cloned snippets in file, #unique snippets in file, fraction clones in file
-echo "file, clones, unique, fraction clones" > fractionClones.csv
-sed -n "2,$ p" clonesInFiles.csv | while read line
-do
-    numK=0
-    numU=0
-    tokens=($line)
-    file=${tokens[0]}
-    for type in ${tokens[@]:1}
-    do  
-        if [ "K," == $type ]
-        then
-            numK=$numK+1
-        elif [ "U," == $type ]
-            numU=$numU+1
-        else
-            echo "Unknown type $type on line $line!"
-        fi
-        fraction=`echo $numK/($numK+$numU) | bc`
-        echo "$file, $numK, $numU, $fraction" >> fractionClones.csv
-    done
-done
-
-
 # OTESTAT
 # Check how many files contains only clones and only unique snippets respectively
 ## If fraction == 1, all snippets in the file are clones. (fraction<=1).
-fractionClones=`sed -n "2,$ p" fractionClones.csv | cut -d' ' -f4`
+fractionClones=`sed -n "2,$ p" $frequencyFile | cut -d' ' -f4`
 onlyClones=`echo "$fractionClones" | grep "^1\." | wc -l`
 ## If no number in fraction > 0, fraction==0, that is all snippets in the file are unique.
 onlyUnique=`echo "$fractionClones" | grep -v "[1-9]" | wc -l`
@@ -111,8 +68,8 @@ onlyUniqueFrac=`echo "$onlyUnique / ($onlyClones+$onlyUnique)" | bc -l`
 echo "Files only containing clones: $onlyClones ($onlyClonesFrac)"
 echo "Files only containing unique snippets: $onlyUnique ($onlyUniqueFrac)"
 
-numLines=`wc -l $snippetsFile | cut -d' ' -f1`
+numLines=`wc -l $frequencyFile | cut -d' ' -f1`
 numFiles=`echo "$numLines - 1" | bc`
-echo "On average the following number of snippets in a file are clones:"
+echo "On average the following fraction of snippets in a file are clones:"
 echo "`echo "$fractionClones" | paste -sd+` / $numFiles" | bc -l
 

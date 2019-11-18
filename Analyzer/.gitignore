@@ -9,4 +9,5 @@ bin
 reports
 
 # Slurm output
+slurm-*\.out
 logs
