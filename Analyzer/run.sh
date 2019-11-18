@@ -1,10 +1,11 @@
 #!/bin/bash -l
 
 #SBATCH -A snic2019-8-228
-#SBATCH -t 140:00:00
-#SBATCH -p core -n 4
-#SBATCH -J notebook_analyzer
+#SBATCH -t 120:00:00
+#SBATCH -p core -n 6
+#SBATCH -J notebook_analyzer_clones
 
-# TODO: Sätt upp minnesåtgången; skriv ut minnesanvändning!
+java -XX:+UnlockDiagnosticVMOptions -XX:+PrintNMTStatistics -XX:+UseParallelGC \
+	-cp bin:./external/json-simple-1.1.1.jar -Xmx36G \
+	notebooks.Analyzer /proj/uppstore2019098/notebooks -clones
 
-java -XX:+UseParallelGC -cp bin:./external/json-simple-1.1.1.jar notebooks.Analyzer /proj/uppstore2019098/notebooks -count
