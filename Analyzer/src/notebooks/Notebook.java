@@ -30,6 +30,27 @@ public class Notebook {
 		int namePos = path.lastIndexOf('/') + 1;
 		return path.substring(namePos);
 	}
+	
+	/**
+	 * Dump each code snippet to a separate file in the directory whose name is
+	 * given as an argument of the method. Each file will be named
+	 * <name>_<id>.<suffix> where <name> is the name of this notebook (except
+	 * its suffix, if any), id is the index of the snippet in the notebook file
+	 * and suffix is given as an argument.
+	 */
+	public void dumpCode(String location, String suffix) throws NotebookException, IOException {
+		List<JSONObject> cells = this.getCodeCells();
+		String noteBookName = getNameWithoutSuffix();
+		for (int i=0; i<cells.size(); i++) {
+			String outputFile = location + "/" + noteBookName + "_" + i + "." + suffix;
+			Writer writer = new FileWriter(outputFile);
+			JSONArray lines = getSource(cells.get(i));
+			for (int j=0; j<lines.size(); j++) {
+				writer.write((String)lines.get(j) + "\n");
+			}
+			writer.close();
+		}
+	}
 
 	/**
 	 * @return Array containing the hash of the source code stored in each code cell
@@ -319,6 +340,19 @@ public class Notebook {
 			}
 		}
 		return Language.UNKNOWN;
+	}
+	
+	/**
+	 * @return The name of the notebook, with everything after the last "." removed
+	 */
+	private String getNameWithoutSuffix() {
+		String fullName = this.getName();
+		int separatorIndex = fullName.lastIndexOf(".");
+		if (-1 == separatorIndex) {
+			return fullName;
+		} else {
+			return fullName.substring(0, separatorIndex);
+		}
 	}
 	
 	/**

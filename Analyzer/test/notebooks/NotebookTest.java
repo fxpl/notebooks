@@ -2,6 +2,7 @@ package notebooks;
 
 import static org.junit.Assert.*;
 
+import java.io.*;
 import java.security.NoSuchAlgorithmException;
 
 import org.junit.Test;
@@ -12,6 +13,47 @@ import notebooks.Notebook;
 import notebooks.NotebookException;
 
 public class NotebookTest {
+	
+	/**
+	 * Verify that each snippet in the input file is dumped  to a separate
+	 * output file, line by line, and that the output files are named
+	 * correctly.
+	 */
+	@Test
+	public void testDumpCode() throws IOException, NotebookException {
+		String dataDir = "test/data/dump";
+		String[] inFiles = {"nb1.ipynb", "nb2.ipynb", "nb3"};
+		String outputDir = ".";
+		String suffix = "py";
+		String[] expectedOutFiles = {"nb1_0.py", "nb1_1.py", "nb2_0.py", "nb3_0.py"};
+		String[][] expectedLines = {
+				{"import numpy", ""},
+				{"def my_function", "\ta = 2", "\tb = 2"},
+				{"import pandas"},
+				{"import something"}
+		};
+		
+		// Run
+		for (String nbFile: inFiles) {
+			Notebook nb = new Notebook(dataDir + "/" + nbFile);
+			nb.dumpCode(outputDir, suffix);
+		}
+		
+		// Check output
+		for (int i=0; i<expectedOutFiles.length; i++) {
+			String fileName = expectedOutFiles[i];
+			BufferedReader reader = new BufferedReader(new FileReader(fileName));
+			for (int j=0; j<expectedLines[i].length; j++) {
+				assertEquals("Wrong code dumped to " + fileName, expectedLines[i][j], reader.readLine());
+			}
+			reader.close();
+		}
+		
+		// Clean up
+		for (String outFile: expectedOutFiles) {
+			new File(outFile).delete();
+		}
+	}
 	
 	/**
 	 * Verify that getName returns the name of the notebook (without preceding
