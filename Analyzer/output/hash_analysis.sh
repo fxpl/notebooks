@@ -6,12 +6,11 @@
 #SBATCH -J count_clones
 #SBATCH -M snowy
 
-clonesFile="clones2019-11-10T18:21:42.078.csv"
-snippetsFile="snippets2019-11-08T16:29:42.901.csv"
-frequencyFile="fractionClones.csv"
+hash2files="hash2files2019-11-20T15:54:25.367.csv"
+frequencyFile="cloneFrequency2019-11-20T15:55:04.007.csv"
 
 # Most clones snippets
-sortedCloneCount=`grep -o ',' -n $clonesFile | uniq -c | sort -n`
+sortedCloneCount=`grep -o ',' -n $hash2files | uniq -c | sort -n`
 echo "Most cloned snippets:"
 echo "$sortedCloneCount" | tail
 echo ""
@@ -30,9 +29,9 @@ do
 	then
 		numSnippetsInSeveralFiles=$(($numSnippetsInSeveralFiles + 1))
 	fi
-#done < "$(sed -n "2,$ p" $clonesFile)"	# Funkar inte...
-done < $clonesFile
-numLines=`wc -l $clonesFile | cut -d' ' -f1`
+#done < "$(sed -n "2,$ p" $hash2files)"	# Funkar inte...
+done < $hash2files
+numLines=`wc -l $hash2files | cut -d' ' -f1`
 numSnippets=`echo "$numLines - 1" | bc`
 severalFraction=`echo "$numSnippetsInSeveralFiles / $numSnippets" | bc -l`
 severalPercent=`echo "$severalFraction * 100" | bc`
@@ -41,8 +40,8 @@ $numSnippetsInSeveralFiles ($severalPercent %)."
 
 
 # Number of clones and unique snippets respectively
-cloneCount=`sed -n "2,$ p" $clonesFile | grep -o ',' -n | uniq -c | sed -E "s/^\s*//" | cut -d' ' -f1`
-hashes=`sed -n "2,$ p" $clonesFile | cut -d',' -f1`
+cloneCount=`sed -n "2,$ p" $hash2files | grep -o ',' -n | uniq -c | sed -E "s/^\s*//" | cut -d' ' -f1`
+hashes=`sed -n "2,$ p" $hash2files | cut -d',' -f1`
 paste <(echo "$hashes") <(echo "$cloneCount") > numCommas.txt
 sed -Ei "s/\t/ /" numCommas.txt
 
@@ -57,7 +56,7 @@ exit
 
 
 # OTESTAT
-# Check how many files contains only clones and only unique snippets respectively
+# Check how many files contain only clones and only unique snippets respectively
 ## If fraction == 1, all snippets in the file are clones. (fraction<=1).
 fractionClones=`sed -n "2,$ p" $frequencyFile | cut -d' ' -f4`
 onlyClones=`echo "$fractionClones" | grep "^1\." | wc -l`
