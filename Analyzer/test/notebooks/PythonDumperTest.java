@@ -42,7 +42,6 @@ public class PythonDumperTest {
 	@Test
 	public void testDump_nonPythonFile() throws NotebookException, IOException {
 		String src = "test/data/dump/nbR.ipynb";
-		String targetDir = "test/tmp";
 		File outputFile = new File(targetDir + "/nbR_0.py");
 		
 		dumper.dump(src, targetDir);
@@ -57,7 +56,6 @@ public class PythonDumperTest {
 	@Test
 	public void testDump_singleFile() throws NotebookException, IOException {
 		String src = "test/data/dump/nb1.ipynb";
-		String targetDir = "test/tmp";
 		String[] expectedOutputs = {"nb1_0.py", "nb1_1.py"};
 		
 		dumper.dump(src, targetDir);
@@ -77,13 +75,12 @@ public class PythonDumperTest {
 	public void testDump_wholeDir() throws NotebookException, IOException {
 		String dir = "dump";
 		String src = "test/data/" + dir;
-		String target = "test/tmp";
 		String[] expectedOutputs = {"nb1_0.py", "nb1_1.py", "nb2_0.py", "nb3_0.py"};
 		
-		dumper.dump(src, target);
+		dumper.dump(src, targetDir);
 		
 		for (String fileName: expectedOutputs) {
-			File output = new File(target + "/" + dir + "/" + fileName);
+			File output = new File(targetDir + "/" + dir + "/" + fileName);
 			assertTrue(fileName + " is missing!", output.exists());
 			// The content of the file is checked by NotebookTest.
 			output.delete();
@@ -98,13 +95,12 @@ public class PythonDumperTest {
 		String dir = "dump";
 		String subDir = "sub";
 		String src = "test/data/" + dir;
-		String target = "test/tmp";
 		String expectedOutput = "nb4_0.py";
 		
-		dumper.dump(src, target);
+		dumper.dump(src, targetDir);
 		// Files in test/tmp/dir already checked by another test
 		
-		String outputFileName = target + "/" + dir + "/" + subDir + "/" + expectedOutput;
+		String outputFileName = targetDir + "/" + dir + "/" + subDir + "/" + expectedOutput;
 		File outputFile = new File(outputFileName);
 		assertTrue(outputFile + " is missing!", outputFile.exists());
 	}
