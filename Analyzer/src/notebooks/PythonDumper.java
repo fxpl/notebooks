@@ -10,7 +10,7 @@ public class PythonDumper {
 	 * file in targetDir. Every notebook in srcDir/somePath is stored in
 	 * targetDir/somePath. targetDir/somePath is created if needed.
 	 */
-	public void dump(String src, String target) throws NotebookException, IOException {
+	public void dump(String src, String target) {
 		File srcFile = new File(src);
 		if (!srcFile.isDirectory()) {
 			// Create parent directory if needed
@@ -20,8 +20,15 @@ public class PythonDumper {
 			}
 			// Dump if Python file
 			Notebook srcNb = new Notebook(src);
-			if (Language.PYTHON.equals(srcNb.language())) {
-				srcNb.dumpCode(target, "py");
+			try {
+				if (Language.PYTHON.equals(srcNb.language())) {
+					srcNb.dumpCode(target, "py");
+				}
+			} catch (NotebookException e) {
+				System.err.println("Couldn't dump notebook " + srcNb.getName() + ": " + e.getMessage() + " Skipping!");
+			} catch (IOException e) {
+				System.err.println("I/O error when dumping python snippets: " + e.getMessage());
+				e.printStackTrace();
 			}
 		} else {
 			// This is a directory. Traverse.
@@ -38,11 +45,6 @@ public class PythonDumper {
 			System.out.println("Usage: PythonDumper <path to input file or directory> <path to output directory>");
 			System.exit(1);
 		}
-		try {
-			new PythonDumper().dump(args[0], args[1]);
-		} catch (NotebookException | IOException e) {
-			System.err.println("Couldn't dump Python notebooks: " + e.getMessage());
-			e.printStackTrace();
-		}
+		new PythonDumper().dump(args[0], args[1]);
 	}
 }
