@@ -33,5 +33,16 @@ public class PythonDumper {
 		}
 	}
 	
-
+	public static void main(String[] args) {
+		if (2 != args.length) {
+			System.out.println("Usage: PythonDumper <path to input file or directory> <path to output directory>");
+			System.exit(1);
+		}
+		try {
+			new PythonDumper().dump(args[0], args[1]);
+		} catch (NotebookException | IOException e) {
+			System.err.println("Couldn't dump Python notebooks: " + e.getMessage());
+			e.printStackTrace();
+		}
+	}
 }
