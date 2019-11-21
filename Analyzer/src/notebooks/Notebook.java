@@ -46,7 +46,7 @@ public class Notebook {
 			Writer writer = new FileWriter(outputFile);
 			JSONArray lines = getSource(cells.get(i));
 			for (int j=0; j<lines.size(); j++) {
-				writer.write((String)lines.get(j) + "\n");
+				writer.write((String)lines.get(j));
 			}
 			writer.close();
 		}
