@@ -22,12 +22,15 @@ public class NotebookTest {
 	@Test
 	public void testDumpCode() throws IOException, NotebookException {
 		String dataDir = "test/data/dump";
-		String[] inFiles = {"nb1.ipynb", "nb2.ipynb", "nb3"};
+		String[] inFiles = {"nb1.ipynb", "nb1_str.ipynb", "nb2.ipynb", "nb3"};
 		String outputDir = ".";
 		String suffix = "py";
-		String[] expectedOutFiles = {"nb1_0.py", "nb1_1.py", "nb2_0.py", "nb3_0.py"};
+		String[] expectedOutFiles = {"nb1_0.py", "nb1_1.py",
+				"nb1_str_0.py", "nb1_str_1.py", "nb2_0.py", "nb3_0.py"};
 		String[][] expectedLines = {
-				{"import numpy", ""},
+				{"import numpy", "\t"},
+				{"def my_function", "\ta = 2", "\tb = 2"},
+				{"import numpy", "\t"},
 				{"def my_function", "\ta = 2", "\tb = 2"},
 				{"import pandas"},
 				{"import something"}

@@ -397,12 +397,17 @@ public class Notebook {
 			source = new JSONArray();
 		}
 		if (source instanceof JSONArray) {
-			return (JSONArray) source;
+			JSONArray result = (JSONArray) source;
+			if (!result.isEmpty()) {
+				String lastLine = (String)(result.get(result.size()-1));
+				result.set(result.size()-1, lastLine + "\n");
+			}
+			return result;
 		} else if (source instanceof String) {
 			JSONArray result = new JSONArray();
 			String[] lines = ((String) source).split("\\n");
 			for (String line: lines) {
-				result.add(line);
+				result.add(line + "\n");
 			}
 			return result;
 		} else {
