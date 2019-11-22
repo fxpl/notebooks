@@ -6,37 +6,55 @@ import java.io.IOException;
 public class PythonDumper {
 	
 	/**
-	 * Dump all snippets in the Python notebook stored in srcDir to a separate
-	 * file in targetDir. Every notebook in srcDir/somePath is stored in
-	 * targetDir/somePath. targetDir/somePath is created if needed.
+	 * Dump all snippets in the Python notebook(s) stored in src to a separate
+	 * file in target. Every notebook in src/somePath is stored in
+	 * target/somePath. target/somePath is created if needed.
 	 */
 	public void dump(String src, String target) {
 		File srcFile = new File(src);
 		if (!srcFile.isDirectory()) {
-			// Create parent directory if needed
-			File targetDir = new File(target);
-			if (!targetDir.exists()) {
-				targetDir.mkdirs();
-			}
-			// Dump if Python file
-			Notebook srcNb = new Notebook(src);
-			try {
-				if (Language.PYTHON.equals(srcNb.language())) {
-					srcNb.dumpCode(target, "py");
-				}
-			} catch (NotebookException e) {
-				System.err.println("Couldn't dump notebook " + srcNb.getName() + ": " + e.getMessage() + " Skipping!");
-			} catch (IOException e) {
-				System.err.println("I/O error when dumping python snippets: " + e.getMessage());
-				e.printStackTrace();
-			}
+			createDirectoryIfMissing(target);
+			dumpIfPythonNotebook(src, target);
 		} else {
 			// This is a directory. Traverse.
 			String[] subFiles = srcFile.list();
-			String targetDirName = target + "/" + srcFile.getName();
+			String targetDirName = target + File.separatorChar + srcFile.getName();
 			for (String subFile: subFiles) {
-				dump(src + "/" + subFile, targetDirName);
+				dump(src + File.separatorChar + subFile, targetDirName);
 			}
+		}
+	}
+
+	/**
+	 * @param src Path to a notebook to dump
+	 * @param target Path to directory where dumps will be stored
+	 */
+	private void dumpIfPythonNotebook(String src, String target) {
+		Notebook srcNb = new Notebook(src);
+		try {
+			if (Language.PYTHON.equals(srcNb.language())) {
+				srcNb.dumpCode(target, "py");
+			}
+		} catch (NotebookException e) {
+			System.err.println("Couldn't dump notebook " + srcNb.getName() + ": " + e.getMessage() + " Skipping!");
+		} catch (IOException e) {
+			System.err.println("I/O error when dumping python snippets: " + e.getMessage());
+			e.printStackTrace();
+		} catch (RuntimeException e) {
+			System.err.println("Runtime error for notebook " + srcNb.getName() + ": " + e);
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Create a directory if it doesn't already exist. Also create its parent
+	 * directories if needed.
+	 * @param path Path to the directory to be created
+	 */
+	private void createDirectoryIfMissing(String path) {
+		File targetDir = new File(path);
+		if (!targetDir.exists()) {
+			targetDir.mkdirs();
 		}
 	}
 	
