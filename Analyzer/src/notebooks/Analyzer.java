@@ -166,9 +166,14 @@ public class Analyzer {
 					numUnique++;
 				}
 			}
-			double cloneFrequency = (double)numClones / (numClones + numUnique);
-			writer.write(fileName + ", " + numClones + ", " + numUnique + ", "
-			+ String.format(Locale.US, "%.4f", cloneFrequency) + "\n");
+			writer.write(fileName + ", " + numClones + ", " + numUnique + ", ");
+			int numSnippets = numClones + numUnique;
+			if (0 != numSnippets) {
+				double cloneFrequency = (double)numClones / numSnippets;
+				writer.write(String.format(Locale.US, "%.4f", cloneFrequency) + "\n");
+			} else {
+				writer.write("0\n");
+			}
 		}
 		writer.close();
 	}

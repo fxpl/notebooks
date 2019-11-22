@@ -37,7 +37,7 @@ public class AnalyzerTest {
 	public void testClones() throws IOException {
 		String dataDir = "test/data/hash";
 		String[] files = {"empty_code_string.ipynb", "empty_code_strings.ipynb",
-				"single_import.ipynb", "two_import_cells.ipynb",
+				"missing_cells.ipynb", "single_import.ipynb", "two_import_cells.ipynb",
 				"intra_clones.ipynb", "intra_clones_and_unique.ipynb"
 		};
 		// Expected values
@@ -78,6 +78,38 @@ public class AnalyzerTest {
 			assertEquals("Wrong number of snippets stored for " + hash + ":", expectedSnippets.size(), actualSnippets.size());
 			assertTrue("Wrong snippets stored for " + hash, actualSnippets.containsAll(expectedSnippets));
 		}
+		deleteCloneCsvs();
+	}
+	
+	/**
+	 * Verify that the output files file2hashes<current-date-time>.csv,
+	 * hash2files<current-date-time>.csv and cloneFrequency<current-date-time>.csv
+	 * have the right content after clone analysis of an empty notebook.
+	 * @throws IOException
+	 */
+	@Test
+	public void testClones_csv_emptyNotebook() throws IOException {
+		String dataDir = "test/data/hash";
+		String fileName = "missing_cells.ipynb";
+		String[] expectedSnippetLines = {
+				"file, snippets"
+		};
+		String[] expectedClonesLines = {
+				"hash, file, index, ..."
+		};
+		String[] expectedFrequencyLiens = {
+				"file, clones, unique, clone frequency",
+				fileName + ", 0, 0, 0"
+		};
+		
+		// Actual values
+		analyzer.initializeNotebooksFrom(dataDir + "/" + fileName);
+		analyzer.clones();
+		
+		checkCsv("file2hashes", expectedSnippetLines);
+		checkCsv("hash2files", expectedClonesLines);
+		checkCsv("cloneFrequency", expectedFrequencyLiens);
+		
 		deleteCloneCsvs();
 	}
 	
