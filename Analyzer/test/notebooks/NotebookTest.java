@@ -49,6 +49,7 @@ public class NotebookTest {
 			for (int j=0; j<expectedLines[i].length; j++) {
 				assertEquals("Wrong code dumped to " + fileName, expectedLines[i][j], reader.readLine());
 			}
+			assertNull("Too many lines in " + fileName, reader.readLine());
 			reader.close();
 		}
 		
