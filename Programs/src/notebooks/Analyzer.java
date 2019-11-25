@@ -331,11 +331,6 @@ public class Analyzer {
 		try {
 			Future<T> result = executor.submit(worker);
 			return result.get();
-		} catch (ClassCastException e) {
-			System.err.println("ClassCastException in " + worker.getNotebookName()
-				+ ": " + e.getMessage() + " Skipping!");
-			e.printStackTrace(System.err);
-			return worker.defaultValue();
 		} catch (ExecutionException e) {
 			System.err.println(e.getMessage() + " Skipping!");
 			return worker.defaultValue();
