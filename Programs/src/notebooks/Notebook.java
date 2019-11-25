@@ -1,12 +1,15 @@
 package notebooks;
 
 import java.io.*;
+
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
 import org.json.simple.*;
 import org.json.simple.parser.*;
+
+// TODO: Går det att hantera CastExceptions på något snyggare sätt?!
 
 /**
  * A Jupyter notebook.
@@ -87,9 +90,20 @@ public class Notebook {
 	public Language language() throws NotebookException {
 		JSONObject notebook = this.getNotebook();
 		this.languageSpecIn = LangSpec.NONE;
-		Language language = getLanguageFromMetadata(notebook);
+		Language language;
+		try {
+			language = getLanguageFromMetadata(notebook);
+		} catch (ClassCastException e) {
+			throw new NotebookException("Cast exception when retreiving language from metadata for "
+					+ this.path + ": " + e.toString());
+		}
 		if (Language.UNKNOWN == language) {
-			language = getLanguageFromCodeCells(notebook);
+			try {
+				language = getLanguageFromCodeCells(notebook);
+			} catch (ClassCastException e) {
+				throw new NotebookException("Cast exception when retreiving language from code cells for "
+						+ this.path + ": " + e.toString());
+			}
 		}
 		if (Language.UNKNOWN == language) {
 			System.err.println("No language found in " + this.path);
@@ -181,19 +195,31 @@ public class Notebook {
 	 * but also an array of worksheets, each containing a cell array.
 	 * @param notebook Notebook/worksheet to extract cells from
 	 * @return Array containing all cells of the notebook
+	 * @throws NotebookException 
 	 */
 	@SuppressWarnings("unchecked")	// The JSON library uses raw types internally
-	private static JSONArray getCellArray(JSONObject notebook) {
+	private /*static*/ JSONArray getCellArray(JSONObject notebook) throws NotebookException {
 		JSONArray cells;
 		if (notebook.containsKey("cells")) {
-			// According to spec
-			cells = (JSONArray) notebook.get("cells");
+			try {
+				// According to spec
+				cells = (JSONArray) notebook.get("cells");
+			} catch (ClassCastException e) {
+				throw new NotebookException("Couldn't cast cells in "
+						+ this.path + " to JSONArray: " + e.toString());
+			}
 		} else {
 			cells = new JSONArray();
 		}
 		if(notebook.containsKey("worksheets")) {
 			// Not according to spec, but occurring
-			JSONArray worksheets = (JSONArray) notebook.get("worksheets");
+			JSONArray worksheets;
+			try {
+				worksheets = (JSONArray) notebook.get("worksheets");
+			} catch (ClassCastException e) {
+				throw new NotebookException("Couldn't cast worksheets in "
+						+ this.path + " to JSONArray: " + e.toString());
+			}
 			for (int i=0; i<worksheets.size(); i++) {
 				JSONArray worksSheetCells = getCellArray((JSONObject) worksheets.get(i));
 				cells.addAll(worksSheetCells);
@@ -213,16 +239,29 @@ public class Notebook {
 	/**
 	 * @param notebook Notebook to extract code cells from
 	 * @return A list containing all code cells in notebook
+	 * @throws NotebookException 
 	 */
-	private List<JSONObject> getCodeCells(JSONObject notebook) {
+	private List<JSONObject> getCodeCells(JSONObject notebook) throws NotebookException {
 		JSONArray cells = getCellArray(notebook);
 		List<JSONObject> result = new ArrayList<JSONObject>();
 		for (int i=0; i<cells.size(); i++) {
-			JSONObject cell = (JSONObject) cells.get(i);
+			JSONObject cell;
+			try {
+				cell = (JSONObject) cells.get(i);
+			} catch (ClassCastException e) {
+				throw new NotebookException("Couldn't cast cell number " + i
+						+ " in " + this.path + "to JSONObject: " + e.toString());
+			}
 			if (cell.containsKey("cell_type")) {
-				String type = (String) cell.get("cell_type");
-				if (type.equals("code")) {
-					result.add(cell);
+				try {
+					String type = (String) cell.get("cell_type");
+					if (type.equals("code")) {
+						result.add(cell);
+					}
+				} catch (Exception e) {
+					throw new NotebookException("Couldn't cast cell type of cell number " + i
+							+ " in " + this.path + "to string: " + e.toString());
+					
 				}
 			} else {
 				System.err.println("Key \"cell_type\" is missing in a cell in " + this.path);
@@ -253,8 +292,9 @@ public class Notebook {
 	/**
 	 * @param notebook Notebook to extract language from
 	 * @return The language specified in code cells, if it exists and is consistent. UNKNOWN otherwise.
+	 * @throws NotebookException 
 	 */
-	private Language getLanguageFromCodeCells(JSONObject notebook) {
+	private Language getLanguageFromCodeCells(JSONObject notebook) throws NotebookException {
 		List<JSONObject> codeCells = getCodeCells(notebook);
 		if (0 < codeCells.size()) {
 			String language = "";
@@ -371,6 +411,8 @@ public class Notebook {
 			result = (JSONObject)new JSONParser().parse(reader);
 		} catch (IOException | ParseException e) {
 			throw new NotebookException("Could not parse " + this.path + ": " + e.toString());
+		} catch (ClassCastException e) {
+			throw new NotebookException("Couldn't cast notebook to JSONObject in " + this.path + ": " + e.toString());
 		}
 		try {
 			reader.close();
@@ -397,15 +439,33 @@ public class Notebook {
 			source = new JSONArray();
 		}
 		if (source instanceof JSONArray) {
-			JSONArray result = (JSONArray) source;
+			JSONArray result;
+			try {
+				result = (JSONArray) source;
+			} catch (ClassCastException e) {
+				throw new NotebookException("Couldn't convert source to JSONArray in a cell in "
+						+ this.path + ": " + e.toString());
+			}
 			if (!result.isEmpty()) {
-				String lastLine = (String)(result.get(result.size()-1));
+				String lastLine;
+				try {
+					lastLine = (String)(result.get(result.size()-1));
+				} catch (ClassCastException e) {
+					throw new NotebookException("Couldn't convert last source line to string in a cell in "
+							+ this.path + ": " + e.toString());
+				}
 				result.set(result.size()-1, lastLine + "\n");
 			}
 			return result;
 		} else if (source instanceof String) {
 			JSONArray result = new JSONArray();
-			String[] lines = ((String) source).split("\\n");
+			String[] lines;
+			try {
+				lines = ((String) source).split("\\n");
+			} catch (ClassCastException e) {
+				throw new NotebookException("Couldn't convert source to String in a cell in "
+						+ this.path + ": " + e.toString());
+			}
 			for (String line: lines) {
 				result.add(line + "\n");
 			}
