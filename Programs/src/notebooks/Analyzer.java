@@ -276,53 +276,37 @@ public class Analyzer {
 		return this.notebooks.size();
 	}
 	
-	/** TODO: Skriv ut meddelandet från undantagen!
+	/**
 	 * Parse command line arguments and perform actions accordingly.
 	 */
 	private void analyze(String[] args) {
 		for (String arg: args) {
-			switch (arg) {
-			case "-count":
-				System.out.println("Notebooks parsed: " + this.numNotebooks());
-				try {
-					System.out.println("Code snippets: " + this.numCodeCells());
-				} catch (IOException e) {
-					System.err.println("I/O error on handling output file for snippet counts." +
-							"Snippets not counted!");
+			try {
+				switch (arg) {
+					case "-count":
+						System.out.println("Notebooks parsed: " + this.numNotebooks());
+						System.out.println("Code snippets: " + this.numCodeCells());
+						break;
+					case "-lang":
+						Map<Language, Integer> languages = this.languages();
+						System.out.println("\nLANGUAGES:");
+						for (Language language: languages.keySet()) {
+							System.out.println(language + ": " + languages.get(language));
+						}
+						System.out.println("");
+						break;
+					case "-loc":
+						System.out.println("Lines of code: " + this.LOC());
+						break;
+					case "-clones":
+						this.clones();
+						System.out.println("Clone files created!");
+						break;
+					default:
+						System.err.println("Unknown argument: " + arg);
 				}
-				break;
-			case "-lang":				
-				try {
-					Map<Language, Integer> languages = this.languages();
-					System.out.println("\nLANGUAGES:");
-					for (Language language: languages.keySet()) {
-						System.out.println(language + ": " + languages.get(language));
-					}
-					System.out.println("");
-				} catch (IOException e) {
-					System.err.println("Exception: " + e);
-					e.printStackTrace();
-				}
-				break;
-			case "-loc":
-				try {
-					System.out.println("Lines of code: " + this.LOC());
-				} catch(IOException e) {
-					System.err.println("I/O error on handling output file for LOC counts." +
-							"LOC not counted!");
-				}
-				break;
-			case "-clones":
-				try {
-					this.clones();
-					System.out.println("Clone file created!");
-				} catch (IOException e) {
-					System.err.println("I/O error on handling output file for clones." +
-							"Output file not created!");
-				}
-				break;
-			default:
-				System.err.println("Unknown argument: " + arg);
+			} catch (IOException e) {
+				System.err.println("I/O error: " + e.getMessage() + ". Operation interrupted.");
 			}
 		}
 	}
