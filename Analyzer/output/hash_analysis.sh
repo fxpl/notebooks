@@ -59,13 +59,16 @@ fractionClones=`sed -n "2,$ p" $frequencyFile | cut -d' ' -f4`
 onlyClones=`echo "$fractionClones" | grep "1.0000" | wc -l`
 ## If no number in fraction > 0, fraction==0, that is all snippets in the file are unique.
 onlyUnique=`echo "$fractionClones" | grep "0.0000" | wc -l`		# 0 without decimals = no snippets in file
+noSnippets=`echo "$fractionClones" | grep "^0$" | wc -l`		# 0 without decimals = no snippets in file
 
 numLines=`wc -l $frequencyFile | cut -d' ' -f1`
 numFiles=`echo "$numLines - 1" | bc`
 onlyClonesFrac=`echo "$onlyClones / $numFiles" | bc -l`
 onlyUniqueFrac=`echo "$onlyUnique / $numFiles" | bc -l`
+noSnippetsFrac=`echo "$noSnippets / $numFiles" | bc -l`
 echo "Files only containing clones: $onlyClones ($onlyClonesFrac)"
 echo "Files only containing unique snippets: $onlyUnique ($onlyUniqueFrac)"
+echo "Files containing no snippets: $noSnippets ($noSnippetsFrac)"
 
 echo "On average the following fraction of snippets in a file are clones:"
 echo "(`echo "$fractionClones" | paste -sd+`) / $numFiles" | bc -l
