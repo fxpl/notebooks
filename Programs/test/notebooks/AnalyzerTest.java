@@ -28,6 +28,54 @@ public class AnalyzerTest {
 	public void tearDown() {
 		analyzer.shutDown();
 	}
+	
+	/**
+	 * Verify that the output file allLanguageValues<current-date-time>.csv has
+	 * the right content after analysis of all language value fields.
+	 * @throws IOException 
+	 */
+	@Test
+	public void testAllLanguageValues() throws IOException {
+		String dataDir ="test/data/langFields";
+		String[] files = {"all_lang_specs.ipynb", "empty.ipynb", "no_kernelspec.ipynb"};
+		String[] expectedLines = {
+				"file, " + LangSpec.METADATA_LANGUAGE + ", " + LangSpec.METADATA_LANGUAGEINFO_NAME
+				+ ", " + LangSpec.METADATA_KERNELSPEC_LANGUAGE + ", " + LangSpec.METADATA_KERNELSPEC_NAME
+				+ ", " + LangSpec.CODE_CELLS,	// header
+				files[0] + ", " + Language.JULIA + ", " + Language.PYTHON + ", "	+ Language.R + ", " + Language.OTHER + ", " + Language.SCALA, 
+				files[1] + ", " + Language.UNKNOWN + ", " + Language.UNKNOWN + ", "	+ Language.UNKNOWN + ", " + Language.UNKNOWN + ", " + Language.UNKNOWN,
+				files[2] + ", " + Language.R + ", " + Language.JULIA + ", "	+ Language.UNKNOWN + ", " + Language.UNKNOWN + ", " + Language.SCALA
+		};
+		
+		for (String file: files) {
+			analyzer.initializeNotebooksFrom(dataDir + "/" + file);
+		}
+		analyzer.allLanguageValues();
+		checkCsv("all_languages", expectedLines);
+		lastOutputFile("all_languages").delete();
+		
+	}
+	
+	/**
+	 * Verify that all language values are set to UNKNOWN when
+	 * allLanguageValues is called for a notebook with a non parseable file. 
+	 * @throws IOException
+	 */
+	@Test
+	public void testAllLanguageValues_nonParseable() throws IOException {
+		String dataDir = "test/data/langFields";
+		String file = "non_parseable.ipynb";
+		String[] expectedLInes = {
+				"file, " + LangSpec.METADATA_LANGUAGE + ", " + LangSpec.METADATA_LANGUAGEINFO_NAME
+				+ ", " + LangSpec.METADATA_KERNELSPEC_LANGUAGE + ", " + LangSpec.METADATA_KERNELSPEC_NAME
+				+ ", " + LangSpec.CODE_CELLS,	// header
+				file + ", " + Language.UNKNOWN + ", " + Language.UNKNOWN + ", "	+ Language.UNKNOWN + ", " + Language.UNKNOWN + ", " + Language.UNKNOWN
+		};
+		analyzer.initializeNotebooksFrom(dataDir + "/" + file);
+		analyzer.allLanguageValues();
+		checkCsv("all_languages", expectedLInes);
+		lastOutputFile("all_languages").delete();
+	}
 
 	/**
 	 * Verify that snippets are stored correctly in the clone hash map.

@@ -187,12 +187,43 @@ public class Analyzer {
 		List<Snippet> snippets = clones.get(hash);
 		return snippets.size() >= 2;
 	}
+	
+	/**
+	 * Create a file all_languages<current-date-time>.csv with a header line followed by the language defined in each language specification field for each notebook. The file contains one line per notebook, on the format
+	 * <filename>,<language found in metadata.language>,<language found in metadata.language_info.name>,<language found in metadata.kernelspec.language>,<language found in metadata.kernelspec.name>,<language found in code cells>
+	 * If any field is missing in a notebook, "UNKNOWN" is written for that field.
+	 * @throws IOException 
+	 */
+	public void allLanguageValues() throws IOException {
+		LangSpec[] langSpecFields = {LangSpec.METADATA_LANGUAGE , LangSpec.METADATA_LANGUAGEINFO_NAME, 
+				LangSpec.METADATA_KERNELSPEC_LANGUAGE, LangSpec.METADATA_KERNELSPEC_NAME,
+				LangSpec.CODE_CELLS};
+		Writer writer = new FileWriter("all_languages" + LocalDateTime.now() + ".csv");
+		// Write header
+		writer.write("file");
+		for (LangSpec field: langSpecFields) {
+			writer.write(", " + field.toString());
+		}
+		writer.write("\n");
+		
+		// Write language values
+		for(Notebook notebook: notebooks) {
+			Map<LangSpec, Language> languages = employ(new AllLanguagesExtractor(notebook));
+			String name = notebook.getName();
+			writer.write(name);
+			for (LangSpec field: langSpecFields) {
+				writer.write(", " + languages.get(field));
+			}
+			writer.write("\n");
+		}
+		writer.close();
+	}
 
 	/**
 	 * Create a file languages<current-date-time>.csv with a header line
 	 * followed by the language and the element from which is was extracted
 	 * from the notebook file. The file contains one line per notebook, on the
-	 * format <filename><language><location of language>.
+	 * format <filename>,<language>,<location of language>.
 	 * @return A map with the different languages as keys and the number of files written in this language as value
 	 * @throws IOException On problems with handling the output file
 	 */
