@@ -3,10 +3,11 @@
 		{
 			"cell_type" : "code",
 			"source" : [
-				"",
-				"",
-				" "
+				"import something",
 			]
 		}
-	]
+	],
+	"metadata" : {
+		"language" : "Python"
+	}
 }

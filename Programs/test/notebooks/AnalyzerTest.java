@@ -28,6 +28,54 @@ public class AnalyzerTest {
 	public void tearDown() {
 		analyzer.shutDown();
 	}
+	
+	/**
+	 * Verify that the output file allLanguageValues<current-date-time>.csv has
+	 * the right content after analysis of all language value fields.
+	 * @throws IOException 
+	 */
+	@Test
+	public void testAllLanguageValues() throws IOException {
+		String dataDir ="test/data/langFields";
+		String[] files = {"all_lang_specs.ipynb", "empty.ipynb", "no_kernelspec.ipynb"};
+		String[] expectedLines = {
+				"file, " + LangSpec.METADATA_LANGUAGE + ", " + LangSpec.METADATA_LANGUAGEINFO_NAME
+				+ ", " + LangSpec.METADATA_KERNELSPEC_LANGUAGE + ", " + LangSpec.METADATA_KERNELSPEC_NAME
+				+ ", " + LangSpec.CODE_CELLS,	// header
+				files[0] + ", " + Language.JULIA + ", " + Language.PYTHON + ", "	+ Language.R + ", " + Language.OTHER + ", " + Language.SCALA, 
+				files[1] + ", " + Language.UNKNOWN + ", " + Language.UNKNOWN + ", "	+ Language.UNKNOWN + ", " + Language.UNKNOWN + ", " + Language.UNKNOWN,
+				files[2] + ", " + Language.R + ", " + Language.JULIA + ", "	+ Language.UNKNOWN + ", " + Language.UNKNOWN + ", " + Language.SCALA
+		};
+		
+		for (String file: files) {
+			analyzer.initializeNotebooksFrom(dataDir + "/" + file);
+		}
+		analyzer.allLanguageValues();
+		checkCsv("all_languages", expectedLines);
+		lastOutputFile("all_languages").delete();
+		
+	}
+	
+	/**
+	 * Verify that all language values are set to UNKNOWN when
+	 * allLanguageValues is called for a notebook with a non parseable file. 
+	 * @throws IOException
+	 */
+	@Test
+	public void testAllLanguageValues_nonParseable() throws IOException {
+		String dataDir = "test/data/langFields";
+		String file = "non_parseable.ipynb";
+		String[] expectedLInes = {
+				"file, " + LangSpec.METADATA_LANGUAGE + ", " + LangSpec.METADATA_LANGUAGEINFO_NAME
+				+ ", " + LangSpec.METADATA_KERNELSPEC_LANGUAGE + ", " + LangSpec.METADATA_KERNELSPEC_NAME
+				+ ", " + LangSpec.CODE_CELLS,	// header
+				file + ", " + Language.UNKNOWN + ", " + Language.UNKNOWN + ", "	+ Language.UNKNOWN + ", " + Language.UNKNOWN + ", " + Language.UNKNOWN
+		};
+		analyzer.initializeNotebooksFrom(dataDir + "/" + file);
+		analyzer.allLanguageValues();
+		checkCsv("all_languages", expectedLInes);
+		lastOutputFile("all_languages").delete();
+	}
 
 	/**
 	 * Verify that snippets are stored correctly in the clone hash map.
@@ -37,7 +85,7 @@ public class AnalyzerTest {
 	public void testClones() throws IOException {
 		String dataDir = "test/data/hash";
 		String[] files = {"empty_code_string.ipynb", "empty_code_strings.ipynb",
-				"single_import.ipynb", "two_import_cells.ipynb",
+				"missing_cells.ipynb", "single_import.ipynb", "two_import_cells.ipynb",
 				"intra_clones.ipynb", "intra_clones_and_unique.ipynb"
 		};
 		// Expected values
@@ -78,6 +126,38 @@ public class AnalyzerTest {
 			assertEquals("Wrong number of snippets stored for " + hash + ":", expectedSnippets.size(), actualSnippets.size());
 			assertTrue("Wrong snippets stored for " + hash, actualSnippets.containsAll(expectedSnippets));
 		}
+		deleteCloneCsvs();
+	}
+	
+	/**
+	 * Verify that the output files file2hashes<current-date-time>.csv,
+	 * hash2files<current-date-time>.csv and cloneFrequency<current-date-time>.csv
+	 * have the right content after clone analysis of an empty notebook.
+	 * @throws IOException
+	 */
+	@Test
+	public void testClones_csv_emptyNotebook() throws IOException {
+		String dataDir = "test/data/hash";
+		String fileName = "missing_cells.ipynb";
+		String[] expectedSnippetLines = {
+				"file, snippets"
+		};
+		String[] expectedClonesLines = {
+				"hash, file, index, ..."
+		};
+		String[] expectedFrequencyLiens = {
+				"file, clones, unique, clone frequency",
+				fileName + ", 0, 0, 0"
+		};
+		
+		// Actual values
+		analyzer.initializeNotebooksFrom(dataDir + "/" + fileName);
+		analyzer.clones();
+		
+		checkCsv("file2hashes", expectedSnippetLines);
+		checkCsv("hash2files", expectedClonesLines);
+		checkCsv("cloneFrequency", expectedFrequencyLiens);
+		
 		deleteCloneCsvs();
 	}
 	

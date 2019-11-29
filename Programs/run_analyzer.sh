@@ -5,7 +5,7 @@
 #SBATCH -p core -n 6
 #SBATCH -J notebook_analyzer_clones
 
-java -XX:+UnlockDiagnosticVMOptions -XX:+PrintNMTStatistics -XX:+UseParallelGC \
+java -XX:+UnlockDiagnosticVMOptions -XX:NativeMemoryTracking=summary -XX:NativeMemoryTracking -XX:+PrintNMTStatistics -XX:+UseParallelGC \
 	-cp bin:./external/json-simple-1.1.1.jar -Xmx36G \
 	notebooks.Analyzer /proj/uppstore2019098/notebooks -clones
 

@@ -166,9 +166,14 @@ public class Analyzer {
 					numUnique++;
 				}
 			}
-			double cloneFrequency = (double)numClones / (numClones + numUnique);
-			writer.write(fileName + ", " + numClones + ", " + numUnique + ", "
-			+ String.format(Locale.US, "%.4f", cloneFrequency) + "\n");
+			writer.write(fileName + ", " + numClones + ", " + numUnique + ", ");
+			int numSnippets = numClones + numUnique;
+			if (0 != numSnippets) {
+				double cloneFrequency = (double)numClones / numSnippets;
+				writer.write(String.format(Locale.US, "%.4f", cloneFrequency) + "\n");
+			} else {
+				writer.write("0\n");
+			}
 		}
 		writer.close();
 	}
@@ -182,12 +187,43 @@ public class Analyzer {
 		List<Snippet> snippets = clones.get(hash);
 		return snippets.size() >= 2;
 	}
+	
+	/**
+	 * Create a file all_languages<current-date-time>.csv with a header line followed by the language defined in each language specification field for each notebook. The file contains one line per notebook, on the format
+	 * <filename>,<language found in metadata.language>,<language found in metadata.language_info.name>,<language found in metadata.kernelspec.language>,<language found in metadata.kernelspec.name>,<language found in code cells>
+	 * If any field is missing in a notebook, "UNKNOWN" is written for that field.
+	 * @throws IOException 
+	 */
+	public void allLanguageValues() throws IOException {
+		LangSpec[] langSpecFields = {LangSpec.METADATA_LANGUAGE , LangSpec.METADATA_LANGUAGEINFO_NAME, 
+				LangSpec.METADATA_KERNELSPEC_LANGUAGE, LangSpec.METADATA_KERNELSPEC_NAME,
+				LangSpec.CODE_CELLS};
+		Writer writer = new FileWriter("all_languages" + LocalDateTime.now() + ".csv");
+		// Write header
+		writer.write("file");
+		for (LangSpec field: langSpecFields) {
+			writer.write(", " + field.toString());
+		}
+		writer.write("\n");
+		
+		// Write language values
+		for(Notebook notebook: notebooks) {
+			Map<LangSpec, Language> languages = employ(new AllLanguagesExtractor(notebook));
+			String name = notebook.getName();
+			writer.write(name);
+			for (LangSpec field: langSpecFields) {
+				writer.write(", " + languages.get(field));
+			}
+			writer.write("\n");
+		}
+		writer.close();
+	}
 
 	/**
 	 * Create a file languages<current-date-time>.csv with a header line
 	 * followed by the language and the element from which is was extracted
 	 * from the notebook file. The file contains one line per notebook, on the
-	 * format <filename><language><location of language>.
+	 * format <filename>,<language>,<location of language>.
 	 * @return A map with the different languages as keys and the number of files written in this language as value
 	 * @throws IOException On problems with handling the output file
 	 */
@@ -271,53 +307,41 @@ public class Analyzer {
 		return this.notebooks.size();
 	}
 	
-	/** TODO: Skriv ut meddelandet från undantagen!
+	/**
 	 * Parse command line arguments and perform actions accordingly.
 	 */
 	private void analyze(String[] args) {
 		for (String arg: args) {
-			switch (arg) {
-			case "-count":
-				System.out.println("Notebooks parsed: " + this.numNotebooks());
-				try {
-					System.out.println("Code snippets: " + this.numCodeCells());
-				} catch (IOException e) {
-					System.err.println("I/O error on handling output file for snippet counts." +
-							"Snippets not counted!");
+			try {
+				switch (arg) {
+					case "-count":
+						System.out.println("Notebooks parsed: " + this.numNotebooks());
+						System.out.println("Code snippets: " + this.numCodeCells());
+						break;
+					case "-lang":
+						Map<Language, Integer> languages = this.languages();
+						System.out.println("\nLANGUAGES:");
+						for (Language language: languages.keySet()) {
+							System.out.println(language + ": " + languages.get(language));
+						}
+						System.out.println("");
+						break;
+					case "-loc":
+						System.out.println("Lines of code: " + this.LOC());
+						break;
+					case "-clones":
+						this.clones();
+						System.out.println("Clone files created!");
+						break;
+					case "-lang_all":
+						this.allLanguageValues();
+						System.out.println("File with all language values created!");
+						break;
+					default:
+						System.err.println("Unknown argument: " + arg);
 				}
-				break;
-			case "-lang":				
-				try {
-					Map<Language, Integer> languages = this.languages();
-					System.out.println("\nLANGUAGES:");
-					for (Language language: languages.keySet()) {
-						System.out.println(language + ": " + languages.get(language));
-					}
-					System.out.println("");
-				} catch (IOException e) {
-					System.err.println("Exception: " + e);
-					e.printStackTrace();
-				}
-				break;
-			case "-loc":
-				try {
-					System.out.println("Lines of code: " + this.LOC());
-				} catch(IOException e) {
-					System.err.println("I/O error on handling output file for LOC counts." +
-							"LOC not counted!");
-				}
-				break;
-			case "-clones":
-				try {
-					this.clones();
-					System.out.println("Clone file created!");
-				} catch (IOException e) {
-					System.err.println("I/O error on handling output file for clones." +
-							"Output file not created!");
-				}
-				break;
-			default:
-				System.err.println("Unknown argument: " + arg);
+			} catch (IOException e) {
+				System.err.println("I/O error: " + e.getMessage() + ". Operation interrupted.");
 			}
 		}
 	}
@@ -326,11 +350,6 @@ public class Analyzer {
 		try {
 			Future<T> result = executor.submit(worker);
 			return result.get();
-		} catch (ClassCastException e) {
-			System.err.println("ClassCastException in " + worker.getNotebookName()
-				+ ": " + e.getMessage() + " Skipping!");
-			e.printStackTrace(System.err);
-			return worker.defaultValue();
 		} catch (ExecutionException e) {
 			System.err.println(e.getMessage() + " Skipping!");
 			return worker.defaultValue();

@@ -2,7 +2,9 @@ package notebooks;
 
 import static org.junit.Assert.*;
 
-import java.security.NoSuchAlgorithmException;
+import java.io.*;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.Test;
 
@@ -12,6 +14,51 @@ import notebooks.Notebook;
 import notebooks.NotebookException;
 
 public class NotebookTest {
+	
+	/**
+	 * Verify that each snippet in the input file is dumped  to a separate
+	 * output file, line by line, and that the output files are named
+	 * correctly.
+	 */
+	@Test
+	public void testDumpCode() throws IOException, NotebookException {
+		String dataDir = "test/data/dump";
+		String[] inFiles = {"nb1.ipynb", "nb1_str.ipynb", "nb2.ipynb", "nb3"};
+		String outputDir = ".";
+		String suffix = "py";
+		String[] expectedOutFiles = {"nb1_0.py", "nb1_1.py",
+				"nb1_str_0.py", "nb1_str_1.py", "nb2_0.py", "nb3_0.py"};
+		String[][] expectedLines = {
+				{"import numpy", "\t"},
+				{"def my_function", "\ta = 2", "\tb = 2"},
+				{"import numpy", "\t"},
+				{"def my_function", "\ta = 2", "\tb = 2"},
+				{"import pandas"},
+				{"import something"}
+		};
+		
+		// Run
+		for (String nbFile: inFiles) {
+			Notebook nb = new Notebook(dataDir + "/" + nbFile);
+			nb.dumpCode(outputDir, suffix);
+		}
+		
+		// Check output
+		for (int i=0; i<expectedOutFiles.length; i++) {
+			String fileName = expectedOutFiles[i];
+			BufferedReader reader = new BufferedReader(new FileReader(fileName));
+			for (int j=0; j<expectedLines[i].length; j++) {
+				assertEquals("Wrong code dumped to " + fileName, expectedLines[i][j], reader.readLine());
+			}
+			assertNull("Too many lines in " + fileName, reader.readLine());
+			reader.close();
+		}
+		
+		// Clean up
+		for (String outFile: expectedOutFiles) {
+			new File(outFile).delete();
+		}
+	}
 	
 	/**
 	 * Verify that getName returns the name of the notebook (without preceding
@@ -25,9 +72,10 @@ public class NotebookTest {
 	
 	/**
 	 * Verify that code snippets are hashed correctly.
+	 * @throws NotebookException
 	 */
 	@Test
-	public void testHashes() throws NotebookException, NoSuchAlgorithmException {
+	public void testHashes() throws NotebookException {
 		String dataDir = "test/data/hash";
 		String[] files = {"empty_code_string.ipynb", "empty_code_strings.ipynb",
 				"single_import.ipynb", "two_import_cells.ipynb"};
@@ -73,6 +121,11 @@ public class NotebookTest {
 		}
 	}
 	
+	/**
+	 * Verify that the correct language specification field is returned by
+	 * langSpec().
+	 * @throws NotebookException
+	 */
 	@Test
 	public void testLangSpec() throws NotebookException {
 		String dataDir = "test/data/lang";
@@ -88,6 +141,86 @@ public class NotebookTest {
 			Notebook notebook = new Notebook(dataDir + "/" + files[i]);
 			assertEquals("Wrong language specification location:", langSpecs[i], notebook.langSpec());
 		}
+	}
+	
+	/**
+	 * Verify that the right language is found in each language specification
+	 * field in a notebook where all such fields are initialized.
+	 * @throws NotebookException
+	 */
+	@Test
+	public void testAllLanguageValues_initialized() throws NotebookException {
+		String fileName = "test/data/langFields/all_lang_specs.ipynb";
+		final int NUM_LANG_FIELDS = LangSpec.values().length - 1;
+		Map<LangSpec, Language> expected
+			= new HashMap<LangSpec, Language>(NUM_LANG_FIELDS);
+		expected.put(LangSpec.METADATA_LANGUAGE, Language.JULIA);
+		expected.put(LangSpec.METADATA_LANGUAGEINFO_NAME, Language.PYTHON);
+		expected.put(LangSpec.METADATA_KERNELSPEC_LANGUAGE, Language.R);
+		expected.put(LangSpec.METADATA_KERNELSPEC_NAME, Language.OTHER);
+		expected.put(LangSpec.CODE_CELLS, Language.SCALA);
+		
+		Notebook notebook = new Notebook(fileName);
+		assertEquals("Wrong language field values returned",
+				expected, notebook.allLanguageValues());
+	}
+	
+	/**
+	 * Verify that "UNKNOWN" is set as the language by langFieldValues when the
+	 * language specification fields in a notebook are missing.
+	 * @throws NotebookException
+	 */
+	@Test
+	public void testAllLanguageValues_empty() throws NotebookException {
+		String fileName = "test/data/langFields/empty.ipynb";
+		final int NUM_LANG_FIELDS = LangSpec.values().length - 1;
+		Map<LangSpec, Language> expected
+			= new HashMap<LangSpec, Language>(NUM_LANG_FIELDS);
+		expected.put(LangSpec.METADATA_LANGUAGE, Language.UNKNOWN);
+		expected.put(LangSpec.METADATA_LANGUAGEINFO_NAME, Language.UNKNOWN);
+		expected.put(LangSpec.METADATA_KERNELSPEC_LANGUAGE, Language.UNKNOWN);
+		expected.put(LangSpec.METADATA_KERNELSPEC_NAME, Language.UNKNOWN);
+		expected.put(LangSpec.CODE_CELLS, Language.UNKNOWN);
+		
+		Notebook notebook = new Notebook(fileName);
+		assertEquals("Wrong language field values returned",
+				expected, notebook.allLanguageValues());
+	}
+	
+	/**
+	 * Verify that "UNKNOWN" is set as the language for the KERNELSPEC fields by
+	 * langFieldValues when a notebook contains metadata, but not kernelspec.
+	 * @throws NotebookException
+	 */
+	@Test
+	public void testAllLanguageValues_noKernelSpec() throws NotebookException {
+		String fileName = "test/data/langFields/no_kernelspec.ipynb";
+		final int NUM_LANG_FIELDS = LangSpec.values().length - 1;
+		Map<LangSpec, Language> expected
+			= new HashMap<LangSpec, Language>(NUM_LANG_FIELDS);
+		expected.put(LangSpec.METADATA_LANGUAGE, Language.R);
+		expected.put(LangSpec.METADATA_LANGUAGEINFO_NAME, Language.JULIA);
+		expected.put(LangSpec.METADATA_KERNELSPEC_LANGUAGE, Language.UNKNOWN);
+		expected.put(LangSpec.METADATA_KERNELSPEC_NAME, Language.UNKNOWN);
+		expected.put(LangSpec.CODE_CELLS, Language.SCALA);
+		
+		Notebook notebook = new Notebook(fileName);
+		assertEquals("Wrong language field values returned",
+				expected, notebook.allLanguageValues());
+	}
+	
+	/**
+	 * Verify that the language spec value is not changed by langFieldValues.
+	 * @throws NotebookException
+	 */
+	@Test
+	public void testAllLanguageValues_langSpec() throws NotebookException {
+		String fileName = "test/data/langFields/all_lang_specs.ipynb";
+		Notebook notebook = new Notebook(fileName);
+		notebook.language();
+		notebook.allLanguageValues();
+		assertEquals("Language specification field changed by langFieldValues",
+				LangSpec.METADATA_LANGUAGE, notebook.langSpec());
 	}
 	
 	/**
