@@ -149,7 +149,7 @@ public class NotebookTest {
 	 * @throws NotebookException
 	 */
 	@Test
-	public void testLangFields_initialized() throws NotebookException {
+	public void testAllLanguageValues_initialized() throws NotebookException {
 		String fileName = "test/data/langFields/all_lang_specs.ipynb";
 		final int NUM_LANG_FIELDS = LangSpec.values().length - 1;
 		Map<LangSpec, Language> expected
@@ -162,7 +162,7 @@ public class NotebookTest {
 		
 		Notebook notebook = new Notebook(fileName);
 		assertEquals("Wrong language field values returned",
-				expected, notebook.langFieldValues());
+				expected, notebook.allLanguageValues());
 	}
 	
 	/**
@@ -171,7 +171,7 @@ public class NotebookTest {
 	 * @throws NotebookException
 	 */
 	@Test
-	public void testLangFields_empty() throws NotebookException {
+	public void testAllLanguageValues_empty() throws NotebookException {
 		String fileName = "test/data/langFields/empty.ipynb";
 		final int NUM_LANG_FIELDS = LangSpec.values().length - 1;
 		Map<LangSpec, Language> expected
@@ -184,7 +184,7 @@ public class NotebookTest {
 		
 		Notebook notebook = new Notebook(fileName);
 		assertEquals("Wrong language field values returned",
-				expected, notebook.langFieldValues());
+				expected, notebook.allLanguageValues());
 	}
 	
 	/**
@@ -193,7 +193,7 @@ public class NotebookTest {
 	 * @throws NotebookException
 	 */
 	@Test
-	public void testLangFields_noKernelSpec() throws NotebookException {
+	public void testAllLanguageValues_noKernelSpec() throws NotebookException {
 		String fileName = "test/data/langFields/no_kernelspec.ipynb";
 		final int NUM_LANG_FIELDS = LangSpec.values().length - 1;
 		Map<LangSpec, Language> expected
@@ -206,7 +206,7 @@ public class NotebookTest {
 		
 		Notebook notebook = new Notebook(fileName);
 		assertEquals("Wrong language field values returned",
-				expected, notebook.langFieldValues());
+				expected, notebook.allLanguageValues());
 	}
 	
 	/**
@@ -214,11 +214,11 @@ public class NotebookTest {
 	 * @throws NotebookException
 	 */
 	@Test
-	public void testLangFields_langSpec() throws NotebookException {
+	public void testAllLanguageValues_langSpec() throws NotebookException {
 		String fileName = "test/data/langFields/all_lang_specs.ipynb";
 		Notebook notebook = new Notebook(fileName);
 		notebook.language();
-		notebook.langFieldValues();
+		notebook.allLanguageValues();
 		assertEquals("Language specification field changed by langFieldValues",
 				LangSpec.METADATA_LANGUAGE, notebook.langSpec());
 	}

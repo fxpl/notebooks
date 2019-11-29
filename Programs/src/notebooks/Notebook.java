@@ -86,12 +86,13 @@ public class Notebook {
 	 * (except NONE). Store in a Map with the LangSpec value being the key.
 	 * @return The map described above
 	 */
-	public Map<LangSpec, Language> langFieldValues() throws NotebookException {
+	public Map<LangSpec, Language> allLanguageValues() throws NotebookException {
 		Map<LangSpec, Language> result
 			= new HashMap<LangSpec, Language>(LangSpec.values().length-1);
 		LangSpec langSpecIn = this.languageSpecIn;
 		JSONObject notebook = this.getNotebook();
 		if (!notebook.containsKey("metadata")) {
+			// TODO(?): Bryt ut
 			result.put(LangSpec.METADATA_LANGUAGE, Language.UNKNOWN);
 			result.put(LangSpec.METADATA_LANGUAGEINFO_NAME, Language.UNKNOWN);
 			result.put(LangSpec.METADATA_KERNELSPEC_LANGUAGE, Language.UNKNOWN);
