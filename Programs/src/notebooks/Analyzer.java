@@ -333,6 +333,10 @@ public class Analyzer {
 						this.clones();
 						System.out.println("Clone files created!");
 						break;
+					case "-lang_all":
+						this.allLanguageValues();
+						System.out.println("File with all language values created!");
+						break;
 					default:
 						System.err.println("Unknown argument: " + arg);
 				}
