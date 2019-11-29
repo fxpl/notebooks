@@ -4,6 +4,8 @@ import static org.junit.Assert.*;
 
 import java.io.*;
 import java.security.NoSuchAlgorithmException;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.Test;
 
@@ -71,9 +73,10 @@ public class NotebookTest {
 	
 	/**
 	 * Verify that code snippets are hashed correctly.
+	 * @throws NotebookException
 	 */
 	@Test
-	public void testHashes() throws NotebookException, NoSuchAlgorithmException {
+	public void testHashes() throws NotebookException {
 		String dataDir = "test/data/hash";
 		String[] files = {"empty_code_string.ipynb", "empty_code_strings.ipynb",
 				"single_import.ipynb", "two_import_cells.ipynb"};
@@ -119,6 +122,11 @@ public class NotebookTest {
 		}
 	}
 	
+	/**
+	 * Verify that the correct language specification field is returned by
+	 * langSpec().
+	 * @throws NotebookException
+	 */
 	@Test
 	public void testLangSpec() throws NotebookException {
 		String dataDir = "test/data/lang";
@@ -134,6 +142,86 @@ public class NotebookTest {
 			Notebook notebook = new Notebook(dataDir + "/" + files[i]);
 			assertEquals("Wrong language specification location:", langSpecs[i], notebook.langSpec());
 		}
+	}
+	
+	/**
+	 * Verify that the right language is found in each language specification
+	 * field in a notebook where all such fields are initialized.
+	 * @throws NotebookException
+	 */
+	@Test
+	public void testLangFields_initialized() throws NotebookException {
+		String fileName = "test/data/langFields/all_lang_specs.ipynb";
+		final int NUM_LANG_FIELDS = LangSpec.values().length - 1;
+		Map<LangSpec, Language> expected
+			= new HashMap<LangSpec, Language>(NUM_LANG_FIELDS);
+		expected.put(LangSpec.METADATA_LANGUAGE, Language.JULIA);
+		expected.put(LangSpec.METADATA_LANGUAGEINFO_NAME, Language.PYTHON);
+		expected.put(LangSpec.METADATA_KERNELSPEC_LANGUAGE, Language.R);
+		expected.put(LangSpec.METADATA_KERNELSPEC_NAME, Language.OTHER);
+		expected.put(LangSpec.CODE_CELLS, Language.SCALA);
+		
+		Notebook notebook = new Notebook(fileName);
+		assertEquals("Wrong language field values returned",
+				expected, notebook.langFieldValues());
+	}
+	
+	/**
+	 * Verify that "UNKNOWN" is set as the language by langFieldValues when the
+	 * language specification fields in a notebook are missing.
+	 * @throws NotebookException
+	 */
+	@Test
+	public void testLangFields_empty() throws NotebookException {
+		String fileName = "test/data/langFields/empty.ipynb";
+		final int NUM_LANG_FIELDS = LangSpec.values().length - 1;
+		Map<LangSpec, Language> expected
+			= new HashMap<LangSpec, Language>(NUM_LANG_FIELDS);
+		expected.put(LangSpec.METADATA_LANGUAGE, Language.UNKNOWN);
+		expected.put(LangSpec.METADATA_LANGUAGEINFO_NAME, Language.UNKNOWN);
+		expected.put(LangSpec.METADATA_KERNELSPEC_LANGUAGE, Language.UNKNOWN);
+		expected.put(LangSpec.METADATA_KERNELSPEC_NAME, Language.UNKNOWN);
+		expected.put(LangSpec.CODE_CELLS, Language.UNKNOWN);
+		
+		Notebook notebook = new Notebook(fileName);
+		assertEquals("Wrong language field values returned",
+				expected, notebook.langFieldValues());
+	}
+	
+	/**
+	 * Verify that "UNKNOWN" is set as the language for the KERNELSPEC fields by
+	 * langFieldValues when a notebook contains metadata, but not kernelspec.
+	 * @throws NotebookException
+	 */
+	@Test
+	public void testLangFields_noKernelSpec() throws NotebookException {
+		String fileName = "test/data/langFields/no_kernelspec.ipynb";
+		final int NUM_LANG_FIELDS = LangSpec.values().length - 1;
+		Map<LangSpec, Language> expected
+			= new HashMap<LangSpec, Language>(NUM_LANG_FIELDS);
+		expected.put(LangSpec.METADATA_LANGUAGE, Language.R);
+		expected.put(LangSpec.METADATA_LANGUAGEINFO_NAME, Language.JULIA);
+		expected.put(LangSpec.METADATA_KERNELSPEC_LANGUAGE, Language.UNKNOWN);
+		expected.put(LangSpec.METADATA_KERNELSPEC_NAME, Language.UNKNOWN);
+		expected.put(LangSpec.CODE_CELLS, Language.SCALA);
+		
+		Notebook notebook = new Notebook(fileName);
+		assertEquals("Wrong language field values returned",
+				expected, notebook.langFieldValues());
+	}
+	
+	/**
+	 * Verify that the language spec value is not changed by langFieldValues.
+	 * @throws NotebookException
+	 */
+	@Test
+	public void testLangFields_langSpec() throws NotebookException {
+		String fileName = "test/data/langFields/all_lang_specs.ipynb";
+		Notebook notebook = new Notebook(fileName);
+		notebook.language();
+		notebook.langFieldValues();
+		assertEquals("Language specification field changed by langFieldValues",
+				LangSpec.METADATA_LANGUAGE, notebook.langSpec());
 	}
 	
 	/**

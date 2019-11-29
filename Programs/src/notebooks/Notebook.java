@@ -82,6 +82,41 @@ public class Notebook {
 	}
 	
 	/**
+	 * Fetch the language defined by each of the fields defined by LangSpec
+	 * (except NONE). Store in a Map with the LangSpec value being the key.
+	 * @return The map described above
+	 */
+	public Map<LangSpec, Language> langFieldValues() throws NotebookException {
+		Map<LangSpec, Language> result
+			= new HashMap<LangSpec, Language>(LangSpec.values().length-1);
+		LangSpec langSpecIn = this.languageSpecIn;
+		JSONObject notebook = this.getNotebook();
+		if (!notebook.containsKey("metadata")) {
+			result.put(LangSpec.METADATA_LANGUAGE, Language.UNKNOWN);
+			result.put(LangSpec.METADATA_LANGUAGEINFO_NAME, Language.UNKNOWN);
+			result.put(LangSpec.METADATA_KERNELSPEC_LANGUAGE, Language.UNKNOWN);
+			result.put(LangSpec.METADATA_KERNELSPEC_NAME, Language.UNKNOWN);
+		} else {
+			JSONObject metadata = (JSONObject)notebook.get("metadata");
+			result.put(LangSpec.METADATA_LANGUAGE, getLanguageFromLanguage(metadata));
+			result.put(LangSpec.METADATA_LANGUAGEINFO_NAME, getLanguageFromLanguageinfo(metadata));
+			if (!metadata.containsKey("kernelspec")) {
+				result.put(LangSpec.METADATA_KERNELSPEC_LANGUAGE, Language.UNKNOWN);
+				result.put(LangSpec.METADATA_KERNELSPEC_NAME, Language.UNKNOWN);
+			} else {
+				JSONObject kernelspec = (JSONObject)metadata.get("kernelspec");
+				result.put(LangSpec.METADATA_KERNELSPEC_LANGUAGE, getLanguageFromKernelspecLanguage(kernelspec));
+				result.put(LangSpec.METADATA_KERNELSPEC_NAME, getLanguageFromKernelSpecName(kernelspec));
+			}
+		}
+		result.put(LangSpec.CODE_CELLS, getLanguageFromCodeCells(notebook));
+		
+		// Reset langSpecIn
+		this.languageSpecIn = langSpecIn;
+		return result;
+	}
+	
+	/**
 	 * This updates instance variables, but it will always set the same values
 	 * for a given object, so it doesn't have to be synchronized. (The same
 	 * holds for its private helper methods.) 
@@ -338,19 +373,38 @@ public class Notebook {
 
 	/**
 	 * @param metadata Metadata to analyze
-	 * @return The language specified in Get source codemetadata->kernelspec. UNKNOWN otherwise.
+	 * @return The language specified in Get source code metadata->kernelspec. UNKNOWN otherwise.
 	 */
 	private Language getLanguageFromKernelspec(JSONObject metadata) {
 		if (metadata.containsKey("kernelspec")) {
 			JSONObject kernelspec = (JSONObject)metadata.get("kernelspec");
-			if (kernelspec.containsKey("language")) {
-				languageSpecIn = LangSpec.METADATA_KERNELSPEC_LANGUAGE;
-				return getLanguage((String) kernelspec.get("language"));
+			Language ksLang = getLanguageFromKernelspecLanguage(kernelspec);
+			if (Language.UNKNOWN != ksLang) {
+				return ksLang;
 			}
-			if (kernelspec.containsKey("name")) {
-				languageSpecIn = LangSpec.METADATA_KERNELSPEC_NAME;
-				return getLanguage((String)kernelspec.get("name"));
-			}
+			return getLanguageFromKernelSpecName(kernelspec);
+		}
+		return Language.UNKNOWN;
+	}
+
+	/**
+	 * @param kernelspec
+	 */
+	private Language getLanguageFromKernelSpecName(JSONObject kernelspec) {
+		if (kernelspec.containsKey("name")) {
+			languageSpecIn = LangSpec.METADATA_KERNELSPEC_NAME;
+			return getLanguage((String)kernelspec.get("name"));
+		}
+		return Language.UNKNOWN;
+	}
+
+	/**
+	 * @param kernelspec
+	 */
+	private Language getLanguageFromKernelspecLanguage(JSONObject kernelspec) {
+		if (kernelspec.containsKey("language")) {
+			languageSpecIn = LangSpec.METADATA_KERNELSPEC_LANGUAGE;
+			return getLanguage((String) kernelspec.get("language"));
 		}
 		return Language.UNKNOWN;
 	}
