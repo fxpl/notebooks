@@ -23,7 +23,7 @@ public class NotebookTest {
 	@Test
 	public void testDumpCode() throws IOException, NotebookException {
 		String dataDir = "test/data/dump";
-		String[] inFiles = {"nb1.ipynb", "nb1_str.ipynb", "nb2.ipynb", "nb3"};
+		String[] inFiles = {"nb1.ipynb", "nb1_str.ipynb", "nb2.ipynb", "nb3.ipynb"};
 		String outputDir = ".";
 		String suffix = "py";
 		String[] expectedOutFiles = {"nb1_0.py", "nb1_1.py",

@@ -13,8 +13,10 @@ public class PythonDumper {
 	public void dump(String src, String target) {
 		File srcFile = new File(src);
 		if (!srcFile.isDirectory()) {
-			createDirectoryIfMissing(target);
-			dumpIfPythonNotebook(src, target);
+			if (srcFile.getName().endsWith(".ipynb")) {
+				createDirectoryIfMissing(target);
+				dumpIfPythonNotebook(src, target);
+			}
 		} else {
 			// This is a directory. Traverse.
 			String[] subFiles = srcFile.list();

@@ -36,6 +36,20 @@ public class PythonDumperTest {
 	}
 	
 	/**
+	 * Verify that dumper does not try to dump files that do not end with ipynb.
+	 */
+	@Test
+	public void testDump_nonNotebookFile() {
+		String src = "test/data/dump/txt.txt";
+		File outputFile = new File(targetDir + "/" + "shouldNotBeCreated.txt");
+		
+		dumper.dump(src, targetDir);
+		
+		assertFalse("Output file created from non-notebook file " + src,
+				outputFile.exists());
+	}
+	
+	/**
 	 * Verify that the snippets of a notebook are not dumped by dumper if the
 	 * notebook is not written in Python.
 	 */
