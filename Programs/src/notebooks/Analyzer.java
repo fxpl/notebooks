@@ -351,7 +351,7 @@ public class Analyzer {
 			Future<T> result = executor.submit(worker);
 			return result.get();
 		} catch (ExecutionException e) {
-			System.err.println(e.getMessage() + " Skipping!");
+			System.err.println(e.getMessage() + " Skipping notebook!");
 			return worker.defaultValue();
 		} catch (InterruptedException e) {
 			System.err.println("A thread was interrupted: " +

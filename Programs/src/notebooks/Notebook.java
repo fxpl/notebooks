@@ -295,8 +295,8 @@ public class Notebook {
 						result.add(cell);
 					}
 				} catch (Exception e) {
-					throw new NotebookException("Couldn't cast cell type of cell number " + i
-							+ " in " + this.path + "to string: " + e.toString());
+					System.err.println("Couldn't cast cell type of cell number " + i
+							+ " in " + this.path + " to string: " + e.toString() + ". Skipping cell.");
 					
 				}
 			} else {
