@@ -192,6 +192,19 @@ public class Notebook {
 		return getCodeCells().size();
 	}
 	
+	/**
+	 * Print the snippet whose index is given as an argument to the method,
+	 * followed by an empty line.
+	 * @param Index of snippet to print
+	 */
+	public void printSnippet(int index) throws NotebookException {
+		JSONArray snippet = getSource(this.getCodeCells().get(index));
+		for (int i=0; i<snippet.size(); i++) {
+			System.out.print((String)snippet.get(i));
+		}
+		System.out.println("");
+	}
+	
 	
 	/**
 	 * Count lines of code and set all loc variables.

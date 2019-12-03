@@ -297,6 +297,34 @@ public class NotebookTest {
 		}
 	}
 	
+	@Test
+	public void testPrintSnippet() throws NotebookException, IOException {
+		// Redirect stdout
+		PrintStream stdout = System.out;
+		OutputStream output = new ByteArrayOutputStream();
+		System.setOut(new PrintStream(output));
+		
+		// Test data
+		String dataDir = "test/data/dump";
+		String file = "nb1.ipynb";
+		int snippetIndex = 1;
+		String expectedOutput = "def my_function\n\ta = 2\n\tb = 2\n\n";
+		
+		// Verify behavior
+		Notebook notebook = new Notebook(dataDir + "/" + file);
+		try {
+			notebook.printSnippet(snippetIndex);
+			assertEquals("Wrong code printed", expectedOutput, output.toString());
+		} catch (NotebookException e) {
+			// Before failing, we have to reset stdout!
+			System.setOut(stdout);
+			throw e;
+		}
+		
+		// Reset stdout
+		System.setOut(stdout);
+	}
+	
 	/**
 	 * Verify that a NotebookException is thrown if we try to extract a source
 	 * value that is not a string or an array.
