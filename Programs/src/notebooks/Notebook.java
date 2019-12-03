@@ -202,7 +202,6 @@ public class Notebook {
 		for (int i=0; i<snippet.size(); i++) {
 			System.out.print((String)snippet.get(i));
 		}
-		System.out.println("");
 	}
 	
 	

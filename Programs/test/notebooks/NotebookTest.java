@@ -308,7 +308,7 @@ public class NotebookTest {
 		String dataDir = "test/data/dump";
 		String file = "nb1.ipynb";
 		int snippetIndex = 1;
-		String expectedOutput = "def my_function\n\ta = 2\n\tb = 2\n\n";
+		String expectedOutput = "def my_function\n\ta = 2\n\tb = 2\n";
 		
 		// Verify behavior
 		Notebook notebook = new Notebook(dataDir + "/" + file);
