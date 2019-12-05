@@ -63,8 +63,8 @@ public class Analyzer {
 	
 	/**
 	 * Compute the MD5 hash of each snippet in each notebook. Return a map with
-	 * the key being the hashes and the values being lists of all snippets
-	 * containing the corresponding code.
+	 * the key being the snippet code and the values being lists of all
+	 * snippets containing that code.
 	 * For each notebook, print the name of the notebook followed by a list of
 	 * the hash of each snippet in the notebook to the file 
 	 * file2hashes<current-date-time>.csv.
@@ -75,33 +75,33 @@ public class Analyzer {
 	 * @throws IOException On problems handling the output file.
 	 */
 	public Map<SnippetCode, List<Snippet>> clones() throws IOException {
-		Map<String, SnippetCode[]> hashes = getHashes();
-		Map<SnippetCode, List<Snippet>> clones = getClones(hashes);
-		printFile2Hashes(hashes);
+		Map<String, SnippetCode[]> snippets = getSnippets();
+		Map<SnippetCode, List<Snippet>> clones = getClones(snippets);
+		printFile2Hashes(snippets);
 		printHash2Files(clones);
-		printCloneFrequencies(hashes, clones);
+		printCloneFrequencies(snippets, clones);
 		return clones;
 	}
 
 	/**
-	 * @return A map from file names to hashes (snippets)
+	 * @return A map from file names to snippets
 	 */
-	private Map<String, SnippetCode[]> getHashes() throws IOException {
-		Map<String, SnippetCode[]> hashes = new HashMap<String, SnippetCode[]>();
+	private Map<String, SnippetCode[]> getSnippets() throws IOException {
+		Map<String, SnippetCode[]> snippets = new HashMap<String, SnippetCode[]>();
 		for (int i=0; i<notebooks.size(); i++) {
 			if (0 == i%10000) {
 				System.out.println("Hashing snippets in notebook " + i);
 			}
 			Notebook currentNotebook = notebooks.get(i);
 			String fileName = currentNotebook.getName();
-			SnippetCode[] hashesInNotebook = employ(new HashExtractor(currentNotebook));
-			hashes.put(fileName, hashesInNotebook);
+			SnippetCode[] snippetsInNotebook = employ(new HashExtractor(currentNotebook));
+			snippets.put(fileName, snippetsInNotebook);
 		}
-		return hashes;
+		return snippets;
 	}
 	
 	/**
-	 * return A map from hashes (snippets) to files
+	 * return A map from snippets to files
 	 */
 	private Map<SnippetCode, List<Snippet>> getClones(Map<String, SnippetCode[]> fileMap) throws IOException {
 		int numAnalyzed = 0;
@@ -110,14 +110,14 @@ public class Analyzer {
 			if (0 == numAnalyzed%10000) {
 				System.out.println("Finding clones in notebook " + numAnalyzed);
 			}
-			SnippetCode[] hashes = fileMap.get(fileName);
-			for (int j=0; j<hashes.length; j++) {
-				if (clones.containsKey(hashes[j])) {
-					clones.get(hashes[j]).add(new Snippet(fileName, j));
+			SnippetCode[] snippetCodes = fileMap.get(fileName);
+			for (int j=0; j<snippetCodes.length; j++) {
+				if (clones.containsKey(snippetCodes[j])) {
+					clones.get(snippetCodes[j]).add(new Snippet(fileName, j));
 				} else {
 					List<Snippet> snippets = new ArrayList<Snippet>();
 					snippets.add(new Snippet(fileName, j));
-					clones.put(hashes[j], snippets);
+					clones.put(snippetCodes[j], snippets);
 				}
 			}
 			numAnalyzed++;
@@ -180,12 +180,12 @@ public class Analyzer {
 	}
 	
 	/**
-	 * Look in clones to decide whether hash is the hash of a clone or a unique
-	 * snippet (that is, if the list of snippets is at least 2).
-	 * @return true if hash is a clone, false otherwise
+	 * Look in clones to decide whether snippet is a clone or a unique snippet
+	 * (that is, if the list of snippets is at least 2).
+	 * @return true if snippet is a clone, false otherwise
 	 */
-	private boolean isClone(SnippetCode hash, Map<SnippetCode, List<Snippet>> clones) {
-		List<Snippet> snippets = clones.get(hash);
+	private boolean isClone(SnippetCode snippet, Map<SnippetCode, List<Snippet>> clones) {
+		List<Snippet> snippets = clones.get(snippet);
 		return snippets.size() >= 2;
 	}
 	
