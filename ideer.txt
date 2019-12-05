@@ -25,3 +25,28 @@
 * Plottar
 * Finns data så att vi kan köra?
 
+
+== Frågor om kloner ==
+
+Hur många kloner per notebook
+Hur många kloner per notebookstorleksintervall 
+Hur många notebooks per klon
+Klonernas storleksfördelning
+Klonkällor per notebooks
+Kloner per förekomst
+Kloner per språk / storlek (LOC, #snippets) / ...
+
+Kvalitativ analys av X vanligaste klonerna
+  Vad innehåller de?
+  Samband?
+Kvalitativ analys av X minsta/största/median-klonerna
+  Vad innehåller de?
+
+Finns det "helt" klonade notebooks? 
+Notebooks per klon-%-intervall (0-5, 5-10, etc.)
+Sannolikhet att flera kloner finns från samma källa
+
+Är notebooks från samma repo mer lika? 
+
+Om vi har metadata från GitHub om repos:
+  "korrelation" mot repots ålder/aktivitet/#committs 
