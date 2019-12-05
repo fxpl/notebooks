@@ -127,10 +127,9 @@ public class Analyzer {
 
 	private void printHash2Files(Map<SnippetCode, List<Snippet>> clones) throws IOException {
 		Writer writer = new FileWriter("hash2files" + LocalDateTime.now() + ".csv");
-		writer.write("hash, file, index, ...\n");
+		writer.write("hash, LOC, file, index, ...\n");
 		for (SnippetCode code: clones.keySet()) {
-			String hash = code.getHash();
-			writer.write(hash);
+			writer.write(code.getHash() + ", " + code.getLOC());
 			for (Snippet s: clones.get(code)) {
 				writer.write(", " + s.toString());
 			}

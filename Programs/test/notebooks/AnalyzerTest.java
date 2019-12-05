@@ -178,7 +178,7 @@ public class AnalyzerTest {
 		};
 		String[] expectedClonesLines = {
 				hash2filesHeader(),
-				hash + ", " + fileName + ", 0"
+				hash + ", 1, " + fileName + ", 0"
 		};
 		String[] expectedFrequencyLiens = {
 				cloneFrequencyHeader(),
@@ -213,7 +213,7 @@ public class AnalyzerTest {
 		};
 		String[] expectedHash2FileLines = {
 				hash2filesHeader(),
-				hash + ", " + fileName + ", 0, " + fileName + ", 1"
+				hash + ", 1, " + fileName + ", 0, " + fileName + ", 1"
 		};
 		String[] expectedFrequencyLines = {
 				cloneFrequencyHeader(),
@@ -440,7 +440,7 @@ public class AnalyzerTest {
 	 * @return Expected header of hash2files files
 	 */
 	private static String hash2filesHeader() {
-		return "hash, file, index, ...";
+		return "hash, LOC, file, index, ...";
 	}
 	
 	/**
