@@ -139,12 +139,12 @@ public class Analyzer {
 		writer.close();
 	}
 	
-	private void printFile2Hashes(Map<String, SnippetCode[]> clones) throws IOException {
+	private void printFile2Hashes(Map<String, SnippetCode[]> files) throws IOException {
 		Writer writer = new FileWriter("file2hashes" + LocalDateTime.now() + ".csv");
 		writer.write("file, snippets\n");
-		for (String fileName: clones.keySet()) {
+		for (String fileName: files.keySet()) {
 			writer.write(fileName);
-			SnippetCode[] code = clones.get(fileName);
+			SnippetCode[] code = files.get(fileName);
 			for (SnippetCode snippet: code) {
 				writer.write(", " + snippet.getHash());
 			}

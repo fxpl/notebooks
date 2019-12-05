@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.*;
-
 import notebooks.Analyzer;
 import notebooks.LangSpec;
 import notebooks.Language;
@@ -140,13 +139,13 @@ public class AnalyzerTest {
 		String dataDir = "test/data/hash";
 		String fileName = "missing_cells.ipynb";
 		String[] expectedSnippetLines = {
-				"file, snippets"
+				file2hashesHeader()
 		};
 		String[] expectedClonesLines = {
-				"hash, file, index, ..."
+				hash2filesHeader()
 		};
 		String[] expectedFrequencyLiens = {
-				"file, clones, unique, clone frequency",
+				cloneFrequencyHeader(),
 				fileName + ", 0, 0, 0"
 		};
 		
@@ -174,15 +173,15 @@ public class AnalyzerTest {
 		String fileName = "single_import.ipynb";
 		String hash = "33BE8D72467938FBB23EF42CF8C9E85F";
 		String[] expectedSnippetLines = {
-				"file, snippets",
+				file2hashesHeader(),
 				fileName + ", " + hash
 		};
 		String[] expectedClonesLines = {
-				"hash, file, index, ...",
+				hash2filesHeader(),
 				hash + ", " + fileName + ", 0"
 		};
 		String[] expectedFrequencyLiens = {
-				"file, clones, unique, clone frequency",
+				cloneFrequencyHeader(),
 				fileName + ", 0, 1, 0.0000"
 		};
 		
@@ -209,15 +208,15 @@ public class AnalyzerTest {
 		String fileName = "intra_clones.ipynb";
 		String hash = "0120F99AA7C49E1CD5F4EE4A6BB1CC4A";
 		String[] expectedFile2HashesLines = {
-				"file, snippets",
+				file2hashesHeader(),
 				fileName + ", " + hash + ", " + hash
 		};
 		String[] expectedHash2FileLines = {
-				"hash, file, index, ...",
+				hash2filesHeader(),
 				hash + ", " + fileName + ", 0, " + fileName + ", 1"
 		};
 		String[] expectedFrequencyLines = {
-				"file, clones, unique, clone frequency",
+				cloneFrequencyHeader(),
 				fileName + ", 2, 0, 1.0000"
 		};
 		
@@ -245,12 +244,12 @@ public class AnalyzerTest {
 		String kossaHash = "0120F99AA7C49E1CD5F4EE4A6BB1CC4A";
 		String uniqueHash = "A2D53E3DA394A52271CF00632C961D2A";
 		String[] expectedFile2HashesLines = {
-			"file, snippets",
+			file2hashesHeader(),
 			fileName + ", " + kossaHash + ", " + uniqueHash + ", " + kossaHash
 		};
 		// hash2Files is hard to test since we don't know in which order the hashes are stored
 		String[] expectedFrequencyLines = {
-			"file, clones, unique, clone frequency",
+			cloneFrequencyHeader(),
 			fileName + ", 2, 1, 0.6667"
 		};
 		
@@ -415,12 +414,33 @@ public class AnalyzerTest {
 	}
 	
 	/**
+	 * @return Expected header of cloneFrequency files
+	 */
+	private static String cloneFrequencyHeader() {
+		return "file, clones, unique, clone frequency";
+	}
+	
+	/**
 	 * Delete all CSV files created by the clone analysis. 
 	 */
 	private void deleteCloneCsvs() {
 		lastOutputFile("file2hashes").delete();
 		lastOutputFile("hash2files").delete();
 		lastOutputFile("cloneFrequency").delete();
+	}
+	
+	/**
+	 * @return Expected header of file2hash files
+	 */
+	private static String file2hashesHeader() {
+		return "file, snippets";
+	}
+	
+	/**
+	 * @return Expected header of hash2files files
+	 */
+	private static String hash2filesHeader() {
+		return "hash, LOC, file, index, ...";
 	}
 	
 	/**
