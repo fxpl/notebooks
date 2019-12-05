@@ -75,7 +75,7 @@ public class NotebookTest {
 	 * @throws NotebookException
 	 */
 	@Test
-	public void testHashes() throws NotebookException {
+	public void testSnippetCodes() throws NotebookException {
 		String dataDir = "test/data/hash";
 		String[] files = {"empty_code_string.ipynb", "empty_code_strings.ipynb",
 				"single_import.ipynb", "two_import_cells.ipynb"};
@@ -85,11 +85,14 @@ public class NotebookTest {
 				{"33BE8D72467938FBB23EF42CF8C9E85F"},
 				{"33BE8D72467938FBB23EF42CF8C9E85F", "6CABFDBC20F69189D4B8894A06C78F49"}
 		};
+		int[][] expectedLOC = {{0}, {0}, {1}, {1, 1}};
+		
 		for (int i=0; i<files.length; i++) {
 			Notebook notebook = new Notebook(dataDir + "/" + files[i]);
-			String[] hashes = notebook.hashes();
+			SnippetCode[] snippetCodes = notebook.snippetCodes();
 			for (int j=0; j<expectedHashStrings[i].length; j++) {
-				assertEquals("Wrong hash:", expectedHashStrings[i][j], hashes[j]);
+				assertEquals("Wrong hash:", expectedHashStrings[i][j], snippetCodes[j].getHash());
+				assertEquals("Wrong number of LOC:", expectedLOC[i][j], snippetCodes[j].getLOC());
 			}
 		}
 	}

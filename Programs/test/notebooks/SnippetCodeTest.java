@@ -37,6 +37,12 @@ public class SnippetCodeTest {
 	}
 	
 	@Test
+	public void testEquals_diffLOC() {
+		SnippetCode different = new SnippetCode(1000, hash);
+		assertFalse("Snippet codes considered equal when LOC differ!", code.equals(different));
+	}
+	
+	@Test
 	public void testEquals_equal() {
 		SnippetCode equal = new SnippetCode(LOC, hash);
 		assertTrue("Equal snippet codes considered different!", code.equals(equal));

@@ -89,42 +89,42 @@ public class AnalyzerTest {
 				"intra_clones.ipynb", "intra_clones_and_unique.ipynb"
 		};
 		// Expected values
-		Map<String, List<Snippet>> expectedClones = new HashMap<String, List<Snippet>>();
+		Map<SnippetCode, List<Snippet>> expectedClones = new HashMap<SnippetCode, List<Snippet>>();
 		List<Snippet> emptySnippets = new ArrayList<Snippet>(2);
 		emptySnippets.add(new Snippet("empty_code_string.ipynb", 0));
 		emptySnippets.add(new Snippet("empty_code_strings.ipynb", 0));
-		expectedClones.put("D41D8CD98F00B204E9800998ECF8427E", emptySnippets);	// Empty
+		expectedClones.put(new SnippetCode(0, "D41D8CD98F00B204E9800998ECF8427E"), emptySnippets);	// Empty
 		List<Snippet> numpy = new ArrayList<Snippet>(2);
 		numpy.add(new Snippet("single_import.ipynb", 0));
 		numpy.add(new Snippet("two_import_cells.ipynb", 0));
-		expectedClones.put("33BE8D72467938FBB23EF42CF8C9E85F", numpy); // import numpy
+		expectedClones.put(new SnippetCode(1, "33BE8D72467938FBB23EF42CF8C9E85F"), numpy); // import numpy
 		List<Snippet> pandas = new ArrayList<Snippet>(1);
 		pandas.add(new Snippet("two_import_cells.ipynb", 1));
-		expectedClones.put("6CABFDBC20F69189D4B8894A06C78F49", pandas); // import pandas
+		expectedClones.put(new SnippetCode(1, "6CABFDBC20F69189D4B8894A06C78F49"), pandas); // import pandas
 		List<Snippet> kossa = new ArrayList<Snippet>(4);
 		kossa.add(new Snippet("intra_clones.ipynb", 0));
 		kossa.add(new Snippet("intra_clones.ipynb", 1));
 		kossa.add(new Snippet("intra_clones_and_unique.ipynb", 0));
 		kossa.add(new Snippet("intra_clones_and_unique.ipynb", 2));
-		expectedClones.put("0120F99AA7C49E1CD5F4EE4A6BB1CC4A", kossa);
+		expectedClones.put(new SnippetCode(1, "0120F99AA7C49E1CD5F4EE4A6BB1CC4A"), kossa);
 		List<Snippet> unique = new ArrayList<Snippet>(1);
 		unique.add(new Snippet("intra_clones_and_unique.ipynb", 1));
-		expectedClones.put("A2D53E3DA394A52271CF00632C961D2A", unique);
+		expectedClones.put(new SnippetCode(1, "A2D53E3DA394A52271CF00632C961D2A"), unique);
 		
 		// Actual values
 		for (String file: files) {
 			analyzer.initializeNotebooksFrom(dataDir + "/" + file);
 		}
 		analyzer.initializeNotebooksFrom("test/data/hash");
-		Map<String, List<Snippet>> clones = analyzer.clones();
+		Map<SnippetCode, List<Snippet>> clones = analyzer.clones();
 		
 		// Check values
 		assertTrue(expectedClones.keySet().equals(clones.keySet()));
-		for (String hash: expectedClones.keySet()) {
-			List<Snippet> expectedSnippets = expectedClones.get(hash);
-			List<Snippet> actualSnippets = clones.get(hash);
-			assertEquals("Wrong number of snippets stored for " + hash + ":", expectedSnippets.size(), actualSnippets.size());
-			assertTrue("Wrong snippets stored for " + hash, actualSnippets.containsAll(expectedSnippets));
+		for (SnippetCode snippetCode: expectedClones.keySet()) {
+			List<Snippet> expectedSnippets = expectedClones.get(snippetCode);
+			List<Snippet> actualSnippets = clones.get(snippetCode);
+			assertEquals("Wrong number of snippets stored for " + snippetCode + ":", expectedSnippets.size(), actualSnippets.size());
+			assertTrue("Wrong snippets stored for " + snippetCode, actualSnippets.containsAll(expectedSnippets));
 		}
 		deleteCloneCsvs();
 	}

@@ -28,8 +28,8 @@ public class SnippetCode {
 			return false;
 		}
 		SnippetCode otherCode = (SnippetCode)other;
-		return this.hash.equals(otherCode.getHash());
-		// TODO: Bör man kolla LOC också?
+		return this.hash.equals(otherCode.getHash())
+				&& this.LOC == otherCode.LOC;
 	}
 	
 	@Override

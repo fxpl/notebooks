@@ -2,18 +2,18 @@ package notebooks;
 
 import notebooks.Worker;
 
-class HashExtractor extends Worker<String[]> {
+class HashExtractor extends Worker<SnippetCode[]> {
 	public HashExtractor(Notebook notebook) {
 		super(notebook);
 	}
 	
 	@Override
-	public String[] call() throws Exception {
-		return notebook.hashes();
+	public SnippetCode[] call() throws Exception {
+		return notebook.snippetCodes();
 	}
 
 	@Override
-	protected String[] defaultValue() {
-		return new String[0];
+	protected SnippetCode[] defaultValue() {
+		return new SnippetCode[0];
 	}
 }

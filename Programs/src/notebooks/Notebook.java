@@ -56,9 +56,12 @@ public class Notebook {
 	}
 
 	/**
-	 * @return Array containing the hash of the source code stored in each code cell
+	 * Return the code of all snippets of the notebook. For memory consumption
+	 * reasons, the result contains only the length (LOC) and the hash of the
+	 * code in each snippet, not the code itself.
+	 * @return Array containing a representation of the code of the snippets of the notebook
 	 */
-	public String[] hashes() throws NotebookException {
+	public SnippetCode[] snippetCodes() throws NotebookException {
 		MessageDigest hasher;
 		try {
 			hasher = MessageDigest.getInstance("MD5");
@@ -68,17 +71,23 @@ public class Notebook {
 		}
 		List<JSONObject> codeCells = getCodeCells();
 		int numSnippets = codeCells.size();
-		String[] hashes = new String[numSnippets];
+		SnippetCode[] code = new SnippetCode[numSnippets];
 		for (int i=0; i<numSnippets; i++) {
 			String snippet = "";
 			JSONArray lines = getSource(codeCells.get(i));
+			int loc = 0;
 			for (int j=0; j<lines.size(); j++) {
-				snippet += lines.get(j);
+				String line = (String)lines.get(j);	// Type is checked in getSource.
+				line = line .replaceAll("\\s", "");
+				if(!"".equals(line)) {
+					loc++;	// Count non-empty lines
+				}
+				snippet += line;
 			}
-			snippet = snippet.replaceAll("\\s", "");
-			hashes[i] = toHexString(hasher.digest(snippet.getBytes()));
+			String hash = toHexString(hasher.digest(snippet.getBytes()));
+			code[i] = new SnippetCode(loc, hash);
 		}
-		return hashes;
+		return code;
 	}
 	
 	/**
