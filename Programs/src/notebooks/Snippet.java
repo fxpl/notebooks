@@ -1,14 +1,17 @@
 package notebooks;
 
+import java.util.Objects;
+
 public class Snippet {
-	private String fileName;
-	private int snippetIndex;
+	private final String fileName;
+	private final int snippetIndex;
 	
 	public Snippet(String fileName, int snippetIndex) {
 		this.fileName = fileName;
 		this.snippetIndex = snippetIndex;
 	}
 	
+	@Override
 	public boolean equals(Object other) {
 		if (other.getClass() != this.getClass()) {
 			return false;
@@ -18,6 +21,12 @@ public class Snippet {
 				&& otherSnippet.snippetIndex == this.snippetIndex;
 	}
 	
+	@Override
+	public int hashCode() {
+		return Objects.hash(fileName, snippetIndex);
+	}
+	
+	@Override
 	public String toString() {
 		return fileName + ", " + snippetIndex;
 	}

@@ -2,6 +2,8 @@ package notebooks;
 
 import static org.junit.Assert.*;
 
+import java.util.Objects;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -37,10 +39,17 @@ public class SnippetTest {
 		assertFalse("Different snippets considered equal!", snippet.equals(different));
 	}
 	
+	@SuppressWarnings("unlikely-arg-type")
 	@Test
 	public void testEquals_diffType() {
 		Notebook different = new Notebook("");
 		assertFalse("Snippet and notebook considered equal!", snippet.equals(different));
+	}
+	
+	@Test
+	public void testHashCode() {
+		int expectedHashCode = Objects.hash(name, index);
+		assertEquals("Wrong hash code returned!", expectedHashCode, snippet.hashCode());
 	}
 	
 	@Test
