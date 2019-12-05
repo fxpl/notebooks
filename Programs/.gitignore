@@ -14,3 +14,6 @@ reports
 # Slurm output
 slurm-*\.out
 logs
+
+# Log files
+*.log
