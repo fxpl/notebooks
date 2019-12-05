@@ -440,7 +440,7 @@ public class AnalyzerTest {
 	 * @return Expected header of hash2files files
 	 */
 	private static String hash2filesHeader() {
-		return "hash, LOC, file, index, ...";
+		return "hash, file, index, ...";
 	}
 	
 	/**
