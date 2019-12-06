@@ -12,7 +12,7 @@ import org.junit.Test;
 public class PythonDumperTest {
 	private boolean deleteTargetAtTearDown = false;
 	private String targetDir = "test/PythonDumperTestOutput";	// Should not exist on startup
-	private PythonDumper dumper;
+	private Dumper dumper;
 
 	/**
 	 * Create dumper and make sure that targetDir is empty.
@@ -43,7 +43,7 @@ public class PythonDumperTest {
 		String src = "test/data/dump/txt.txt";
 		File outputFile = new File(targetDir + "/" + "shouldNotBeCreated.txt");
 		
-		dumper.dump(src, targetDir);
+		dumper.dumpAll(src, targetDir);
 		
 		assertFalse("Output file created from non-notebook file " + src,
 				outputFile.exists());
@@ -58,7 +58,7 @@ public class PythonDumperTest {
 		String src = "test/data/dump/nbR.ipynb";
 		File outputFile = new File(targetDir + "/nbR_0.py");
 		
-		dumper.dump(src, targetDir);
+		dumper.dumpAll(src, targetDir);
 		
 		assertFalse("Output file created from non-Python file " + src,
 				outputFile.exists());
@@ -72,7 +72,7 @@ public class PythonDumperTest {
 		String src = "test/data/dump/nb1.ipynb";
 		String[] expectedOutputs = {"nb1_0.py", "nb1_1.py"};
 		
-		dumper.dump(src, targetDir);
+		dumper.dumpAll(src, targetDir);
 		
 		for (String fileName: expectedOutputs) {
 			File output = new File(targetDir + "/" + fileName);
@@ -91,7 +91,7 @@ public class PythonDumperTest {
 		String src = "test/data/" + dir;
 		String[] expectedOutputs = {"nb1_0.py", "nb1_1.py", "nb2_0.py", "nb3_0.py"};
 		
-		dumper.dump(src, targetDir);
+		dumper.dumpAll(src, targetDir);
 		
 		for (String fileName: expectedOutputs) {
 			File output = new File(targetDir + "/" + dir + "/" + fileName);
@@ -111,7 +111,7 @@ public class PythonDumperTest {
 		String src = "test/data/" + dir;
 		String expectedOutput = "nb4_0.py";
 		
-		dumper.dump(src, targetDir);
+		dumper.dumpAll(src, targetDir);
 		// Files in test/tmp/dir already checked by another test
 		
 		String outputFileName = targetDir + "/" + dir + "/" + subDir + "/" + expectedOutput;

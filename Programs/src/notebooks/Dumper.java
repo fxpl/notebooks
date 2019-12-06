@@ -1,0 +1,48 @@
+package notebooks;
+
+import java.io.File;
+
+public abstract class Dumper {
+
+	/**
+	 * Dump all snippets in the Python notebook(s) stored in src to a separate
+	 * file in target. Every notebook in src/somePath is stored in
+	 * target/somePath. target/somePath is created if needed.
+	 */
+	public void dumpAll(String src, String target) {
+		File srcFile = new File(src);
+		if (!srcFile.isDirectory()) {
+			if (srcFile.getName().endsWith(".ipynb")) {
+				createDirectoryIfMissing(target);
+				dumpNotebook(src, target);
+			}
+		} else {
+			// This is a directory. Traverse.
+			String[] subFiles = srcFile.list();
+			String targetDirName = target + File.separatorChar + srcFile.getName();
+			for (String subFile: subFiles) {
+				dumpAll(src + File.separatorChar + subFile, targetDirName);
+			}
+		}
+	}
+	
+	/**
+	 * Dump a single notebook.
+	 * @param src Path to a notebook to dump
+	 * @param target Path to directory where dumps will be stored
+	 */
+	protected abstract void dumpNotebook(String src, String target);
+
+	/**
+	 * Create a directory if it doesn't already exist. Also create its parent
+	 * directories if needed.
+	 * @param path Path to the directory to be created
+	 */
+	private void createDirectoryIfMissing(String path) {
+		File targetDir = new File(path);
+		if (!targetDir.exists()) {
+			targetDir.mkdirs();
+		}
+	}
+
+}
