@@ -36,17 +36,26 @@ public class PythonDumperTest {
 	}
 	
 	/**
-	 * Verify that dumper does not try to dump files that do not end with ipynb.
+	 * Verify that dumper does not dump non-notebook files.
 	 */
 	@Test
 	public void testDump_nonNotebookFile() {
-		String src = "test/data/dump/txt.txt";
-		File outputFile = new File(targetDir + "/" + "shouldNotBeCreated.txt");
-		
+		String src = "test/data/dump/non-notebook.ipynb";
 		dumper.dumpAll(src, targetDir);
-		
+		assertTrue("Output file created from non-notebook file " + src,
+				new File(targetDir).list().length == 0);
+		;
+	}
+	
+	/**
+	 * Verify that dumper does not try to dump files that do not end with ipynb.
+	 */
+	@Test
+	public void testDump_txtFile() {
+		String src = "test/data/dump/txt.txt";
+		dumper.dumpAll(src, targetDir);
 		assertFalse("Output file created from non-notebook file " + src,
-				outputFile.exists());
+				new File(targetDir).exists());
 	}
 	
 	/**
