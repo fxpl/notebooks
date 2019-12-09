@@ -1,13 +1,6 @@
 <project>
-
-	<!-- NB: These variables may need to be changed! -->
-	<!-- UPPMAX: -->
-	<!--<property name="junit.path" value="/home/maka4186/bin/junit/junit.jar"/>
-	<property name="hamcrest.path" value="/home/maka4186/bin/junit/hamcrest.jar"/>-->
-	<!-- Ada: -->
 	<property name="junit.path" value="./external/junit4.jar"/>
 	<property name="junit.path" value="./external/hamcrest-all.jar"/>
-
 	<property name="json.path" value="./external/json-simple-1.1.1.jar"/>
 	<property name="bin" value="./bin"/>
 	<property name="dbg" value="on"/>
