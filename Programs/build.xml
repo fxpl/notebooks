@@ -34,7 +34,7 @@
 
 	<target name="test" depends="buildTest">
 		<mkdir dir="reports"/>
-		<junit printsummary="yes" haltonfailure="no">
+		<junit printsummary="yes" haltonfailure="yes">
 			<classpath>
 				<pathelement location="${bin}"/>
 				<pathelement location="${junit.path}"/>
