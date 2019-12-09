@@ -4,6 +4,8 @@ import java.io.*;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.zip.ZipOutputStream;
+import java.util.zip.ZipEntry;
 import java.util.*;
 
 import org.json.simple.*;
@@ -55,6 +57,36 @@ public class Notebook {
 		}
 	}
 
+	/**
+   * Works like dumpCode except that each notebook is turned into
+   * a zip file with one file entry per snippet.
+	 */
+  public void dumpCodeAsZip(String location, String suffix) throws NotebookException, IOException {
+    String noteBookName = getNameWithoutSuffix();
+    List<JSONObject> cells = this.getCodeCells();
+
+    try {
+        FileOutputStream fos = new FileOutputStream(location + "/" + noteBookName + ".zip");
+        ZipOutputStream zos = new ZipOutputStream(fos);
+
+        for (int i=0; i<cells.size(); i++) {
+            ZipEntry entry = new ZipEntry(noteBookName + "_" + i + "." + suffix); 
+            zos.putNextEntry(entry);
+
+            for (Object line : getSource(cells.get(i))) {
+                zos.write(((String) line).getBytes());
+            }
+
+            zos.closeEntry();
+        }
+
+        zos.close();
+        fos.close();
+    } catch(IOException ioe) {
+        ioe.printStackTrace();
+    }
+	}
+    
 	/**
 	 * Return the code of all snippets of the notebook. For memory consumption
 	 * reasons, the result contains only the length (LOC) and the hash of the
