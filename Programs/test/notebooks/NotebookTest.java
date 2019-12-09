@@ -6,8 +6,6 @@ import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 
-import java.nio.file.Paths;
-import java.nio.file.Path;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -70,8 +68,6 @@ public class NotebookTest {
 	@Test
 	public void testDumpCodeAsZip() throws IOException, NotebookException {
 		String dataDir = "test/data/dump";
-    Path outDir = Paths.get(dataDir);
-    
 		String[] inFiles = {"nb1.ipynb", "nb1_str.ipynb", "nb2.ipynb", "nb3.ipynb"};
 		String outputDir = ".";
 		String suffix = "py";
@@ -112,7 +108,7 @@ public class NotebookTest {
           ZipEntry entry = zip.getNextEntry();
           assertEquals("Wrong filename for code snippet in " + fileName, expectedSnippets[i][snippetId], entry.getName());
 
-          var reader = new BufferedReader(new InputStreamReader(zip));
+          BufferedReader reader = new BufferedReader(new InputStreamReader(zip));
           for (int lineId = 0; lineId < expectedLines[totalSnippetId].length; lineId += 1) {
               assertEquals("Wrong code dumped to " + fileName + " in " + entry.getName(), expectedLines[totalSnippetId][lineId], reader.readLine());
           }
@@ -121,6 +117,8 @@ public class NotebookTest {
 
           totalSnippetId += 1;
       }
+      
+      zip.close();
     }
     
 		// Clean up
