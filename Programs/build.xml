@@ -37,7 +37,9 @@
 
 			<formatter type="plain"/>
 			<batchtest todir="reports">
-				<fileset dir="test"/>
+				<fileset dir="test">
+					<exclude name="notebooks/DumperTest.java"/>
+				</fileset>
 			</batchtest>
 		</junit>
 	</target>

@@ -9,30 +9,20 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-public class PythonDumperTest {
-	private boolean deleteTargetAtTearDown = false;
-	private String targetDir = "test/PythonDumperTestOutput";	// Should not exist on startup
-	private Dumper dumper;
-
-	/**
-	 * Create dumper and make sure that targetDir is empty.
-	 */
+public class PythonDumperTest extends DumperTest {
+	
+	public PythonDumperTest() {
+		super();
+	}
+	
 	@Before
 	public void setUp() {
-		dumper = new PythonDumper();
-		File target = new File(targetDir);
-		assertFalse("Target direcory " + targetDir + " existed at set up!", target.exists());
-		deleteTargetAtTearDown = true;
+		super.setUp();
 	}
-
-	/**
-	 * Delete newly created output files.
-	 */
+	
 	@After
 	public void tearDown() {
-		if (deleteTargetAtTearDown) {
-			deleteRecursively(targetDir);
-		}
+		super.tearDown();
 	}
 	
 	/**
@@ -126,20 +116,5 @@ public class PythonDumperTest {
 		String outputFileName = targetDir + "/" + dir + "/" + subDir + "/" + expectedOutput;
 		File outputFile = new File(outputFileName);
 		assertTrue(outputFile + " is missing!", outputFile.exists());
-	}
-	
-	/**
-	 * Delete the contents of the directory named dirName recursively. If
-	 * deleteDir, then also delete dirName itself.
-	 */
-	private void deleteRecursively(String dirName) {
-		File dir = new File(dirName);
-		if (dir.isDirectory()) {
-			String[] contents = dir.list();
-			for (String file: contents) {
-				deleteRecursively(dirName + "/" + file);
-			}
-		}
-		dir.delete();
 	}
 }
