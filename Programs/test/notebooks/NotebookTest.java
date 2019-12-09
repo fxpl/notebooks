@@ -6,6 +6,11 @@ import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 
+import java.nio.file.Paths;
+import java.nio.file.Path;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+
 import org.junit.Test;
 
 import notebooks.LangSpec;
@@ -62,7 +67,71 @@ public class NotebookTest {
 		}
 	}
 	
-	/**
+	@Test
+	public void testDumpCodeAsZip() throws IOException, NotebookException {
+		String dataDir = "test/data/dump";
+    Path outDir = Paths.get(dataDir);
+    
+		String[] inFiles = {"nb1.ipynb", "nb1_str.ipynb", "nb2.ipynb", "nb3.ipynb"};
+		String outputDir = ".";
+		String suffix = "py";
+		String[] expectedOutFiles = {"nb1.zip", "nb1_str.zip", "nb2.zip", "nb3.zip"};
+
+		String[][] expectedSnippets = {
+        {"nb1_0.py", "nb1_1.py"},
+        {"nb1_str_0.py", "nb1_str_1.py"},
+        {"nb2_0.py"},
+        {"nb3_0.py"}
+    };
+
+		String[][] expectedLines = {
+				{"import numpy", "\t"},
+				{"def my_function", "\ta = 2", "\tb = 2"},
+				{"import numpy", "\t"},
+				{"def my_function", "\ta = 2", "\tb = 2"},
+				{"import pandas"},
+				{"import something"}
+		};
+		
+		// Run
+		for (String nbFile: inFiles) {
+			Notebook nb = new Notebook(dataDir + "/" + nbFile);
+			nb.dumpCodeAsZip(outputDir, suffix);
+		}
+
+    int totalSnippetId = 0;
+		// Check output
+		for (int i=0; i<expectedOutFiles.length; i++) {
+			String fileName = "./"  +  expectedOutFiles[i];
+      
+      ZipInputStream zip = new ZipInputStream(new BufferedInputStream(new FileInputStream(fileName)));
+
+      System.err.printf("%s\n", fileName);
+          
+      for (int snippetId=0; snippetId < expectedSnippets[i].length; snippetId += 1) {
+          ZipEntry entry = zip.getNextEntry();
+          assertEquals("Wrong filename for code snippet in " + fileName, expectedSnippets[i][snippetId], entry.getName());
+
+          var reader = new BufferedReader(new InputStreamReader(zip));
+          for (int lineId = 0; lineId < expectedLines[totalSnippetId].length; lineId += 1) {
+              assertEquals("Wrong code dumped to " + fileName + " in " + entry.getName(), expectedLines[totalSnippetId][lineId], reader.readLine());
+          }
+
+          assertNull("Too many lines in " + fileName, reader.readLine());
+
+          totalSnippetId += 1;
+      }
+    }
+    
+		// Clean up
+    for (String outFile: expectedOutFiles) {
+        new File(outFile).delete();
+    }
+  }
+	
+
+
+  /**
 	 * Verify that getName returns the name of the notebook (without preceding
 	 * path).
 	 */
