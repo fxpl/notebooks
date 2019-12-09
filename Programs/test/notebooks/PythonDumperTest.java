@@ -18,6 +18,7 @@ public class PythonDumperTest extends DumperTest {
 	@Before
 	public void setUp() {
 		super.setUp();
+		dumper = new PythonDumper();
 	}
 	
 	@After

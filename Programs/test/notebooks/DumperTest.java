@@ -13,7 +13,6 @@ public class DumperTest {
 	 * Create dumper and make sure that targetDir is empty.
 	 */
 	public void setUp() {
-		dumper = new PythonDumper();
 		File target = new File(targetDir);
 		assertFalse("Target direcory " + targetDir + " existed at set up!", target.exists());
 		deleteTargetAtTearDown = true;
