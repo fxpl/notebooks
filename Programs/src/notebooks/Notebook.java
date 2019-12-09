@@ -202,6 +202,22 @@ public class Notebook {
 	}
 	
 	/**
+	 * @return The total number of characters in the code snippets
+	 */
+	public int numCodeChars() throws NotebookException {
+		int result = 0;
+		List<JSONObject> codeCells = this.getCodeCells();
+		for (JSONObject cell: codeCells) {
+			JSONArray lines = getSource(cell);
+			for (int i=0; i<lines.size(); i++) {
+				String line = (String)lines.get(i);	// Type is checked in getSource.
+				result += line.length();
+			}
+		}
+		return result;
+	}
+	
+	/**
 	 * Print the snippet whose index is given as an argument to the method,
 	 * followed by an empty line.
 	 * @param Index of snippet to print

@@ -19,6 +19,8 @@ public class NotebookTest {
 	 * Verify that each snippet in the input file is dumped  to a separate
 	 * output file, line by line, and that the output files are named
 	 * correctly.
+	 * @throws IOException 
+	 * @throws NotebookException 
 	 */
 	@Test
 	public void testDumpCode() throws IOException, NotebookException {
@@ -300,6 +302,26 @@ public class NotebookTest {
 		}
 	}
 	
+	/**
+	 * Verify that the correct number of code characters are returned by
+	 * numCodeChars.
+	 * @throws NotebookException 
+	 */
+	@Test
+	public void testNumCodeChars() throws NotebookException {
+		String dataDir = "test/data/codeChars";
+		int[] numCodeChars = {45, 45, 14};
+		String[] files = {"nb1.ipynb", "nb1_str.ipynb", "nb2.ipynb"};
+		for (int i=0; i<files.length; i++) {
+			Notebook notebook = new Notebook(dataDir + "/" + files[i]);
+			assertEquals("Wrong number of code characters returned!",
+					numCodeChars[i], notebook.numCodeChars());
+		}
+	}
+	
+	/**
+	 * TODO
+	 */
 	@Test
 	public void testPrintSnippet() throws NotebookException, IOException {
 		// Redirect stdout
