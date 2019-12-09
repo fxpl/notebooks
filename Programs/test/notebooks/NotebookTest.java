@@ -310,12 +310,15 @@ public class NotebookTest {
 	@Test
 	public void testNumCodeChars() throws NotebookException {
 		String dataDir = "test/data/codeChars";
-		int[] numCodeChars = {45, 45, 14};
+		int[][] expectedNumChars = {{15, 30}, {15, 30}, {14}};
 		String[] files = {"nb1.ipynb", "nb1_str.ipynb", "nb2.ipynb"};
 		for (int i=0; i<files.length; i++) {
 			Notebook notebook = new Notebook(dataDir + "/" + files[i]);
-			assertEquals("Wrong number of code characters returned!",
-					numCodeChars[i], notebook.numCodeChars());
+			int[] numChars = notebook.numCodeChars();
+			for (int j=0; j<numChars.length; j++) {
+				assertEquals("Wrong number of code characters returned for " + files[i] + ", snippet " + j + "!", 
+						expectedNumChars[i][j], numChars[j]);
+			}
 		}
 	}
 	

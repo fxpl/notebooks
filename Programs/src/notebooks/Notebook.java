@@ -202,17 +202,20 @@ public class Notebook {
 	}
 	
 	/**
-	 * @return The total number of characters in the code snippets
+	 * @return An array with the number of characters in each snippet
 	 */
-	public int numCodeChars() throws NotebookException {
-		int result = 0;
+	public int[] numCodeChars() throws NotebookException {
 		List<JSONObject> codeCells = this.getCodeCells();
-		for (JSONObject cell: codeCells) {
+		int[] result = new int[codeCells.size()];
+		for (int i=0; i<codeCells.size(); i++) {
+			JSONObject cell = codeCells.get(i);
 			JSONArray lines = getSource(cell);
-			for (int i=0; i<lines.size(); i++) {
-				String line = (String)lines.get(i);	// Type is checked in getSource.
-				result += line.length();
+			result[i] = 0;
+			for (int j=0; j<lines.size(); j++) {
+				String line = (String)lines.get(j);	// Type is checked in getSource.
+				result[i] += line.length();
 			}
+			
 		}
 		return result;
 	}
