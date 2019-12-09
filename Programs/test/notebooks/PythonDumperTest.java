@@ -48,17 +48,6 @@ public class PythonDumperTest {
 	}
 	
 	/**
-	 * Verify that dumper does not try to dump files that do not end with ipynb.
-	 */
-	@Test
-	public void testDump_txtFile() {
-		String src = "test/data/dump/txt.txt";
-		dumper.dumpAll(src, targetDir);
-		assertFalse("Output file created from non-notebook file " + src,
-				new File(targetDir).exists());
-	}
-	
-	/**
 	 * Verify that the snippets of a notebook are not dumped by dumper if the
 	 * notebook is not written in Python.
 	 */
@@ -88,6 +77,17 @@ public class PythonDumperTest {
 			assertTrue(fileName + " is missing!", output.exists());
 			// The content of the file is checked by NotebookTest.
 		}
+	}
+	
+	/**
+	 * Verify that dumper does not try to dump files that do not end with ipynb.
+	 */
+	@Test
+	public void testDump_txtFile() {
+		String src = "test/data/dump/txt.txt";
+		dumper.dumpAll(src, targetDir);
+		assertFalse("Output file created from non-notebook file " + src,
+				new File(targetDir).exists());
 	}
 	
 	/**
