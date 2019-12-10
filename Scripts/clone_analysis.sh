@@ -6,7 +6,7 @@
 #SBATCH -J count_clones
 #SBATCH -M snowy
 
-hash2files=`./get_latest_output.sh "hash2file"`
+hash2files=`./get_latest_output.sh "hash2files"`
 frequencyFile=`./get_latest_output.sh "cloneFrequency"`
 
 # Most clones snippets
