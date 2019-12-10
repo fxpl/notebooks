@@ -6,8 +6,8 @@
 #SBATCH -J count_clones
 #SBATCH -M snowy
 
-hash2files="hash2files2019-11-20T15:54:25.367.csv"
-frequencyFile="cloneFrequency2019-11-20T15:55:04.007.csv"
+hash2files=`./get_latest_output.sh "hash2file"`
+frequencyFile=`./get_latest_output.sh "cloneFrequency"`
 
 # Most clones snippets
 sortedCloneCount=`grep -o ',' -n $hash2files | uniq -c | sort -n`
@@ -19,7 +19,6 @@ echo "Least cloned snippets:"
 echo "$sortedCloneCount" | head
 echo ""
 
-# OTESTAT
 # Number of snippets occurring in > 1 file
 numSnippetsInSeveralFiles=0
 while read line
@@ -29,7 +28,6 @@ do
 	then
 		numSnippetsInSeveralFiles=$(($numSnippetsInSeveralFiles + 1))
 	fi
-#done < "$(sed -n "2,$ p" $hash2files)"	# Funkar inte...
 done < $hash2files
 numLines=`wc -l $hash2files | cut -d' ' -f1`
 numSnippets=`echo "$numLines - 1" | bc`
@@ -38,21 +36,20 @@ severalPercent=`echo "$severalFraction * 100" | bc`
 echo "Number of snippets occurring in more than one file: \
 $numSnippetsInSeveralFiles ($severalPercent %)."
 
-
 # Number of clones and unique snippets respectively
+numCommas="../output/numCommas.txt"
 cloneCount=`sed -n "2,$ p" $hash2files | grep -o ',' -n | uniq -c | sed -E "s/^\s*//" | cut -d' ' -f1`
 hashes=`sed -n "2,$ p" $hash2files | cut -d',' -f1`
-paste <(echo "$hashes") <(echo "$cloneCount") > numCommas.txt
-sed -Ei "s/\t/ /" numCommas.txt
+paste <(echo "$hashes") <(echo "$cloneCount") > $numCommas
+sed -Ei "s/\t/ /" $numCommas
 
-clones=`cut numCommas.txt -d' ' -f2 | grep -v "^2$" | wc -l`
-unique=`cut numCommas.txt -d' ' -f2 | grep "^2$" | wc -l`
+clones=`cut $numCommas -d' ' -f2 | grep -v "^2$" | wc -l`
+unique=`cut $numCommas -d' ' -f2 | grep "^2$" | wc -l`
 fraction=`echo "$clones / ($clones+$unique)" | bc -l`
 echo "Total number of clones: $clones"
 echo "Total number of unique snippets: $unique"
 echo "Fraction clones: $fraction"
 
-# OTESTAT
 # Check how many files contain only clones and only unique snippets respectively
 ## If fraction == 1, all snippets in the file are clones. (fraction<=1).
 fractionClones=`sed -n "2,$ p" $frequencyFile | cut -d' ' -f4`
