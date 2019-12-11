@@ -19,9 +19,9 @@ sed -n "2,$ p" $hashFile | grep -o ',' -n | uniq -c | sort -rn \
 
  	lineNum=$(($lineNum+1))		# Since we skip header (read from line 2) above
 	line=`sed -n "$lineNum, $lineNum p" $hashFile`
-	length=`echo $line | cut -d',' -f2`
+	snippetLength=`echo $line | cut -d',' -f2`
 
-	if [ $length -ge $minLength ];
+	if [ $snippetLength -ge $minLength ];
 	then
 		# Information about the snippet
 		notebook=`echo $line | cut -d',' -f3`
