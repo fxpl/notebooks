@@ -42,7 +42,8 @@ Kvalitativ analys av X vanligaste klonerna
 Kvalitativ analys av X minsta/största/median-klonerna
   Vad innehåller de?
 
-Finns det "helt" klonade notebooks? 
+Finns det "helt" klonade notebooks? Hur många?
+Hur många notebooks har  bara unika snippets? Inga snippets?
 Notebooks per klon-%-intervall (0-5, 5-10, etc.)
 Sannolikhet att flera kloner finns från samma källa
 
@@ -50,3 +51,5 @@ Sannolikhet att flera kloner finns från samma källa
 
 Om vi har metadata från GitHub om repos:
   "korrelation" mot repots ålder/aktivitet/#committs 
+
+Hur stor andel av snippetsen är kloner respektive unika? Totalt? I en genomsnittlig fil?
