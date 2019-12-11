@@ -2,13 +2,13 @@
 
 #SBATCH -A snic2019-8-228
 #SBATCH -p core -n 1
-#SBATCH -t 10:00:00
+#SBATCH -t 12:00:00
 #SBATCH -J move_unparseable
 #SBATCH -M snowy
 
 projDir="/proj/uppstore2019098/notebooks"
 logFile="../logs/analyze-hash-complete3.out"
-unparseable="./unparseable.txt"
+unparseable="../logs/unparseable.txt"
 targetDir="$projDir/unparseable_notebooks"
 
 # Find unparseable notebooks
