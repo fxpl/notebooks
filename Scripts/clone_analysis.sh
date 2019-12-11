@@ -6,17 +6,17 @@
 #SBATCH -J count_clones
 #SBATCH -M snowy
 
-hash2files=`./get_latest_output.sh "hash2files"`
+hash2files=`./get_latest_output.sh "hash2files"`		# TODO: Formatet på denna har ändrats!
 frequencyFile=`./get_latest_output.sh "cloneFrequency"`
 
 # Most clones snippets
-sortedCloneCount=`grep -o ',' -n $hash2files | uniq -c | sort -n`
+sortedCommasPerLine=`grep -o ',' -n $hash2files | uniq -c | sort -n`
 echo "Most cloned snippets:"
-echo "$sortedCloneCount" | tail
+echo "$sortedCommasPerLine" | tail
 echo ""
 # Sanity check
 echo "Least cloned snippets:"
-echo "$sortedCloneCount" | head
+echo "$sortedCommasPerLine" | head
 echo ""
 
 # Number of snippets occurring in > 1 file
@@ -24,7 +24,7 @@ numSnippetsInSeveralFiles=0
 while read line
 do
 	tokens=($line)
-	if [ ${#tokens[@]} -ge 5 ] && [ ${tokens[1]} != ${tokens[-2]} ]
+	if [ ${#tokens[@]} -ge 6 ] && [ ${tokens[3]} != ${tokens[-2]} ]
 	then
 		numSnippetsInSeveralFiles=$(($numSnippetsInSeveralFiles + 1))
 	fi
@@ -37,14 +37,15 @@ echo "Number of snippets occurring in more than one file: \
 $numSnippetsInSeveralFiles ($severalPercent %)."
 
 # Number of clones and unique snippets respectively
+# TODO: Nedanstående är en duplicering av sortedCommasPerLine på rad 13
 numCommas="../output/numCommas.txt"
-cloneCount=`sed -n "2,$ p" $hash2files | grep -o ',' -n | uniq -c | sed -E "s/^\s*//" | cut -d' ' -f1`
+commaCount=`sed -n "2,$ p" $hash2files | grep -o ',' -n | uniq -c | sed -E "s/^\s*//" | cut -d' ' -f1`
 hashes=`sed -n "2,$ p" $hash2files | cut -d',' -f1`
-paste <(echo "$hashes") <(echo "$cloneCount") > $numCommas
+paste <(echo "$hashes") <(echo "$commaCount") > $numCommas
 sed -Ei "s/\t/ /" $numCommas
 
-clones=`cut $numCommas -d' ' -f2 | grep -v "^2$" | wc -l`
-unique=`cut $numCommas -d' ' -f2 | grep "^2$" | wc -l`
+clones=`cut $numCommas -d' ' -f2 | grep -v "^3$" | wc -l`
+unique=`cut $numCommas -d' ' -f2 | grep "^3$" | wc -l`
 fraction=`echo "$clones / ($clones+$unique)" | bc -l`
 echo "Total number of clones: $clones"
 echo "Total number of unique snippets: $unique"
