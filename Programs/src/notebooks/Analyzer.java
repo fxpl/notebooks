@@ -256,9 +256,6 @@ public class Analyzer {
 		Writer writer = new FileWriter("languages" + LocalDateTime.now() + ".csv");
 		writer.write("file, language\n");
 		for (int i=0; i<notebooks.size(); i++) {
-			if (0 == i%10000) {
-				System.out.println("Extracting language from notebook " + i);
-			}
 			Language language = languageIn(notebooks.get(i), writer);
 			languages.put(language, languages.get(language) + 1);
 		}
@@ -296,10 +293,6 @@ public class Analyzer {
 		writer.write("file, total, non-blank, blank\n");
 		List<Notebook> notebook = notebooks;
 		for (int i=0; i<notebook.size(); i++) {
-			if (0 == i%10000) {
-				System.out.println("Counting LOC in notebook " + i);
-				System.out.println(totalLOC + " lines of code found so far.");
-			}
 			totalLOC += LOCIn(notebook.get(i), writer);
 		}
 		writer.close();
@@ -336,10 +329,6 @@ public class Analyzer {
 		Writer writer = new FileWriter("snippets" + LocalDateTime.now() + ".csv");
 		writer.write("file, snippets\n");
 		for (int i=0; i<notebooks.size(); i++) {
-			if (0 == i%10000) {
-				System.out.println("Counting code cells in notebook " + i);
-				System.out.println(totalNumCodeCells + " code cells found so far.");
-			}
 			totalNumCodeCells += numCodeCellsIn(notebooks.get(i), writer);
 		}
 		writer.close();
