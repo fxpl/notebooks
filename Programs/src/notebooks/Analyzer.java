@@ -293,7 +293,7 @@ public class Analyzer {
 				System.out.println(totalNumCodeCells + " code cells found so far.");
 			}
 			int numCodeCells = employ(new CodeCellCounter(notebooks.get(i)));
-			writer.write(notebooks.get(i).getName() + ", "+ numCodeCells + "\n");
+			writer.write(notebooks.get(i).getName() + ", " + numCodeCells + "\n");
 			totalNumCodeCells += numCodeCells;
 		}
 		writer.close();
@@ -320,11 +320,7 @@ public class Analyzer {
 						break;
 					case "-lang":
 						Map<Language, Integer> languages = this.languages();
-						System.out.println("\nLANGUAGES:");
-						for (Language language: languages.keySet()) {
-							System.out.println(language + ": " + languages.get(language));
-						}
-						System.out.println("");
+						printLanguageSummary(languages);
 						break;
 					case "-loc":
 						System.out.println("Lines of code: " + this.LOC());
@@ -344,6 +340,14 @@ public class Analyzer {
 				System.err.println("I/O error: " + e.getMessage() + ". Operation interrupted.");
 			}
 		}
+	}
+
+	private void printLanguageSummary(Map<Language, Integer> languages) {
+		System.out.println("\nLANGUAGES:");
+		for (Language language: languages.keySet()) {
+			System.out.println(language + ": " + languages.get(language));
+		}
+		System.out.println("");
 	}
 	
 	private <T> T employ(Worker<T> worker) {
