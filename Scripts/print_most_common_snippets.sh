@@ -1,7 +1,7 @@
 #!/bin/bash -l
 
 #SBATCH -A snic2019-8-228
-#SBATCH -t 15:00
+#SBATCH -t 1:00:00
 #SBATCH -p core -n 1
 #SBATCH -J notebook_snippetPrinter
 
