@@ -1,3 +1,6 @@
+# Slurm files
+slurm-*.out
+
 # Log and pstats directory
 logs
 
