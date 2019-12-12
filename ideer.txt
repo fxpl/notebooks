@@ -29,10 +29,11 @@
 == Frågor om kloner ==
 
 Hur många kloner per notebook
-Hur många kloner per notebookstorleksintervall 
+Hur många kloner per notebookstorleksintervall (mätt i LOC resp bytes)
 Hur många notebooks per klon
-Klonernas storleksfördelning
-Klonkällor per notebooks
+Klonernas storleksfördelning (i LOC)
+Antalet andra notebooks som varje notebook delar snippets med
+Antalet Klonkällor per notebooks
 Kloner per förekomst
 Kloner per språk / storlek (LOC, #snippets) / ...
 
@@ -50,6 +51,6 @@ Sannolikhet att flera kloner finns från samma källa
 Är notebooks från samma repo mer lika? 
 
 Om vi har metadata från GitHub om repos:
-  "korrelation" mot repots ålder/aktivitet/#committs 
+  "korrelation" olika klonmått mot repots ålder/aktivitet/#committs
 
 Hur stor andel av snippetsen är kloner respektive unika? Totalt? I en genomsnittlig fil?
