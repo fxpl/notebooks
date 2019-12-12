@@ -9,10 +9,10 @@
 projDir="/proj/uppstore2019098/notebooks"
 logFile="../logs/analyze-hash-complete3.out"
 unparseable="../logs/unparseable.txt"
-targetDir="$projDir/unparseable_notebooks"
+targetDir="/proj/uppstore2019098/unparseable_notebooks"
 
 # Find unparseable notebooks
-egrep -a "Skipping notebook\!" $logFile | grep "/proj/uppstore2019098/notebooks/" | cut -d'/' -f5- | cut -d':' -f1 > $unparseable
+egrep -a "Skipping notebook\!" $logFile | grep -a "/proj/uppstore2019098/notebooks/" | cut -d'/' -f5- | cut -d':' -f1 > $unparseable
 
 # Create parallel directory structure
 rev $unparseable | cut -d'/' -f2- | rev | uniq | while read subdir;
