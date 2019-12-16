@@ -431,9 +431,9 @@ public class Notebook {
 		Language language = Language.UNKNOWN;
 		if (notebook.containsKey("metadata")) {
 			JSONObject metadata = (JSONObject) notebook.get("metadata");
-			language = getLanguageFromLanguage(metadata);
+			language = getLanguageFromLanguageinfo(metadata);
 			if (Language.UNKNOWN == language) {
-				language = getLanguageFromLanguageinfo(metadata);
+				language = getLanguageFromLanguage(metadata);
 			}
 			if (Language.UNKNOWN == language) {
 				language = getLanguageFromKernelspec(metadata);
