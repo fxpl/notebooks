@@ -36,7 +36,7 @@ public class AnalyzerTest {
 		String[] expectedLOCLines = {LOCHeader(),
 				fileName + ", 2, 1, 1"};
 		String[] expectedLangLines = {languagesHeader(),
-					fileName + ", " + Language.SCALA + ", " + LangSpec.METADATA_LANGUAGE
+					fileName + ", " + Language.JULIA + ", " + LangSpec.METADATA_LANGUAGEINFO_NAME
 				};
 		String[] expectedAllLangLines = {allLanguagesHeader(),
 					fileName + ", " + Language.SCALA + ", " + Language.JULIA + ", "
@@ -311,7 +311,7 @@ public class AnalyzerTest {
 		expected.put(Language.R, 2);
 		expected.put(Language.SCALA, 3);
 		expected.put(Language.OTHER, 1);
-		expected.put(Language.UNKNOWN, 6);
+		expected.put(Language.UNKNOWN, 7);
 		Map<Language, Integer> actual = analyzer.languages();
 		assertEquals("Error in language extraction:", expected, actual);
 		lastOutputFile("languages").delete();
