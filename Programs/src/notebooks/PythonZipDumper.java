@@ -15,6 +15,6 @@ public class PythonZipDumper extends Dumper {
 			System.out.println("Usage: PythonZipDumper <path to input file or directory> <path to output directory>");
 			System.exit(1);
 		}
-		new PythonDumper().dumpAll(args[0], args[1]);
+		new PythonZipDumper().dumpAll(args[0], args[1]);
 	}
 }
