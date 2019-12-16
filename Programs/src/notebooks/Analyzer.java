@@ -16,6 +16,9 @@ import java.util.concurrent.*;
 public class Analyzer {
 	private ExecutorService executor;
 	private List<Notebook> notebooks;
+	private static LangSpec[] langSpecFields = {LangSpec.METADATA_LANGUAGE , LangSpec.METADATA_LANGUAGEINFO_NAME, 
+			LangSpec.METADATA_KERNELSPEC_LANGUAGE, LangSpec.METADATA_KERNELSPEC_NAME,
+			LangSpec.CODE_CELLS};
 	
 	/**
 	 * Note that when you are done with this Analyzer, you must call the method
@@ -62,6 +65,36 @@ public class Analyzer {
 	}
 	
 	/**
+	 * Create CSV files with information about LOC, languages (actual one and
+	 * all defined ones respectively) and clones.
+	 * @throws IOException On problems handling the output file
+	 */
+	public void allAnalyzes() throws IOException {
+		Writer LOCWriter = new FileWriter("loc" + LocalDateTime.now() + ".csv");
+		LOCWriter.write(LOCHeader());
+		Writer langWriter = new FileWriter("languages" + LocalDateTime.now() + ".csv");
+		langWriter.write(languagesHeader());
+		Writer allLangWriter = new FileWriter("all_languages" + LocalDateTime.now() + ".csv");
+		allLangWriter.write(allLanguagesHeader());
+		
+		Map<String, SnippetCode[]> snippets = new HashMap<String, SnippetCode[]>();
+		for (Notebook notebook: this.notebooks) {
+			LOCIn(notebook, LOCWriter);
+			languageIn(notebook, langWriter);
+			allLanguageValuesIn(notebook, allLangWriter);
+			getSnippetsFrom(notebook, snippets);
+		}
+		/* Language summary is not printed here, since the information can
+		   easily be extracted from the CSV file. */
+		Map<SnippetCode, List<Snippet>> clones = getClones(snippets);
+		printCloneFiles(snippets, clones);
+		
+		LOCWriter.close();
+		langWriter.close();
+		allLangWriter.close();
+	}
+	
+	/**
 	 * Compute the MD5 hash of each snippet in each notebook. Return a map with
 	 * the key being the snippet code and the values being lists of all
 	 * snippets containing that code.
@@ -77,9 +110,7 @@ public class Analyzer {
 	public Map<SnippetCode, List<Snippet>> clones() throws IOException {
 		Map<String, SnippetCode[]> snippets = getSnippets();
 		Map<SnippetCode, List<Snippet>> clones = getClones(snippets);
-		printFile2Hashes(snippets);
-		printHash2Files(clones);
-		printCloneFrequencies(snippets, clones);
+		printCloneFiles(snippets, clones);
 		return clones;
 	}
 
@@ -109,7 +140,7 @@ public class Analyzer {
 	}
 	
 	/**
-	 * return A map from snippets to files
+	 * @return A map from snippets to files
 	 */
 	private Map<SnippetCode, List<Snippet>> getClones(Map<String, SnippetCode[]> fileMap) throws IOException {
 		int numAnalyzed = 0;
@@ -132,10 +163,23 @@ public class Analyzer {
 		}
 		return clones;
 	}
+	
+	/**
+	 * Create and fill file2Hashes, hash2Files and cloneFrequencies files
+	 * @param snippets A map from file names to snippets
+	 * @param clones A map from snippets to files
+	 * @throws IOException On problems handling the output files
+	 */
+	private void printCloneFiles(Map<String, SnippetCode[]> snippets,
+			Map<SnippetCode, List<Snippet>> clones) throws IOException {
+		printFile2hashes(snippets);
+		printHash2files(clones);
+		printCloneFrequencies(snippets, clones);
+	}
 
-	private void printHash2Files(Map<SnippetCode, List<Snippet>> clones) throws IOException {
+	private void printHash2files(Map<SnippetCode, List<Snippet>> clones) throws IOException {
 		Writer writer = new FileWriter("hash2files" + LocalDateTime.now() + ".csv");
-		writer.write("hash, LOC, file, index, ...\n");
+		writer.write(hash2filesHeader());
 		for (SnippetCode code: clones.keySet()) {
 			writer.write(code.getHash() + ", " + code.getLOC());
 			for (Snippet s: clones.get(code)) {
@@ -146,9 +190,16 @@ public class Analyzer {
 		writer.close();
 	}
 	
-	private void printFile2Hashes(Map<String, SnippetCode[]> files) throws IOException {
+	/**
+	 * @return Header for the file2hashes csv file
+	 */
+	private String hash2filesHeader() {
+		return "hash, LOC, file, index, ...\n";
+	}
+	
+	private void printFile2hashes(Map<String, SnippetCode[]> files) throws IOException {
 		Writer writer = new FileWriter("file2hashes" + LocalDateTime.now() + ".csv");
-		writer.write("file, snippets\n");
+		writer.write(file2hashesHeader());
 		for (String fileName: files.keySet()) {
 			writer.write(fileName);
 			SnippetCode[] code = files.get(fileName);
@@ -159,11 +210,18 @@ public class Analyzer {
 		}
 		writer.close();
 	}
+
+	/**
+	 * @return Header for the file2hashes csv file
+	 */
+	private String file2hashesHeader() {
+		return "file, snippets\n";
+	}
 	
 	private void printCloneFrequencies(Map<String, SnippetCode[]> file2Hashes,
 			Map<SnippetCode, List<Snippet>> hash2Files) throws IOException {
 		Writer writer = new FileWriter("cloneFrequency" + LocalDateTime.now() + ".csv");
-		writer.write("file, clones, unique, clone frequency\n");
+		writer.write(cloneFrequencyHeader());
 		for (String fileName: file2Hashes.keySet()) {
 			int numClones = 0, numUnique = 0;
 			SnippetCode[] code = file2Hashes.get(fileName);
@@ -185,6 +243,13 @@ public class Analyzer {
 		}
 		writer.close();
 	}
+
+	/**
+	 * @return Header for the cloneFrequency csv file
+	 */
+	private String cloneFrequencyHeader() {
+		return "file, clones, unique, clone frequency\n";
+	}
 	
 	/**
 	 * Look in clones to decide whether snippet is a clone or a unique snippet
@@ -203,22 +268,24 @@ public class Analyzer {
 	 * @throws IOException 
 	 */
 	public void allLanguageValues() throws IOException {
-		LangSpec[] langSpecFields = {LangSpec.METADATA_LANGUAGE , LangSpec.METADATA_LANGUAGEINFO_NAME, 
-				LangSpec.METADATA_KERNELSPEC_LANGUAGE, LangSpec.METADATA_KERNELSPEC_NAME,
-				LangSpec.CODE_CELLS};
 		Writer writer = new FileWriter("all_languages" + LocalDateTime.now() + ".csv");
-		// Write header
-		writer.write("file");
-		for (LangSpec field: langSpecFields) {
-			writer.write(", " + field.toString());
-		}
-		writer.write("\n");
-		
-		// Write language values
+		writer.write(allLanguagesHeader());
 		for(Notebook notebook: notebooks) {
-			allLanguageValuesIn(notebook, langSpecFields, writer);
+			allLanguageValuesIn(notebook, writer);
 		}
 		writer.close();
+	}
+	
+	/**
+	 * @return Header for the all_languages csv file
+	 */
+	private static String allLanguagesHeader() {
+		String result = "file";
+		for (LangSpec field : langSpecFields) {
+			result += ", " + field.toString();
+		}
+		result += "\n";
+		return result;
 	}
 
 	/**
@@ -229,8 +296,7 @@ public class Analyzer {
 	 * @param writer Open writer that writes to the file mentioned above
 	 * @throws IOException On problems when writing to the CSV file
 	 */
-	private void allLanguageValuesIn(Notebook notebook, LangSpec[] langSpecFields,
-			Writer writer) throws IOException {
+	private void allLanguageValuesIn(Notebook notebook, Writer writer) throws IOException {
 		Map<LangSpec, Language> languages = employ(new AllLanguagesExtractor(notebook));
 		String name = notebook.getName();
 		writer.write(name);
@@ -254,13 +320,20 @@ public class Analyzer {
 			languages.put(language, 0);
 		}
 		Writer writer = new FileWriter("languages" + LocalDateTime.now() + ".csv");
-		writer.write("file, language\n");
+		writer.write(languagesHeader());
 		for (int i=0; i<notebooks.size(); i++) {
 			Language language = languageIn(notebooks.get(i), writer);
 			languages.put(language, languages.get(language) + 1);
 		}
 		writer.close();
 		return languages;
+	}
+	
+	/**
+	 * @return Header for the languages csv file
+	 */
+	private static String languagesHeader() {
+		return "file, language\n";
 	}
 
 	/**
@@ -290,13 +363,19 @@ public class Analyzer {
 	public int LOC() throws IOException {
 		int totalLOC = 0;
 		Writer writer = new FileWriter("loc" + LocalDateTime.now() + ".csv");
-		writer.write("file, total, non-blank, blank\n");
-		List<Notebook> notebook = notebooks;
-		for (int i=0; i<notebook.size(); i++) {
-			totalLOC += LOCIn(notebook.get(i), writer);
+		writer.write(LOCHeader());
+		for (int i=0; i<notebooks.size(); i++) {
+			totalLOC += LOCIn(notebooks.get(i), writer);
 		}
 		writer.close();
 		return totalLOC;
+	}
+
+	/**
+	 * @return Header for the LOC csv file
+	 */
+	private static String LOCHeader() {
+		return "file, total, non-blank, blank\n";
 	}
 
 	/**
@@ -327,12 +406,19 @@ public class Analyzer {
 	public int numCodeCells() throws IOException {
 		int totalNumCodeCells = 0;
 		Writer writer = new FileWriter("snippets" + LocalDateTime.now() + ".csv");
-		writer.write("file, snippets\n");
+		writer.write(numCodeCellsHeader());
 		for (int i=0; i<notebooks.size(); i++) {
 			totalNumCodeCells += numCodeCellsIn(notebooks.get(i), writer);
 		}
 		writer.close();
 		return totalNumCodeCells;
+	}
+	
+	/**
+	 * @return Header for the file2hashes csv file
+	 */
+	private String numCodeCellsHeader() {
+		return "file, snippets\n";
 	}
 
 	/**
@@ -364,6 +450,10 @@ public class Analyzer {
 		for (String arg: args) {
 			try {
 				switch (arg) {
+					case "-all":
+						this.allAnalyzes();
+						System.out.println("All analyzes made for " + this.numNotebooks());
+						break;
 					case "-count":
 						System.out.println("Notebooks parsed: " + this.numNotebooks());
 						System.out.println("Code snippets: " + this.numCodeCells());

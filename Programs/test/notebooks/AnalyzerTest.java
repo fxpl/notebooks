@@ -28,6 +28,43 @@ public class AnalyzerTest {
 		analyzer.shutDown();
 	}
 	
+	@Test
+	public void testAllAnalyzes() throws IOException { 
+		String testDir = "test/data/all";
+		String fileName = "single_import_diff_langs.ipynb";
+		String snippetHash = "33BE8D72467938FBB23EF42CF8C9E85F";
+		String[] expectedLOCLines = {LOCHeader(),
+				fileName + ", 2, 1, 1"};
+		String[] expectedLangLines = {languagesHeader(),
+					fileName + ", " + Language.SCALA + ", " + LangSpec.METADATA_LANGUAGE
+				};
+		String[] expectedAllLangLines = {allLanguagesHeader(),
+					fileName + ", " + Language.SCALA + ", " + Language.JULIA + ", "
+					+ Language.R + ", " + Language.OTHER + ", " + Language.PYTHON
+				};
+		String[] expectedFile2hashesLines = {file2hashesHeader(),
+				fileName + ", " + snippetHash};
+		String[] expectedHash2filesLines = {hash2filesHeader(),
+				snippetHash + ", 1, " + fileName + ", 0"};
+		String[] expectedCloneFreqLines = {cloneFrequencyHeader(),
+				fileName + ", 0, 1, 0.0000"};
+		
+		analyzer.initializeNotebooksFrom(testDir + "/" + fileName);
+		analyzer.allAnalyzes();
+		
+		checkCsv("loc", expectedLOCLines);
+		checkCsv("languages", expectedLangLines);
+		checkCsv("all_languages", expectedAllLangLines);
+		checkCsv("file2hashes", expectedFile2hashesLines);
+		checkCsv("hash2files", expectedHash2filesLines);
+		checkCsv("cloneFrequency", expectedCloneFreqLines);
+		
+		lastOutputFile("loc").delete();
+		lastOutputFile("languages").delete();
+		lastOutputFile("all_languages").delete();
+		deleteCloneCsvs();
+	}
+	
 	/**
 	 * Verify that the output file allLanguageValues<current-date-time>.csv has
 	 * the right content after analysis of all language value fields.
@@ -35,12 +72,10 @@ public class AnalyzerTest {
 	 */
 	@Test
 	public void testAllLanguageValues() throws IOException {
-		String dataDir ="test/data/langFields";
+		String dataDir = "test/data/langFields";
 		String[] files = {"all_lang_specs.ipynb", "empty.ipynb", "no_kernelspec.ipynb"};
 		String[] expectedLines = {
-				"file, " + LangSpec.METADATA_LANGUAGE + ", " + LangSpec.METADATA_LANGUAGEINFO_NAME
-				+ ", " + LangSpec.METADATA_KERNELSPEC_LANGUAGE + ", " + LangSpec.METADATA_KERNELSPEC_NAME
-				+ ", " + LangSpec.CODE_CELLS,	// header
+				allLanguagesHeader(),
 				files[0] + ", " + Language.JULIA + ", " + Language.PYTHON + ", "	+ Language.R + ", " + Language.OTHER + ", " + Language.SCALA, 
 				files[1] + ", " + Language.UNKNOWN + ", " + Language.UNKNOWN + ", "	+ Language.UNKNOWN + ", " + Language.UNKNOWN + ", " + Language.UNKNOWN,
 				files[2] + ", " + Language.R + ", " + Language.JULIA + ", "	+ Language.UNKNOWN + ", " + Language.UNKNOWN + ", " + Language.SCALA
@@ -114,7 +149,6 @@ public class AnalyzerTest {
 		for (String file: files) {
 			analyzer.initializeNotebooksFrom(dataDir + "/" + file);
 		}
-		analyzer.initializeNotebooksFrom("test/data/hash");
 		Map<SnippetCode, List<Snippet>> clones = analyzer.clones();
 		
 		// Check values
@@ -295,7 +329,7 @@ public class AnalyzerTest {
 		Language[] languages = {Language.OTHER, Language.R, Language.PYTHON};
 		LangSpec[] langSpecs = {LangSpec.METADATA_KERNELSPEC_LANGUAGE, LangSpec.METADATA_KERNELSPEC_LANGUAGE, LangSpec.METADATA_LANGUAGEINFO_NAME};
 		String[] expectedLines = new String[languages.length+1];
-		expectedLines[0] = "file, language";
+		expectedLines[0] = languagesHeader();
 		for (int i=0; i<languages.length; i++) {
 			expectedLines[i+1] = files[i] + ", " + languages[i] + ", " + langSpecs[i];
 		}
@@ -335,7 +369,7 @@ public class AnalyzerTest {
 		int[] LOC = {3, 0, 13};
 		int[] emptyLOC = {0, 0, 2};
 		String[] expectedLines = new String[LOC.length+1];
-		expectedLines[0] = "file, total, non-blank, blank"; // header
+		expectedLines[0] = LOCHeader();
 		for (int i=0; i<LOC.length; i++) {
 			expectedLines[i+1] = files[i] + ", " + LOC[i] + ", " + (LOC[i]-emptyLOC[i]) + ", " + emptyLOC[i];
 		}
@@ -398,6 +432,15 @@ public class AnalyzerTest {
 	}
 	
 	/**
+	 * @return Expected header of all_languages files
+	 */
+	private static String allLanguagesHeader() {
+		return "file, " + LangSpec.METADATA_LANGUAGE + ", " + LangSpec.METADATA_LANGUAGEINFO_NAME
+				+ ", " + LangSpec.METADATA_KERNELSPEC_LANGUAGE + ", " + LangSpec.METADATA_KERNELSPEC_NAME
+				+ ", " + LangSpec.CODE_CELLS;
+	}
+	
+	/**
 	 * Check that the most recent file <prefix><timestamp>.csv has the right
 	 * content.
 	 * @param prefix First part of name of file to be analyzed (see above)
@@ -444,6 +487,13 @@ public class AnalyzerTest {
 	}
 	
 	/**
+	 * @return Expected header of languages files
+	 */
+	private static String languagesHeader() {
+		return "file, language";
+	}
+	
+	/**
 	 * Find the output file <prefix><timestamp>.csv with the greatest (latest)
 	 * time stamp.
 	 * @param prefix First part of the output file
@@ -459,6 +509,13 @@ public class AnalyzerTest {
 			}
 		}
 		return new File(outputFileName);
+	}
+	
+	/**
+	 * @return Expected header of LOC file
+	 */
+	private static String LOCHeader() {
+		return "file, total, non-blank, blank";
 	}
 
 }
