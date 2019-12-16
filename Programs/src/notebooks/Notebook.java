@@ -451,11 +451,7 @@ public class Notebook {
 	private Language getLanguageFromKernelspec(JSONObject metadata) {
 		if (metadata.containsKey("kernelspec")) {
 			JSONObject kernelspec = (JSONObject)metadata.get("kernelspec");
-			Language ksLang = getLanguageFromKernelspecLanguage(kernelspec);
-			if (Language.UNKNOWN != ksLang) {
-				return ksLang;
-			}
-			return getLanguageFromKernelSpecName(kernelspec);
+			return getLanguageFromKernelspecLanguage(kernelspec);
 		}
 		return Language.UNKNOWN;
 	}

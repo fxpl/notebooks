@@ -183,7 +183,7 @@ public class NotebookTest {
 		Language[] languages = {Language.UNKNOWN, Language.UNKNOWN, Language.OTHER,
 				Language.PYTHON, Language.PYTHON, Language.JULIA,
 				Language.R, Language.R,
-				Language.SCALA, Language.SCALA, Language.PYTHON,
+				Language.SCALA, Language.SCALA, Language.UNKNOWN,
 				Language.JULIA, Language.JULIA, Language.PYTHON, Language.SCALA,
 				Language.PYTHON, Language.UNKNOWN, Language.UNKNOWN,
 				Language.UNKNOWN, Language.PYTHON};
@@ -207,7 +207,7 @@ public class NotebookTest {
 				"li_n_python.ipynb", "code_cells_amb.ipynb", "code_cells_python.ipynb"};
 		LangSpec[] langSpecs = {LangSpec.NONE, LangSpec.NONE,
 				LangSpec.METADATA_KERNELSPEC_LANGUAGE, LangSpec.METADATA_KERNELSPEC_LANGUAGE,
-				LangSpec.METADATA_KERNELSPEC_NAME, LangSpec.METADATA_LANGUAGE,
+				LangSpec.NONE, LangSpec.METADATA_LANGUAGE,
 				LangSpec.METADATA_LANGUAGEINFO_NAME, LangSpec.CODE_CELLS, LangSpec.CODE_CELLS};
 		for (int i=0; i<files.length; i++) {
 			Notebook notebook = new Notebook(dataDir + "/" + files[i]);
