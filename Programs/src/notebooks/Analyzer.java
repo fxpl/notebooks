@@ -70,6 +70,8 @@ public class Analyzer {
 	 * @throws IOException On problems handling the output file
 	 */
 	public void allAnalyzes() throws IOException {
+		Writer snippetsWriter = new FileWriter("snippets" + LocalDateTime.now() + ".csv");
+		snippetsWriter.write(numCodeCellsHeader());
 		Writer LOCWriter = new FileWriter("loc" + LocalDateTime.now() + ".csv");
 		LOCWriter.write(LOCHeader());
 		Writer langWriter = new FileWriter("languages" + LocalDateTime.now() + ".csv");
@@ -79,6 +81,7 @@ public class Analyzer {
 		
 		Map<String, SnippetCode[]> snippets = new HashMap<String, SnippetCode[]>();
 		for (Notebook notebook: this.notebooks) {
+			numCodeCellsIn(notebook, snippetsWriter);
 			LOCIn(notebook, LOCWriter);
 			languageIn(notebook, langWriter);
 			allLanguageValuesIn(notebook, allLangWriter);
@@ -89,6 +92,7 @@ public class Analyzer {
 		Map<SnippetCode, List<Snippet>> clones = getClones(snippets);
 		printCloneFiles(snippets, clones);
 		
+		snippetsWriter.close();
 		LOCWriter.close();
 		langWriter.close();
 		allLangWriter.close();

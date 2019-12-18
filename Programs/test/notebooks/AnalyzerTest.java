@@ -33,6 +33,8 @@ public class AnalyzerTest {
 		String testDir = "test/data/all";
 		String fileName = "single_import_diff_langs.ipynb";
 		String snippetHash = "33BE8D72467938FBB23EF42CF8C9E85F";
+		String[] expectedSnippetLines = {snippetsHeader(),
+				fileName + ", 1"};
 		String[] expectedLOCLines = {LOCHeader(),
 				fileName + ", 2, 1, 1"};
 		String[] expectedLangLines = {languagesHeader(),
@@ -52,6 +54,7 @@ public class AnalyzerTest {
 		analyzer.initializeNotebooksFrom(testDir + "/" + fileName);
 		analyzer.allAnalyzes();
 		
+		checkCsv("snippets", expectedSnippetLines);
 		checkCsv("loc", expectedLOCLines);
 		checkCsv("languages", expectedLangLines);
 		checkCsv("all_languages", expectedAllLangLines);
@@ -59,6 +62,7 @@ public class AnalyzerTest {
 		checkCsv("hash2files", expectedHash2filesLines);
 		checkCsv("cloneFrequency", expectedCloneFreqLines);
 		
+		lastOutputFile("snippets").delete();
 		lastOutputFile("loc").delete();
 		lastOutputFile("languages").delete();
 		lastOutputFile("all_languages").delete();
@@ -407,7 +411,7 @@ public class AnalyzerTest {
 		String[] files = {"zero.ipynb", "one.ipynb", "three_with_md.ipynb"};
 		int[] numCodeCells = {0, 1, 3};
 		String[] expectedLines = new String[numCodeCells.length+1];
-		expectedLines[0] = "file, snippets";
+		expectedLines[0] = snippetsHeader();
 		for (int i=0; i<numCodeCells.length; i++) {
 			expectedLines[i+1] = files[i] + ", " + numCodeCells[i];
 		}
@@ -420,6 +424,13 @@ public class AnalyzerTest {
 		checkCsv("snippets", expectedLines);
 		
 		lastOutputFile("snippets").delete();
+	}
+	
+	/**
+	 * @return Expected header of snippet files
+	 */
+	private static String snippetsHeader() {
+		return "file, snippets";
 	}
 
 	/**
