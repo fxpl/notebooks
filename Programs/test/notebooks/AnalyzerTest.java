@@ -526,7 +526,7 @@ public class AnalyzerTest {
 	 * @return Expected header of LOC file
 	 */
 	private static String LOCHeader() {
-		return "file, total, non-blank, blank";
+		return "file, total LOC, non-blank LOC, blank LOC";
 	}
 
 }
