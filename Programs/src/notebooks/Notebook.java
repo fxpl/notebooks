@@ -392,6 +392,8 @@ public class Notebook {
 			return Language.R;
 		} else if (spec.startsWith("scala") || spec.startsWith("Scala")) {
 			return Language.SCALA;
+		} else if (spec.trim().equals("")) {
+			return Language.UNKNOWN;
 		} else {
 			return Language.OTHER;
 		}
