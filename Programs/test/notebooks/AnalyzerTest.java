@@ -33,6 +33,8 @@ public class AnalyzerTest {
 		String testDir = "test/data/all";
 		String fileName = "single_import_diff_langs.ipynb";
 		String snippetHash = "33BE8D72467938FBB23EF42CF8C9E85F";
+		String[] expectedCodeCellsLines = {codeCellsHeader(),
+				fileName + ", 1"};
 		String[] expectedLOCLines = {LOCHeader(),
 				fileName + ", 2, 1, 1"};
 		String[] expectedLangLines = {languagesHeader(),
@@ -52,6 +54,7 @@ public class AnalyzerTest {
 		analyzer.initializeNotebooksFrom(testDir + "/" + fileName);
 		analyzer.allAnalyzes();
 		
+		checkCsv("code_cells", expectedCodeCellsLines);
 		checkCsv("loc", expectedLOCLines);
 		checkCsv("languages", expectedLangLines);
 		checkCsv("all_languages", expectedAllLangLines);
@@ -59,6 +62,7 @@ public class AnalyzerTest {
 		checkCsv("hash2files", expectedHash2filesLines);
 		checkCsv("cloneFrequency", expectedCloneFreqLines);
 		
+		lastOutputFile("code_cells").delete();
 		lastOutputFile("loc").delete();
 		lastOutputFile("languages").delete();
 		lastOutputFile("all_languages").delete();
@@ -393,11 +397,11 @@ public class AnalyzerTest {
 	public void testNumCodeCells_total() throws IOException {
 		analyzer.initializeNotebooksFrom("test/data/count");
 		assertEquals("Wrong number of cells found in notebooks!", 15, analyzer.numCodeCells());
-		lastOutputFile("snippets").delete();
+		lastOutputFile("code_cells").delete();
 	}
 	
 	/**
-	 * Verify that the output file snippets<current-date-time>.csv is
+	 * Verify that the output file code_cells<current-date-time>.csv is
 	 * created and filled correctly when the number of cells are counted.
 	 * @throws IOException on errors when handling output file
 	 */
@@ -407,7 +411,7 @@ public class AnalyzerTest {
 		String[] files = {"zero.ipynb", "one.ipynb", "three_with_md.ipynb"};
 		int[] numCodeCells = {0, 1, 3};
 		String[] expectedLines = new String[numCodeCells.length+1];
-		expectedLines[0] = "file, snippets";
+		expectedLines[0] = codeCellsHeader();
 		for (int i=0; i<numCodeCells.length; i++) {
 			expectedLines[i+1] = files[i] + ", " + numCodeCells[i];
 		}
@@ -417,9 +421,16 @@ public class AnalyzerTest {
 		}
 		analyzer.numCodeCells();
 		
-		checkCsv("snippets", expectedLines);
+		checkCsv("code_cells", expectedLines);
 		
-		lastOutputFile("snippets").delete();
+		lastOutputFile("code_cells").delete();
+	}
+	
+	/**
+	 * @return Expected header of snippet files
+	 */
+	private static String codeCellsHeader() {
+		return "file, code cells";
 	}
 
 	/**

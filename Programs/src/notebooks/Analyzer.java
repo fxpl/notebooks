@@ -70,6 +70,8 @@ public class Analyzer {
 	 * @throws IOException On problems handling the output file
 	 */
 	public void allAnalyzes() throws IOException {
+		Writer codeCellsWriter = new FileWriter("code_cells" + LocalDateTime.now() + ".csv");
+		codeCellsWriter.write(numCodeCellsHeader());
 		Writer LOCWriter = new FileWriter("loc" + LocalDateTime.now() + ".csv");
 		LOCWriter.write(LOCHeader());
 		Writer langWriter = new FileWriter("languages" + LocalDateTime.now() + ".csv");
@@ -79,6 +81,7 @@ public class Analyzer {
 		
 		Map<String, SnippetCode[]> snippets = new HashMap<String, SnippetCode[]>();
 		for (Notebook notebook: this.notebooks) {
+			numCodeCellsIn(notebook, codeCellsWriter);
 			LOCIn(notebook, LOCWriter);
 			languageIn(notebook, langWriter);
 			allLanguageValuesIn(notebook, allLangWriter);
@@ -89,6 +92,7 @@ public class Analyzer {
 		Map<SnippetCode, List<Snippet>> clones = getClones(snippets);
 		printCloneFiles(snippets, clones);
 		
+		codeCellsWriter.close();
 		LOCWriter.close();
 		langWriter.close();
 		allLangWriter.close();
@@ -398,14 +402,14 @@ public class Analyzer {
 	
 	/**
 	 * Count the number of code cells in each notebook. Print each value on a
-	 * separate line in the file snippets<current-date-time>.csv. Start the
-	 * csv file with the header "file, snippets".
+	 * separate line in the file code_cells<current-date-time>.csv. Start the
+	 * csv file with the header "file, code cells".
 	 * @return Total number of code cells in notebooks stored in analyzer
 	 * @throws IOException On problems with handling the output file
 	 */
 	public int numCodeCells() throws IOException {
 		int totalNumCodeCells = 0;
-		Writer writer = new FileWriter("snippets" + LocalDateTime.now() + ".csv");
+		Writer writer = new FileWriter("code_cells" + LocalDateTime.now() + ".csv");
 		writer.write(numCodeCellsHeader());
 		for (int i=0; i<notebooks.size(); i++) {
 			totalNumCodeCells += numCodeCellsIn(notebooks.get(i), writer);
@@ -418,7 +422,7 @@ public class Analyzer {
 	 * @return Header for the file2hashes csv file
 	 */
 	private String numCodeCellsHeader() {
-		return "file, snippets\n";
+		return "file, code cells\n";
 	}
 
 	/**
@@ -456,7 +460,7 @@ public class Analyzer {
 						break;
 					case "-count":
 						System.out.println("Notebooks parsed: " + this.numNotebooks());
-						System.out.println("Code snippets: " + this.numCodeCells());
+						System.out.println("Code cells: " + this.numCodeCells());
 						break;
 					case "-lang":
 						Map<Language, Integer> languages = this.languages();
