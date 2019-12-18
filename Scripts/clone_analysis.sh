@@ -6,7 +6,7 @@
 #SBATCH -J count_clones
 #SBATCH -M snowy
 
-hash2files=`./get_latest_output.sh "hash2files"`		# TODO: Formatet på denna har ändrats!
+hash2files=`./get_latest_output.sh "hash2files"`
 frequencyFile=`./get_latest_output.sh "cloneFrequency"`
 
 # Number of snippets occurring in > 1 file
@@ -27,14 +27,14 @@ echo "Number of snippets occurring in more than one file: \
 $numSnippetsInSeveralFiles ($severalPercent %)."
 
 # Number of clones and unique snippets respectively
-numCommas="../output/numCommas.txt"
-commaCount=`sed -n "2,$ p" $hash2files | grep -o ',' -n | uniq -c | sed -E "s/^\s*//" | cut -d' ' -f1`
+numFilesFile="../output/filesPerSnippet.csv"
+numFiles=`sed -n "2,$ p" $hash2files | grep -o ',' -n | uniq -c | sed -E "s/^\s*//" | cut -d' ' -f1 | sed -E "s/^([0-9]+)$/(\1-1)\/2/" | bc`
 hashes=`sed -n "2,$ p" $hash2files | cut -d',' -f1`
-paste <(echo "$hashes") <(echo "$commaCount") > $numCommas
-sed -Ei "s/\t/ /" $numCommas
+paste <(echo "$hashes") <(echo "$numFiles") > $numFilesFile
+sed -Ei "s/\t/ /" $numFilesFile
 
-clones=`cut $numCommas -d' ' -f2 | grep -v "^3$" | wc -l`
-unique=`cut $numCommas -d' ' -f2 | grep "^3$" | wc -l`
+clones=`cut $numFilesFile -d' ' -f2 | grep -v "^1$" | wc -l`
+unique=`cut $numFilesFile -d' ' -f2 | grep "^1$" | wc -l`
 fraction=`echo "$clones / ($clones+$unique)" | bc -l`
 echo "Total number of clones: $clones"
 echo "Total number of unique snippets: $unique"
