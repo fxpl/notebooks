@@ -179,6 +179,7 @@ public class NotebookTest {
 				"k_l_scala.ipynb", "k_l_scala210.ipynb", "k_n_python.ipynb",
 				"l_julia.ipynb", "l_Julia.ipynb", "l_Python.ipynb", "l_Scala.ipynb",
 				"li_n_python.ipynb", "l_li_n_python.ipynb",
+				"li_n_empty.ipynb", "li_n_space.ipynb",
 				"code_cells_amb.ipynb", "code_cells_amb2.ipynb",
 				"code_cells_nolang.ipynb", "code_cells_python.ipynb"};
 		Language[] languages = {Language.UNKNOWN, Language.UNKNOWN, Language.OTHER,
@@ -187,6 +188,7 @@ public class NotebookTest {
 				Language.SCALA, Language.SCALA, Language.UNKNOWN,
 				Language.JULIA, Language.JULIA, Language.PYTHON, Language.SCALA,
 				Language.PYTHON, Language.PYTHON,
+				Language.UNKNOWN, Language.UNKNOWN,
 				Language.UNKNOWN, Language.UNKNOWN,
 				Language.UNKNOWN, Language.PYTHON};
 		for (int i=0; i<files.length; i++) {
@@ -207,10 +209,12 @@ public class NotebookTest {
 				"k_l_cpp.ipynb", "k_l_python.ipynb",
 				"k_n_python.ipynb", "l_julia.ipynb",
 				"li_n_python.ipynb", "l_li_n_python.ipynb",
+				"li_n_empty.ipynb", "li_n_space.ipynb",
 				"code_cells_amb.ipynb", "code_cells_python.ipynb"};
 		LangSpec[] langSpecs = {LangSpec.NONE, LangSpec.NONE,
 				LangSpec.METADATA_KERNELSPEC_LANGUAGE, LangSpec.METADATA_KERNELSPEC_LANGUAGE,
 				LangSpec.NONE, LangSpec.METADATA_LANGUAGE,
+				LangSpec.METADATA_LANGUAGEINFO_NAME, LangSpec.METADATA_LANGUAGEINFO_NAME,
 				LangSpec.METADATA_LANGUAGEINFO_NAME, LangSpec.METADATA_LANGUAGEINFO_NAME,
 				LangSpec.CODE_CELLS, LangSpec.CODE_CELLS};
 		for (int i=0; i<files.length; i++) {

@@ -315,7 +315,7 @@ public class AnalyzerTest {
 		expected.put(Language.R, 2);
 		expected.put(Language.SCALA, 3);
 		expected.put(Language.OTHER, 1);
-		expected.put(Language.UNKNOWN, 7);
+		expected.put(Language.UNKNOWN, 9);
 		Map<Language, Integer> actual = analyzer.languages();
 		assertEquals("Error in language extraction:", expected, actual);
 		lastOutputFile("languages").delete();
@@ -526,7 +526,7 @@ public class AnalyzerTest {
 	 * @return Expected header of LOC file
 	 */
 	private static String LOCHeader() {
-		return "file, total, non-blank, blank";
+		return "file, total LOC, non-blank LOC, blank LOC";
 	}
 
 }

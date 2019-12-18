@@ -379,7 +379,7 @@ public class Analyzer {
 	 * @return Header for the LOC csv file
 	 */
 	private static String LOCHeader() {
-		return "file, total, non-blank, blank\n";
+		return "file, total LOC, non-blank LOC, blank LOC\n";
 	}
 
 	/**
