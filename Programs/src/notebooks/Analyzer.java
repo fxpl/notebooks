@@ -337,7 +337,7 @@ public class Analyzer {
 	 * @return Header for the languages csv file
 	 */
 	private static String languagesHeader() {
-		return "file, language\n";
+		return "file, language, language spec in\n";
 	}
 
 	/**
