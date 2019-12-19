@@ -1,0 +1,30 @@
+#!/bin/bash -l
+
+#SBATCH -A snic2019-8-228
+#SBATCH -p core -n 1
+#SBATCH -t 5:00
+#SBATCH -J move_unparseable_mf
+#SBATCH -M snowy
+
+projDir="/proj/uppstore2019098/notebooks"
+logFile="../logs/dumper-zip-python-complete.out"
+unparseable="../logs/unparseable_mf.txt"
+targetDir="/proj/uppstore2019098/unparseable_notebooks"
+
+# Find unparseable notebooks
+egrep -a "Skipping\!" $logFile | grep -a "/proj/uppstore2019098/notebooks/" | cut -d'/' -f5- | cut -d':' -f1 > $unparseable
+
+# Create parallel directory structure
+rev $unparseable | cut -d'/' -f2- | rev | uniq | while read subdir;
+do
+	mkdir -p $targetDir/$subdir
+done
+
+# Move notebooks
+while read nbPath;
+do
+	notebook=`echo $nbPath | rev | cut -d'/' -f1 | rev`
+	subdir=`echo $nbPath | rev | cut -d'/' -f2- | rev`
+	mv $projDir/$subdir/$notebook $targetDir/$subdir
+done < $unparseable
+
