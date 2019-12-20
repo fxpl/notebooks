@@ -501,7 +501,7 @@ public class AnalyzerTest {
 	 * @return Expected header of languages files
 	 */
 	private static String languagesHeader() {
-		return "file, language";
+		return "file, language, language spec in";
 	}
 	
 	/**
