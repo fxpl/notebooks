@@ -13,7 +13,7 @@ percentages="("
 
 i=0
 for language in ${languages[@]}; do
-	number=`sed -n "2,$ p" $file | grep $language | wc -l`
+	number=`sed -n "2,$ p" $file | cut -d',' -f2 | egrep " $language$" | wc -l`
 	perc=`echo 100*$number/$total | bc -l`
 	perc=`printf "%.4f" $perc`
 	echo "$language: $number/$total ($perc%)"
