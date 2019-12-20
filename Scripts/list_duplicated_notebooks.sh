@@ -6,8 +6,8 @@
 #SBATCH -M snowy
 
 f2h=`./get_latest_output.sh "file2hashes"`
-duplicates=../output/duplicates_sorted.txt
-mostDuplicated=../output/most_duplicated_notebooks.txt
+duplicates=../Output/duplicates_sorted.txt
+mostDuplicated=../Output/most_duplicated_notebooks.txt
 
 # For each combination of hashes (snippets), find the notebooks containing
 # this combination (in order). Sort the output on the number of notebooks
