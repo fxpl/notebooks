@@ -5,6 +5,10 @@
 #SBATCH -p core -n 1
 #SBATCH -J notebook_snippetPrinter
 
+################################################################################
+# Dump the most common snippets to stdout.
+################################################################################
+
 hashFile=`./get_latest_output.sh "hash2files"`
 projPath=/proj/uppstore2019098/notebooks
 pathFile=$projPath/file_list.txt

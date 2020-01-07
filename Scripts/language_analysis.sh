@@ -6,6 +6,12 @@
 #SBATCH -J language_analysis
 #SBATCH -M snowy
 
+################################################################################
+# Count the number of notebooks written in Python, Julia, R and Scala
+# respectively. Also count the number of notebooks with another language, or no
+# language at all, specified. Report result in pure numbers and percentages.
+################################################################################
+
 languages=( PYTHON JULIA R SCALA OTHER UNKNOWN )
 file=`./get_latest_output.sh "languages"`
 total=`sed -n "2,$ p" $file | wc -l`

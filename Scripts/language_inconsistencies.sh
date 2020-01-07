@@ -6,6 +6,12 @@
 #SBATCH -J lang_inconsistencies 
 #SBATCH --qos=short 
 
+################################################################################
+# Find notebooks where different languages are specified in metadata.language,
+# metadata.language_info.name, metadata.kernelspec.language and and/or code
+# cells.
+################################################################################
+
 langFile=`./get_latest_output.sh "all_languages"`
 sed -n "2,$ p" $langFile \
 	| awk -F ',' \

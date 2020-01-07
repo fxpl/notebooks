@@ -6,8 +6,13 @@
 #SBATCH -J move_unparseable
 #SBATCH -M snowy
 
+################################################################################
+# Find as many unparseable notebooks as possible in analyzer log file and move
+# these to a separate directory.
+################################################################################
+
 projDir="/proj/uppstore2019098/notebooks"
-#logFile="../logs/analyze-hash-complete3.out"
+#logFile="../Logs/analyze-hash-complete3.out"
 logFile="../Logs/analyze-all-complete.out"
 unparseable="../Logs/unparseable.txt"
 targetDir="/proj/uppstore2019098/unparseable_notebooks"
