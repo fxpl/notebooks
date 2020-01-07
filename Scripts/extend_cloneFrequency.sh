@@ -10,7 +10,7 @@
 # Add info about sizes and languages to clone frequency file.
 ################################################################################
 
-sizeFile="../output/notebook_sizes.csv"
+sizeFile="../Output/notebook_sizes.csv"
 
 # Create csv file containing the size of each non-forked parseable notebook (in bytes)
 nbDir="/proj/uppstore2019098/notebooks"
@@ -28,7 +28,7 @@ done
 locFile=`./get_latest_output.sh "loc"`
 langFile=`./get_latest_output.sh "languages"`
 cloneFreq=`./get_latest_output.sh "cloneFrequency"`
-cloneFreqWithSizes="../output/extendedCloneFrequency.csv"
+cloneFreqWithSizes="../Output/extendedCloneFrequency.csv"
 header1=`head -1 $cloneFreq | cut -d',' -f1`
 header2=`head -1 $locFile | cut -d',' -f2-3`
 header3=`head -1 $sizeFile | cut -d',' -f2`

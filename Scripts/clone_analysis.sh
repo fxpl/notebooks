@@ -28,7 +28,7 @@ echo "Number of snippets occurring in more than one file: \
 $numSnippetsInSeveralFiles ($severalPercent %)."
 
 # Number of clones and unique snippets respectively
-numFilesFile="../output/filesPerSnippet.csv"
+numFilesFile="../Output/filesPerSnippet.csv"
 numFiles=`sed -n "2,$ p" $hash2files | grep -o ',' -n | uniq -c | sed -E "s/^\s*//" | cut -d' ' -f1 | sed -E "s/^([0-9]+)$/(\1-1)\/2/" | bc`
 hashes=`sed -n "2,$ p" $hash2files | cut -d',' -f1`
 paste <(echo "$hashes") <(echo "$numFiles") > $numFilesFile
@@ -62,7 +62,7 @@ echo "On average the following fraction of snippets in a file are clones:"
 echo "(`echo "$fractionClones" | paste -sd+`) / $numFiles" | bc -l
 
 # Report the number of snippets that are non-unique within each notebook.
-intraCloneFile="../output/intra_clones.csv"
+intraCloneFile="../Output/intra_clones.csv"
 echo "file, intra clones" > $intraCloneFile
 sed -n "2,$ p" $file2hashes | while read line;
 do
