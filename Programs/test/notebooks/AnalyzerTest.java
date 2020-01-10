@@ -126,31 +126,31 @@ public class AnalyzerTest {
 	@Test
 	public void testClones() throws IOException {
 		String dataDir = "test/data/hash";
-		String[] files = {"empty_code_string.ipynb", "empty_code_strings.ipynb",
-				"missing_cells.ipynb", "single_import.ipynb", "two_import_cells.ipynb",
-				"intra_clones.ipynb", "intra_clones_and_unique.ipynb"
+		String[] files = {"nb_4.ipynb", "nb_5.ipynb",
+				"nb_100.ipynb", "nb_6.ipynb", "nb_7.ipynb",
+				"nb_1.ipynb", "nb_2.ipynb"
 		};
 		// Expected values
 		Map<SnippetCode, List<Snippet>> expectedClones = new HashMap<SnippetCode, List<Snippet>>();
 		List<Snippet> emptySnippets = new ArrayList<Snippet>(2);
-		emptySnippets.add(new Snippet("empty_code_string.ipynb", 0));
-		emptySnippets.add(new Snippet("empty_code_strings.ipynb", 0));
+		emptySnippets.add(new Snippet("nb_4.ipynb", 0));
+		emptySnippets.add(new Snippet("nb_5.ipynb", 0));
 		expectedClones.put(new SnippetCode(0, "D41D8CD98F00B204E9800998ECF8427E"), emptySnippets);	// Empty
 		List<Snippet> numpy = new ArrayList<Snippet>(2);
-		numpy.add(new Snippet("single_import.ipynb", 0));
-		numpy.add(new Snippet("two_import_cells.ipynb", 0));
+		numpy.add(new Snippet("nb_6.ipynb", 0));
+		numpy.add(new Snippet("nb_7.ipynb", 0));
 		expectedClones.put(new SnippetCode(1, "33BE8D72467938FBB23EF42CF8C9E85F"), numpy); // import numpy
 		List<Snippet> pandas = new ArrayList<Snippet>(1);
-		pandas.add(new Snippet("two_import_cells.ipynb", 1));
+		pandas.add(new Snippet("nb_7.ipynb", 1));
 		expectedClones.put(new SnippetCode(1, "6CABFDBC20F69189D4B8894A06C78F49"), pandas); // import pandas
 		List<Snippet> kossa = new ArrayList<Snippet>(4);
-		kossa.add(new Snippet("intra_clones.ipynb", 0));
-		kossa.add(new Snippet("intra_clones.ipynb", 1));
-		kossa.add(new Snippet("intra_clones_and_unique.ipynb", 0));
-		kossa.add(new Snippet("intra_clones_and_unique.ipynb", 2));
+		kossa.add(new Snippet("nb_1.ipynb", 0));
+		kossa.add(new Snippet("nb_1.ipynb", 1));
+		kossa.add(new Snippet("nb_2.ipynb", 0));
+		kossa.add(new Snippet("nb_2.ipynb", 2));
 		expectedClones.put(new SnippetCode(1, "0120F99AA7C49E1CD5F4EE4A6BB1CC4A"), kossa);
 		List<Snippet> unique = new ArrayList<Snippet>(1);
-		unique.add(new Snippet("intra_clones_and_unique.ipynb", 1));
+		unique.add(new Snippet("nb_2.ipynb", 1));
 		expectedClones.put(new SnippetCode(1, "A2D53E3DA394A52271CF00632C961D2A"), unique);
 		
 		// Actual values
@@ -180,7 +180,7 @@ public class AnalyzerTest {
 	@Test
 	public void testClones_csv_emptyNotebook() throws IOException {
 		String dataDir = "test/data/hash";
-		String fileName = "missing_cells.ipynb";
+		String fileName = "nb_100.ipynb";
 		String[] expectedSnippetLines = {
 				file2hashesHeader()
 		};
@@ -218,7 +218,7 @@ public class AnalyzerTest {
 	@Test
 	public void testClones_csv_singleSnippet() throws IOException {
 		String dataDir = "test/data/hash";
-		String fileName = "single_import.ipynb";
+		String fileName = "nb_6.ipynb";
 		String hash = "33BE8D72467938FBB23EF42CF8C9E85F";
 		String[] expectedSnippetLines = {
 				file2hashesHeader(),
@@ -259,7 +259,7 @@ public class AnalyzerTest {
 	@Test
 	public void testClones_csv_intraClone() throws IOException {
 		String dataDir = "test/data/hash";
-		String fileName = "intra_clones.ipynb";
+		String fileName = "nb_1.ipynb";
 		String hash = "0120F99AA7C49E1CD5F4EE4A6BB1CC4A";
 		String[] expectedFile2HashesLines = {
 				file2hashesHeader(),
@@ -300,7 +300,7 @@ public class AnalyzerTest {
 	@Test
 	public void testClones_csv_mixed() throws IOException {
 		String dataDir = "test/data/hash";
-		String fileName = "intra_clones_and_unique.ipynb";
+		String fileName = "nb_2.ipynb";
 		String kossaHash = "0120F99AA7C49E1CD5F4EE4A6BB1CC4A";
 		String uniqueHash = "A2D53E3DA394A52271CF00632C961D2A";
 		String[] expectedFile2HashesLines = {
@@ -338,13 +338,13 @@ public class AnalyzerTest {
 		String dataDir = "test/data/hash";
 		String[] expectedLines = {
 				connectionsHeader(),
-				"empty_code_string.ipynb, 1, 1.0000, 0, 0.0000",
-				"empty_code_strings.ipynb, 1, 1.0000, 0, 0.0000",
-				"intra_clones.ipynb, 6, 3.0000, 6, 3.0000",
-				"intra_clones_and_unique.ipynb, 6, 2.0000, 6, 2.0000",
-				"missing_cells.ipynb, 0, 0.0000, 0, 0.0000",
-				"single_import.ipynb, 1, 1.0000, 1, 1.0000",
-				"two_import_cells.ipynb, 1, 0.5000, 1, 0.5000",
+				"nb_4.ipynb, 1, 1.0000, 0, 0.0000",
+				"nb_5.ipynb, 1, 1.0000, 0, 0.0000",
+				"nb_1.ipynb, 6, 3.0000, 6, 3.0000",
+				"nb_2.ipynb, 6, 2.0000, 6, 2.0000",
+				"nb_100.ipynb, 0, 0.0000, 0, 0.0000",
+				"nb_6.ipynb, 1, 1.0000, 1, 1.0000",
+				"nb_7.ipynb, 1, 0.5000, 1, 0.5000",
 		};
 		
 		analyzer.initializeNotebooksFrom(dataDir);
@@ -533,7 +533,7 @@ public class AnalyzerTest {
 			String expectedLine = expectedLines[i];
 			boolean exists = false;
 			Scanner outputReader = new Scanner(outputFile);
-			while (outputReader.hasNext() && false == exists) {
+			while (outputReader.hasNextLine() && false == exists) {
 				if (outputReader.nextLine().equals(expectedLine)) {
 					exists = true;
 				}

@@ -146,8 +146,8 @@ public class NotebookTest {
 	@Test
 	public void testSnippetCodes() throws NotebookException {
 		String dataDir = "test/data/hash";
-		String[] files = {"empty_code_string.ipynb", "empty_code_strings.ipynb",
-				"single_import.ipynb", "two_import_cells.ipynb"};
+		String[] files = {"nb_4.ipynb", "nb_5.ipynb",
+				"nb_6.ipynb", "nb_7.ipynb"};
 		String[][] expectedHashStrings = {
 				{"D41D8CD98F00B204E9800998ECF8427E"},
 				{"D41D8CD98F00B204E9800998ECF8427E"},
