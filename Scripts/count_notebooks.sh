@@ -6,18 +6,25 @@
 #SBATCH -J count_notebooks
 #SBATCH -M snowy
 
+################################################################################
+# Count the number of notebooks in input directory, in output files and in
+# directories for forked and unparseable notebooks.
+################################################################################
+
 projDir="/proj/uppstore2019098"
-logFile="../logs/dumper-zip-python-complete.out"
+logFile="../Logs/analyze-all-complete.out"
+codeCells=`./get_latest_output.sh "code_cells"`
 #TODO: Kör även efter flytt av oparsningsbart, och analyzern körd efter flytt
 
-processed=`find $projDir/notebooks -name "*ipynb" | wc -l`
+outputLines=`wc -l $codeCells | cut -d' ' -f1`
+outputNotebooks=`echo "$outputLines - 1" | bc`
+inDir=`find $projDir/notebooks -name "*ipynb" | wc -l`
 forked=`find $projDir/forked_notebooks -name "*ipynb" | wc -l`
 unparseable=`find $projDir/unparseable_notebooks -name "*ipynb" | wc -l`
+unparseable_unmoved=`egrep "Skipping notebook\!" $logFile | wc -l`
 
-unparseable_unmoved=`egrep "Skipping\!" $logFile | wc -l`	# TODO: Ändra till "Skipping notebook\!" innan nästa körning!
-unparseable=`echo "$unparseable + ${unparseable_unmoved}" | bc`
-processed=`echo "$processed - ${unparseable_unmoved}" | bc`
-
-echo "Processed notebooks: $processed"	# TODO: Dubbelkolla med wc -l på output-fil
-echo "Forked notebooks: $forked"
-echo "Unparseable notebooks: $unparseable"
+echo "Notebooks in input directory: $inDir"
+echo "Analyzed notebooks: $outputNotebooks"
+echo "Of these, processing failed for: ${unparseable_unmoved}"
+echo "Forked (moved) notebooks: $forked"
+echo "Unparseable (moved) notebooks: $unparseable"

@@ -4,5 +4,3 @@ slurm-*.out
 # Log and pstats directory
 logs
 
-# Output directory
-output

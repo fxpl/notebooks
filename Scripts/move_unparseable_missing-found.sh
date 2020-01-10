@@ -6,6 +6,11 @@
 #SBATCH -J move_unparseable_mf
 #SBATCH -M snowy
 
+################################################################################
+# Find unparseable notebooks in dumper log file and move these to a separate
+# directory.
+################################################################################
+
 projDir="/proj/uppstore2019098/notebooks"
 logFile="../logs/dumper-zip-python-complete.out"
 unparseable="../logs/unparseable_mf.txt"

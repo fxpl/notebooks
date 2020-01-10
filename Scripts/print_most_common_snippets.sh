@@ -5,11 +5,15 @@
 #SBATCH -p core -n 1
 #SBATCH -J notebook_snippetPrinter
 
+################################################################################
+# Dump the most common snippets to stdout.
+################################################################################
+
 hashFile=`./get_latest_output.sh "hash2files"`
 projPath=/proj/uppstore2019098/notebooks
-pathFile=$projPath/file_list.txt
+pathFile=$projPath/notebook_paths.txt
 numSnippets=100	# Number of snippets to print
-minLength=6	# Minimum number of lines in snippet
+minLength=4	# Minimum number of lines in snippet
 
 i=1
 # Print the $numSnippets most common clones using SnippetPrinter (=> stdout at
@@ -26,7 +30,6 @@ sed -n "2,$ p" $hashFile | grep -o ',' -n | uniq -c | sort -rn \
 		# Information about the snippet
 		notebook=`echo $line | cut -d',' -f3`
 		snippetIndex=`echo $line | cut -d',' -f4 | tr -d ' '`
-		notebookPath=`grep $notebook $pathFile | cut -d'/' -f2-`
 		notebookPath=$projPath"/"`grep $notebook $pathFile | cut -d'/' -f2-`
 
 		# Number of occurrences of the snippet

@@ -529,7 +529,7 @@ public class Analyzer {
 				switch (arg) {
 					case "-all":
 						this.allAnalyzes();
-						System.out.println("All analyzes made for " + this.numNotebooks());
+						System.out.println("All analyzes made for " + this.numNotebooks() + "notebooks.");
 						break;
 					case "-count":
 						System.out.println("Notebooks parsed: " + this.numNotebooks());

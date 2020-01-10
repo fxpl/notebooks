@@ -2,17 +2,23 @@
 
 #SBATCH -A snic2019-8-228
 #SBATCH -p core -n 1
-#SBATCH -t 12:00:00
+#SBATCH -t 1:00:00
 #SBATCH -J move_unparseable
 #SBATCH -M snowy
 
+################################################################################
+# Find as many unparseable notebooks as possible in analyzer log file and move
+# these to a separate directory.
+################################################################################
+
 projDir="/proj/uppstore2019098/notebooks"
-logFile="../logs/analyze-hash-complete3.out"
-unparseable="../logs/unparseable.txt"
+#logFile="../Logs/analyze-hash-complete3.out"
+logFile="../Logs/analyze-all-complete.out"
+unparseable="../Logs/unparseable.txt"
 targetDir="/proj/uppstore2019098/unparseable_notebooks"
 
 # Find unparseable notebooks
-egrep -a "Skipping notebook\!" $logFile | grep -a "/proj/uppstore2019098/notebooks/" | cut -d'/' -f5- | cut -d':' -f1 > $unparseable
+egrep -a "Skipping notebook\! | Could not parse " $logFile | grep -a "/proj/uppstore2019098/notebooks/" | cut -d'/' -f5- | cut -d':' -f1 > $unparseable
 
 # Create parallel directory structure
 rev $unparseable | cut -d'/' -f2- | rev | uniq | while read subdir;

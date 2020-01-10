@@ -6,6 +6,11 @@
 #SBATCH -J move_forks
 #SBATCH -M snowy
 
+################################################################################
+# Move all fork notebooks, that is notebooks that come from repositories that
+# are forks of other repositories, to a separate directory.
+################################################################################
+
 projDir="/proj/uppstore2019098/notebooks"
 forks="$projDir/forked_notebooks.txt"
 paths="$projDir/file_list.txt"
