@@ -179,6 +179,7 @@ public class Analyzer {
 		printFile2hashes(snippets);
 		printHash2files(clones);
 		printCloneFrequencies(snippets, clones);
+		printConnectionsFile(snippets, clones);
 	}
 
 	private void printHash2files(Map<SnippetCode, List<Snippet>> clones) throws IOException {
@@ -253,6 +254,78 @@ public class Analyzer {
 	 */
 	private String cloneFrequencyHeader() {
 		return "file, clones, unique, clone frequency\n";
+	}
+	
+	/**
+	 * Imagine a graph where the nodes are the notebooks and each snippet that
+	 * is shared between two notebooks constitutes an edge between these
+	 * notebooks. For every node/notebook, count the number of edges
+	 * starting/ending at this node, both including and excluding empty
+	 * snippets. Also calculate normalized values, i.e. the number of edges
+	 * divided by the number of snippets in the notebook. print the result to
+	 * connections<current-date-time>.csv
+	 * @param file2snippets Mapping from notebook name to snippets
+	 * @param snippet2files Mapping from snippets to position in notebooks
+	 */
+	private void printConnectionsFile(Map<String, SnippetCode[]> file2snippets,
+			Map<SnippetCode, List<Snippet>> snippet2files) throws IOException {
+		Writer writer = new FileWriter("connections" + LocalDateTime.now() + ".csv");
+		writer.write(connectionsHeader());
+		for (String fileName: file2snippets.keySet()) {
+			printConnections(fileName, file2snippets, snippet2files, writer);
+		}
+		writer.close();
+	}
+
+	/**
+	 * @param fileName Name of notebook file
+	 * @param file2snippets Mapping from notebook name to snippets
+	 * @param snippets2files Mapping from snippets to position in notebooks
+	 * @param writer Writer that will print the result
+	 */
+	private void printConnections(String fileName, Map<String, SnippetCode[]> file2snippets,
+			Map<SnippetCode, List<Snippet>> snippets2files, Writer writer)
+			throws IOException {
+		int connections = 0;
+		int nonEmptyConnections = 0;	// Connections excluding empty snippets
+		SnippetCode[] snippets = file2snippets.get(fileName);
+		for (SnippetCode snippet: snippets) {
+			int connectionsForSnippet = snippets2files.get(snippet).size() - 1;	// -1 for current notebook
+			connections += connectionsForSnippet;
+			if (0 < snippet.getLOC()) {
+				nonEmptyConnections += connectionsForSnippet; 
+			}
+		}
+		int numSnippets = snippets.length;
+		double normalizedConnections = normalized(connections, numSnippets);
+		double normalizedNonEmptyConnections = normalized(nonEmptyConnections, numSnippets);
+		
+		writer.write(fileName + ", " + connections + ", "
+				+ String.format(Locale.US,  "%.4f", normalizedConnections) + ", "
+				+ nonEmptyConnections + ", "
+				+ String.format(Locale.US,  "%.4f", normalizedNonEmptyConnections) + "\n");
+	}
+	
+	/**
+	 * Normalize numerator by dividing it by denominator, unless the denominator is 0.
+	 * Then return 0.
+	 * @param numerator
+	 * @param denominator
+	 * @return numerator normalized according to description above
+	 */
+	private double normalized(int numerator, int denominator) {
+		if (0 == denominator) {
+			return 0;
+		} else {
+			return (double)numerator/denominator;
+		}
+	}
+	
+	/**
+	 * @return Header for the connections csv file
+	 */
+	private String connectionsHeader() {
+		return "file, connections, connections normalized, non-empty connections, non-empty connections normalized\n";
 	}
 	
 	/**

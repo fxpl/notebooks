@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 
 import org.junit.*;
 import notebooks.Analyzer;
@@ -50,6 +51,8 @@ public class AnalyzerTest {
 				snippetHash + ", 1, " + fileName + ", 0"};
 		String[] expectedCloneFreqLines = {cloneFrequencyHeader(),
 				fileName + ", 0, 1, 0.0000"};
+		String[] expectedConnectionsLines = {connectionsHeader(),
+				fileName + ", 0, 0.0000, 0, 0.0000"};
 		
 		analyzer.initializeNotebooksFrom(testDir + "/" + fileName);
 		analyzer.allAnalyzes();
@@ -61,6 +64,7 @@ public class AnalyzerTest {
 		checkCsv("file2hashes", expectedFile2hashesLines);
 		checkCsv("hash2files", expectedHash2filesLines);
 		checkCsv("cloneFrequency", expectedCloneFreqLines);
+		checkCsv("connections", expectedConnectionsLines);
 		
 		lastOutputFile("code_cells").delete();
 		lastOutputFile("loc").delete();
@@ -168,8 +172,9 @@ public class AnalyzerTest {
 	
 	/**
 	 * Verify that the output files file2hashes<current-date-time>.csv,
-	 * hash2files<current-date-time>.csv and cloneFrequency<current-date-time>.csv
-	 * have the right content after clone analysis of an empty notebook.
+	 * hash2files<current-date-time>.csv cloneFrequency<current-date-time>.csv
+	 * and connections<current-date-time>.csv have the right content after
+	 * clone analysis of an empty notebook.
 	 * @throws IOException
 	 */
 	@Test
@@ -182,9 +187,13 @@ public class AnalyzerTest {
 		String[] expectedClonesLines = {
 				hash2filesHeader()
 		};
-		String[] expectedFrequencyLiens = {
+		String[] expectedFrequencyLines = {
 				cloneFrequencyHeader(),
 				fileName + ", 0, 0, 0"
+		};
+		String[] expectedConnectionsLines = {
+				connectionsHeader(),
+				fileName + ", 0, 0.0000, 0, 0.0000"
 		};
 		
 		// Actual values
@@ -193,16 +202,17 @@ public class AnalyzerTest {
 		
 		checkCsv("file2hashes", expectedSnippetLines);
 		checkCsv("hash2files", expectedClonesLines);
-		checkCsv("cloneFrequency", expectedFrequencyLiens);
+		checkCsv("cloneFrequency", expectedFrequencyLines);
+		checkCsv("connections", expectedConnectionsLines);
 		
 		deleteCloneCsvs();
 	}
 	
 	/**
 	 * Verify that the output files file2hashes<current-date-time>.csv,
-	 * hash2files<current-date-time>.csv and cloneFrequency<current-date-time>.csv
-	 * have the right content after clone analysis of a notebook with a single
-	 * snippet.
+	 * hash2files<current-date-time>.csv, cloneFrequency<current-date-time>.csv
+	 * and connections<current-date-time>.csv have the right content after
+	 * clone analysis of a notebook with a single snippet.
 	 * @throws IOException
 	 */
 	@Test
@@ -222,6 +232,10 @@ public class AnalyzerTest {
 				cloneFrequencyHeader(),
 				fileName + ", 0, 1, 0.0000"
 		};
+		String[] expectedConnectionsLines = {
+				connectionsHeader(),
+				fileName + ", 0, 0.0000, 0, 0.0000"
+		};
 		
 		// Actual values
 		analyzer.initializeNotebooksFrom(dataDir + "/" + fileName);
@@ -230,14 +244,16 @@ public class AnalyzerTest {
 		checkCsv("file2hashes", expectedSnippetLines);
 		checkCsv("hash2files", expectedClonesLines);
 		checkCsv("cloneFrequency", expectedFrequencyLiens);
+		checkCsv("connections", expectedConnectionsLines);
 		
 		deleteCloneCsvs();
 	}
 	
 	/**
 	 * Verify that the output files file2hashes<current-date-time>.csv, 
-	 * hash2files<current-date-time>.csv and cloneFrequency<current-date-time>.csv
-	 * have the right content after clone analysis of a notebooks with a clone.
+	 * hash2files<current-date-time>.csv, cloneFrequency<current-date-time>.csv
+	 * and connections<current-date-time>.csv have the right content after
+	 * clone analysis of a notebooks with a clone.
 	 * @throws IOException
 	 */
 	@Test
@@ -257,6 +273,10 @@ public class AnalyzerTest {
 				cloneFrequencyHeader(),
 				fileName + ", 2, 0, 1.0000"
 		};
+		String[] expectedConnectionsLines = {
+				connectionsHeader(),
+				fileName + ", 2, 1.0000, 2, 1.0000"
+		};
 		
 		// Actual values
 		analyzer.initializeNotebooksFrom(dataDir + "/" + fileName);
@@ -265,13 +285,15 @@ public class AnalyzerTest {
 		checkCsv("file2hashes", expectedFile2HashesLines);
 		checkCsv("hash2files", expectedHash2FileLines);
 		checkCsv("cloneFrequency", expectedFrequencyLines);
+		checkCsv("connections", expectedConnectionsLines);
 		
 		deleteCloneCsvs();
 	}
 	
 	/**
-	 * Verify that the output files file2hashes<current-date-time>.csv and
-	 * cloneFrequency<current-date-time>.csv have the right content after clone
+	 * Verify that the output files file2hashes<current-date-time>.csv,
+	 * cloneFrequency<current-date-time>.csv and
+	 * connections<current-date-time>.csv have the right content after clone
 	 * analysis of a notebooks with both clones and a unique snippet.
 	 * @throws IOException
 	 */
@@ -290,6 +312,10 @@ public class AnalyzerTest {
 			cloneFrequencyHeader(),
 			fileName + ", 2, 1, 0.6667"
 		};
+		String[] expectedConnectionsLines = {
+			connectionsHeader(),
+			fileName + ", 2, 0.6667, 2, 0.6667"
+		};
 		
 		// Actual values
 		analyzer.initializeNotebooksFrom(dataDir + "/" + fileName);
@@ -297,6 +323,34 @@ public class AnalyzerTest {
 		
 		checkCsv("file2hashes", expectedFile2HashesLines);
 		checkCsv("cloneFrequency", expectedFrequencyLines);
+		checkCsv("connections", expectedConnectionsLines);
+		
+		deleteCloneCsvs();
+	}
+	
+	/**
+	 * Verify that connections are identified correctly at analysis of the whole
+	 * clone test files directory.
+	 * @throws IOException 
+	 */
+	@Test
+	public void testConnectionsCsv_all() throws IOException {
+		String dataDir = "test/data/hash";
+		String[] expectedLines = {
+				connectionsHeader(),
+				"empty_code_string.ipynb, 1, 1.0000, 0, 0.0000",
+				"empty_code_strings.ipynb, 1, 1.0000, 0, 0.0000",
+				"intra_clones.ipynb, 6, 3.0000, 6, 3.0000",
+				"intra_clones_and_unique.ipynb, 6, 2.0000, 6, 2.0000",
+				"missing_cells.ipynb, 0, 0.0000, 0, 0.0000",
+				"single_import.ipynb, 1, 1.0000, 1, 1.0000",
+				"two_import_cells.ipynb, 1, 0.5000, 1, 0.5000",
+		};
+		
+		analyzer.initializeNotebooksFrom(dataDir);
+		analyzer.clones();
+		
+		checkCsv_anyOrder("connections", expectedLines);
 		
 		deleteCloneCsvs();
 	}
@@ -455,7 +509,7 @@ public class AnalyzerTest {
 	 * Check that the most recent file <prefix><timestamp>.csv has the right
 	 * content.
 	 * @param prefix First part of name of file to be analyzed (see above)
-	 * @param expectedLines Array of the lines expected to be found in the file
+	 * @param expectedLines Array of the lines expected to be found in the file, in order
 	 */
 	private void checkCsv(String prefix, String[] expectedLines) throws IOException {
 		File outputFile = lastOutputFile(prefix);
@@ -468,10 +522,39 @@ public class AnalyzerTest {
 	}
 	
 	/**
+	 * Check that the most recent file <prefix><timestamp>.csv contains all
+	 * lines in expectedLines.
+	 * @param prefix First part of name of file to be analyzed (see above)
+	 * @param expectedLines Array of the lines expected to be found in the file, not necessarily in order
+	 */
+	private void checkCsv_anyOrder(String prefix, String[] expectedLines) throws FileNotFoundException {
+		File outputFile = lastOutputFile(prefix);
+		for (int i=0; i<expectedLines.length; i++) {
+			String expectedLine = expectedLines[i];
+			boolean exists = false;
+			Scanner outputReader = new Scanner(outputFile);
+			while (outputReader.hasNext() && false == exists) {
+				if (outputReader.nextLine().equals(expectedLine)) {
+					exists = true;
+				}
+			}
+			outputReader.close();
+			assertTrue("The line " + expectedLine + " cannot be found in " + prefix + " csv!", exists);
+		}
+	}
+	
+	/**
 	 * @return Expected header of cloneFrequency files
 	 */
 	private static String cloneFrequencyHeader() {
 		return "file, clones, unique, clone frequency";
+	}
+	
+	/**
+	 * @return Expected header of connections files
+	 */
+	private static String connectionsHeader() {
+		return "file, connections, connections normalized, non-empty connections, non-empty connections normalized";
 	}
 	
 	/**
@@ -481,6 +564,7 @@ public class AnalyzerTest {
 		lastOutputFile("file2hashes").delete();
 		lastOutputFile("hash2files").delete();
 		lastOutputFile("cloneFrequency").delete();
+		lastOutputFile("connections").delete();
 	}
 	
 	/**
