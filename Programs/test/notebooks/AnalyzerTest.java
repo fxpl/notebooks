@@ -138,6 +138,7 @@ public class AnalyzerTest {
 		expectedClones.put(new SnippetCode(0, "D41D8CD98F00B204E9800998ECF8427E"), emptySnippets);	// Empty
 		List<Snippet> numpy = new ArrayList<Snippet>(2);
 		numpy.add(new Snippet("nb_6.ipynb", 0));
+		numpy.add(new Snippet("nb_6.ipynb", 1));
 		numpy.add(new Snippet("nb_7.ipynb", 0));
 		expectedClones.put(new SnippetCode(1, "33BE8D72467938FBB23EF42CF8C9E85F"), numpy); // import numpy
 		List<Snippet> pandas = new ArrayList<Snippet>(1);
@@ -152,6 +153,9 @@ public class AnalyzerTest {
 		List<Snippet> unique = new ArrayList<Snippet>(1);
 		unique.add(new Snippet("nb_2.ipynb", 1));
 		expectedClones.put(new SnippetCode(1, "A2D53E3DA394A52271CF00632C961D2A"), unique);
+		List<Snippet> somePackage = new ArrayList<Snippet>(2);
+		somePackage.add(new Snippet("nb_7.ipynb", 2));
+		expectedClones.put(new SnippetCode(1, "5CA918CC7C216AF51875415D3FE5C21F"), somePackage);
 		
 		// Actual values
 		for (String file: files) {
@@ -222,19 +226,19 @@ public class AnalyzerTest {
 		String hash = "33BE8D72467938FBB23EF42CF8C9E85F";
 		String[] expectedSnippetLines = {
 				file2hashesHeader(),
-				fileName + ", " + hash
+				fileName + ", " + hash + ", " + hash
 		};
 		String[] expectedClonesLines = {
 				hash2filesHeader(),
-				hash + ", 1, " + fileName + ", 0"
+				hash + ", 1, " + fileName + ", 0, " + fileName + ", 1"
 		};
 		String[] expectedFrequencyLiens = {
 				cloneFrequencyHeader(),
-				fileName + ", 0, 1, 0.0000"
+				fileName + ", 2, 0, 1.0000"
 		};
 		String[] expectedConnectionsLines = {
 				connectionsHeader(),
-				fileName + ", 0, 0.0000, 0, 0.0000"
+				fileName + ", 2, 1.0000, 2, 1.0000"
 		};
 		
 		// Actual values
@@ -338,13 +342,17 @@ public class AnalyzerTest {
 		String dataDir = "test/data/hash";
 		String[] expectedLines = {
 				connectionsHeader(),
-				"nb_4.ipynb, 1, 1.0000, 0, 0.0000",
-				"nb_5.ipynb, 1, 1.0000, 0, 0.0000",
+				"nb_4.ipynb, 2, 2.0000, 0, 0.0000",
+				"nb_5.ipynb, 2, 2.0000, 0, 0.0000",
 				"nb_1.ipynb, 6, 3.0000, 6, 3.0000",
-				"nb_2.ipynb, 6, 2.0000, 6, 2.0000",
+				"nb_2.ipynb, 7, 2.3333, 7, 2.3333",
+				"nb_3.ipynb, 1, 1.0000, 1, 1.0000",
 				"nb_100.ipynb, 0, 0.0000, 0, 0.0000",
-				"nb_6.ipynb, 1, 1.0000, 1, 1.0000",
-				"nb_7.ipynb, 1, 0.5000, 1, 0.5000",
+				"nb_6.ipynb, 4, 2.0000, 4, 2.0000",
+				"nb_7.ipynb, 5, 1.6667, 5, 1.6667",
+				"nb_10.ipynb, 2, 2.0000, 0, 0.0000",
+				"nb_8.ipynb, 1, 1.0000, 1, 1.0000",
+				"nb_9.ipynb, 4, 2.0000, 4, 2.0000"
 		};
 		
 		analyzer.initializeNotebooksFrom(dataDir);
@@ -534,7 +542,8 @@ public class AnalyzerTest {
 			boolean exists = false;
 			Scanner outputReader = new Scanner(outputFile);
 			while (outputReader.hasNextLine() && false == exists) {
-				if (outputReader.nextLine().equals(expectedLine)) {
+				String nextLine = outputReader.nextLine();
+				if (nextLine.equals(expectedLine)) {
 					exists = true;
 				}
 			}
