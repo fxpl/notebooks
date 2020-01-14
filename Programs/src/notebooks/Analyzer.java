@@ -641,10 +641,19 @@ public class Analyzer {
 				clones = false,
 				langAll = false;
 		String reproFile = null;
+		String nbPath = null;
 		// Read arguments
 		for (int i=0; i<args.length; i++) {
 			String arg = args[i];
 			switch (arg) {
+			case "-nb_path":
+				try {
+					nbPath = args[++i];
+				} catch (ArrayIndexOutOfBoundsException e) {
+					System.err.println("Argument '-nb_location' must be followed by the path of the notebook(s)!");
+					System.err.println("No notebooks will be analyzed!");
+				}
+				break;
 			case "-repro_file":
 				try {
 					reproFile = args[++i];
@@ -677,6 +686,9 @@ public class Analyzer {
 			
 			// Perform analyzes
 			try {
+				if (null != nbPath) {
+					this.initializeNotebooksFrom(nbPath);
+				}
 				if (null != reproFile) {
 					try {
 						this.initializeReproMap(reproFile);
@@ -738,9 +750,8 @@ public class Analyzer {
 
 	public static void main(String[] args) {
 		Analyzer analyzer = new Analyzer();
-		// TODO Flagga för sökväg!
-		analyzer.initializeNotebooksFrom(args[0]);
-		analyzer.analyze(Arrays.copyOfRange(args, 1, args.length));
+		// TODO: Möjlighet att speca output-katalog!
+		analyzer.analyze(args);
 		analyzer.shutDown();
 	}
 }
