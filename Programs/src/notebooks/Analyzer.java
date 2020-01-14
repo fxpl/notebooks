@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.concurrent.*;
 
 /**
@@ -19,6 +20,7 @@ public class Analyzer {
 	private static LangSpec[] langSpecFields = {LangSpec.METADATA_LANGUAGE , LangSpec.METADATA_LANGUAGEINFO_NAME, 
 			LangSpec.METADATA_KERNELSPEC_LANGUAGE, LangSpec.METADATA_KERNELSPEC_NAME,
 			LangSpec.CODE_CELLS};
+	private Map<String, String> repros = null;
 	
 	/**
 	 * Note that when you are done with this Analyzer, you must call the method
@@ -54,6 +56,30 @@ public class Analyzer {
 				initializeNotebooksFrom(file.getPath() + "/" + subFileName);
 			}
 		}
+	}
+	
+	/** TODO: Testa denna (eventuellt indirekt...)!
+	 * TODO: Lägga reproinfo i notebook istället, och använd notebookobjekt i file2hash-map!? Isf måste Snippetobjektet innehålla en notebook istf ett filnamn, för att man ska kunna hämta info om reprot!
+	 * Initialize the map from notebook name to repro.
+	 * @param fileName Name of file with mapping from notebook number to repro
+	 */
+	void initializeReproMap(String fileName) throws FileNotFoundException {
+		repros = new HashMap<String, String>();
+		Scanner scanner = new Scanner(new File(fileName));
+		while (scanner.hasNextLine()) {
+			String line = scanner.nextLine();
+			String[] subStrings = line.split(",");	// TODO: Funkar detta, eller behöver man \:ar?
+			try {
+				int notebookNumber = Integer.parseInt(subStrings[0]);
+				String notebookName = "nb_" + notebookNumber + ".ipynb";
+				String reproName = subStrings[1];
+				repros.put(notebookName, reproName);
+			} catch (NumberFormatException e) {
+				System.err.println("Notebook numbers in repro file must be integers! Notebook with \"number\" "
+						+ subStrings[0] + " is excluded from mapping!");
+			}
+		}
+		scanner.close();
 	}
 	
 	/**
@@ -524,34 +550,77 @@ public class Analyzer {
 	 * Parse command line arguments and perform actions accordingly.
 	 */
 	private void analyze(String[] args) {
-		for (String arg: args) {
+		boolean all = false,
+				count = false,
+				lang = false,
+				loc = false,
+				clones = false,
+				langAll = false;
+		String reproFile = null;
+		// Read arguments
+		for (int i=0; i<args.length; i++) {
+			String arg = args[i];
+			switch (arg) {
+			case "-repro_file":
+				try {
+					initializeReproMap(args[++i]);
+				} catch (ArrayIndexOutOfBoundsException e) {
+					System.err.println("Argument '-repro_file' must be followed by the name of the repro file!");
+					System.err.println("Repro information not initialized!");
+				} catch (FileNotFoundException e) {
+					System.err.println("Repro file not found: " + e.getMessage());
+					System.err.println("Repro information not initialized!");
+				}
+				break;
+			case "-all":
+				all = true;
+				break;
+			case "-count":
+				count = true;
+				break;
+			case "-lang":
+				lang = true;
+				break;
+			case "-loc":
+				loc = true;
+				break;
+			case "-clones":
+				clones = true;
+				break;
+			case "-lang_all":
+				lang = true;
+				break;
+			default:
+				System.err.println("Unknown argument: " + arg);
+			}
+			
+			// Perform analyzes
 			try {
-				switch (arg) {
-					case "-all":
-						this.allAnalyzes();
-						System.out.println("All analyzes made for " + this.numNotebooks() + "notebooks.");
-						break;
-					case "-count":
-						System.out.println("Notebooks parsed: " + this.numNotebooks());
-						System.out.println("Code cells: " + this.numCodeCells());
-						break;
-					case "-lang":
-						Map<Language, Integer> languages = this.languages();
-						printLanguageSummary(languages);
-						break;
-					case "-loc":
-						System.out.println("Lines of code: " + this.LOC());
-						break;
-					case "-clones":
-						this.clones();
-						System.out.println("Clone files created!");
-						break;
-					case "-lang_all":
-						this.allLanguageValues();
-						System.out.println("File with all language values created!");
-						break;
-					default:
-						System.err.println("Unknown argument: " + arg);
+				if (null != reproFile) {
+					this.initializeReproMap(reproFile);
+				}
+				if (all) {
+					this.allAnalyzes();
+					System.out.println("All analyzes made for " + this.numNotebooks() + "notebooks.");
+				}
+				if (count) {
+					System.out.println("Notebooks parsed: " + this.numNotebooks());
+					System.out.println("Code cells: " + this.numCodeCells());
+				}
+				if (lang) {
+					Map<Language, Integer> languages = this.languages();
+					printLanguageSummary(languages);
+				}
+				if (loc) {
+					System.out.println("Lines of code: " + this.LOC());
+				}
+				if (clones) {
+					this.clones();
+					System.out.println("Clone files created!");
+				}
+				if (langAll) {
+					this.allLanguageValues();
+					System.out.println("File with all language values created!");
 				}
 			} catch (IOException e) {
 				System.err.println("I/O error: " + e.getMessage() + ". Operation interrupted.");
