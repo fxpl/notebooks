@@ -23,6 +23,7 @@ public class Analyzer {
 			LangSpec.METADATA_KERNELSPEC_LANGUAGE, LangSpec.METADATA_KERNELSPEC_NAME,
 			LangSpec.CODE_CELLS};
 	private Map<String, String> repros = null;
+	private String outputDir = ".";	// Default value
 	
 	/**
 	 * Note that when you are done with this Analyzer, you must call the method
@@ -98,13 +99,13 @@ public class Analyzer {
 	 * @throws IOException On problems handling the output file
 	 */
 	public void allAnalyzes() throws IOException {
-		Writer codeCellsWriter = new FileWriter("code_cells" + LocalDateTime.now() + ".csv");
+		Writer codeCellsWriter = new FileWriter(outputDir + "/code_cells" + LocalDateTime.now() + ".csv");
 		codeCellsWriter.write(numCodeCellsHeader());
-		Writer LOCWriter = new FileWriter("loc" + LocalDateTime.now() + ".csv");
+		Writer LOCWriter = new FileWriter(outputDir + "/loc" + LocalDateTime.now() + ".csv");
 		LOCWriter.write(LOCHeader());
-		Writer langWriter = new FileWriter("languages" + LocalDateTime.now() + ".csv");
+		Writer langWriter = new FileWriter(outputDir + "/languages" + LocalDateTime.now() + ".csv");
 		langWriter.write(languagesHeader());
-		Writer allLangWriter = new FileWriter("all_languages" + LocalDateTime.now() + ".csv");
+		Writer allLangWriter = new FileWriter(outputDir + "/all_languages" + LocalDateTime.now() + ".csv");
 		allLangWriter.write(allLanguagesHeader());
 		
 		Map<String, SnippetCode[]> snippets = new HashMap<String, SnippetCode[]>();
@@ -211,7 +212,7 @@ public class Analyzer {
 	}
 
 	private void printHash2files(Map<SnippetCode, List<Snippet>> clones) throws IOException {
-		Writer writer = new FileWriter("hash2files" + LocalDateTime.now() + ".csv");
+		Writer writer = new FileWriter(outputDir + "/hash2files" + LocalDateTime.now() + ".csv");
 		writer.write(hash2filesHeader());
 		for (SnippetCode code: clones.keySet()) {
 			writer.write(code.getHash() + ", " + code.getLOC());
@@ -231,7 +232,7 @@ public class Analyzer {
 	}
 	
 	private void printFile2hashes(Map<String, SnippetCode[]> files) throws IOException {
-		Writer writer = new FileWriter("file2hashes" + LocalDateTime.now() + ".csv");
+		Writer writer = new FileWriter(outputDir + "/file2hashes" + LocalDateTime.now() + ".csv");
 		writer.write(file2hashesHeader());
 		for (String fileName: files.keySet()) {
 			writer.write(fileName);
@@ -253,7 +254,7 @@ public class Analyzer {
 	
 	private void printCloneFrequencies(Map<String, SnippetCode[]> file2Hashes,
 			Map<SnippetCode, List<Snippet>> hash2Files) throws IOException {
-		Writer writer = new FileWriter("cloneFrequency" + LocalDateTime.now() + ".csv");
+		Writer writer = new FileWriter(outputDir + "/cloneFrequency" + LocalDateTime.now() + ".csv");
 		writer.write(cloneFrequencyHeader());
 		for (String fileName: file2Hashes.keySet()) {
 			int numClones = 0, numUnique = 0;
@@ -308,7 +309,7 @@ public class Analyzer {
 	 */
 	private void printConnectionsFile(Map<String, SnippetCode[]> file2snippets,
 			Map<SnippetCode, List<Snippet>> snippet2files) throws IOException {
-		Writer writer = new FileWriter("connections" + LocalDateTime.now() + ".csv");
+		Writer writer = new FileWriter(outputDir + "/connections" + LocalDateTime.now() + ".csv");
 		writer.write(connectionsHeader());
 		for (String fileName: file2snippets.keySet()) {
 			printConnections(fileName, file2snippets, snippet2files, writer);
@@ -455,7 +456,7 @@ public class Analyzer {
 	 * @throws IOException 
 	 */
 	public void allLanguageValues() throws IOException {
-		Writer writer = new FileWriter("all_languages" + LocalDateTime.now() + ".csv");
+		Writer writer = new FileWriter(outputDir + "/all_languages" + LocalDateTime.now() + ".csv");
 		writer.write(allLanguagesHeader());
 		for(Notebook notebook: notebooks) {
 			allLanguageValuesIn(notebook, writer);
@@ -506,7 +507,7 @@ public class Analyzer {
 		for (Language language: Language.values()) {
 			languages.put(language, 0);
 		}
-		Writer writer = new FileWriter("languages" + LocalDateTime.now() + ".csv");
+		Writer writer = new FileWriter(outputDir + "/languages" + LocalDateTime.now() + ".csv");
 		writer.write(languagesHeader());
 		for (int i=0; i<notebooks.size(); i++) {
 			Language language = languageIn(notebooks.get(i), writer);
@@ -549,7 +550,7 @@ public class Analyzer {
 	 */
 	public int LOC() throws IOException {
 		int totalLOC = 0;
-		Writer writer = new FileWriter("loc" + LocalDateTime.now() + ".csv");
+		Writer writer = new FileWriter(outputDir + "/loc" + LocalDateTime.now() + ".csv");
 		writer.write(LOCHeader());
 		for (int i=0; i<notebooks.size(); i++) {
 			totalLOC += LOCIn(notebooks.get(i), writer);
@@ -592,7 +593,7 @@ public class Analyzer {
 	 */
 	public int numCodeCells() throws IOException {
 		int totalNumCodeCells = 0;
-		Writer writer = new FileWriter("code_cells" + LocalDateTime.now() + ".csv");
+		Writer writer = new FileWriter(outputDir + "/code_cells" + LocalDateTime.now() + ".csv");
 		writer.write(numCodeCellsHeader());
 		for (int i=0; i<notebooks.size(); i++) {
 			totalNumCodeCells += numCodeCellsIn(notebooks.get(i), writer);
@@ -642,6 +643,7 @@ public class Analyzer {
 				langAll = false;
 		String reproFile = null;
 		String nbPath = null;
+		String outputDir = null;
 		// Read arguments
 		for (int i=0; i<args.length; i++) {
 			String arg = args[i];
@@ -650,7 +652,7 @@ public class Analyzer {
 				try {
 					nbPath = args[++i];
 				} catch (ArrayIndexOutOfBoundsException e) {
-					System.err.println("Argument '-nb_location' must be followed by the path of the notebook(s)!");
+					System.err.println("Argument '-nb_path' must be followed by the path of the notebook(s)!");
 					System.err.println("No notebooks will be analyzed!");
 				}
 				break;
@@ -658,8 +660,16 @@ public class Analyzer {
 				try {
 					reproFile = args[++i];
 				} catch (ArrayIndexOutOfBoundsException e) {
-					System.err.println("Argument '-repro_file' must be followed by the name of the repro file!");
+					System.err.println("Argument '-repro_file' must be followed by the path to the repro file!");
 					System.err.println("Repro information not initialized!");
+				}
+				break;
+			case "-output_dir":
+				try {
+					outputDir = args[++i];
+				} catch (ArrayIndexOutOfBoundsException e) {
+					System.err.println("Argument '-output_dir' must be followed the the path to the output dir!");
+					System.err.println("Default output directory is used!");
 				}
 				break;
 			case "-all":
@@ -696,6 +706,9 @@ public class Analyzer {
 						System.err.println("Repro file not found: " + e.getMessage());
 						System.err.println("Repro information not initialized!");
 					}
+				}
+				if (null != outputDir) {
+					this.outputDir = outputDir;
 				}
 				if (all) {
 					this.allAnalyzes();
@@ -750,7 +763,6 @@ public class Analyzer {
 
 	public static void main(String[] args) {
 		Analyzer analyzer = new Analyzer();
-		// TODO: Möjlighet att speca output-katalog!
 		analyzer.analyze(args);
 		analyzer.shutDown();
 	}
