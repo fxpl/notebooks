@@ -647,12 +647,9 @@ public class Analyzer {
 			switch (arg) {
 			case "-repro_file":
 				try {
-					initializeReproMap(args[++i]);
+					reproFile = args[++i];
 				} catch (ArrayIndexOutOfBoundsException e) {
 					System.err.println("Argument '-repro_file' must be followed by the name of the repro file!");
-					System.err.println("Repro information not initialized!");
-				} catch (FileNotFoundException e) {
-					System.err.println("Repro file not found: " + e.getMessage());
 					System.err.println("Repro information not initialized!");
 				}
 				break;
@@ -681,11 +678,16 @@ public class Analyzer {
 			// Perform analyzes
 			try {
 				if (null != reproFile) {
-					this.initializeReproMap(reproFile);
+					try {
+						this.initializeReproMap(reproFile);
+					} catch (FileNotFoundException e) {
+						System.err.println("Repro file not found: " + e.getMessage());
+						System.err.println("Repro information not initialized!");
+					}
 				}
 				if (all) {
 					this.allAnalyzes();
-					System.out.println("All analyzes made for " + this.numNotebooks() + "notebooks.");
+					System.out.println("All analyzes made for " + this.numNotebooks() + " notebooks.");
 				}
 				if (count) {
 					System.out.println("Notebooks parsed: " + this.numNotebooks());
@@ -736,6 +738,7 @@ public class Analyzer {
 
 	public static void main(String[] args) {
 		Analyzer analyzer = new Analyzer();
+		// TODO Flagga för sökväg!
 		analyzer.initializeNotebooksFrom(args[0]);
 		analyzer.analyze(Arrays.copyOfRange(args, 1, args.length));
 		analyzer.shutDown();
