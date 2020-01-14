@@ -32,29 +32,31 @@ public class AnalyzerTest {
 	@Test
 	public void testAllAnalyzes() throws IOException { 
 		String testDir = "test/data/all";
-		String fileName = "single_import_diff_langs.ipynb";
+		String notebookFile = "nb_1.ipynb";
+		String reproFile = "repros.csv";
 		String snippetHash = "33BE8D72467938FBB23EF42CF8C9E85F";
 		String[] expectedCodeCellsLines = {codeCellsHeader(),
-				fileName + ", 1"};
+				notebookFile + ", 1"};
 		String[] expectedLOCLines = {LOCHeader(),
-				fileName + ", 2, 1, 1"};
+				notebookFile + ", 2, 1, 1"};
 		String[] expectedLangLines = {languagesHeader(),
-					fileName + ", " + Language.JULIA + ", " + LangSpec.METADATA_LANGUAGEINFO_NAME
+					notebookFile + ", " + Language.JULIA + ", " + LangSpec.METADATA_LANGUAGEINFO_NAME
 				};
 		String[] expectedAllLangLines = {allLanguagesHeader(),
-					fileName + ", " + Language.SCALA + ", " + Language.JULIA + ", "
+					notebookFile + ", " + Language.SCALA + ", " + Language.JULIA + ", "
 					+ Language.R + ", " + Language.OTHER + ", " + Language.PYTHON
 				};
 		String[] expectedFile2hashesLines = {file2hashesHeader(),
-				fileName + ", " + snippetHash};
+				notebookFile + ", " + snippetHash};
 		String[] expectedHash2filesLines = {hash2filesHeader(),
-				snippetHash + ", 1, " + fileName + ", 0"};
+				snippetHash + ", 1, " + notebookFile + ", 0"};
 		String[] expectedCloneFreqLines = {cloneFrequencyHeader(),
-				fileName + ", 0, 1, 0.0000"};
+				notebookFile + ", 0, 1, 0.0000"};
 		String[] expectedConnectionsLines = {connectionsHeader(),
-				fileName + ", 0, 0.0000, 0, 0.0000"};
+				notebookFile + ", 0, 0.0000, 0, 0.0000, 0, 0, 0.0000, 0.0000"};
 		
-		analyzer.initializeNotebooksFrom(testDir + "/" + fileName);
+		analyzer.initializeReproMap(testDir + "/" + reproFile);
+		analyzer.initializeNotebooksFrom(testDir + "/" + notebookFile);
 		analyzer.allAnalyzes();
 		
 		checkCsv("code_cells", expectedCodeCellsLines);
@@ -130,6 +132,7 @@ public class AnalyzerTest {
 				"nb_100.ipynb", "nb_6.ipynb", "nb_7.ipynb",
 				"nb_1.ipynb", "nb_2.ipynb"
 		};
+		String reproFile = "repros.csv";
 		// Expected values
 		Map<SnippetCode, List<Snippet>> expectedClones = new HashMap<SnippetCode, List<Snippet>>();
 		List<Snippet> emptySnippets = new ArrayList<Snippet>(2);
@@ -156,8 +159,12 @@ public class AnalyzerTest {
 		List<Snippet> somePackage = new ArrayList<Snippet>(2);
 		somePackage.add(new Snippet("nb_7.ipynb", 2));
 		expectedClones.put(new SnippetCode(1, "5CA918CC7C216AF51875415D3FE5C21F"), somePackage);
+		List<Snippet> f = new ArrayList<Snippet>(2);
+		f.add(new Snippet("nb_5.ipynb", 1));
+		expectedClones.put(new SnippetCode(1, "ECE926D8C0356205276A45266D361161"), f);
 		
 		// Actual values
+		analyzer.initializeReproMap(dataDir + "/" + reproFile);
 		for (String file: files) {
 			analyzer.initializeNotebooksFrom(dataDir + "/" + file);
 		}
@@ -184,7 +191,8 @@ public class AnalyzerTest {
 	@Test
 	public void testClones_csv_emptyNotebook() throws IOException {
 		String dataDir = "test/data/hash";
-		String fileName = "nb_100.ipynb";
+		String notebookFile = "nb_100.ipynb";
+		String reproMapName = "repros.csv";
 		String[] expectedSnippetLines = {
 				file2hashesHeader()
 		};
@@ -193,15 +201,16 @@ public class AnalyzerTest {
 		};
 		String[] expectedFrequencyLines = {
 				cloneFrequencyHeader(),
-				fileName + ", 0, 0, 0"
+				notebookFile + ", 0, 0, 0"
 		};
 		String[] expectedConnectionsLines = {
 				connectionsHeader(),
-				fileName + ", 0, 0.0000, 0, 0.0000"
+				notebookFile + ", 0, 0.0000, 0, 0.0000, 0, 0, 0.0000, 0.0000"
 		};
 		
 		// Actual values
-		analyzer.initializeNotebooksFrom(dataDir + "/" + fileName);
+		analyzer.initializeReproMap(dataDir + "/" + reproMapName);
+		analyzer.initializeNotebooksFrom(dataDir + "/" + notebookFile);
 		analyzer.clones();
 		
 		checkCsv("file2hashes", expectedSnippetLines);
@@ -222,27 +231,29 @@ public class AnalyzerTest {
 	@Test
 	public void testClones_csv_singleSnippet() throws IOException {
 		String dataDir = "test/data/hash";
-		String fileName = "nb_6.ipynb";
+		String notebookFile = "nb_6.ipynb";
+		String reproFile = "repros.csv";
 		String hash = "33BE8D72467938FBB23EF42CF8C9E85F";
 		String[] expectedSnippetLines = {
 				file2hashesHeader(),
-				fileName + ", " + hash + ", " + hash
+				notebookFile + ", " + hash + ", " + hash
 		};
 		String[] expectedClonesLines = {
 				hash2filesHeader(),
-				hash + ", 1, " + fileName + ", 0, " + fileName + ", 1"
+				hash + ", 1, " + notebookFile + ", 0, " + notebookFile + ", 1"
 		};
 		String[] expectedFrequencyLiens = {
 				cloneFrequencyHeader(),
-				fileName + ", 2, 0, 1.0000"
+				notebookFile + ", 2, 0, 1.0000"
 		};
 		String[] expectedConnectionsLines = {
 				connectionsHeader(),
-				fileName + ", 2, 1.0000, 2, 1.0000"
+				notebookFile + ", 2, 1.0000, 2, 1.0000, 2, 2, 0.0000, 0.0000"
 		};
 		
 		// Actual values
-		analyzer.initializeNotebooksFrom(dataDir + "/" + fileName);
+		analyzer.initializeReproMap(dataDir + "/" + reproFile);
+		analyzer.initializeNotebooksFrom(dataDir + "/" + notebookFile);
 		analyzer.clones();
 		
 		checkCsv("file2hashes", expectedSnippetLines);
@@ -263,27 +274,29 @@ public class AnalyzerTest {
 	@Test
 	public void testClones_csv_intraClone() throws IOException {
 		String dataDir = "test/data/hash";
-		String fileName = "nb_1.ipynb";
+		String notebookFile = "nb_1.ipynb";
+		String reproFile = "repros.csv";
 		String hash = "0120F99AA7C49E1CD5F4EE4A6BB1CC4A";
 		String[] expectedFile2HashesLines = {
 				file2hashesHeader(),
-				fileName + ", " + hash + ", " + hash
+				notebookFile + ", " + hash + ", " + hash
 		};
 		String[] expectedHash2FileLines = {
 				hash2filesHeader(),
-				hash + ", 1, " + fileName + ", 0, " + fileName + ", 1"
+				hash + ", 1, " + notebookFile + ", 0, " + notebookFile + ", 1"
 		};
 		String[] expectedFrequencyLines = {
 				cloneFrequencyHeader(),
-				fileName + ", 2, 0, 1.0000"
+				notebookFile + ", 2, 0, 1.0000"
 		};
 		String[] expectedConnectionsLines = {
 				connectionsHeader(),
-				fileName + ", 2, 1.0000, 2, 1.0000"
+				notebookFile + ", 2, 1.0000, 2, 1.0000, 2, 2, 0.0000, 0.0000"
 		};
 		
 		// Actual values
-		analyzer.initializeNotebooksFrom(dataDir + "/" + fileName);
+		analyzer.initializeReproMap(dataDir + "/" + reproFile);
+		analyzer.initializeNotebooksFrom(dataDir + "/" + notebookFile);
 		analyzer.clones();
 		
 		checkCsv("file2hashes", expectedFile2HashesLines);
@@ -304,25 +317,27 @@ public class AnalyzerTest {
 	@Test
 	public void testClones_csv_mixed() throws IOException {
 		String dataDir = "test/data/hash";
-		String fileName = "nb_2.ipynb";
+		String notebookFile = "nb_2.ipynb";
+		String reproFile = "repros.csv";
 		String kossaHash = "0120F99AA7C49E1CD5F4EE4A6BB1CC4A";
 		String uniqueHash = "A2D53E3DA394A52271CF00632C961D2A";
 		String[] expectedFile2HashesLines = {
 			file2hashesHeader(),
-			fileName + ", " + kossaHash + ", " + uniqueHash + ", " + kossaHash
+			notebookFile + ", " + kossaHash + ", " + uniqueHash + ", " + kossaHash
 		};
 		// hash2Files is hard to test since we don't know in which order the hashes are stored
 		String[] expectedFrequencyLines = {
 			cloneFrequencyHeader(),
-			fileName + ", 2, 1, 0.6667"
+			notebookFile + ", 2, 1, 0.6667"
 		};
 		String[] expectedConnectionsLines = {
 			connectionsHeader(),
-			fileName + ", 2, 0.6667, 2, 0.6667"
+			notebookFile + ", 2, 0.6667, 2, 0.6667, 2, 2, 0.0000, 0.0000"
 		};
 		
 		// Actual values
-		analyzer.initializeNotebooksFrom(dataDir + "/" + fileName);
+		analyzer.initializeReproMap(dataDir + "/" + reproFile);
+		analyzer.initializeNotebooksFrom(dataDir + "/" + notebookFile);
 		analyzer.clones();
 		
 		checkCsv("file2hashes", expectedFile2HashesLines);
@@ -340,21 +355,24 @@ public class AnalyzerTest {
 	@Test
 	public void testConnectionsCsv_all() throws IOException {
 		String dataDir = "test/data/hash";
+		String reproFile = "repros.csv";
 		String[] expectedLines = {
 				connectionsHeader(),
-				"nb_4.ipynb, 2, 2.0000, 0, 0.0000",
-				"nb_5.ipynb, 2, 2.0000, 0, 0.0000",
-				"nb_1.ipynb, 6, 3.0000, 6, 3.0000",
-				"nb_2.ipynb, 7, 2.3333, 7, 2.3333",
-				"nb_3.ipynb, 1, 1.0000, 1, 1.0000",
-				"nb_100.ipynb, 0, 0.0000, 0, 0.0000",
-				"nb_6.ipynb, 4, 2.0000, 4, 2.0000",
-				"nb_7.ipynb, 5, 1.6667, 5, 1.6667",
-				"nb_10.ipynb, 2, 2.0000, 0, 0.0000",
-				"nb_8.ipynb, 1, 1.0000, 1, 1.0000",
-				"nb_9.ipynb, 4, 2.0000, 4, 2.0000"
+				"nb_4.ipynb, 2, 2.0000, 0, 0.0000, 1, 0, 1.0000, 0.0000",
+				"nb_5.ipynb, 3, 1.5000, 1, 1.0000, 1, 0, 1.0000, 1.0000",
+				"nb_1.ipynb, 6, 3.0000, 6, 3.0000, 2, 2, 4.0000, 4.0000",
+				"nb_2.ipynb, 7, 2.3333, 7, 2.3333, 3, 3, 4.0000, 4.0000",
+				"nb_3.ipynb, 1, 1.0000, 1, 1.0000, 1, 1, 0.0000, 0.0000",
+				"nb_100.ipynb, 0, 0.0000, 0, 0.0000, 0, 0, 0.0000, 0.0000",
+				"nb_6.ipynb, 4, 2.0000, 4, 2.0000, 4, 4, 0.0000, 0.0000",
+				"nb_7.ipynb, 5, 1.6667, 5, 1.6667, 2, 2, 1.5000, 1.5000",
+				"nb_10.ipynb, 2, 2.0000, 0, 0.0000, 0, 0, 2.0000, 0.0000",
+				"nb_8.ipynb, 1, 1.0000, 1, 1.0000, 0, 0, 1.0000, 1.0000",
+				"nb_9.ipynb, 4, 2.0000, 4, 2.0000, 2, 2, 2.0000, 2.0000",
+				"nb_11.ipynb, 1, 1.0000, 1, 1.0000, 0, 0, 1.0000, 1.0000"
 		};
 		
+		analyzer.initializeReproMap(dataDir + "/" + reproFile);
 		analyzer.initializeNotebooksFrom(dataDir);
 		analyzer.clones();
 		
@@ -563,7 +581,8 @@ public class AnalyzerTest {
 	 * @return Expected header of connections files
 	 */
 	private static String connectionsHeader() {
-		return "file, connections, connections normalized, non-empty connections, non-empty connections normalized";
+		return "file, connections, connections normalized, non-empty connections, non-empty connections normalized"
+				+ "intra repro connections, non-empty intra repro connections, mean inter repro connections, mean non-empty inter repro connections";
 	}
 	
 	/**

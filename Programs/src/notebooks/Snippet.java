@@ -21,6 +21,13 @@ public class Snippet {
 				&& otherSnippet.snippetIndex == this.snippetIndex;
 	}
 	
+	/**
+	 * @return The file name of the notebook where the snippet resides
+	 */
+	String getFileName() {
+		return fileName;
+	}
+	
 	@Override
 	public int hashCode() {
 		return Objects.hash(fileName, snippetIndex);

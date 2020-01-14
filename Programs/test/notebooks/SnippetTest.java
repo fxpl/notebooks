@@ -47,6 +47,11 @@ public class SnippetTest {
 	}
 	
 	@Test
+	public void testGetName() {
+		assertEquals("Wrong file name returned for snippet!",  name, snippet.getFileName());
+	}
+	
+	@Test
 	public void testHashCode() {
 		int expectedHashCode = Objects.hash(name, index);
 		assertEquals("Wrong hash code returned!", expectedHashCode, snippet.hashCode());
