@@ -643,6 +643,7 @@ public class Analyzer {
 		String reproFile = null;
 		String nbPath = null;
 		String outputDir = null;
+
 		// Read arguments
 		for (int i=0; i<args.length; i++) {
 			String arg = args[i];
@@ -692,49 +693,49 @@ public class Analyzer {
 			default:
 				System.err.println("Unknown argument: " + arg);
 			}
+		}
 			
-			// Perform analyzes
-			try {
-				if (null != nbPath) {
-					this.initializeNotebooksFrom(nbPath);
-				}
-				if (null != reproFile) {
-					try {
-						this.initializeReproMap(reproFile);
-					} catch (FileNotFoundException e) {
-						System.err.println("Repro file not found: " + e.getMessage());
-						System.err.println("Repro information not initialized!");
-					}
-				}
-				if (null != outputDir) {
-					this.outputDir = outputDir;
-				}
-				if (all) {
-					this.allAnalyzes();
-					System.out.println("All analyzes made for " + this.numNotebooks() + " notebooks.");
-				}
-				if (count) {
-					System.out.println("Notebooks parsed: " + this.numNotebooks());
-					System.out.println("Code cells: " + this.numCodeCells());
-				}
-				if (lang) {
-					Map<Language, Integer> languages = this.languages();
-					printLanguageSummary(languages);
-				}
-				if (loc) {
-					System.out.println("Lines of code: " + this.LOC());
-				}
-				if (clones) {
-					this.clones();
-					System.out.println("Clone files created!");
-				}
-				if (langAll) {
-					this.allLanguageValues();
-					System.out.println("File with all language values created!");
-				}
-			} catch (IOException e) {
-				System.err.println("I/O error: " + e.getMessage() + ". Operation interrupted.");
+		// Perform analyzes
+		try {
+			if (null != nbPath) {
+				this.initializeNotebooksFrom(nbPath);
 			}
+			if (null != reproFile) {
+				try {
+					this.initializeReproMap(reproFile);
+				} catch (FileNotFoundException e) {
+					System.err.println("Repro file not found: " + e.getMessage());
+					System.err.println("Repro information not initialized!");
+				}
+			}
+			if (null != outputDir) {
+				this.outputDir = outputDir;
+			}
+			if (all) {
+				this.allAnalyzes();
+				System.out.println("All analyzes made for " + this.numNotebooks() + " notebooks.");
+			}
+			if (count) {
+				System.out.println("Notebooks parsed: " + this.numNotebooks());
+				System.out.println("Code cells: " + this.numCodeCells());
+			}
+			if (lang) {
+				Map<Language, Integer> languages = this.languages();
+				printLanguageSummary(languages);
+			}
+			if (loc) {
+				System.out.println("Lines of code: " + this.LOC());
+			}
+			if (clones) {
+				this.clones();
+				System.out.println("Clone files created!");
+			}
+			if (langAll) {
+				this.allLanguageValues();
+				System.out.println("File with all language values created!");
+			}
+		} catch (IOException e) {
+			System.err.println("I/O error: " + e.getMessage() + ". Operation interrupted.");
 		}
 	}
 
