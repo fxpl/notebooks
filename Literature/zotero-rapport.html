@@ -1,0 +1,4396 @@
+<!DOCTYPE html>
+<html><head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<title>Zotero-rapport</title>
+		<link rel="stylesheet" type="text/css" href="data:text/css;base64,Ym9keSB7CgliYWNrZ3JvdW5kOiB3aGl0ZTsKfQoKYSB7Cgl0ZXh0LWRlY29yYXRpb246IHVuZGVybGluZTsKfQoKYm9keSB7CglwYWRkaW5nOiAwOwp9Cgp1bC5yZXBvcnQgbGkuaXRlbSB7Cglib3JkZXItdG9wOiA0cHggc29saWQgIzU1NTsKCXBhZGRpbmctdG9wOiAxZW07CglwYWRkaW5nLWxlZnQ6IDFlbTsKCXBhZGRpbmctcmlnaHQ6IDFlbTsKCW1hcmdpbi1ib3R0b206IDJlbTsKfQoKaDEsIGgyLCBoMywgaDQsIGg1LCBoNiB7Cglmb250LXdlaWdodDogbm9ybWFsOwp9CgpoMiB7CgltYXJnaW46IDAgMCAuNWVtOwp9CgpoMi5wYXJlbnRJdGVtIHsKCWZvbnQtd2VpZ2h0OiBib2xkOwoJZm9udC1zaXplOiAxZW07CglwYWRkaW5nOiAwIDAgLjVlbTsKCWJvcmRlci1ib3R0b206IDFweCBzb2xpZCAjY2NjOwp9CgovKiBJZiBjb21iaW5pbmcgY2hpbGRyZW4sIGRpc3BsYXkgcGFyZW50IHNsaWdodGx5IGxhcmdlciAqLwp1bC5yZXBvcnQuY29tYmluZUNoaWxkSXRlbXMgaDIucGFyZW50SXRlbSB7Cglmb250LXNpemU6IDEuMWVtOwoJcGFkZGluZy1ib3R0b206IC43NWVtOwoJbWFyZ2luLWJvdHRvbTogLjRlbTsKfQoKaDIucGFyZW50SXRlbSAudGl0bGUgewoJZm9udC13ZWlnaHQ6IG5vcm1hbDsKfQoKaDMgewoJbWFyZ2luLWJvdHRvbTogLjZlbTsKCWZvbnQtd2VpZ2h0OiBib2xkICFpbXBvcnRhbnQ7Cglmb250LXNpemU6IDFlbTsKCWRpc3BsYXk6IGJsb2NrOwp9CgovKiBNZXRhZGF0YSB0YWJsZSAqLwp0aCB7Cgl2ZXJ0aWNhbC1hbGlnbjogdG9wOwoJdGV4dC1hbGlnbjogcmlnaHQ7Cgl3aWR0aDogMTUlOwoJd2hpdGUtc3BhY2U6IG5vd3JhcDsKfQoKdGQgewoJcGFkZGluZy1sZWZ0OiAuNWVtOwp9CgoKdWwucmVwb3J0LCB1bC5ub3RlcywgdWwudGFncyB7CglsaXN0LXN0eWxlOiBub25lOwoJbWFyZ2luLWxlZnQ6IDA7CglwYWRkaW5nLWxlZnQ6IDA7Cn0KCi8qIFRhZ3MgKi8KaDMudGFncyB7Cglmb250LXNpemU6IDEuMWVtOwp9Cgp1bC50YWdzIHsKCWxpbmUtaGVpZ2h0OiAxLjc1ZW07CglsaXN0LXN0eWxlOiBub25lOwp9Cgp1bC50YWdzIGxpIHsKCWRpc3BsYXk6IGlubGluZTsKfQoKdWwudGFncyBsaTpub3QoOmxhc3QtY2hpbGQpOmFmdGVyIHsKCWNvbnRlbnQ6ICcsICc7Cn0KCgovKiBDaGlsZCBub3RlcyAqLwpoMy5ub3RlcyB7Cglmb250LXNpemU6IDEuMWVtOwp9Cgp1bC5ub3RlcyB7CgltYXJnaW4tYm90dG9tOiAxLjJlbTsKfQoKdWwubm90ZXMgPiBsaTpmaXJzdC1jaGlsZCBwIHsKCW1hcmdpbi10b3A6IDA7Cn0KCnVsLm5vdGVzID4gbGkgewoJcGFkZGluZzogLjdlbSAwOwp9Cgp1bC5ub3RlcyA+IGxpOm5vdCg6bGFzdC1jaGlsZCkgewoJYm9yZGVyLWJvdHRvbTogMXB4ICNjY2Mgc29saWQ7Cn0KCgp1bC5ub3RlcyA+IGxpIHA6Zmlyc3QtY2hpbGQgewoJbWFyZ2luLXRvcDogMDsKfQoKdWwubm90ZXMgPiBsaSBwOmxhc3QtY2hpbGQgewoJbWFyZ2luLWJvdHRvbTogMDsKfQoKLyogQWRkIHF1b3RhdGlvbiBtYXJrcyBhcm91bmQgYmxvY2txdW90ZSAqLwp1bC5ub3RlcyA+IGxpIGJsb2NrcXVvdGUgcDpub3QoOmVtcHR5KTpiZWZvcmUsCmxpLm5vdGUgYmxvY2txdW90ZSBwOm5vdCg6ZW1wdHkpOmJlZm9yZSB7Cgljb250ZW50OiAn4oCcJzsKfQoKdWwubm90ZXMgPiBsaSBibG9ja3F1b3RlIHA6bm90KDplbXB0eSk6bGFzdC1jaGlsZDphZnRlciwKbGkubm90ZSBibG9ja3F1b3RlIHA6bm90KDplbXB0eSk6bGFzdC1jaGlsZDphZnRlciB7Cgljb250ZW50OiAn4oCdJzsKfQoKLyogUHJlc2VydmUgd2hpdGVzcGFjZSBvbiBwbGFpbnRleHQgbm90ZXMgKi8KdWwubm90ZXMgbGkgcC5wbGFpbnRleHQsIGxpLm5vdGUgcC5wbGFpbnRleHQsIGRpdi5ub3RlIHAucGxhaW50ZXh0IHsKCXdoaXRlLXNwYWNlOiBwcmUtd3JhcDsKfQoKLyogRGlzcGxheSB0YWdzIHdpdGhpbiBjaGlsZCBub3RlcyBpbmxpbmUgKi8KdWwubm90ZXMgaDMudGFncyB7CglkaXNwbGF5OiBpbmxpbmU7Cglmb250LXNpemU6IDFlbTsKfQoKdWwubm90ZXMgaDMudGFnczphZnRlciB7Cgljb250ZW50OiAnICc7Cn0KCnVsLm5vdGVzIHVsLnRhZ3MgewoJZGlzcGxheTogaW5saW5lOwp9Cgp1bC5ub3RlcyB1bC50YWdzIGxpOm5vdCg6bGFzdC1jaGlsZCk6YWZ0ZXIgewoJY29udGVudDogJywgJzsKfQoKCi8qIENoaWxkIGF0dGFjaG1lbnRzICovCmgzLmF0dGFjaG1lbnRzIHsKCWZvbnQtc2l6ZTogMS4xZW07Cn0KCnVsLmF0dGFjaG1lbnRzIGxpIHsKCXBhZGRpbmctdG9wOiAuNWVtOwp9Cgp1bC5hdHRhY2htZW50cyBkaXYubm90ZSB7CgltYXJnaW4tbGVmdDogMmVtOwp9Cgp1bC5hdHRhY2htZW50cyBkaXYubm90ZSBwOmZpcnN0LWNoaWxkIHsKCW1hcmdpbi10b3A6IC43NWVtOwp9Cg==">
+		<link rel="stylesheet" type="text/css" media="screen,projection" href="data:text/css;base64,LyogR2VuZXJpYyBzdHlsZXMgKi8KYm9keSB7Cglmb250OiA2Mi41JSBHZW9yZ2lhLCBUaW1lcywgc2VyaWY7Cgl3aWR0aDogNzgwcHg7CgltYXJnaW46IDAgYXV0bzsKfQoKaDIgewoJZm9udC1zaXplOiAxLjVlbTsKCWxpbmUtaGVpZ2h0OiAxLjVlbTsKCWZvbnQtZmFtaWx5OiBHZW9yZ2lhLCBUaW1lcywgc2VyaWY7Cn0KCnAgewoJbGluZS1oZWlnaHQ6IDEuNWVtOwp9CgphOmxpbmssIGE6dmlzaXRlZCB7Cgljb2xvcjogIzkwMDsKfQoKYTpob3ZlciwgYTphY3RpdmUgewoJY29sb3I6ICM3Nzc7Cn0KCgp1bC5yZXBvcnQgewoJZm9udC1zaXplOiAxLjRlbTsKCXdpZHRoOiA2ODBweDsKCW1hcmdpbjogMCBhdXRvOwoJcGFkZGluZzogMjBweCAyMHB4Owp9CgovKiBNZXRhZGF0YSB0YWJsZSAqLwp0YWJsZSB7Cglib3JkZXI6IDFweCAjY2NjIHNvbGlkOwoJb3ZlcmZsb3c6IGF1dG87Cgl3aWR0aDogMTAwJTsKCW1hcmdpbjogLjFlbSBhdXRvIC43NWVtOwoJcGFkZGluZzogMC41ZW07Cn0K">
+		<link rel="stylesheet" type="text/css" media="print" href="data:text/css;base64,Ym9keSB7Cglmb250OiAxMnB0ICJUaW1lcyBOZXcgUm9tYW4iLCBUaW1lcywgR2VvcmdpYSwgc2VyaWY7CgltYXJnaW46IDA7Cgl3aWR0aDogYXV0bzsKCWNvbG9yOiBibGFjazsKfQoKLyogUGFnZSBCcmVha3MgKHBhZ2UtYnJlYWstaW5zaWRlIG9ubHkgcmVjb2duaXplZCBieSBPcGVyYSkgKi8KaDEsIGgyLCBoMywgaDQsIGg1LCBoNiB7CglwYWdlLWJyZWFrLWFmdGVyOiBhdm9pZDsKCXBhZ2UtYnJlYWstaW5zaWRlOiBhdm9pZDsKfQoKdWwsIG9sLCBkbCB7CglwYWdlLWJyZWFrLWluc2lkZTogYXZvaWQ7Cgljb2xvci1hZGp1c3Q6IGV4YWN0Owp9CgpoMiB7Cglmb250LXNpemU6IDEuM2VtOwoJbGluZS1oZWlnaHQ6IDEuM2VtOwp9CgphIHsKCWNvbG9yOiAjMDAwOwoJdGV4dC1kZWNvcmF0aW9uOiBub25lOwp9Cg==">
+	</head>
+	<body>
+		<ul class="report combineChildItems">
+			<li id="item_BJQRFBWE" class="item conferencePaper">
+			<h2>A Large-Scale Study About Quality and Reproducibility of Jupyter Notebooks</h2>
+				<table>
+					<tbody><tr>
+						<th>Typ</th>
+						<td>Konferensartikel</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Joao Felipe Pimentel</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Leonardo Murta</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Vanessa Braganholo</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Juliana Freire</td>
+					</tr>
+					<tr>
+					<th>Webbadress</th>
+						<td><a href="https://ieeexplore.ieee.org/document/8816763/">https://ieeexplore.ieee.org/document/8816763/</a></td>
+					</tr>
+					<tr>
+					<th>Ort</th>
+						<td>Montreal, QC, Canada</td>
+					</tr>
+					<tr>
+					<th>Utgivare</th>
+						<td>IEEE</td>
+					</tr>
+					<tr>
+					<th>Sidor</th>
+						<td>507-517</td>
+					</tr>
+					<tr>
+					<th>ISBN</th>
+						<td>978-1-72813-412-3</td>
+					</tr>
+					<tr>
+					<th>Datum</th>
+						<td>5/2019</td>
+					</tr>
+					<tr>
+					<th>DOI</th>
+						<td><a href="http://doi.org/10.1109/MSR.2019.00077">10.1109/MSR.2019.00077</a></td>
+					</tr>
+					<tr>
+					<th>Hämtad den</th>
+						<td>2019-09-30 13:12:03</td>
+					</tr>
+					<tr>
+					<th>Bibliotekskatalog</th>
+						<td>Crossref</td>
+					</tr>
+					<tr>
+					<th>Namn på konferens</th>
+						<td>2019 IEEE/ACM 16th International Conference on Mining Software Repositories (MSR)</td>
+					</tr>
+					<tr>
+					<th>Språk</th>
+						<td>en</td>
+					</tr>
+					<tr>
+					<th>Sammanfattning</th>
+						<td>Jupyter Notebooks have been widely adopted by many different 
+communities, both in science and industry. They support the creation of 
+literate programming documents that combine code, text, and execution 
+results with visualizations and all sorts of rich media. The 
+self-documenting aspects and the ability to reproduce results have been 
+touted as signiﬁcant beneﬁts of notebooks. At the same time, there has 
+been growing criticism that the way notebooks are being used leads to 
+unexpected behavior, encourage poor coding practices, and that their 
+results can be hard to reproduce. To understand good and bad practices 
+used in the development of real notebooks, we studied 1.4 million 
+notebooks from GitHub. We present a detailed analysis of their 
+characteristics that impact reproducibility. We also propose a set of 
+best practices that can improve the rate of reproducibility and discuss 
+open challenges that require further research and development.</td>
+					</tr>
+					<tr>
+					<th>Protokolltitel</th>
+						<td>2019 IEEE/ACM 16th International Conference on Mining Software Repositories (MSR)</td>
+					</tr>
+					<tr>
+					<th>Tillagd den</th>
+						<td>2019-09-30 13:12:03</td>
+					</tr>
+					<tr>
+					<th>Ändrad den</th>
+						<td>2019-12-17 17:13:22</td>
+					</tr>
+				</tbody></table>
+				<h3 class="tags">Etiketter:</h3>
+				<ul class="tags">
+					<li>Software quality</li>
+					<li>Notebooks</li>
+					<li>GitHub mining</li>
+				</ul>
+				<h3 class="attachments">Bifogade dokument</h3>
+				<ul class="attachments">
+					<li id="item_R3SDMM4P">Pimentel m. fl. - 2019 - A Large-Scale Study About Quality and Reproducibil.pdf						<div class="note"><div><p>Tidigare kritik mot Jupyter notebooks inkluderar:</p>
+<ul>
+<li>"hidden states"</li>
+<li>oväntad exekveringsordning med fragmenterad kod</li>
+<li>dåliga practices för namngivning, versionshantering, testning och modularisering av kod</li>
+<li>beroenden (med rätt version) är inte inkodade i formatet</li>
+</ul>
+<p>Författarna utgår från detta och undersöker Jupyter notebooks på 
+GitHub med målet att se hur reproducerbara Jupyter notebooks är.</p>
+<p>De utgår från de notebooks som lades upp på GitHub mellan 1/1 2013 
+(året då Jupyter notebooks lanserades) och 16/4 2018, 1 450 071 stycken.
+ De exkluderar ogiltiga och tomma notebooks, samt duplicerade dito. De 
+sistnämnda hittar de genom att jämföra hashar.</p>
+<p>De hävdar att 43 204 notebooks inte specar språk. 33 378 av dessa har
+ nbformat&lt;4 som är den första språkagnostiska Jupyterreleasen. Det 
+senare borde innebära att de använder Python, men författarna exkluderar
+ dessa ur datasetet.</p>
+<p>De kommer fram till att:</p>
+<ul>
+<li>fördelningen av antal notebooks/repro är väldigt högerskeva</li>
+<li>de mest förekommande språken är Python (93,32%), R (1,31%) och Julia (0,93%).</li>
+<li>de flesta notebooksen innehåller markdownceller och knappt 1/4 av 
+alla celler är markdowndito. Texten i dessa är dock ofta kort och 
+innehåller inte features som listor, länkar och bilder. De konstaterar 
+att innehållet i markdowncellerna kanske inte räcker för välbeskrivna 
+narrativ.</li>
+<li>notebooksens namn är ofta korta men meningsfulla, men innehåller ofta olämpliga tecken, d.v.s. annat än [A-Z a-z 0-9 ._-].</li>
+<li>de mest frekvent importerade modulerna i Pythonnotebooksen är numpy, matplotlib och pandas.</li>
+<li>53,94% respektive 8,54% av alla syntaktiskt korrekta Pythonnotebooks
+ definierar funktioner respektive klasser. Dock är det vanligare med 
+funktioner i notebooks som även innnehåller loopar eller villkorssatser 
+(d.v.s. ett lite mer komplicerat programflöde). Funktionerna extraheras 
+sällan i lokala moduler.</li>
+<li>enligt en ganska grov uppskattning importerar endast 1,54% av de 
+syntaktiskt korrekta Pythonnotebooksen testmoduler. (Det oftast 
+importerade testpaketet är en modul från en kurs, som har forkats 3211 
+gånger. :-D) Författarna förklarar detta med att vetenskaplig kod ofta 
+är svårtestad. (Jag är inte övertygad om att det är en giltig ursäkt!) 
+Men de tycker att en testsvit är viktig för reproducerbarhetens skull.</li>
+<li>de flesta notebooks innehåller output, vilket författarna tycker är 
+bra för reproducerbarheten eftersom det gör att andra kan jämföra sina 
+resultat med dessa.</li>
+<li>bland de notebooks som hade exekverats (d.v.s. innehöll info om i 
+vilken ordning cellerna har exekverats) hade 21,11% icke-exekverade 
+celler och 62,08% hade tomma celler. Antalet icke-exekverade och tomma 
+celler ökar mot slutet av notebooksen.</li>
+<li>i 36,36% av de notebooks som hade en otvetydig exekveringsordning 
+hade cellerna exekverats i en annan ordning än uppifrån och ner.</li>
+</ul>
+<p>De försöker reproducera resultaten i 788 781 notebooks, vilket är 
+antalet som inte är korrupta, hade otvetydig exekveringsordning, och 
+inte hade trasiga beroenden. De avbröt exekveringen om den tog mer än 5 
+miunter, vilket var fallet för 9982 stycken. 570 476 exekveringar 
+kastade undantag. De vanligaste undantagen var, i ordning, ImportError, 
+NameError (d.v.s. odefinierad variabel), ModuleNotFoundError och 
+FileNotFoundError. De odefinierade variablerna har förmodligen att göra 
+med exekveringsordningen och "hidden states".</p>
+<p>Sammantaget exekverade de 208 323 av notebooksen. Endast 34 836 av 
+dessa gav samma resultat som förlagan, trots att studiens författare 
+exekverade cellerna i samma ordning som de var exekverade av 
+notebookförfattarna.</p>
+<p>&nbsp;</p>
+<p>De föreslår även ett antal "best practices" som ungefär säger att och hur man ska undvika de misstag som beskrivs ovan.</p>
+<p>&nbsp;</p>
+<p>Data och kod finns tillgängligt online!</p></div>
+					</div>					</li>
+				</ul>
+			</li>
+
+
+			<li id="item_X94AYJ6P" class="item webpage">
+			<h2>A Preliminary Analysis on the Use of Python Notebooks</h2>
+				<table>
+					<tbody><tr>
+						<th>Typ</th>
+						<td>Webbsida</td>
+					</tr>
+					<tr>
+					<th>Webbadress</th>
+						<td><a href="https://blog.bitergia.com/2018/04/02/a-preliminary-analysis-on-the-use-of-python-notebooks/">https://blog.bitergia.com/2018/04/02/a-preliminary-analysis-on-the-use-of-python-notebooks/</a></td>
+					</tr>
+					<tr>
+					<th>Datum</th>
+						<td>2018-04-02T10:44:24+00:00</td>
+					</tr>
+					<tr>
+					<th>Hämtad den</th>
+						<td>2019-10-04 15:34:37</td>
+					</tr>
+					<tr>
+					<th>Språk</th>
+						<td>en-US</td>
+					</tr>
+					<tr>
+					<th>Sammanfattning</th>
+						<td>The adoption of Python notebooks to perform data analysis has 
+considerably increased, becoming a de-facto standard within data 
+scientists communities. But, which Python libraries are used on them? 
+Notebooks are interactive human-readable documents, which contain the 
+analysis description and the results (e.g, figures, tables) as well as 
+the Python code used to perform data analysis.... Continue Reading →</td>
+					</tr>
+					<tr>
+					<th>Titel på webbplats</th>
+						<td>Bitergia Software Development Analytics</td>
+					</tr>
+					<tr>
+					<th>Tillagd den</th>
+						<td>2019-10-04 15:34:37</td>
+					</tr>
+					<tr>
+					<th>Ändrad den</th>
+						<td>2019-10-31 13:02:30</td>
+					</tr>
+				</tbody></table>
+				<h3 class="tags">Etiketter:</h3>
+				<ul class="tags">
+					<li>Notebooks</li>
+				</ul>
+				<h3 class="attachments">Bifogade dokument</h3>
+				<ul class="attachments">
+					<li id="item_5LJDLDSN">Snapshot						<div class="note"><div><p>Undersöker
+ vilka bibliotek som importeras i "Python notebooks", vilka bibliotek 
+som används tillsammans och hur de importeras. Analysen bygger på 2702 
+slumpmässigt valda Python/Jupyter notebooks från GitHub.</p>
+<p>Presenterar de 30 mest använda biblioteken. numpy och matplotlib 
+kommer i topp. Därefter, tvärtemot Ulfs resultat kommer IPython. Det 
+följs av pandas (som i Ulfs studie var topp 3 tillsammans med numpy och 
+matplotlib).</p>
+<p>Kommer även fram till att de flesta bibliotek används i kombination 
+med något annat. De undersöker också hur bibliotek från en och samma 
+kategori används tillsammans. Visualiseringsbibliotek används 
+tillsammans med varandra i högre utsträckning än 
+maskininlärningsbibliotek.</p>
+<p>Man kan importera bibliotek i sin helhet, eller välja att bara 
+importera enstaka paket från ett bibliotek. De kommer fram till att 
+kärnbibliotek som numpy oftast importeras i sin helhet, medan bara 
+enstaka paket importeras från många andra bibliotek. Författaren tror 
+att detta beror på hur dokumentationen är skriven för de olika 
+biblioteken.</p>
+<p>&nbsp;</p>
+<p>I vissa notebooks importeras hela bibliotek flera gånger. Det visar 
+sig (vid manuell koll) vara notebooks som används som 
+utbildningsmaterial och tutorials, där varje cell representerar ett 
+fristående program.</p></div>
+					</div>					</li>
+				</ul>
+			</li>
+
+
+			<li id="item_XQ5HM4K6" class="item conferencePaper">
+			<h2>A study of the uniqueness of source code</h2>
+				<table>
+					<tbody><tr>
+						<th>Typ</th>
+						<td>Konferensartikel</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Mark Gabel</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Zhendong Su</td>
+					</tr>
+					<tr>
+					<th>Webbadress</th>
+						<td><a href="http://portal.acm.org/citation.cfm?doid=1882291.1882315">http://portal.acm.org/citation.cfm?doid=1882291.1882315</a></td>
+					</tr>
+					<tr>
+					<th>Ort</th>
+						<td>Santa Fe, New Mexico, USA</td>
+					</tr>
+					<tr>
+					<th>Utgivare</th>
+						<td>ACM Press</td>
+					</tr>
+					<tr>
+					<th>Sidor</th>
+						<td>147</td>
+					</tr>
+					<tr>
+					<th>ISBN</th>
+						<td>978-1-60558-791-2</td>
+					</tr>
+					<tr>
+					<th>Datum</th>
+						<td>2010</td>
+					</tr>
+					<tr>
+					<th>DOI</th>
+						<td><a href="http://doi.org/10.1145/1882291.1882315">10.1145/1882291.1882315</a></td>
+					</tr>
+					<tr>
+					<th>Hämtad den</th>
+						<td>2019-12-06 13:30:15</td>
+					</tr>
+					<tr>
+					<th>Bibliotekskatalog</th>
+						<td>Crossref</td>
+					</tr>
+					<tr>
+					<th>Namn på konferens</th>
+						<td>the eighteenth ACM SIGSOFT international symposium</td>
+					</tr>
+					<tr>
+					<th>Språk</th>
+						<td>en</td>
+					</tr>
+					<tr>
+					<th>Sammanfattning</th>
+						<td>This paper presents the results of the ﬁrst study of the 
+uniqueness of source code. We deﬁne the uniqueness of a unit of source 
+code with respect to the entire body of written software, which we 
+approximate with a corpus of 420 million lines of source code. Our 
+high-level methodology consists of examining a collection of 6,000 
+software projects and measuring the degree to which each project can be 
+‘assembled’ solely from portions of this corpus, thus providing a 
+precise measure of ‘uniqueness’ that we call syntactic redundancy. We 
+parameterized our study over a variety of variables, the most important 
+of which being the level of granularity at which we view source code. 
+Our suite of experiments together consumed approximately four months of 
+CPU time, providing quantitative answers to the following questions: at 
+what levels of granularity is software unique, and at a given level of 
+granularity, how unique is software? While we believe these questions to
+ be of intrinsic interest, we discuss possible applications to genetic 
+programming and developer productivity tools.</td>
+					</tr>
+					<tr>
+					<th>Protokolltitel</th>
+						<td>Proceedings of the eighteenth ACM SIGSOFT international symposium on Foundations of software engineering - FSE '10</td>
+					</tr>
+					<tr>
+					<th>Tillagd den</th>
+						<td>2019-12-06 13:30:15</td>
+					</tr>
+					<tr>
+					<th>Ändrad den</th>
+						<td>2019-12-06 13:30:15</td>
+					</tr>
+				</tbody></table>
+				<h3 class="attachments">Bifogade dokument</h3>
+				<ul class="attachments">
+					<li id="item_ZWK4G2PD">Gabel och Su - 2010 - A study of the uniqueness of source code.pdf						<div class="note"><div><p>[Översiktligt läst]</p>
+<p>Författarna approximerar "all källkod" med ett 420 000 000-rader 
+korpus. De undersöker sedan 6000 mjukvaruprojekt för att ta reda på i 
+vilken utsträckning koden i varje projekt kan byggas av "byggstenar" (i 
+form av kodblock) från deras korpus, d.v.s. i vilken utsträckning de är 
+"icke-unika".</p>
+<p>De kommer fram till att det finns en "general lack of uniqueness in 
+software at levels of granularity equivalent to approximately one to 
+seven lines of source code". Jag tolkar detta som att i princip all 
+mjukvara kankonstrueras av kodblock på 1-7 rader från deras korpus 
+(\approx all mjukvara), men är inte säker efter att bara ha läst 
+abstract och conclusions. Kunde vara intressant att läsa vidare, men 
+kanske inte den mest relevanta artikeln för Jupyterprojektet.</p></div>
+					</div>					</li>
+				</ul>
+			</li>
+
+
+			<li id="item_QRRIZX3A" class="item journalArticle">
+			<h2>Aiding Collaborative Reuse of Computational Notebooks with Annotated Cell Folding</h2>
+				<table>
+					<tbody><tr>
+						<th>Typ</th>
+						<td>Tidskriftsartikel</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Adam Rule</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Ian Drosos</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Aurélien Tabard</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>James D. Hollan</td>
+					</tr>
+					<tr>
+					<th>Webbadress</th>
+						<td><a href="http://dl.acm.org/citation.cfm?doid=3290265.3274419">http://dl.acm.org/citation.cfm?doid=3290265.3274419</a></td>
+					</tr>
+					<tr>
+					<th>Band/Årgång</th>
+						<td>2</td>
+					</tr>
+					<tr>
+					<th>Nummer</th>
+						<td>CSCW</td>
+					</tr>
+					<tr>
+					<th>Sidor</th>
+						<td>1-12</td>
+					</tr>
+					<tr>
+					<th>Publikation</th>
+						<td>Proceedings of the ACM on Human-Computer Interaction</td>
+					</tr>
+					<tr>
+					<th>ISSN</th>
+						<td>25730142</td>
+					</tr>
+					<tr>
+					<th>Datum</th>
+						<td>2018-11-01</td>
+					</tr>
+					<tr>
+					<th>DOI</th>
+						<td><a href="http://doi.org/10.1145/3274419">10.1145/3274419</a></td>
+					</tr>
+					<tr>
+					<th>Hämtad den</th>
+						<td>2019-09-27 14:52:50</td>
+					</tr>
+					<tr>
+					<th>Bibliotekskatalog</th>
+						<td>Crossref</td>
+					</tr>
+					<tr>
+					<th>Språk</th>
+						<td>en</td>
+					</tr>
+					<tr>
+					<th>Tillagd den</th>
+						<td>2019-09-27 14:52:50</td>
+					</tr>
+					<tr>
+					<th>Ändrad den</th>
+						<td>2019-10-07 13:16:35</td>
+					</tr>
+				</tbody></table>
+				<h3 class="tags">Etiketter:</h3>
+				<ul class="tags">
+					<li>Notebooks</li>
+				</ul>
+				<h3 class="attachments">Bifogade dokument</h3>
+				<ul class="attachments">
+					<li id="item_FGNGD7NK">Rule m. fl. - 2018 - Aiding Collaborative Reuse of Computational Notebo.pdf						<div class="note"><div><p>[Översiktligt läst]</p>
+<p>Skapar en extension till Jupyter notebooks -"Janus", som gör det 
+möjligt att "fälla ihop" celler i notebooksen. De testar konceptet på 32
+ data science-studenter och på 3 mer erfarna analytiker. De kommer fram 
+till att "cell folding" underlättar både den ursprungliga analysen och 
+återanvändning av notebooksen (för gruppresentationer eller samarbete 
+med andra).</p>
+<p>"Cell foldingen" riskerar dock att göra att användaren missar att 
+läsa relevanta ihopfällda celler eller lägger för mycket tid på att 
+studera översiktsvyn.</p>
+<p>Dessa för- och nackdelar har även setts i tidigare studier, på andra medier.</p>
+<p>&nbsp;</p></div>
+					</div>					</li>
+				</ul>
+			</li>
+
+
+			<li id="item_J4QKKS3A" class="item journalArticle">
+			<h2>Better Code, Better Sharing: On the Need of Analyzing Jupyter Notebooks</h2>
+				<table>
+					<tbody><tr>
+						<th>Typ</th>
+						<td>Tidskriftsartikel</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Jiawei Wang</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Li Li</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Andreas Zeller</td>
+					</tr>
+					<tr>
+					<th>Sidor</th>
+						<td>5</td>
+					</tr>
+					<tr>
+					<th>Bibliotekskatalog</th>
+						<td>Zotero</td>
+					</tr>
+					<tr>
+					<th>Språk</th>
+						<td>en</td>
+					</tr>
+					<tr>
+					<th>Sammanfattning</th>
+						<td>By bringing together code, text, and examples, Jupyter 
+notebooks have become one of the most popular means to produce scientiﬁc
+ results in a productive and reproducible way. As many of the notebook 
+authors are experts in their scientiﬁc ﬁelds, but laymen with respect to
+ software engineering, one may ask questions on the quality of notebooks
+ and their code. In a preliminary study, we experimentally demonstrate 
+that Jupyter notebooks are inundated with poor quality code, e.g., not 
+respecting recommended coding practices, or containing unused variables 
+and deprecated functions. Considering the education nature of Jupyter 
+notebooks, these poor coding practices as well as the lacks of quality 
+control might be propagated into the next generation of developers. 
+Hence, we argue that there is a strong need to programmatically analyze 
+Jupyter notebooks, calling on our community to pay more attention to the
+ reliability of Jupyter notebooks.</td>
+					</tr>
+					<tr>
+					<th>Tillagd den</th>
+						<td>2019-10-28 13:12:30</td>
+					</tr>
+					<tr>
+					<th>Ändrad den</th>
+						<td>2019-10-31 13:23:51</td>
+					</tr>
+				</tbody></table>
+				<h3 class="tags">Etiketter:</h3>
+				<ul class="tags">
+					<li>Software quality</li>
+					<li>Notebooks</li>
+				</ul>
+				<h3 class="attachments">Bifogade dokument</h3>
+				<ul class="attachments">
+					<li id="item_SFLQIAVC">Wang m. fl. - Better Code, Better Sharing On the Need of Analyz.pdf						<div class="note"><div><p>Verkar vara skriven i September 2018. Accessdatum på en flera referenser: 2019-05-10.</p>
+<p>Hävdar (med referens) att Jupyter notebooks är de facto standard för 
+data scientists. Skriver också att de (så vitt de vet) är de första som 
+motiverar en djup analys av Jupyter notebooks. Tycker bland annat att 
+man ska titta efter duplicerad kod och ineffektiva algoritmer.</p>
+<p>Argumenterar för att kodkvalitet är viktig i Jupyter notebooks 
+eftersom de ofta används som utbildningsmaterial, och brister riskerar 
+att propagera till nästa generation. (De undersöker dock inte i <strong>vilka</strong> notebooks nedan nämnda brister finns.)</p>
+<p>Påpekar också att många forskningsresultat beror på beräkningar från notebooks.</p>
+<p>Tycker att Jupyter notebooks behöver analyseras för att kodkvalitet 
+och -korrekthet samt överrensstämmelse mellan kod och text ska kunna 
+"säkerställas".</p>
+<p>Författarna analyserar 1982 Pythonbaserade notebooks och kommer fram 
+till att att LOC i snitt är 102,5 medan medianen är 62. Hälften av 
+notebooksen har &gt; 10 kodceller.</p>
+<p>De använder verktyget PEP8 för att analysera kodkvaliteten. På de 202
+ 332 raderna kod ger PEP8 73 371 fel (d.v.s. &gt; 1 fel på var tredje 
+rad). När de analyserar Pythonskript (i samma repron) som inte är 
+notebooks får de bara 60 878 fel på 452 953 rader kod (1 fel på var 
+7,4:e rad).</p>
+<p>Det finns 2056 oanvända variabler i korpusen, utspridda över 803 notebooks.</p>
+<p>214 notebooks använder ett specifikt bibliotek, "Scikit-Learn". Av 
+dessa anropar 75 stycken (35%) något deprecated "API" (fast jag tror att
+ de menar funktion).</p>
+<p>Avslutar med olika (ganska vaga) förslag på vad communityt borde göra.</p></div>
+					</div>					</li>
+				</ul>
+			</li>
+
+
+			<li id="item_42CUM92U" class="item conferencePaper">
+			<h2>CCAligner: a token based large-gap clone detector</h2>
+				<table>
+					<tbody><tr>
+						<th>Typ</th>
+						<td>Konferensartikel</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Pengcheng Wang</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Jeffrey Svajlenko</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Yanzhao Wu</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Yun Xu</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Chanchal K. Roy</td>
+					</tr>
+					<tr>
+					<th>Webbadress</th>
+						<td><a href="http://dl.acm.org/citation.cfm?doid=3180155.3180179">http://dl.acm.org/citation.cfm?doid=3180155.3180179</a></td>
+					</tr>
+					<tr>
+					<th>Ort</th>
+						<td>Gothenburg, Sweden</td>
+					</tr>
+					<tr>
+					<th>Utgivare</th>
+						<td>ACM Press</td>
+					</tr>
+					<tr>
+					<th>Sidor</th>
+						<td>1066-1077</td>
+					</tr>
+					<tr>
+					<th>ISBN</th>
+						<td>978-1-4503-5638-1</td>
+					</tr>
+					<tr>
+					<th>Datum</th>
+						<td>2018</td>
+					</tr>
+					<tr>
+					<th>DOI</th>
+						<td><a href="http://doi.org/10.1145/3180155.3180179">10.1145/3180155.3180179</a></td>
+					</tr>
+					<tr>
+					<th>Hämtad den</th>
+						<td>2019-10-03 15:00:24</td>
+					</tr>
+					<tr>
+					<th>Bibliotekskatalog</th>
+						<td>Crossref</td>
+					</tr>
+					<tr>
+					<th>Namn på konferens</th>
+						<td>the 40th International Conference</td>
+					</tr>
+					<tr>
+					<th>Språk</th>
+						<td>en</td>
+					</tr>
+					<tr>
+					<th>Sammanfattning</th>
+						<td>Copying code and then pasting with large number of edits is a 
+common activity in software development, and the pasted code is a kind 
+of complicated Type-3 clone. Due to large number of edits, we consider 
+the clone as a large-gap clone. Large-gap clone can reflect the 
+extension of code, such as change and improvement. The existing 
+state-of-the-art clone detectors suffer from several limitations in 
+detecting large-gap clones. In this paper, we propose a tool, CCAligner,
+ using code window that considers e edit distance for matching to detect
+ large-gap clones. In our approach, a novel e-mismatch index is designed
+ and the asymmetric similarity coefficient is used for similarity 
+measure. We thoroughly evaluate CCAligner both for large-gap clone 
+detection, and for general Type-1, Type-2 and Type-3 clone detection. 
+The results show that CCAligner performs better than other competing 
+tools in large-gap clone detection, and has the best execution time for 
+10MLOC input with good precision and recall in general Type-1 to Type-3 
+clone detection. Compared with existing state-of-the-art tools, 
+CCAligner is the best performing large-gap clone detection tool, and 
+remains competitive with the best clone detectors in general Type-1, 
+Type-2 and Type-3 clone detection.</td>
+					</tr>
+					<tr>
+					<th>Protokolltitel</th>
+						<td>Proceedings of the 40th International Conference on Software Engineering  - ICSE '18</td>
+					</tr>
+					<tr>
+					<th>Kort titel</th>
+						<td>CCAligner</td>
+					</tr>
+					<tr>
+					<th>Tillagd den</th>
+						<td>2019-10-03 15:00:24</td>
+					</tr>
+					<tr>
+					<th>Ändrad den</th>
+						<td>2019-10-31 14:00:48</td>
+					</tr>
+				</tbody></table>
+				<h3 class="tags">Etiketter:</h3>
+				<ul class="tags">
+					<li>Cloning</li>
+					<li>Clone detection tools</li>
+				</ul>
+				<h3 class="attachments">Bifogade dokument</h3>
+				<ul class="attachments">
+					<li id="item_DHXA7C77">Wang m. fl. - 2018 - CCAligner a token based large-gap clone detector.pdf						<div class="note"><div><p>[Halvnoggrant läst]</p>
+<p>Presenterar verktyget CCAlinger som ska kunna hitta typ 3-kloner med 
+stora skillnader ("large-gap clones"). I praktiken definierar de 
+"large-gap clones" som typ 3-kloner där de två snippetsen dessutom 
+skiljer sig mycket i storlek.</p>
+<p>De jämför sitt verktyg med NiCad och SourcererCC med samma input som 
+SourcererCC-studien använde. De kommer fram till att CCAlinger är bättre
+ än de andra två på large-gap-kloner, och jämförbar när det gäller 
+(vanliga) typ 1-3-kloner. (SourcererCC är minst lika bra här!) 
+Exekveringstiderna ligger nära SourcererCC:s</p>
+<p>Emellertid får CCAligner slut på minne (gräns: 12GB) när de försöker 
+processa 100MLOC, vilket är en storlek som SourcererCC klarar. 
+Författarna förklarar detta med att SourcererCC specifikt är designat 
+för storskalig klondetektering, medan de själva främst fokuserar på 
+"large-gap clones".</p>
+<p>Verkar bara kunna processa C och Java.</p>
+<p>&nbsp;</p>
+<p>Trädbaserade klondetekteringsverktyg är långsamma enligt författarna.
+ De hävdar vidare (med referens till SourcererCC-artikeln) att NiCad och
+ SourcererCC är de klondetekteringsverktyg i litteraturen som har bäst 
+prestanda.</p>
+<p>Enligt 2 referenser i denna är 6 rader och 50 token standard-minimumstorlek på kloner.</p></div>
+					</div>					</li>
+				</ul>
+			</li>
+
+
+			<li id="item_KTXINWZN" class="item conferencePaper">
+			<h2>Characterizing Duplicate Code Snippets between Stack Overflow and Tutorials</h2>
+				<table>
+					<tbody><tr>
+						<th>Typ</th>
+						<td>Konferensartikel</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Manziba Akanda Nishi</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Agnieszka Ciborowska</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Kostadin Damevski</td>
+					</tr>
+					<tr>
+					<th>Webbadress</th>
+						<td><a href="https://ieeexplore.ieee.org/document/8816800/">https://ieeexplore.ieee.org/document/8816800/</a></td>
+					</tr>
+					<tr>
+					<th>Ort</th>
+						<td>Montreal, QC, Canada</td>
+					</tr>
+					<tr>
+					<th>Utgivare</th>
+						<td>IEEE</td>
+					</tr>
+					<tr>
+					<th>Sidor</th>
+						<td>240-244</td>
+					</tr>
+					<tr>
+					<th>ISBN</th>
+						<td>978-1-72813-412-3</td>
+					</tr>
+					<tr>
+					<th>Datum</th>
+						<td>5/2019</td>
+					</tr>
+					<tr>
+					<th>DOI</th>
+						<td><a href="http://doi.org/10.1109/MSR.2019.00048">10.1109/MSR.2019.00048</a></td>
+					</tr>
+					<tr>
+					<th>Hämtad den</th>
+						<td>2019-09-30 12:38:01</td>
+					</tr>
+					<tr>
+					<th>Bibliotekskatalog</th>
+						<td>Crossref</td>
+					</tr>
+					<tr>
+					<th>Namn på konferens</th>
+						<td>2019 IEEE/ACM 16th International Conference on Mining Software Repositories (MSR)</td>
+					</tr>
+					<tr>
+					<th>Språk</th>
+						<td>en</td>
+					</tr>
+					<tr>
+					<th>Sammanfattning</th>
+						<td>Developers are usually unaware of the quality and lineage of 
+information available on popular Web resources, leading to potential 
+maintenance problems and license violations when reusing code snippets 
+from these resources. In this paper, we study the duplication of code 
+snippets between two popular sources of software development 
+information: the Stack Overﬂow Q&amp;A site and software development 
+tutorials. Our goals are to empirically understand the scale of repeated
+ information between these two sources, to gain insight into why 
+developers copy information from one source to the other, and to 
+understand the evolution of duplicated information over time. To this 
+end, we correlate a set of nearly 600 tutorials on Android available on 
+the Web to the SOTorrent dataset, which isolates code snippets from 
+Stack Overﬂow posts and tracks their changes over time. Our ﬁndings 
+reveal that there are over 1,400 duplicate code snippets related to 
+Android on Stack Overﬂow. Code that was duplicated on the two sources is
+ effective at answering Stack Overﬂow questions; a signiﬁcant number 
+(31%) of answers that contained a duplicate code block were chosen as 
+the accepted answer. Qualitative analysis reveals that developers 
+commonly use Stack Overﬂow to ask clarifying questions about code they 
+reused from tutorials, and copy code snippets from tutorials to provide 
+answers to questions.</td>
+					</tr>
+					<tr>
+					<th>Protokolltitel</th>
+						<td>2019 IEEE/ACM 16th International Conference on Mining Software Repositories (MSR)</td>
+					</tr>
+					<tr>
+					<th>Tillagd den</th>
+						<td>2019-09-30 12:38:01</td>
+					</tr>
+					<tr>
+					<th>Ändrad den</th>
+						<td>2019-10-29 14:13:46</td>
+					</tr>
+				</tbody></table>
+				<h3 class="tags">Etiketter:</h3>
+				<ul class="tags">
+					<li>Cloning</li>
+					<li>StackOverflow</li>
+				</ul>
+				<h3 class="attachments">Bifogade dokument</h3>
+				<ul class="attachments">
+					<li id="item_JFFB8PPB">Nishi m. fl. - 2019 - Characterizing Duplicate Code Snippets between Sta.pdf						<div class="note"><div><p>[Översiktligt läst]</p>
+<p>Identifierar kodsnippets som finns både på StackOverflow och i någon 
+av 600 undersökta Android-tutorials på nätet. De hittar 1400 snippets 
+som förekommer på båda ställena. Anledningarna är att folk ofta frågar 
+om förtydliganden av kod som de har hittat i tutorials, och att snippets
+ från tutorials ofta kopieras in i ett svar på StackOverflow-frågor. 31%
+ av dessa svar hade blivit "accepted answer".</p></div>
+					</div>					</li>
+				</ul>
+			</li>
+
+
+			<li id="item_4547DX22" class="item conferencePaper">
+			<h2>Cloning by accident: an empirical study of source code cloning across software systems</h2>
+				<table>
+					<tbody><tr>
+						<th>Typ</th>
+						<td>Konferensartikel</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>R. Al-Ekram</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>C. Kapser</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>R. Holt</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>M. Godfrey</td>
+					</tr>
+					<tr>
+					<th>Webbadress</th>
+						<td><a href="http://ieeexplore.ieee.org/document/1541846/">http://ieeexplore.ieee.org/document/1541846/</a></td>
+					</tr>
+					<tr>
+					<th>Ort</th>
+						<td>Queensland, Australia</td>
+					</tr>
+					<tr>
+					<th>Utgivare</th>
+						<td>IEEE</td>
+					</tr>
+					<tr>
+					<th>Sidor</th>
+						<td>363-372</td>
+					</tr>
+					<tr>
+					<th>ISBN</th>
+						<td>978-0-7803-9507-7</td>
+					</tr>
+					<tr>
+					<th>Datum</th>
+						<td>2005</td>
+					</tr>
+					<tr>
+					<th>DOI</th>
+						<td><a href="http://doi.org/10.1109/ISESE.2005.1541846">10.1109/ISESE.2005.1541846</a></td>
+					</tr>
+					<tr>
+					<th>Hämtad den</th>
+						<td>2019-12-06 13:25:49</td>
+					</tr>
+					<tr>
+					<th>Bibliotekskatalog</th>
+						<td>Crossref</td>
+					</tr>
+					<tr>
+					<th>Namn på konferens</th>
+						<td>2005 International Symposium on Empirical Software Engineering, 2005.</td>
+					</tr>
+					<tr>
+					<th>Språk</th>
+						<td>en</td>
+					</tr>
+					<tr>
+					<th>Sammanfattning</th>
+						<td>One of the key goals of open source development is the sharing
+ of knowledge, experience, and solutions that pertain to a software 
+system and its problem domain. Source code cloning is one way in which 
+expertise can be reused across systems; cloning is known to have been 
+used in several open source projects, such as the SCSI drivers of the 
+Linux kernel [16]. In this paper, we discuss two case studies in which 
+we performed clone detection on several open source systems within the 
+same domain. In the first case study we examined nine text editors 
+written in C, and in the second study we examined eight X-Windows window
+ managers written in C and C++. To our surprise, we found little 
+evidence of "true" cloning activity, but we did notice a significant 
+number of "accidental" clones --- that is, code fragments that are 
+similar due to the precise protocols they must use when interacting with
+ a given API or set of libraries. We further discuss the nature of 
+"true" versus "accidental" clones, as well as the details of our case 
+studies.</td>
+					</tr>
+					<tr>
+					<th>Protokolltitel</th>
+						<td>2005 International Symposium on Empirical Software Engineering, 2005.</td>
+					</tr>
+					<tr>
+					<th>Kort titel</th>
+						<td>Cloning by accident</td>
+					</tr>
+					<tr>
+					<th>Tillagd den</th>
+						<td>2019-12-06 13:25:49</td>
+					</tr>
+					<tr>
+					<th>Ändrad den</th>
+						<td>2019-12-17 13:46:15</td>
+					</tr>
+				</tbody></table>
+				<h3 class="tags">Etiketter:</h3>
+				<ul class="tags">
+					<li>Cloning</li>
+				</ul>
+				<h3 class="attachments">Bifogade dokument</h3>
+				<ul class="attachments">
+					<li id="item_69QVL5UN">Al-Ekram m. fl. - 2005 - Cloning by accident an empirical study of source .pdf						<div class="note"><div><p>Författarna
+ gör 2 fallstudier av kodkloning: bland texteditorer och bland 
+fönsterhanterare för X. De använder CCFinder samt ett 
+postprocessingssystem som heter CLICS. De tittar bara på 
+inter-projektkloner, inte kloner inom ett projekt. De sätter 
+minimumstorleken av en klon till 30 token.</p>
+<p>Texteditorerna (9 stycken) är alla skrivna i C och består av 913 000 
+LOC i 1197 filer. Endast 0,49% av raderna ingår i klonfragment. Nästan 
+alla "kloner" är relaterade till UI:n och har inte blivit kopierade utan
+ uppstått av en händelse för att de implementerar snarlik 
+funktionalitet.</p>
+<p>Fönsterhanterarna (8 stycken) består av sammanlagt 491 655 LOC 
+uppdelad på 1031 filer. Så lite som 0,29% av raderna ingår i 
+klonfragment. Även här är majoriteten av klonbaren "accidental", men 
+författarna hittar också fall där de är övertygade om att kod faktiskt 
+har kopierats (om än ganska få).</p>
+<p>De definierar kloning som "the act of intentional duplication of code
+ fragment with possible customization". Detta innebär att "clones by 
+accident" (även benämnt som "accidental clones") tekniskt sett inte är 
+kloner, eftersom de är lika bara av en händelse. De förklarar begreppet 
+"accidental clone" som "clones that appear not through explicit copy and
+ paste, but as a side effect of using similar libraries and interfaces".</p>
+<p>De föreslår att API-utvecklare ska skapa abstraktioner för de 
+"accidental clones" som uppstår för att man behöver anropa en viss följd
+ av funktioner i ett API för att använda en viss funktionalitet.</p>
+<p>I tidigare studier har man sett att kloningsfrekvensen <em>inom</em> 
+projekt är 10-15%, vilket är betydligt högre än den här studiens 
+resultat. Författarna förklarar detta med att man i regel klonar den kod
+ man är bekant med, vilket ofta inte är andra projekts kod. De nämner 
+också att en anledning kan vara att man inte vet var man ska leta efter 
+kod att kopiera.</p></div>
+					</div>					</li>
+				</ul>
+			</li>
+
+
+			<li id="item_76XC3JNB" class="item journalArticle">
+			<h2>Code Cloning Habits Of The Jupyter Notebook Community</h2>
+				<table>
+					<tbody><tr>
+						<th>Typ</th>
+						<td>Tidskriftsartikel</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Ulf Sigvardsson</td>
+					</tr>
+					<tr>
+					<th>Sidor</th>
+						<td>48</td>
+					</tr>
+					<tr>
+					<th>Bibliotekskatalog</th>
+						<td>Zotero</td>
+					</tr>
+					<tr>
+					<th>Språk</th>
+						<td>en</td>
+					</tr>
+					<tr>
+					<th>Tillagd den</th>
+						<td>2019-09-02 16:37:42</td>
+					</tr>
+					<tr>
+					<th>Ändrad den</th>
+						<td>2019-10-07 12:43:39</td>
+					</tr>
+				</tbody></table>
+				<h3 class="tags">Etiketter:</h3>
+				<ul class="tags">
+					<li>Cloning</li>
+					<li>Notebooks</li>
+					<li>GitHub mining</li>
+				</ul>
+				<h3 class="attachments">Bifogade dokument</h3>
+				<ul class="attachments">
+					<li id="item_XXMVG6IR">Sigvardsson - Code Cloning Habits Of The Jupyter Notebook Commun.pdf						<div class="note"><div><p>Samlar
+ ihop Jupyter Notebooks från github och extraherar alla kodsnippets, 
+totalt 32 288 102 snippets från 2 603 321 notebooks. Han klipper bort 
+alla kommentarer, blanktecken och radbrytningar. Därefter MD5-hashar han
+ alla snippets och mappar snippets med identiska hashar (=typ 1-kloner) 
+till ett och samma "kluster".</p>
+<p>Han räknar ut dupliceringsratio för varje notebook som:<br>(NumberOfSnippets - NumberOfUniqueSnippets) / (NumberOfSnippets)</p>
+<p>Inkluderar forkade notebooks, vilket vi inte ska göra!</p>
+<p>Han räknar ut:</p>
+<ul>
+<li>distributionen av språk i notebooksen. Python dominerar starkt 
+(94,93%). Därefter kommer Julia, R och Scala (0,79%, 0,79% respektive 
+0,16%). Visualiserar med torusdiagram.</li>
+<li>andel klonade snippets, för varje språk och för hela datamängden. Visualiserar med heat maps.</li>
+</ul>
+<p>Sedan analyserar han vilka paket som importeras tillsammans i 
+Python-notebooks. Räknar ut "normalized level of complementarity" som<br>P(A|B) - P(A), där<br>P(A|B) = (antal notebooks som innehåller A och B) / (antal notebooks som innehåller A)<br>P(A) = (antal instanser av A) / (totalt antal imports)<br>P(A)
+ är alltså sannolikheten att en *import* ska vara A, medan P(A|B) 
+snarast verkar vara den betingade sannolikheten för att en *notebook* 
+innehåller B givet att den innehåller A (normalt betecknad P(B|A)).</p>
+<p>Analysen sker för var och en av grupperna<br>1) 0-50 kB<br>2) 50-100 kB<br>3) 1-30 MB</p>
+<p>De vanligaste paketen (i alla grupperna) är numpy, pandas och 
+matplotlib. (Dessa används ofta tillsammans och brukar kallas för "the 
+scientific Python stack".) Ju större filer, desto större sannolikhet för
+ import av var och ett av dessa 3 paket (och även några andra).</p>
+<p>Han kommer vidare fram till att:</p>
+<ul>
+<li>12,6% av notebooksen innehåller bara unika snippets</li>
+<li>Ungefär 75% av alla snippets finns i minst 2 olika notebooks</li>
+<li>53,9% av alla notebooks består helt och hållet av kloner</li>
+<li>en genomsnittlig notebook består till 69,8% av klonade snippets</li>
+</ul>
+<p>Pratar om att alla negativa korrelationer är små, men verkar inte 
+räkna ut några korrelationer mellan någonting. (Förmodligen menar han 
+negativ "normalized level och complementarity".)</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p></div>
+					</div>					</li>
+				</ul>
+			</li>
+
+
+			<li id="item_UBFS5NM8" class="item journalArticle">
+			<h2>Cross-project code clones in GitHub</h2>
+				<table>
+					<tbody><tr>
+						<th>Typ</th>
+						<td>Tidskriftsartikel</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Mohammad Gharehyazie</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Baishakhi Ray</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Mehdi Keshani</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Masoumeh Soleimani Zavosht</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Abbas Heydarnoori</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Vladimir Filkov</td>
+					</tr>
+					<tr>
+					<th>Webbadress</th>
+						<td><a href="http://link.springer.com/10.1007/s10664-018-9648-z">http://link.springer.com/10.1007/s10664-018-9648-z</a></td>
+					</tr>
+					<tr>
+					<th>Band/Årgång</th>
+						<td>24</td>
+					</tr>
+					<tr>
+					<th>Nummer</th>
+						<td>3</td>
+					</tr>
+					<tr>
+					<th>Sidor</th>
+						<td>1538-1573</td>
+					</tr>
+					<tr>
+					<th>Publikation</th>
+						<td>Empirical Software Engineering</td>
+					</tr>
+					<tr>
+					<th>ISSN</th>
+						<td>1382-3256, 1573-7616</td>
+					</tr>
+					<tr>
+					<th>Datum</th>
+						<td>6/2019</td>
+					</tr>
+					<tr>
+					<th>DOI</th>
+						<td><a href="http://doi.org/10.1007/s10664-018-9648-z">10.1007/s10664-018-9648-z</a></td>
+					</tr>
+					<tr>
+					<th>Hämtad den</th>
+						<td>2019-09-27 14:58:04</td>
+					</tr>
+					<tr>
+					<th>Bibliotekskatalog</th>
+						<td>Crossref</td>
+					</tr>
+					<tr>
+					<th>Språk</th>
+						<td>en</td>
+					</tr>
+					<tr>
+					<th>Sammanfattning</th>
+						<td>Code reuse has well-known benefits on code quality, coding 
+efficiency, and maintenance. Open Source Software (OSS) programmers 
+gladly share their own code and they happily reuse others’. Social 
+programming platforms like GitHub have normalized code foraging via 
+their common platforms, enabling code search and reuse across different 
+projects. Removing project borders may facilitate more efficient code 
+foraging, and consequently faster programming. But looking for code 
+across projects takes longer and, once found, may be more challenging to
+ tailor to one’s needs. Learning how much code reuse goes on across 
+projects, and identifying emerging patterns in past cross-project search
+ behavior may help future foraging efforts. Our contribution is two 
+fold. First, to understand crossproject code reuse, here we present an 
+in-depth empirical study of cloning in GitHub. Using Deckard, a popular 
+clone finding tool, we identified copies of code fragments across 
+projects, and investigate their prevalence and characteristics using 
+statistical and network science approaches, and with multiple case 
+studies. By triangulating findings from different analysis methods, we 
+find that cross-project cloning is prevalent in GitHub, ranging from 
+cloning few lines of code to whole project repositories. Some of the 
+projects serve as popular sources of clones, and others seem to contain 
+more clones than their fair share. Moreover, we find that ecosystem 
+cloning follows an onion model: most clones come from the same project, 
+then from projects in the same application domain, and finally from 
+projects in different domains. Second, we utilized these results to 
+develop a novel tool named CLONE-HUNTRESS that streamlines finding and 
+tracking code clones in GitHub. The tool is GitHub integrated, built 
+around a user-friendly interface and runs efficiently over a modern 
+database system. We describe the tool and make it publicly available at 
+http:// clone-det.ictic.sharif.edu/.</td>
+					</tr>
+					<tr>
+					<th>Tillagd den</th>
+						<td>2019-09-27 14:58:04</td>
+					</tr>
+					<tr>
+					<th>Ändrad den</th>
+						<td>2019-12-09 15:14:02</td>
+					</tr>
+				</tbody></table>
+				<h3 class="tags">Etiketter:</h3>
+				<ul class="tags">
+					<li>Cloning</li>
+					<li>GitHub mining</li>
+				</ul>
+				<h3 class="attachments">Bifogade dokument</h3>
+				<ul class="attachments">
+					<li id="item_CTX74D9G">Gharehyazie m. fl. - 2019 - Cross-project code clones in GitHub.pdf						<div class="note"><div><p>Använder
+ Deckard för att identifiera kloner över projektgränser. Deckard är 
+AST-baserad och de använder det för att hitta typ 2-kloner (inkl. typ 
+1-kloner). Skriver att detta kommer underskatta antalet kloner, eftersom
+ många kloner kan ha haft små förändringar sedan kloningen.</p>
+<p>De tittar på de GitHub-Javaprojekt med minst 2 utvecklare, 1 år på 
+nacken och 10 commits och som inte är forkar, 8599 stycken. 5753 av 
+dessa innehåller kloner. Dessa projekt består sammanlagt av 105 000 000 
+rader kod fördelad på 1040 000 filer.</p>
+<p>De gör 3 olika analyser i vilka klonerna måste vara minst 20, 30 
+respektive 50 token (tror jag; så som texten är skriven låter det som 
+att detta är längden på tokenen, men det verkar mer sannolikt att det 
+skulle vara #token).</p>
+<p>De inför begreppet <em>utility clones</em>, vilket är kopior av hela 
+filer, kataloger eller till och med projekt. De hanterar dessa separat 
+med motiveringen att "the borrowing dynamics" skiljer sig från vanliga 
+kloner.</p>
+<p>De kommer fram till att kloner är vanligt förekommande och att 5-10% 
+av kodbasen, i de projekt som innehåller kloner, utgörs av klonad kod.</p>
+<p>De flesta kloner kommer från samma projekt som de förekommer i. 
+Därefter kommer projekt från samma tillämpningsområde och sist projekt 
+från andra tillämpningsområden.</p>
+<p>Antalet klonade rader växer med projektstorleken, men i långsammare takt.</p>
+<p>De har manuellt studerat 90 kloninstanser, slumpvis valda bland de kloner som är &gt;= 30 token. De visar sig vara:</p>
+<ol>
+<li>(38% av klonerna) kodsnuttar som implementerar liknande funktionalitet</li>
+<li>(32% av klonerna) kodsnuttar med liknande struktur</li>
+<li>(28% av klonerna) metoder som implementerar liknande funktionalitet</li>
+<li>(2% av klonerna) autogenererade filer</li>
+</ol>
+<p>De tittar även på utilitykloner och lyckas kategorisera dessa i 5 
+kategorier. De drar slutsatsen att det finns vissa kodmönster som 
+förekommer i många olika projekt.</p>
+<p>De tittar på hur kod klonas mellan projekt, under antagandet att den 
+äldsta instansen av en given klon är källan och att de andra är kopior. 
+(De påpekar att detta inte är en klockren strategi, men de har inte 
+hittat något bättre sätt.) Det visar sig att de flesta projekt 
+innehåller fler kopior än källor. Det finns också vissa projekt som är 
+"superkällor", d.v.s. koden i dessa är klonad till andra projekt i 
+väldigt hög grad.</p>
+<p>De utvecklar ett eget klondetekteringsverktyg "CLONE-HUNTRESS", som 
+finns tillgängligt att använda. Det tycks&nbsp; vara avsett för att man 
+ska jämföra sin egen kod med deras databas.</p>
+<p>Motiveringen till att använda Deckard är att den har bra prestanda 
+för stora dataset, men de skriver att de i framtiden vill använda 
+SourcererCC istället för Deckard som bas för CLONE-HUNTRESS, för att öka
+ prestandan.</p>
+<p>De påpekar att Deckard inte kan hitta kloner över projektgränser (men de har en workaround).</p>
+<p>&nbsp;</p></div>
+					</div>					</li>
+				</ul>
+			</li>
+
+
+			<li id="item_5BWUGZJ7" class="item attachment">
+			<h2>d41586-018-07196-1.pdf</h2>
+				<table>
+					<tbody><tr>
+						<th>Typ</th>
+						<td>Bilaga</td>
+					</tr>
+					<tr>
+					<th>Tillagd den</th>
+						<td>2019-10-28 13:30:05</td>
+					</tr>
+					<tr>
+					<th>Ändrad den</th>
+						<td>2019-10-31 13:57:49</td>
+					</tr>
+				</tbody></table>
+
+			<div><p>Krönika snarare än vetenskaplig artikel.</p>
+<p>Beskriver Jupyter notebooks och hävdar att sådana har blivit de facto
+ standard inom data science. Diskuterar fördelar och nackdelar.</p></div>
+			</li>
+
+
+			<li id="item_HA8YSPRZ" class="item conferencePaper">
+			<h2>DECKARD: Scalable and Accurate Tree-Based Detection of Code Clones</h2>
+				<table>
+					<tbody><tr>
+						<th>Typ</th>
+						<td>Konferensartikel</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Lingxiao Jiang</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Ghassan Misherghi</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Zhendong Su</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Stephane Glondu</td>
+					</tr>
+					<tr>
+					<th>Webbadress</th>
+						<td><a href="http://ieeexplore.ieee.org/document/4222572/">http://ieeexplore.ieee.org/document/4222572/</a></td>
+					</tr>
+					<tr>
+					<th>Ort</th>
+						<td>Minneapolis, MN, USA</td>
+					</tr>
+					<tr>
+					<th>Utgivare</th>
+						<td>IEEE</td>
+					</tr>
+					<tr>
+					<th>Sidor</th>
+						<td>96-105</td>
+					</tr>
+					<tr>
+					<th>ISBN</th>
+						<td>978-0-7695-2828-1</td>
+					</tr>
+					<tr>
+					<th>Datum</th>
+						<td>05/2007</td>
+					</tr>
+					<tr>
+					<th>DOI</th>
+						<td><a href="http://doi.org/10.1109/ICSE.2007.30">10.1109/ICSE.2007.30</a></td>
+					</tr>
+					<tr>
+					<th>Hämtad den</th>
+						<td>2019-10-29 14:03:26</td>
+					</tr>
+					<tr>
+					<th>Bibliotekskatalog</th>
+						<td>Crossref</td>
+					</tr>
+					<tr>
+					<th>Namn på konferens</th>
+						<td>29th International Conference on Software Engineering</td>
+					</tr>
+					<tr>
+					<th>Språk</th>
+						<td>en</td>
+					</tr>
+					<tr>
+					<th>Sammanfattning</th>
+						<td>Detecting code clones has many software engineering 
+applications. Existing approaches either do not scale to large code 
+bases or are not robust against minor code modiﬁcations. In this paper, 
+we present an efﬁcient algorithm for identifying similar subtrees and 
+apply it to tree representations of source code. Our algorithm is based 
+on a novel characterization of subtrees with numerical vectors in the 
+Euclidean space Rn and an efﬁcient algorithm to cluster these vectors 
+w.r.t. the Euclidean distance metric. Subtrees with vectors in one 
+cluster are considered similar. We have implemented our tree similarity 
+algorithm as a clone detection tool called DECKARD and evaluated it on 
+large code bases written in C and Java including the Linux kernel and 
+JDK. Our experiments show that DECKARD is both scalable and accurate. It
+ is also language independent, applicable to any language with a 
+formally speciﬁed grammar.</td>
+					</tr>
+					<tr>
+					<th>Protokolltitel</th>
+						<td>29th International Conference on Software Engineering (ICSE'07)</td>
+					</tr>
+					<tr>
+					<th>Kort titel</th>
+						<td>DECKARD</td>
+					</tr>
+					<tr>
+					<th>Tillagd den</th>
+						<td>2019-10-29 14:03:26</td>
+					</tr>
+					<tr>
+					<th>Ändrad den</th>
+						<td>2019-10-31 14:01:30</td>
+					</tr>
+				</tbody></table>
+				<h3 class="tags">Etiketter:</h3>
+				<ul class="tags">
+					<li>Cloning</li>
+					<li>Clone detection tools</li>
+				</ul>
+				<h3 class="attachments">Bifogade dokument</h3>
+				<ul class="attachments">
+					<li id="item_KYAUZVVH">Jiang m. fl. - 2007 - DECKARD Scalable and Accurate Tree-Based Detectio.pdf						<div class="note"><div><p>[Översiktligt läst]</p>
+<p>Presenterar klondetekteringsverktyget Deckard och algoritmen det 
+använder. De testar Deckard på stora kodbaser skrivna i Java och C. 
+Kommer fram till att verktyget skalar väl ("till miljoner rader kod") 
+och är korrekt.</p>
+<p>Deckard är trädbaserat. Det funkar på alla språk som har en 
+context-fri grammatik. (Vad är det?) Man ger den en YACC grammar (Vad är
+ det?) och så genererar den parsern själv. YACC grammars finns tydligen 
+för många språk.</p>
+<p>Notera att artikeln är skriven 2007!</p></div>
+					</div>					</li>
+				</ul>
+			</li>
+
+
+			<li id="item_UN5JF9I2" class="item journalArticle">
+			<h2>DéjàVu: a map of code duplicates on GitHub</h2>
+				<table>
+					<tbody><tr>
+						<th>Typ</th>
+						<td>Tidskriftsartikel</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Cristina V. Lopes</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Petr Maj</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Pedro Martins</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Vaibhav Saini</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Di Yang</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Jakub Zitny</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Hitesh Sajnani</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Jan Vitek</td>
+					</tr>
+					<tr>
+					<th>Webbadress</th>
+						<td><a href="http://dl.acm.org/citation.cfm?doid=3152284.3133908">http://dl.acm.org/citation.cfm?doid=3152284.3133908</a></td>
+					</tr>
+					<tr>
+					<th>Band/Årgång</th>
+						<td>1</td>
+					</tr>
+					<tr>
+					<th>Nummer</th>
+						<td>OOPSLA</td>
+					</tr>
+					<tr>
+					<th>Sidor</th>
+						<td>1-28</td>
+					</tr>
+					<tr>
+					<th>Publikation</th>
+						<td>Proceedings of the ACM on Programming Languages</td>
+					</tr>
+					<tr>
+					<th>ISSN</th>
+						<td>24751421</td>
+					</tr>
+					<tr>
+					<th>Datum</th>
+						<td>2017-10-12</td>
+					</tr>
+					<tr>
+					<th>DOI</th>
+						<td><a href="http://doi.org/10.1145/3133908">10.1145/3133908</a></td>
+					</tr>
+					<tr>
+					<th>Hämtad den</th>
+						<td>2019-09-02 16:26:39</td>
+					</tr>
+					<tr>
+					<th>Bibliotekskatalog</th>
+						<td>Crossref</td>
+					</tr>
+					<tr>
+					<th>Språk</th>
+						<td>en</td>
+					</tr>
+					<tr>
+					<th>Kort titel</th>
+						<td>DéjàVu</td>
+					</tr>
+					<tr>
+					<th>Tillagd den</th>
+						<td>2019-09-02 16:26:39</td>
+					</tr>
+					<tr>
+					<th>Ändrad den</th>
+						<td>2019-10-07 12:37:46</td>
+					</tr>
+				</tbody></table>
+				<h3 class="tags">Etiketter:</h3>
+				<ul class="tags">
+					<li>Cloning</li>
+					<li>GitHub mining</li>
+				</ul>
+				<h3 class="attachments">Bifogade dokument</h3>
+				<ul class="attachments">
+					<li id="item_M9U6IBJQ">Lopes m. fl. - 2017 - DéjàVu a map of code duplicates on GitHub.pdf						<div class="note"><div><p>[8 timmar]</p>
+<p>Undersöker mängden (i olika utsträckning) klonade kodfiler för alla 
+C++-, Java-, Python- och JavaScript-projekt på GitHub: De går igenom 
+alla projekt som inte är forkade från ett annat projekt och extraherar 
+följande information för varje kodfil:</p>
+<ul>
+<li>MD5-hash av hela filen</li>
+<li>MD5-hash av alla tokens, inkl. information om frekvens</li>
+<li>storlek i Bytes</li>
+<li>#rader</li>
+<li>#kodrader (med/utan kommentarer)</li>
+<li>#token (totalt + unika)</li>
+</ul>
+<p>De jämför fil- och tokenhashar, och använder SourcererCC för att hitta filer som är minst 80% lika (men där hasharna diffar).</p>
+<p>De analyserar även metadata från GHTorrent.</p>
+<p>De kommer fram till att:</p>
+<ul>
+<li>Java- och C++-projekt innehåller fler filer än Python- och JavaScript-dito.</li>
+<li>C++-filer är större än filer från de andra språken, och JavaScript-dito är mindre.</li>
+<li>De flesta projekt är små och varken särskilt aktiva eller populära.</li>
+<li>De flesta filerna är kloner (har samma hashar) och endast följande andel är unika filer:
+<ul>
+<li>Java: 60% ()</li>
+<li>C++: 27% ()</li>
+<li>Python: 29% ()</li>
+<li>JavaScript: 6% ()</li>
+</ul>
+</li>
+<li>Den mest duplicerade filen är en tom fil (0B). Den näst mest duplicerade innehåller en (1) tom rad.</li>
+<li>De mest duplicerade filerna är generellt små. Om man exkluderar de 
+minsta filerna får man dock bara marginellt lägre klon-frekvens.</li>
+<li>5% av Java- C++- och Python-projekten är exakta kopior av något 
+annat projekt (modulo whitespaces, kommentarer och terminal-symboler). 
+Motsvarande siffra för JavaScript är 11%.</li>
+<li>Betydligt fler projekt än så överlappar till en stor del andra projekt.</li>
+</ul>
+<p>För 4 olika filstorlekar analyserar de de 20 mest klonade filerna inom varje språk, och noterar att:</p>
+<ul>
+<li>De mest duplicerade filerna kommer från ett fåtal välkända bibliotek och ramverk.</li>
+<li>Många repron som är beroende av något annat projekt P har kopierat 
+in hela P:s källkod och komittat tillsammans med sin egen kod. Ofta 
+innehåller P på samma sätt källkoden från projekt som det är beroende 
+av.</li>
+</ul>
+<p>Här är JavaScriptprojekten särskilt uppseendeväckande då många av 
+projekten kallade P ovan finns tillgängliga via pakethanteraren NPM. P i
+ sin tur inkluderar andra NPM-paket på samma sätt.</p>
+<p>De analyserar 20 slumpvisa klonpar för att se om de är avsiktliga 
+kloner eller inte. Resultaten ser olika ut för olika språk och är för 
+långa för att redogöra för här. Se stycke 6.2.3.</p>
+<p>Påpekar att den stora mängden kodkloner kan ge "biased" resultat, men
+ forskare antar generellt att de olika observationerna (repositorierna) 
+är oberoende av varandra!!!</p>
+<p>&nbsp;</p></div>
+					</div>					</li>
+				</ul>
+			</li>
+
+
+			<li id="item_3ZE7NJEC" class="item conferencePaper">
+			<h2>Do code clones matter?</h2>
+				<table>
+					<tbody><tr>
+						<th>Typ</th>
+						<td>Konferensartikel</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Elmar Juergens</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Florian Deissenboeck</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Benjamin Hummel</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Stefan Wagner</td>
+					</tr>
+					<tr>
+					<th>Webbadress</th>
+						<td><a href="http://ieeexplore.ieee.org/document/5070547/">http://ieeexplore.ieee.org/document/5070547/</a></td>
+					</tr>
+					<tr>
+					<th>Ort</th>
+						<td>Vancouver, BC, Canada</td>
+					</tr>
+					<tr>
+					<th>Utgivare</th>
+						<td>IEEE</td>
+					</tr>
+					<tr>
+					<th>Sidor</th>
+						<td>485-495</td>
+					</tr>
+					<tr>
+					<th>ISBN</th>
+						<td>978-1-4244-3453-4</td>
+					</tr>
+					<tr>
+					<th>Datum</th>
+						<td>2009</td>
+					</tr>
+					<tr>
+					<th>DOI</th>
+						<td><a href="http://doi.org/10.1109/ICSE.2009.5070547">10.1109/ICSE.2009.5070547</a></td>
+					</tr>
+					<tr>
+					<th>Hämtad den</th>
+						<td>2019-12-06 13:40:18</td>
+					</tr>
+					<tr>
+					<th>Bibliotekskatalog</th>
+						<td>Crossref</td>
+					</tr>
+					<tr>
+					<th>Namn på konferens</th>
+						<td>2009 IEEE 31st International Conference on Software Engineering</td>
+					</tr>
+					<tr>
+					<th>Språk</th>
+						<td>en</td>
+					</tr>
+					<tr>
+					<th>Sammanfattning</th>
+						<td>Code cloning is not only assumed to inﬂate maintenance costs 
+but also considered defect-prone as inconsistent changes to code 
+duplicates can lead to unexpected behavior. Consequently, the 
+identiﬁcation of duplicated code, clone detection, has been a very 
+active area of research in recent years. Up to now, however, no 
+substantial investigation of the consequences of code cloning on program
+ correctness has been carried out. To remedy this shortcoming, this 
+paper presents the results of a large-scale case study that was 
+undertaken to ﬁnd out if inconsistent changes to cloned code can 
+indicate faults. For the analyzed commercial and open source systems we 
+not only found that inconsistent changes to clones are very frequent but
+ also identiﬁed a signiﬁcant number of faults induced by such changes. 
+The clone detection tool used in the case study implements a novel 
+algorithm for the detection of inconsistent clones. It is available as 
+open source to enable other researchers to use it as basis for further 
+investigations.</td>
+					</tr>
+					<tr>
+					<th>Protokolltitel</th>
+						<td>2009 IEEE 31st International Conference on Software Engineering</td>
+					</tr>
+					<tr>
+					<th>Tillagd den</th>
+						<td>2019-12-06 13:40:18</td>
+					</tr>
+					<tr>
+					<th>Ändrad den</th>
+						<td>2019-12-17 17:14:35</td>
+					</tr>
+				</tbody></table>
+				<h3 class="tags">Etiketter:</h3>
+				<ul class="tags">
+					<li>Software quality</li>
+					<li>Cloning</li>
+				</ul>
+				<h3 class="attachments">Bifogade dokument</h3>
+				<ul class="attachments">
+					<li id="item_A8TJZH94">Juergens m. fl. - 2009 - Do code clones matter.pdf						<div class="note"><div><p>Författarna
+ anlyserar 5 mjukvaruprojekt skrivna av olika team för olika 
+tillämpningar. Tre av dem är skrivna i C#, ett i Cobol och ett i Java. 
+De 4 första är proprietära. Samtliga system är i produktion.</p>
+<p>Som minimumlängd för en klon använder de 10 statements för alla 
+system utom det som är skrivet i Cobol (som tydligen är mer pratigt) 
+-där använder de istället 20 statements som minimumgräns.</p>
+<p>Forskarna sållade själva bort false positives från klonerna, och lät 
+därefter systemens utvecklare tala om vilka inkonsekventa kloner som var
+ oavsiktliga, och vilka av dessa som innehöll någon defekt. De kom fram 
+till att:</p>
+<ul>
+<li>Kloner ändras inkonsekvent (d.v.s. samma ändring görs inte i 
+båda/alla kodfragmenten) --detta har gjorts med cirka hälften av 
+klonerna</li>
+<li>Dessa inkonsekvenser är ofta (för 28 % av klonerna) oavsiktliga</li>
+<li>3-23 % av de inkonsekventa klonerna innehåller defekter. Om man 
+räknar bort ett system där false negative-frekvensen torde vara hög 
+snackar vi 18%.</li>
+<li>Av de oavsiktligt inkonsekventa klonerna innehåller mellan ungefär 1/2 och 1/3 defekter.</li>
+<li>I snitt innehåller inkonsekventa kloner fler defekter än kod i 
+allmänhet. Inkonsekventa kloner kan således vara indikatorer för 
+defekter.</li>
+</ul>
+<p>Av de 107 defekterna som de hittar i inkonsekventa kloner kan:</p>
+<ul>
+<li>17 leda till systemkrascher och tappat data</li>
+<li>44 leda till oväntat beteende som användaren ser</li>
+<li>46 leda till oväntat beteende som användaren inte ser (exv. minnesläckor och mindre prestandabuggar).</li>
+</ul>
+<p>Detta är alltså i produktionssatta system.</p>
+<p>Författarnas slutssats är att inkonsekventa kloner utgör en stor 
+felkälla och att nästan varannan oavsiktligt inkonsekvent ändring av 
+kloner orsakar en defekt.</p>
+<p>&nbsp;</p>
+<p>Enligt deras inledning (med referens till 2 reviewer) anses klonad kod vara dålig på två sätt:</p>
+<ol>
+<li>den kan öka förvaltningskostnader</li>
+<li>inkonsekventa ändringar av koden kan skapa defekter i koden</li>
+</ol></div>
+					</div>					</li>
+				</ul>
+			</li>
+
+
+			<li id="item_KQJDKXUP" class="item conferencePaper">
+			<h2>Exploration and Explanation in Computational Notebooks</h2>
+				<table>
+					<tbody><tr>
+						<th>Typ</th>
+						<td>Konferensartikel</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Adam Rule</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Aurélien Tabard</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>James D. Hollan</td>
+					</tr>
+					<tr>
+					<th>Webbadress</th>
+						<td><a href="http://dl.acm.org/citation.cfm?doid=3173574.3173606">http://dl.acm.org/citation.cfm?doid=3173574.3173606</a></td>
+					</tr>
+					<tr>
+					<th>Ort</th>
+						<td>Montreal QC, Canada</td>
+					</tr>
+					<tr>
+					<th>Utgivare</th>
+						<td>ACM Press</td>
+					</tr>
+					<tr>
+					<th>Sidor</th>
+						<td>1-12</td>
+					</tr>
+					<tr>
+					<th>ISBN</th>
+						<td>978-1-4503-5620-6</td>
+					</tr>
+					<tr>
+					<th>Datum</th>
+						<td>2018</td>
+					</tr>
+					<tr>
+					<th>DOI</th>
+						<td><a href="http://doi.org/10.1145/3173574.3173606">10.1145/3173574.3173606</a></td>
+					</tr>
+					<tr>
+					<th>Hämtad den</th>
+						<td>2019-09-26 13:03:17</td>
+					</tr>
+					<tr>
+					<th>Bibliotekskatalog</th>
+						<td>Crossref</td>
+					</tr>
+					<tr>
+					<th>Namn på konferens</th>
+						<td>the 2018 CHI Conference</td>
+					</tr>
+					<tr>
+					<th>Språk</th>
+						<td>en</td>
+					</tr>
+					<tr>
+					<th>Sammanfattning</th>
+						<td>Computational notebooks combine code, visualizations, and text
+ in a single document. Researchers, data analysts, and even journalists 
+are rapidly adopting this new medium. We present three studies of how 
+they are using notebooks to document and share exploratory data 
+analyses. In the first, we analyzed over 1 million computational 
+notebooks on GitHub, finding that one in four had no explanatory text 
+but consisted entirely of visualizations or code. In a second study, we 
+examined over 200 academic computational notebooks, finding that 
+although the vast majority described methods, only a minority discussed 
+reasoning or results. In a third study, we interviewed 15 academic data 
+analysts, finding that most considered computational notebooks personal,
+ exploratory, and messy. Importantly, they typically used other media to
+ share analyses. These studies demonstrate a tension between exploration
+ and explanation in constructing and sharing computational notebooks. We
+ conclude with opportunities to encourage explanation in computational 
+media without hindering exploration.</td>
+					</tr>
+					<tr>
+					<th>Protokolltitel</th>
+						<td>Proceedings of the 2018 CHI Conference on Human Factors in Computing Systems  - CHI '18</td>
+					</tr>
+					<tr>
+					<th>Tillagd den</th>
+						<td>2019-09-26 13:03:17</td>
+					</tr>
+					<tr>
+					<th>Ändrad den</th>
+						<td>2019-10-07 12:43:54</td>
+					</tr>
+				</tbody></table>
+				<h3 class="tags">Etiketter:</h3>
+				<ul class="tags">
+					<li>Notebooks</li>
+					<li>GitHub mining</li>
+				</ul>
+				<h3 class="attachments">Bifogade dokument</h3>
+				<ul class="attachments">
+					<li id="item_ZSMYWE8B">Rule m. fl. - 2018 - Exploration and Explanation in Computational Noteb.pdf						<div class="note"><div><p>Författarna har gjort 3 delstudier.</p>
+<h2>Studie 1</h2>
+<p>I den första analyserar de de 1 227 573 publika notebooks på github 
+som var nedladdningsbara i juli 2017, och som inte var forkade från ett 
+annat repositorie och kommer fram till att:</p>
+<ul>
+<li>Antalet notebooks per användare och per repro följer en exponentiell (avtagande) fördelning.</li>
+<li>Språket fanns specificerat i 85,1% av notebooksen. Bland dessa 85,1% använde:
+<ul>
+<li>96,3% Python</li>
+<li>ca 1% R</li>
+<li>ca 1% Julia</li>
+</ul>
+</li>
+<li>Av notebooksen skrivna i de 3 ovan nämnda språken importerar 89,1% externa paket/moduler. De vanligaste i Python var:
+<ul>
+<li>numpy (67,3%)</li>
+<li>matplotlib (52,1%)</li>
+<li>pandas (43,3%)</li>
+</ul>
+</li>
+<li>99,8% av alla celler var antingen kod- eller markdown-dito</li>
+<li>27,6% av notebooksen innehöll ingen text, utan bara bilder och kod
+<ul>
+<li>Om man bortser från dessa följde både #celler, mängden text och LOC per notebook log-normalfördelningar.</li>
+</ul>
+</li>
+<li>2,2% av notebooksen innehöll ingen kod</li>
+<li>Medianantalet ord/notebook var 218 om man bortsåg från de som inte innehöll någon text. (Största var 55 000 ord.)</li>
+<li>Medianantalet kodrader var 85 om man bortsåg från de som inte innehöll någon kod. (Största var &gt;400 000 LOC.)</li>
+<li>Textceller återfanns oftast i början av notebooksen.</li>
+<li>De vanligaste orden i reprobeskrivningarna var learning, project, 
+machine, udacity, course, deep, nanodegree, neural, kaggle och model, 
+vilket enligt författarna tyder på att notebooks ofta används för 
+utbildning och maskininlärning.</li>
+<li>Många av notebooksen innehöll ingen story utan var bara en samling skript med några lösa anteckningar.</li>
+</ul>
+<p>&nbsp;</p>
+<h2>Studie 2</h2>
+<p>I den andra studien har de valt ut 52 repron innehållande 221 
+notebooks kopplade till forskning (=har arXiv- eller DOI-länk i README. 
+Här såg de att:</p>
+<ul>
+<li>Hälften av repron innehöll bara 1 notebook</li>
+<li>I de två repron som hade flest notebooks var notebooksen ofta kloner
+ av varandra (inom ett repro, inte mellan). Dessa rensades bort innan de
+ påbörjade sin analys.</li>
+<li>De återstående 145 notebooksen var längre än de i första studien,</li>
+<li>55% hade inledande text, men bara 3% hade en avslutande textcell.</li>
+<li>Av de som innehöll text:<br>
+<ul>
+<li>beskrev 88% de olika stegen i analysen</li>
+<li>beskrev 34% resonemangen</li>
+<li>diskuterade 38% resultaten</li>
+</ul>
+</li>
+<li>82% av notebooksen innehöll kodkommentarer, i vilka i princip alla 
+beskrev vad programmet gör, 10% resonemang och 4% resultat. 50% innehöll
+ bortkommenterade kodblock.</li>
+</ul>
+<p>De kommer fram till att notebooksen används för iterativa analyser, men mindre ofta "rich narratives".</p>
+<p>&nbsp;</p>
+<h2>Studie 3</h2>
+<p>I den tredje studien intervjuar de 15 akademiska dataanalytiker och 
+kommer fram till att notebooks används för olika syften, många inom 
+utbildning. Intervjuerna fokuserar dock på de notebooks som används för 
+forskning.</p>
+<p>Notebooksen beskrevs ofta som något man använde för att experimentera. Resultat presenterade man ofta i andra medier.</p>
+<p>Det var dock några intervjuobjekt som tyckte att notebooks var bra för interaktion med icke-programerare.</p>
+<p>Intervjuobjekten kände ofta att deras notebooks behövde städas, oavsett om de skulle delas eller bara användas av dem själva.</p>
+<p>Författarna kommer fram till att det finns en motsättning mellan 
+olika användningsområden för notebooks. Om man använder dem för 
+iterativt experimenterande får man ofta röriga notebooks. Ska man 
+använda notebooksen för att dokumentera eller kommunicera sin forskning 
+behöver man städa upp dem.</p>
+<p>Författarna tycks anse att notebooksen ska användas i det senare 
+syftet och föreslår åtgärder för att få dataanalytiker att göra det.</p>
+<p>&nbsp;</p>
+<h2>Notera</h2>
+<p>att de även diskuterar begränsningar i studien! Kan vara värt att titta på när vi skriver våra "threats to validity".</p></div>
+					</div>					</li>
+				</ul>
+			</li>
+
+
+			<li id="item_FFZK42V7" class="item conferencePaper">
+			<h2>Fast and Flexible Large-Scale Clone Detection with CloneWorks</h2>
+				<table>
+					<tbody><tr>
+						<th>Typ</th>
+						<td>Konferensartikel</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Jeffrey Svajlenko</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Chanchal K. Roy</td>
+					</tr>
+					<tr>
+					<th>Webbadress</th>
+						<td><a href="http://ieeexplore.ieee.org/document/7965249/">http://ieeexplore.ieee.org/document/7965249/</a></td>
+					</tr>
+					<tr>
+					<th>Ort</th>
+						<td>Buenos Aires, Argentina</td>
+					</tr>
+					<tr>
+					<th>Utgivare</th>
+						<td>IEEE</td>
+					</tr>
+					<tr>
+					<th>Sidor</th>
+						<td>27-30</td>
+					</tr>
+					<tr>
+					<th>ISBN</th>
+						<td>978-1-5386-1589-8</td>
+					</tr>
+					<tr>
+					<th>Datum</th>
+						<td>5/2017</td>
+					</tr>
+					<tr>
+					<th>DOI</th>
+						<td><a href="http://doi.org/10.1109/ICSE-C.2017.3">10.1109/ICSE-C.2017.3</a></td>
+					</tr>
+					<tr>
+					<th>Hämtad den</th>
+						<td>2019-10-03 15:01:07</td>
+					</tr>
+					<tr>
+					<th>Bibliotekskatalog</th>
+						<td>Crossref</td>
+					</tr>
+					<tr>
+					<th>Namn på konferens</th>
+						<td>2017 IEEE/ACM 39th International Conference on Software Engineering Companion (ICSE-C)</td>
+					</tr>
+					<tr>
+					<th>Protokolltitel</th>
+						<td>2017 IEEE/ACM 39th International Conference on Software Engineering Companion (ICSE-C)</td>
+					</tr>
+					<tr>
+					<th>Tillagd den</th>
+						<td>2019-10-03 15:01:07</td>
+					</tr>
+					<tr>
+					<th>Ändrad den</th>
+						<td>2019-10-31 14:01:20</td>
+					</tr>
+				</tbody></table>
+				<h3 class="tags">Etiketter:</h3>
+				<ul class="tags">
+					<li>Cloning</li>
+					<li>Clone detection tools</li>
+				</ul>
+				<h3 class="attachments">Bifogade dokument</h3>
+				<ul class="attachments">
+					<li id="item_Q9E2PZI3">Svajlenko och Roy - 2017 - Fast and Flexible Large-Scale Clone Detection with.pdf						<div class="note"><div><p>[Översiktligt läst]</p>
+<p>Presenterar klondetekteringsverktyget "CloneWorks". Det kan extrahera
+ kloner av olika typer separat, men fungerar bara för Java, C och C#.</p></div>
+					</div>					</li>
+				</ul>
+			</li>
+
+
+			<li id="item_TKJM7U6T" class="item conferencePaper">
+			<h2>File cloning in open source Java projects: The good, the bad, and the ugly</h2>
+				<table>
+					<tbody><tr>
+						<th>Typ</th>
+						<td>Konferensartikel</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Joel Ossher</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Hitesh Sajnani</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Cristina Lopes</td>
+					</tr>
+					<tr>
+					<th>Webbadress</th>
+						<td><a href="http://ieeexplore.ieee.org/document/6080795/">http://ieeexplore.ieee.org/document/6080795/</a></td>
+					</tr>
+					<tr>
+					<th>Ort</th>
+						<td>Williamsburg, VA, USA</td>
+					</tr>
+					<tr>
+					<th>Utgivare</th>
+						<td>IEEE</td>
+					</tr>
+					<tr>
+					<th>Sidor</th>
+						<td>283-292</td>
+					</tr>
+					<tr>
+					<th>ISBN</th>
+						<td>978-1-4577-0664-6 978-1-4577-0663-9 978-1-4577-0662-2</td>
+					</tr>
+					<tr>
+					<th>Datum</th>
+						<td>09/2011</td>
+					</tr>
+					<tr>
+					<th>DOI</th>
+						<td><a href="http://doi.org/10.1109/ICSM.2011.6080795">10.1109/ICSM.2011.6080795</a></td>
+					</tr>
+					<tr>
+					<th>Hämtad den</th>
+						<td>2019-09-27 14:57:16</td>
+					</tr>
+					<tr>
+					<th>Bibliotekskatalog</th>
+						<td>Crossref</td>
+					</tr>
+					<tr>
+					<th>Namn på konferens</th>
+						<td>2011 IEEE 27th International Conference on Software Maintenance (ICSM)</td>
+					</tr>
+					<tr>
+					<th>Språk</th>
+						<td>en</td>
+					</tr>
+					<tr>
+					<th>Sammanfattning</th>
+						<td>We present a study of the extent to which developers copy 
+entire ﬁles or sets of ﬁles into their applications with little or no 
+modiﬁcation. Our aim is to determine the prevalence of such activity 
+within open source Java development, and to identify the circumstances 
+under which ﬁles are reused in this manner.</td>
+					</tr>
+					<tr>
+					<th>Protokolltitel</th>
+						<td>2011 27th IEEE International Conference on Software Maintenance (ICSM)</td>
+					</tr>
+					<tr>
+					<th>Kort titel</th>
+						<td>File cloning in open source Java projects</td>
+					</tr>
+					<tr>
+					<th>Tillagd den</th>
+						<td>2019-09-27 14:57:16</td>
+					</tr>
+					<tr>
+					<th>Ändrad den</th>
+						<td>2019-10-29 13:47:23</td>
+					</tr>
+				</tbody></table>
+				<h3 class="tags">Etiketter:</h3>
+				<ul class="tags">
+					<li>Cloning</li>
+				</ul>
+				<h3 class="attachments">Bifogade dokument</h3>
+				<ul class="attachments">
+					<li id="item_ESYS7B5T">Ossher m. fl. - 2011 - File cloning in open source Java projects The goo.pdf						<div class="note"><div><p>[Översiktligt läst]</p>
+<p>Detta är delvis samma personer som ligger bakom DéjàVu-artikeln och 
+de använder ett dataset som de kallar Sourcerer, men detta var innan 
+SourcererCC och de använder en approach som verkar betydligt mindre 
+sofistikerad. De skriver att de har implementerat sin metod som en del 
+av "the Sourcerer Infrastructure".</p>
+<p>Författarna undersöker hur vanligt kloning på filnivå är i "the Open 
+Source Java ecosystem", men påpekar själva att den koden de har valt ut 
+inte nödvändigtvis är representativ för all open source-Javakod. Datat 
+de analyserar är "the Sourcerer Repository", som främst består av 
+Javafiler från Apache, Java.net, Google Code och Sourceforge, totalt 3 
+237 910 filer från 13 241 olika projekt.</p>
+<p>Deras klondetektering är en kombination av 3 andra metoder:</p>
+<ol>
+<li>Identifiering av exakta kopior i &gt; 1 projekt</li>
+<li>Identifiering av filer där toppleveltypen har samma Fully-Qualified Name (FQN), d.v.s. samma klassnamn i samma paket</li>
+<li>Identifiering av filer med samma fingeravtryck, d.v.s. topptypen har
+ samma namn samt samma metodnamn respektive variabelnamn. (Det spelar 
+ingen roll i vilken ordning sakerna är deklarerade.)</li>
+</ol>
+<p>De säger sig inte förvänta sig hitta alla kloner, utan snarare ett 
+konservativt estimat (en lägre gräns). Deras false positive-frekvens 
+uppskattar de dock till låg (&lt;10%).</p>
+<p>De använder också den katalogmatchningsmetod som beskrivs av Mockus.</p>
+<p>De fokuserar på, och jag rapporterar&nbsp; bara, de resultat de får med en hög konfidensgrad (enligt deras definition).</p>
+<p>De kommer fram till att:</p>
+<ul>
+<li>medelprojektet består av 146,6 filer, medan medianen är 46 filer (högerskev fördelning)</li>
+<li>5,20% av filerna är exakta kopior</li>
+<li>deras kombinerade metod kommer fram till att&nbsp; 10,56% av filerna är kloner</li>
+<li>katalogmatchningsmetoden ger resultatet att 15,12% av filerna är kloner</li>
+<li>16,69% av alla projekt innehåller minst 1 klonad fil, enligt den kombinerade metoden</li>
+<li>det inte ser ut att finnas någon korrelation mellan projektstorlek och klonprocenttal</li>
+</ul>
+<p>Katalogmatchningsresultatet skiljer sig från Mockus resultat på 50%. 
+De förklarar detta med att de analyserar Javafiler medan han analyserar 
+flera språk (vilket gör att biblioteksfiler inkluderas som jar-filer, 
+till skillnad från i C där man ofta inkluderar källkoden för hela 
+bibliotek) samt att hans dataset innehåller många Linuxapplikationer, 
+vilka kan förväntas dela en del kod.</p>
+<p>Slutligen studerar de ett subset av klonerna och delar upp dem i 
+olika kategorier. Siffran inom parentes är antalet klonpar i respektive 
+kategori:</p>
+<ol>
+<li>Biblioteksfiler (124)</li>
+<li>Java Standard Library (54)</li>
+<li>Java Extensions (har inte alltid packats med JDK) (49)</li>
+<li>Utility- och små biblioteksfiler (49)</li>
+<li>Demo/Tutorial-filer (39)</li>
+<li>Relaterade projekt, bl.a. projektforkar och omdöpta projekt (31)</li>
+<li>Duplicerade projekt, ofta för att man har lagt upp projektet exv. på
+ Sourceforge utöver i reprot där man versionshanterar det (9)</li>
+<li>Övrigt (3)</li>
+</ol>
+<p>De diskuterar hur legitima de olika typerna av kloner är. Demo- och 
+tutoriallfiler tycker de exempelvis är helt OK att klona, medan, och de 
+hittar möjliga förklaringar till mer tvivelaktiga klonstrategier.</p></div>
+					</div>					</li>
+				</ul>
+			</li>
+
+
+			<li id="item_VX577UA5" class="item conferencePaper">
+			<h2>How Often and What StackOverflow Posts Do Developers Reference in Their GitHub Projects?</h2>
+				<table>
+					<tbody><tr>
+						<th>Typ</th>
+						<td>Konferensartikel</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Saraj Singh Manes</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Olga Baysal</td>
+					</tr>
+					<tr>
+					<th>Webbadress</th>
+						<td><a href="https://ieeexplore.ieee.org/document/8816796/">https://ieeexplore.ieee.org/document/8816796/</a></td>
+					</tr>
+					<tr>
+					<th>Ort</th>
+						<td>Montreal, QC, Canada</td>
+					</tr>
+					<tr>
+					<th>Utgivare</th>
+						<td>IEEE</td>
+					</tr>
+					<tr>
+					<th>Sidor</th>
+						<td>235-239</td>
+					</tr>
+					<tr>
+					<th>ISBN</th>
+						<td>978-1-72813-412-3</td>
+					</tr>
+					<tr>
+					<th>Datum</th>
+						<td>5/2019</td>
+					</tr>
+					<tr>
+					<th>DOI</th>
+						<td><a href="http://doi.org/10.1109/MSR.2019.00047">10.1109/MSR.2019.00047</a></td>
+					</tr>
+					<tr>
+					<th>Hämtad den</th>
+						<td>2019-09-30 11:29:58</td>
+					</tr>
+					<tr>
+					<th>Bibliotekskatalog</th>
+						<td>Crossref</td>
+					</tr>
+					<tr>
+					<th>Namn på konferens</th>
+						<td>2019 IEEE/ACM 16th International Conference on Mining Software Repositories (MSR)</td>
+					</tr>
+					<tr>
+					<th>Språk</th>
+						<td>en</td>
+					</tr>
+					<tr>
+					<th>Sammanfattning</th>
+						<td>Stack Overﬂow (SO) is a popular Q&amp;A forum for software 
+developers, providing a large amount of copyable code snippets. While 
+GitHub is an independent code collaboration platform, developers often 
+reuse SO code in their GitHub projects. In this paper, we investigate 
+how often GitHub developers re-use code snippets from the SO forum, as 
+well as what concepts they are more likely to reference in their code. 
+To accomplish our goal, we mine SOTorrent dataset that provides 
+connectivity between code snippets on the SO posts with software 
+projects hosted on GitHub. We then study the characteristics of GitHub 
+projects that reference SO posts and discover popular SO discussions 
+that happen in GitHub projects. Our results demonstrate that on average 
+developers make 45 references to SO posts in their projects, with the 
+highest number of references being made within the JavaScript code. We 
+also found that 79% of the SO posts with code snippets that are 
+referenced in GitHub code do change over time (at least ones) raising 
+code maintainability and reliability concerns.</td>
+					</tr>
+					<tr>
+					<th>Protokolltitel</th>
+						<td>2019 IEEE/ACM 16th International Conference on Mining Software Repositories (MSR)</td>
+					</tr>
+					<tr>
+					<th>Tillagd den</th>
+						<td>2019-09-30 11:29:58</td>
+					</tr>
+					<tr>
+					<th>Ändrad den</th>
+						<td>2019-11-15 16:40:46</td>
+					</tr>
+				</tbody></table>
+				<h3 class="tags">Etiketter:</h3>
+				<ul class="tags">
+					<li>StackOverflow</li>
+					<li>GitHub mining</li>
+				</ul>
+				<h3 class="attachments">Bifogade dokument</h3>
+				<ul class="attachments">
+					<li id="item_IJIBPCXV">Manes och Baysal - 2019 - How Often and What StackOverflow Posts Do Develope.pdf						<div class="note"><div><p>[Översiktligt läst]</p>
+<p>Undersöker hur ofta kod på GitHub återanvänder kodsnippets från StackOverflow, och vilka koncept som oftast refereras till.</p>
+<p>Det finns ett dataset SOTorrent med information om kopplingar mellan kodsnippets på StackOverflow och kod på GitHub.</p>
+<p>De kommer fram till att den genomsnittliga utvecklaren gör 45 
+referenser till StackOverflowposter i sina projekt! Flest referenser 
+görs från JavaScriptkod. (Det framgår inte av abstract vilka språk de 
+jämför med.) De upptäcker också att 79% av de StackOverflowposter med 
+kodsnippets som refereras till från GitHub ändras över tid.</p></div>
+					</div>					</li>
+				</ul>
+			</li>
+
+
+			<li id="item_68SVZHMM" class="item journalArticle">
+			<h2>Jupyter notebooks as discovery mechanisms for open science: Citation practices in the astronomy community</h2>
+				<table>
+					<tbody><tr>
+						<th>Typ</th>
+						<td>Tidskriftsartikel</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Morgan Wofford</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Bernadette Marie Boscoe</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Christine Borgman</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Irene Pasquetto</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Milena Golshan</td>
+					</tr>
+					<tr>
+					<th>Webbadress</th>
+						<td><a href="https://ieeexplore.ieee.org/document/8781923/">https://ieeexplore.ieee.org/document/8781923/</a></td>
+					</tr>
+					<tr>
+					<th>Sidor</th>
+						<td>1-1</td>
+					</tr>
+					<tr>
+					<th>Publikation</th>
+						<td>Computing in Science &amp; Engineering</td>
+					</tr>
+					<tr>
+					<th>ISSN</th>
+						<td>1521-9615, 1558-366X</td>
+					</tr>
+					<tr>
+					<th>Datum</th>
+						<td>2019</td>
+					</tr>
+					<tr>
+					<th>DOI</th>
+						<td><a href="http://doi.org/10.1109/MCSE.2019.2932067">10.1109/MCSE.2019.2932067</a></td>
+					</tr>
+					<tr>
+					<th>Hämtad den</th>
+						<td>2019-12-17 17:10:05</td>
+					</tr>
+					<tr>
+					<th>Bibliotekskatalog</th>
+						<td>Crossref</td>
+					</tr>
+					<tr>
+					<th>Språk</th>
+						<td>en</td>
+					</tr>
+					<tr>
+					<th>Sammanfattning</th>
+						<td>Citing data and software is a means to give scholarly credit 
+and to facilitate access to research objects. Citation principles 
+encourage authors to provide full descriptions of objects, with stable 
+links, in their papers. As Jupyter notebooks aggregate data, software, 
+and other objects, they may facilitate or hinder citation, credit, and 
+access to data and software. We report on a study of references to 
+Jupyter notebooks in astronomy over a 5-year period (2014-2018). 
+References increased rapidly, but fewer than half of the references led 
+to Jupyter notebooks that could be located and opened. Jupyter notebooks
+ appear better suited to supporting the research process than to 
+providing access to research objects. We recommend that authors cite 
+individual data and software objects, and that they stabilize any 
+notebooks cited in publications. Publishers should increase the number 
+of citations allowed in papers and employ descriptive metadata-rich 
+citation styles that facilitate credit and discovery.</td>
+					</tr>
+					<tr>
+					<th>Kort titel</th>
+						<td>Jupyter notebooks as discovery mechanisms for open science</td>
+					</tr>
+					<tr>
+					<th>Tillagd den</th>
+						<td>2019-12-17 17:10:05</td>
+					</tr>
+					<tr>
+					<th>Ändrad den</th>
+						<td>2019-12-18 14:54:39</td>
+					</tr>
+				</tbody></table>
+				<h3 class="tags">Etiketter:</h3>
+				<ul class="tags">
+					<li>Notebooks</li>
+				</ul>
+				<h3 class="attachments">Bifogade dokument</h3>
+				<ul class="attachments">
+					<li id="item_A4CD6RIS">Wofford m. fl. - 2019 - Jupyter notebooks as discovery mechanisms for open.pdf						<div class="note"><div><p>Forskarna diskuterar två begrepp som rör enheter man refererar till i vetenskapliga artiklar:</p>
+<ul>
+<li>Fixity innebär att objektet kan återfinnas i samma form som det var när det refererades till</li>
+<li>Granularity innebär att objektet finns i en stabil och definierbar enhet, ofta med tydliga gränser</li>
+</ul>
+<p>Artikelns huvudbudskap är att de Jupyter notebooks som 
+astronomiforskare publicerar och refererar till i regel inte uppfyller 
+dessa två egenskaper.</p>
+<p>Det som är relevant för våra studier är dock framförallt kuriosa från artikeln:</p>
+<ul>
+<li>[med referenser] Jupyter notebooks utvecklades ursprungligen för att
+ ge snabbare "on the fly"-beräkningar för utforskning av data, för att 
+spara tid och arbete jämfört med traditionella approacher med 
+kompilerande kod. När notebooksen blev populärare började emellertid 
+forskare att använda dem som stöd för alla beräkningsfaser i 
+forskningen, inklusive datautforskning, publicering och utbildning</li>
+<li>Jupyter Notebook-referenser inom astronomi har ökat kraftigt mellan 
+2014 (året då Jupyter notebooks&nbsp; började heta Jupyter notebooks) 
+och 2018, och ökningstakten har varit större för varje år.</li>
+<li>Det populäraste stället att spara Jupyter Notebooks på är GitHub, 
+men långt ifrån alla astronominotebooks ligger där. Endast hälften av de
+ som nämnde Jupyter Notebooks i sina artiklar refererade till en faktisk
+ notebook (men de kan såklart finnas på GitHub ändå...) Av dessa var det
+ många som inte refererade till GitHub, utan exempelvis till 
+projektsidor och till lagringsplatser som Bitbucket och liknande.</li>
+</ul></div>
+					</div>					</li>
+				</ul>
+			</li>
+
+
+			<li id="item_5F89P682" class="item conferencePaper">
+			<h2>Large-Scale Code Reuse in Open Source Software</h2>
+				<table>
+					<tbody><tr>
+						<th>Typ</th>
+						<td>Konferensartikel</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Audris Mockus</td>
+					</tr>
+					<tr>
+					<th>Webbadress</th>
+						<td><a href="http://ieeexplore.ieee.org/document/4273078/">http://ieeexplore.ieee.org/document/4273078/</a></td>
+					</tr>
+					<tr>
+					<th>Ort</th>
+						<td>Minneapolis, MN, USA</td>
+					</tr>
+					<tr>
+					<th>Utgivare</th>
+						<td>IEEE</td>
+					</tr>
+					<tr>
+					<th>Sidor</th>
+						<td>7-7</td>
+					</tr>
+					<tr>
+					<th>ISBN</th>
+						<td>978-0-7695-2961-5</td>
+					</tr>
+					<tr>
+					<th>Datum</th>
+						<td>05/2007</td>
+					</tr>
+					<tr>
+					<th>DOI</th>
+						<td><a href="http://doi.org/10.1109/FLOSS.2007.10">10.1109/FLOSS.2007.10</a></td>
+					</tr>
+					<tr>
+					<th>Hämtad den</th>
+						<td>2019-12-06 14:16:58</td>
+					</tr>
+					<tr>
+					<th>Bibliotekskatalog</th>
+						<td>Crossref</td>
+					</tr>
+					<tr>
+					<th>Namn på konferens</th>
+						<td>First International Workshop on Emerging Trends in FLOSS Research and Development (FLOSS'07: ICSE Workshops 2007)</td>
+					</tr>
+					<tr>
+					<th>Språk</th>
+						<td>en</td>
+					</tr>
+					<tr>
+					<th>Sammanfattning</th>
+						<td>We are exploring the practice of large-scale reuse involving 
+at least a group of source code ﬁles. Our research question is to 
+determine the extent of such reuse occurring in open source projects, to
+ identify the code that is reused the most, and to investigate patterns 
+of large-scale reuse. We start by identifying a sample of projects 
+involving all code in several large repositories of open source 
+projects, all projects bundled with popular distributions of Linux and 
+BSD, and several large individual projects. In the next step we obtain 
+the source code and identify groups of ﬁles reused among projects and 
+determine the code that is most widely reused in our sample. Our ﬁndings
+ indicate that more than 50% of the ﬁles were used in more than one 
+project. The most widely reused components were small and represented 
+templates requiring major and minor modiﬁcations and a group of ﬁles 
+reused without any change. Some widely reused components involved 
+hundreds of ﬁles.</td>
+					</tr>
+					<tr>
+					<th>Protokolltitel</th>
+						<td>First International Workshop on Emerging Trends in FLOSS Research and Development (FLOSS'07: ICSE Workshops 2007)</td>
+					</tr>
+					<tr>
+					<th>Tillagd den</th>
+						<td>2019-12-06 14:16:58</td>
+					</tr>
+					<tr>
+					<th>Ändrad den</th>
+						<td>2019-12-06 14:16:59</td>
+					</tr>
+				</tbody></table>
+				<h3 class="attachments">Bifogade dokument</h3>
+				<ul class="attachments">
+					<li id="item_SJCSCVNB">Mockus - 2007 - Large-Scale Code Reuse in Open Source Software.pdf						<div class="note"><div><p>Undersöker
+ i vilken utsträckning hela uppsättningar av filer återanvänds mellan 
+projekt. Deras algoritm identifierar par av källkodskataloger där minst 
+80, 50 respektive 30% av filerna i den mindre katalogen överlappar med 
+filnamn i den större katalogen, och katalogerna delar minst 5 filer. 
+(Här är fil=filnamn.) Filnamn som förekommer &gt; 1000 gånger (exv. 
+main.c och README.txt) togs inte med i jämförelserna.</p>
+<p>Deras studieobjekt består av 38 700 open source-projekt, totalt 5 300
+ 000 filer, innehållande text (ej binärt data, så som bilder). Bland 
+annat innehåller den koden till flera stora Linux- och 
+BSD-distributioner.</p>
+<p>De kommer fram till att ungefär hälften av filerna i projekten också 
+finns i andra projekt. (Procenttröskeln beskriven ovan har ganska liten 
+effekt.)</p>
+<p>De anser att detta ska tolkas som en lägre gräns av återanvändning av
+ kod, eftersom de bara tittar på fall där en stor del av koden (de 
+flesta filerna i en katalog) överlappar, och de missar de fall där 
+utvecklarna har bytt namn på filerna som de har kopierat från ett annat 
+projekt.</p>
+<p>Detta är väldigt mycket, jämfört med andra studier. Kan det vara så 
+att alla Linux- och BSD-distributioner ger biased resultat? Flera 
+distributioner är inkluderade, och de torde dela en ganska stor andel av
+ sin kod. Förmodligen utgör de en ganska stor andel av korpusen.</p>
+<p>Dessutom visar Lopes etal att de flesta klonade filer är ganska små, så 50% av filerna behöver inte betyda 50% av kodraderna.</p></div>
+					</div>					</li>
+				</ul>
+			</li>
+
+
+			<li id="item_YN4RJ7WD" class="item conferencePaper">
+			<h2>Managing Messes in Computational Notebooks</h2>
+				<table>
+					<tbody><tr>
+						<th>Typ</th>
+						<td>Konferensartikel</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Andrew Head</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Fred Hohman</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Titus Barik</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Steven M. Drucker</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Robert DeLine</td>
+					</tr>
+					<tr>
+					<th>Webbadress</th>
+						<td><a href="http://dl.acm.org/citation.cfm?doid=3290605.3300500">http://dl.acm.org/citation.cfm?doid=3290605.3300500</a></td>
+					</tr>
+					<tr>
+					<th>Ort</th>
+						<td>Glasgow, Scotland Uk</td>
+					</tr>
+					<tr>
+					<th>Utgivare</th>
+						<td>ACM Press</td>
+					</tr>
+					<tr>
+					<th>Sidor</th>
+						<td>1-12</td>
+					</tr>
+					<tr>
+					<th>ISBN</th>
+						<td>978-1-4503-5970-2</td>
+					</tr>
+					<tr>
+					<th>Datum</th>
+						<td>2019</td>
+					</tr>
+					<tr>
+					<th>DOI</th>
+						<td><a href="http://doi.org/10.1145/3290605.3300500">10.1145/3290605.3300500</a></td>
+					</tr>
+					<tr>
+					<th>Hämtad den</th>
+						<td>2019-09-27 14:52:44</td>
+					</tr>
+					<tr>
+					<th>Bibliotekskatalog</th>
+						<td>Crossref</td>
+					</tr>
+					<tr>
+					<th>Namn på konferens</th>
+						<td>the 2019 CHI Conference</td>
+					</tr>
+					<tr>
+					<th>Språk</th>
+						<td>en</td>
+					</tr>
+					<tr>
+					<th>Sammanfattning</th>
+						<td>Data analysts use computational notebooks to write code for 
+analyzing and visualizing data. Notebooks help analysts iteratively 
+write analysis code by letting them interleave code with output, and 
+selectively execute cells. However, as analysis progresses, analysts 
+leave behind old code and outputs, and overwrite important code, 
+producing cluttered and inconsistent notebooks. This paper introduces 
+code gathering tools, extensions to computational notebooks that help 
+analysts fnd, clean, recover, and compare versions of code in cluttered,
+ inconsistent notebooks. The tools archive all versions of code outputs,
+ allowing analysts to review these versions and recover the subsets of 
+code that produced them. These subsets can serve as succinct summaries 
+of analysis activity or starting points for new analyses. In a 
+qualitative usability study, 12 professional analysts found the tools 
+useful for cleaning notebooks and writing analysis code, and discovered 
+new ways to use them, like generating personal documentation and 
+lightweight versioning.</td>
+					</tr>
+					<tr>
+					<th>Protokolltitel</th>
+						<td>Proceedings of the 2019 CHI Conference on Human Factors in Computing Systems  - CHI '19</td>
+					</tr>
+					<tr>
+					<th>Tillagd den</th>
+						<td>2019-09-27 14:52:44</td>
+					</tr>
+					<tr>
+					<th>Ändrad den</th>
+						<td>2019-10-07 14:01:01</td>
+					</tr>
+				</tbody></table>
+				<h3 class="tags">Etiketter:</h3>
+				<ul class="tags">
+					<li>Notebooks</li>
+				</ul>
+				<h3 class="attachments">Bifogade dokument</h3>
+				<ul class="attachments">
+					<li id="item_ZK2VAFIZ">Head m. fl. - 2019 - Managing Messes in Computational Notebooks.pdf						<div class="note"><div><p>[Översiktligt läst]</p>
+<p>Designar ett verktyg som extraherar minsta möjliga kod för att 
+producera en utvald mängd av resultat ur en notebook. De testar detta 
+på12 professionella data scientists på Microsoft. Dessa gillar tilltaget
+ och de flesta använder det för en avslutande uppstädning innan de delar
+ med sig av sitt arbete. Vissa använder det även för att generera 
+referensmaterial, light-weight branches eller sammanställningar för 
+olika grupper av mottagare.</p>
+<p>Författarna frågar även deltagarna vad det innebär att städa en 
+notebook och kommer fram till att det främst handlar om att ta bort 
+oönskade kodsnuttar och resultat, men att det även kan finnas 
+efterföljande steg så som att öka kodkvaliteten, dokumentera eller 
+skriva skripts.</p></div>
+					</div>					</li>
+				</ul>
+			</li>
+
+
+			<li id="item_BY3XJMWJ" class="item journalArticle">
+			<h2>Near-miss function clones in open source software: an empirical study</h2>
+				<table>
+					<tbody><tr>
+						<th>Typ</th>
+						<td>Tidskriftsartikel</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>C. K. Roy</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>J. R. Cordy</td>
+					</tr>
+					<tr>
+					<th>Webbadress</th>
+						<td><a href="http://doi.wiley.com/10.1002/smr.416">http://doi.wiley.com/10.1002/smr.416</a></td>
+					</tr>
+					<tr>
+					<th>Sidor</th>
+						<td>n/a-n/a</td>
+					</tr>
+					<tr>
+					<th>Publikation</th>
+						<td>Journal of Software Maintenance and Evolution: Research and Practice</td>
+					</tr>
+					<tr>
+					<th>ISSN</th>
+						<td>1532060X, 15320618</td>
+					</tr>
+					<tr>
+					<th>Datum</th>
+						<td>2009</td>
+					</tr>
+					<tr>
+					<th>DOI</th>
+						<td><a href="http://doi.org/10.1002/smr.416">10.1002/smr.416</a></td>
+					</tr>
+					<tr>
+					<th>Hämtad den</th>
+						<td>2019-12-18 16:15:34</td>
+					</tr>
+					<tr>
+					<th>Bibliotekskatalog</th>
+						<td>Crossref</td>
+					</tr>
+					<tr>
+					<th>Språk</th>
+						<td>en</td>
+					</tr>
+					<tr>
+					<th>Sammanfattning</th>
+						<td>The new hybrid clone detection tool NICAD combines the 
+strengths and overcomes the limitations of both text-based and AST-based
+ clone detection techniques and exploits novel applications of a source 
+transformation system to yield highly accurate identiﬁcation of cloned 
+code in software systems. In this paper, we present an in-depth study of
+ near-miss function clones in open source software using NICAD. We 
+examine more than 20 open source C, Java and C# systems, including the 
+entire Linux Kernel, Apache httpd, J2SDK-Swing and db4o and compare 
+their use of cloned code in several different dimensions, including 
+language, clone size, clone similarity, clone location and clone density
+ both by proportion of cloned functions and lines of cloned code. We 
+manually verify all detected clones and provide a complete catalogue of 
+different clones in an online repository in a variety of formats. These 
+validated results can be used as a cloning reference for these systems 
+and as a benchmark for evaluating other clone detection tools. Copyright
+ © 2009 John Wiley &amp; Sons, Ltd.</td>
+					</tr>
+					<tr>
+					<th>Kort titel</th>
+						<td>Near-miss function clones in open source software</td>
+					</tr>
+					<tr>
+					<th>Tillagd den</th>
+						<td>2019-12-18 16:15:34</td>
+					</tr>
+					<tr>
+					<th>Ändrad den</th>
+						<td>2019-12-18 16:15:34</td>
+					</tr>
+				</tbody></table>
+				<h3 class="attachments">Bifogade dokument</h3>
+				<ul class="attachments">
+					<li id="item_2378DAFX">Roy och Cordy - 2009 - Near-miss function clones in open source software.pdf						<div class="note"><div><p>Författarna
+ använder NICAD för att analysera open source-system skrivna i C (10 
+stycken), Java (7 stycken) respektive C# (6 stycken). Alla utom ett 
+(Linuxkärnan, 6 265 000 LOC) är &lt;300 000 LOC, vissa så små som 
+3000-4000 LOC.</p>
+<p>C# är tydligen ett multiparadigm- 
+(funktionellt/imperativt/generic/objektorienterat/component-orienterat) 
+språk, medan Java får anses vara objektorienterat och C procedurellt.</p>
+<p>De letar efter funktionskloner (exakta respektive near-miss) vars metodkropp är minst 1 rad.</p>
+<p>De kommer fram till att:</p>
+<ul>
+<li>Java- och C#-systemen innehåller mycket fler kloner än C-dito. 
+Författarna tror att det beror på alla små getters och utility- och 
+iteratormetoder i OO-systemen.
+<ul>
+<li>andelen typ 1-klonade rader är 1,0-2,0% i C, 7,2% i Java och 6,0% i C# (i snitt 4,9%)</li>
+<li>motsvarande siffror för typ 3-kloner (med minst 70% likhet mellan funktionerna) är 10,8-13,2%, 20,0% och 24,9% (i snitt 19,1%)</li>
+</ul>
+</li>
+<li>likaledes är antalet filer associerade med typ 1-kloner högre i Java
+ (46%) än i C# (29%), som i sin tur är högre än i C (15%), troligtvis 
+också på grund av alla getters. Däremot har C- och C#-systemen 
+near-miss-kloner utspridda i fler filer.</li>
+<li>när man ökar tröskelvärdet för hur olika klonerna får vara och 
+fortfarande räknas som kloner, beter sig system i de 3 språken ganska 
+lika. Författarna tolkar detta som att den mängd ändringar som görs i 
+klonad kod är ungefär samma för systemen skrivna i de olika språken. 
+(Detta borde innebära att det finns lika många near miss-kloner i alla 
+språken. I samband med diskussionen om hur spridda klonerna är skriver 
+dock författarna att det verkar finnas fler near miss-kloner i C och C# 
+än i Java. :-S)</li>
+<li>klonegenskaper verkar vara oberoende av systemstorlek, men skilja sig mellan språken.</li>
+<li>de flesta system har fler klonpar än klonklasser, d.v.s. många uppsättningar av samma kloner.</li>
+<li>I Java och C# finns en större andel av typ 1-klonerna i samma fil 
+(typiskt i flera olika klasser i samma fil) än i C. C:s near miss-kloner
+ ligger dock i samma fil i mycket högre utsträckning än de andra 
+systemens near-miss-kloner.</li>
+</ul>
+<p>De rapporterar även hur stor andel av filerna som är kloner av varandra; se sista kolumnen in tabell III.</p>
+<p>Deras generella slutsats är att det finns mycket kloner i open source-system.</p></div>
+					</div>					</li>
+				</ul>
+			</li>
+
+
+			<li id="item_TWQT2297" class="item conferencePaper">
+			<h2>On the Extent and Nature of Software Reuse in Open Source Java Projects</h2>
+				<table>
+					<tbody><tr>
+						<th>Typ</th>
+						<td>Konferensartikel</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Lars Heinemann</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Florian Deissenboeck</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Mario Gleirscher</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Benjamin Hummel</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Maximilian Irlbeck</td>
+					</tr>
+					<tr>
+						<th class="editor">Redaktör</th>
+						<td>Klaus Schmid</td>
+					</tr>
+					<tr>
+					<th>Bokserie</th>
+						<td>Lecture Notes in Computer Science</td>
+					</tr>
+					<tr>
+					<th>Ort</th>
+						<td>Berlin, Heidelberg</td>
+					</tr>
+					<tr>
+					<th>Utgivare</th>
+						<td>Springer</td>
+					</tr>
+					<tr>
+					<th>Sidor</th>
+						<td>207-222</td>
+					</tr>
+					<tr>
+					<th>ISBN</th>
+						<td>978-3-642-21347-2</td>
+					</tr>
+					<tr>
+					<th>Datum</th>
+						<td>2011</td>
+					</tr>
+					<tr>
+					<th>DOI</th>
+						<td><a href="http://doi.org/10.1007/978-3-642-21347-2_16">10.1007/978-3-642-21347-2_16</a></td>
+					</tr>
+					<tr>
+					<th>Bibliotekskatalog</th>
+						<td>Springer Link</td>
+					</tr>
+					<tr>
+					<th>Språk</th>
+						<td>en</td>
+					</tr>
+					<tr>
+					<th>Sammanfattning</th>
+						<td>Code repositories on the Internet provide a tremendous amount 
+of freely available open source code that can be reused for building new
+ software. It has been argued that only software reuse can bring the 
+gain of productivity in software construction demanded by the market. 
+However, knowledge about the extent of reuse in software projects is 
+only sparse. To remedy this, we report on an empirical study about 
+software reuse in 20 open source Java projects with a total of 3.3 MLOC.
+ The study investigates (1) whether open source projects reuse third 
+party code and (2) how much white-box and black-box reuse occurs. To 
+answer these questions, we utilize static dependency analysis for 
+quantifying black-box reuse and code clone detection for detecting 
+white-box reuse from a corpus with 6.1 MLOC of reusable Java libraries. 
+Our results indicate that software reuse is common among open source 
+Java projects and that black-box reuse is the predominant form of reuse.</td>
+					</tr>
+					<tr>
+					<th>Protokolltitel</th>
+						<td>Top Productivity through Software Reuse</td>
+					</tr>
+					<tr>
+					<th>Tillagd den</th>
+						<td>2019-12-06 14:09:12</td>
+					</tr>
+					<tr>
+					<th>Ändrad den</th>
+						<td>2019-12-09 15:25:43</td>
+					</tr>
+				</tbody></table>
+				<h3 class="attachments">Bifogade dokument</h3>
+				<ul class="attachments">
+					<li id="item_92ATFL3S">Springer Full Text PDF						<div class="note"><div><p>Undersöker
+ i vilken utsträckning kod från 22 välanvända* Javabibliotek förekommer i
+ 20 populära Javaprojekt från sourceforge (totalt 3 200 000 LOC). De 
+undersöker dels kloning ("vitlådeåteranvändning") och användning i form 
+av binärfiler ("svarlådeanvädning"). För det förstnämnda använder de 
+sitt eget klondetekteringsverktyg, och inkluderar typ 2-kloner som 
+innehåller minst 15 statements.</p>
+<p>Vitlådeåteranväningsfrekevensen definieras som antalet klonade 
+LOC/total LOC i projektet. Svartlådeåteranvändningsfrekvensen är mängden
+ återanvänd binärkod (i B)/total mängd binärkod.</p>
+<p>De gör även en (mycket översiktlig) manuell inspektion av de 20 
+projekten för att hitta kloner dem emellan. I praktiken kan de med denna
+ metod bara hitta storskalig återanväning (flera filer, med bevarade 
+paketnamn).</p>
+<p>De kommer fram till att:</p>
+<ul>
+<li>7 av de 20 projekten innehåller kod klonad från de 22 projekten, med
+ en frekvens mellan 0,06% och 9,39%. Endast 4 av frekvenserna är &gt; 
+1%.</li>
+<li>4 av de 20 projekten (varav 2 överlapar med den 7 nyss nämnda 
+projekten) innehåller kodkloner som de kan hitta med sin manuella 
+inspektion.</li>
+<li>andelen svartlådeåteranvänd kod är betydligt större än andelen klonad, även då man inte räknar med Java API:t.</li>
+</ul>
+<p>Deras generella slutsats är att man inte kan se återanvändning i form
+ av återanvändbara komponenter som bara behöver sättas ihop.</p>
+<p>&nbsp;</p>
+<p>* enligt deras erfarenhet...</p></div>
+					</div>					</li>
+				</ul>
+			</li>
+
+
+			<li id="item_3BJTDUVB" class="item journalArticle">
+			<h2>On the Impact of Programming Languages on Code Quality</h2>
+				<table>
+					<tbody><tr>
+						<th>Typ</th>
+						<td>Tidskriftsartikel</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Emery D Berger</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Celeste Hollenbeck</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Petr Maj</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Olga Vitek</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Jan Vitek</td>
+					</tr>
+					<tr>
+					<th>Band/Årgång</th>
+						<td>1</td>
+					</tr>
+					<tr>
+					<th>Nummer</th>
+						<td>1</td>
+					</tr>
+					<tr>
+					<th>Sidor</th>
+						<td>23</td>
+					</tr>
+					<tr>
+					<th>Bibliotekskatalog</th>
+						<td>Zotero</td>
+					</tr>
+					<tr>
+					<th>Språk</th>
+						<td>en</td>
+					</tr>
+					<tr>
+					<th>Tillagd den</th>
+						<td>2019-09-02 16:26:33</td>
+					</tr>
+					<tr>
+					<th>Ändrad den</th>
+						<td>2019-10-07 12:36:26</td>
+					</tr>
+				</tbody></table>
+				<h3 class="tags">Etiketter:</h3>
+				<ul class="tags">
+					<li>Software quality</li>
+					<li>Programming languages</li>
+					<li>Research methodology</li>
+					<li>Statistics</li>
+				</ul>
+				<h3 class="attachments">Bifogade dokument</h3>
+				<ul class="attachments">
+					<li id="item_DQ8NVHNR">Berger m. fl. - On the Impact of Programming Languages on Code Qua.pdf						<div class="note"><div><p>En tidigare studie av Ray et al. kom fram till att:</p>
+<ol>
+<li>Av 17 undersökta programmeringsspråk hade 11 stycken antingen ett 
+positivt (C, C++, Objective-C, JavaScript, PHP, Python) eller negativt 
+(TypeScript, Clojure, Haskell, Ruby, Scala) samband med antalet buggar.</li>
+<li>Program skrivna i funktionella språk har lite färre defekter än procedurella och skript-dito.</li>
+<li>Det finns inget generelllt samband mellan tillämpningsområde och bugbenägenhet.</li>
+<li>Det finns ett starkt samband mellan bugtyper och språk.</li>
+</ol>
+<p>Ray et al. presenterar detta som korrelationer, men många har senare 
+tolkat det som kausaliteter (språk -&gt; #buggar). Ray et al. 
+kompenserar för projektens ålder, antal commits, antal utvecklare och 
+antal rader committad kod.</p>
+<p>Den här studien försöker repetera experimenten och dessutom 
+reproducera (=inte använda exakt samma metodologi) slutsats nummer 1 
+ovan.</p>
+<p>Vid repetetionen hittade författarna inte samma mängd projekt, 
+kodrader o.s.v. som orginaltudien, trots att de använde samma metodik. 
+När det gäller orginalstudiens resultat observerade den här studien 
+följande:</p>
+<ol>
+<li>kunde repeteras kvalitativt (signifikans för samma språk) men inte exakt (samma värden och signifikansnivåer)</li>
+<li>Författarna var inte överens med orginalstudien när det gäller 
+kategorisering av språk, men när de använde denna kategorisering 
+lyckades de repetera resultaten. (De menar dock att dessa är meningslösa
+ eftersom kategoriseringen är intetsägande.)</li>
+<li>Inte heller dessa författare hittar något samband mellan faktorerna.
+ (Till skillnad från ovan har de inte haft tillgång till orginalstudiens
+ kod här, utan backwards-engineerat.)</li>
+<li>Här får de inte ens samma resultat när det gäller antalet buggar av respektive typ.</li>
+</ol>
+<p>Vid reproduceringen tog de bort duplicerade commits och uteslöt ett 
+språk som visade sig inte ha särskilt många commits. (Många filer var 
+felklassificerade.)</p>
+<p>Vidare konstaterar de att orginalstudiens metod för att klassificera 
+commits som bugfixar är bristfällig. De uppskattar att den ger 36% false
+ positives och 11% false negatives. Den här studien använder dock samma 
+klassificeringsstrategi (i brist på annan praktiskt genomförbar dito), 
+men kompenserar för det i den statistiska analysen genom att bootstrappa
+ (=göra ett permutationstest).</p>
+<p>De gör även annat annorlunda i den statistiska analysen. Bland annat 
+minskar de family-wise error rate med Bonferroni (-&gt; mycket lägre 
+signifikanströsklar för respektive test) och en annan liknande procedur.</p>
+<p>De hittar bara signifikanta språk-bug-samband för C++ (positivt) samt Clojure och Haskell (negativa).</p>
+<p>De räknar inte bara ut konfidensintervall, utan också "prediction 
+intervals", som förutsäger den praktiska effekten av språk på framtida 
+bugmängder. Dessa överlappar för C++ och Clojure, språken med störst 
+positivt respektive negativt samband med antalet buggar. De drar 
+slutsatsen att den praktiska skillnaden mellan olika språk är minimal.</p>
+<p>De listar också ett antal anledningar till att man inte kan dra några kausala slutsatser av resultaten:</p>
+<ul>
+<li>16% av filerna är testfiler. Dessa kan ha andra typer av buggar än "produktionskod".</li>
+<li>Deras korrigering för felklassificerade buggar förutsätter att 
+klassificeringsfelen är uniformt fördelade mellan språken, vilket de 
+inte verkar vara.</li>
+<li>Urvalet av projekt är sannolikt inte helt representativt.</li>
+<li>Studien täcker inga kommersiella projekt.</li>
+<li>Tillämpningsområde påverkar troligtvis bugfrekvensen, och det finns troligtvis andra "confounding factors".</li>
+</ul>
+<p>De rekommenderar följande som best practices för andra forskare:</p>
+<ol>
+<li>Automatisera, dokumentera och dela det du gör!</li>
+<li>Involvera domänexperter för att kontrollera dina antaganden.</li>
+<li>Kontrollera ditt data, verkar det korrekt och rimligt?</li>
+<li>Stirra dig inte blind på p-värden. Dessa säger inte allt, framförallt inte om vikten av dina resultat.</li>
+</ol>
+<p>&nbsp;</p>
+<p>Min kommentar: Det är viktigt att notera att det faktum att 
+författarna inte hittar signifikanta samband för vissa språk inte 
+nödvändigtvis innebär att sådana inte finns. Styrkan är troligen ganska 
+låg, inte minst med tanke på deras FWER-strategi.</p>
+<p>&nbsp;</p></div>
+					</div>					</li>
+				</ul>
+			</li>
+
+
+			<li id="item_KZLAEY9A" class="item journalArticle">
+			<h2>Practical Language-Independent Detection of Near-Miss Clones</h2>
+				<table>
+					<tbody><tr>
+						<th>Typ</th>
+						<td>Tidskriftsartikel</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>James R Cordy</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Thomas R Dean</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Nikita Synytskyy</td>
+					</tr>
+					<tr>
+					<th>Sidor</th>
+						<td>12</td>
+					</tr>
+					<tr>
+					<th>Bibliotekskatalog</th>
+						<td>Zotero</td>
+					</tr>
+					<tr>
+					<th>Språk</th>
+						<td>en</td>
+					</tr>
+					<tr>
+					<th>Sammanfattning</th>
+						<td>Previous research shows that most software systems contain 
+significant amounts of duplicated, or cloned, code. Some clones are 
+exact duplicates of each other, while others differ in small details 
+only. We designate these almost-perfect clones as “near-miss” clones. 
+While technically difficult, detection of near-miss clones has many 
+benefits, both academic and practical. Finding these clones can give us 
+better insight into the way developers maintain and reuse code, and we 
+can also parameterize and remove near-miss clones to reduce overall 
+source code size and decrease system complexity.</td>
+					</tr>
+					<tr>
+					<th>Tillagd den</th>
+						<td>2019-09-27 14:56:20</td>
+					</tr>
+					<tr>
+					<th>Ändrad den</th>
+						<td>2019-10-28 15:40:43</td>
+					</tr>
+				</tbody></table>
+				<h3 class="tags">Etiketter:</h3>
+				<ul class="tags">
+					<li>Cloning</li>
+				</ul>
+				<h3 class="attachments">Bifogade dokument</h3>
+				<ul class="attachments">
+					<li id="item_YYVEF7I5">Cordy m. fl. - Practical Language-Independent Detection of Near-M.pdf						<div class="note"><div><p>[Översiktligt läst]</p>
+<p>Inför begreppet "near-miss clones", kodsegment som är nästan identiska. (Jag hittar ingen exakt definition.)</p>
+<p>Föreslår en generell approach för att identifiera både exakta kopior 
+och near-miss clones av kodstycken. Endast första steget i approachen är
+ språkberoende. Här delar de upp koden i intressanta och ointressanta 
+token. Sedan använder de diff för att jämföra de intressanta tokena 
+(något förenklat...).</p>
+<p>Hävdar att de på detta sätt effektivt kan hitta copy-paste-kloner, 
+men att de riskerar missa några kloner som är semantiskt lika.</p>
+<p>Utvärderar approachen på HTML-kod.</p></div>
+					</div>					</li>
+				</ul>
+			</li>
+
+
+			<li id="item_PJ7FFCNY" class="item journalArticle">
+			<h2>Software clone detection: A systematic review</h2>
+				<table>
+					<tbody><tr>
+						<th>Typ</th>
+						<td>Tidskriftsartikel</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Dhavleesh Rattan</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Rajesh Bhatia</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Maninder Singh</td>
+					</tr>
+					<tr>
+					<th>Webbadress</th>
+						<td><a href="https://linkinghub.elsevier.com/retrieve/pii/S0950584913000323">https://linkinghub.elsevier.com/retrieve/pii/S0950584913000323</a></td>
+					</tr>
+					<tr>
+					<th>Band/Årgång</th>
+						<td>55</td>
+					</tr>
+					<tr>
+					<th>Nummer</th>
+						<td>7</td>
+					</tr>
+					<tr>
+					<th>Sidor</th>
+						<td>1165-1199</td>
+					</tr>
+					<tr>
+					<th>Publikation</th>
+						<td>Information and Software Technology</td>
+					</tr>
+					<tr>
+					<th>ISSN</th>
+						<td>09505849</td>
+					</tr>
+					<tr>
+					<th>Datum</th>
+						<td>7/2013</td>
+					</tr>
+					<tr>
+					<th>DOI</th>
+						<td><a href="http://doi.org/10.1016/j.infsof.2013.01.008">10.1016/j.infsof.2013.01.008</a></td>
+					</tr>
+					<tr>
+					<th>Hämtad den</th>
+						<td>2019-12-06 13:51:11</td>
+					</tr>
+					<tr>
+					<th>Bibliotekskatalog</th>
+						<td>Crossref</td>
+					</tr>
+					<tr>
+					<th>Språk</th>
+						<td>en</td>
+					</tr>
+					<tr>
+					<th>Sammanfattning</th>
+						<td>Objective: This study reports an extensive systematic 
+literature review of software clones in general and software clone 
+detection in particular.
+Method: We used the standard systematic literature review method based 
+on a comprehensive set of 213 articles from a total of 2039 articles 
+published in 11 leading journals and 37 premier conferences and 
+workshops.
+Results: Existing literature about software clones is classiﬁed broadly 
+into different categories. The importance of semantic clone detection 
+and model based clone detection led to different classiﬁcations. 
+Empirical evaluation of clone detection tools/techniques is presented. 
+Clone management, its beneﬁts and cross cutting nature is reported. 
+Number of studies pertaining to nine different types of clones is 
+reported. Thirteen intermediate representations and 24 match detection 
+techniques are reported.
+Conclusion: We call for an increased awareness of the potential beneﬁts 
+of software clone management, and identify the need to develop semantic 
+and model clone detection techniques. Recommendations are given for 
+future research.</td>
+					</tr>
+					<tr>
+					<th>Kort titel</th>
+						<td>Software clone detection</td>
+					</tr>
+					<tr>
+					<th>Tillagd den</th>
+						<td>2019-12-06 13:51:11</td>
+					</tr>
+					<tr>
+					<th>Ändrad den</th>
+						<td>2019-12-17 16:42:21</td>
+					</tr>
+				</tbody></table>
+				<h3 class="tags">Etiketter:</h3>
+				<ul class="tags">
+					<li>Literature study</li>
+					<li>Cloning</li>
+					<li>Clone detection tools</li>
+				</ul>
+				<h3 class="attachments">Bifogade dokument</h3>
+				<ul class="attachments">
+					<li id="item_PTMN6NPN">Rattan m. fl. - 2013 - Software clone detection A systematic review.pdf						<div class="note"><div><p>[Översiktligt läst]</p>
+<p>Artikeln behandlar många apekter av kloning, men inte hur stor 
+förekomsten är. Underlaget för studien är 213 artiklar publicerade fram 
+till mitten av 2011. Huvudfokus tycks vara på klondetektering. Andra 
+områden som avhandlas är hur kloner evolverar, refaktorering av kloner, 
+och effekten av kloning. Det sistnämnda finns sammanfattat i en tabell 
+(11). Det finns studier som kommer fram till att kloning är skadligt, 
+och andra som kommer fram till att det inte är det.</p>
+<p>De definierar olika typer av kloner; kanske värd att referera till! Diskuterar även för- och nackdelar med kloner.</p></div>
+					</div>					</li>
+				</ul>
+			</li>
+
+
+			<li id="item_MD3DF858" class="item conferencePaper">
+			<h2>Software-Clone Rates in Open-Source Programs Written in C or C++</h2>
+				<table>
+					<tbody><tr>
+						<th>Typ</th>
+						<td>Konferensartikel</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Rainer Koschke</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Saman Bazrafshan</td>
+					</tr>
+					<tr>
+					<th>Webbadress</th>
+						<td><a href="http://ieeexplore.ieee.org/document/7476786/">http://ieeexplore.ieee.org/document/7476786/</a></td>
+					</tr>
+					<tr>
+					<th>Ort</th>
+						<td>Suita, Osaka, Japan</td>
+					</tr>
+					<tr>
+					<th>Utgivare</th>
+						<td>IEEE</td>
+					</tr>
+					<tr>
+					<th>Sidor</th>
+						<td>1-7</td>
+					</tr>
+					<tr>
+					<th>ISBN</th>
+						<td>978-1-5090-1855-0</td>
+					</tr>
+					<tr>
+					<th>Datum</th>
+						<td>3/2016</td>
+					</tr>
+					<tr>
+					<th>DOI</th>
+						<td><a href="http://doi.org/10.1109/SANER.2016.28">10.1109/SANER.2016.28</a></td>
+					</tr>
+					<tr>
+					<th>Hämtad den</th>
+						<td>2019-12-06 14:53:18</td>
+					</tr>
+					<tr>
+					<th>Bibliotekskatalog</th>
+						<td>Crossref</td>
+					</tr>
+					<tr>
+					<th>Namn på konferens</th>
+						<td>2016 IEEE 23rd International Conference on Software Analysis, Evolution, and Reengineering (SANER)</td>
+					</tr>
+					<tr>
+					<th>Språk</th>
+						<td>en</td>
+					</tr>
+					<tr>
+					<th>Sammanfattning</th>
+						<td>It is often claimed that duplicated code, also known as 
+software clones, occurs frequently. Different researchers have reported 
+clone rates in the range of 19 and 28 %, in extreme cases even 59 % for 
+particular systems. It is not clear, however, whether those systems are 
+just outliers.</td>
+					</tr>
+					<tr>
+					<th>Protokolltitel</th>
+						<td>2016 IEEE 23rd International Conference on Software Analysis, Evolution, and Reengineering (SANER)</td>
+					</tr>
+					<tr>
+					<th>Tillagd den</th>
+						<td>2019-12-06 14:53:18</td>
+					</tr>
+					<tr>
+					<th>Ändrad den</th>
+						<td>2019-12-11 14:29:24</td>
+					</tr>
+				</tbody></table>
+				<h3 class="tags">Etiketter:</h3>
+				<ul class="tags">
+					<li>Cloning</li>
+				</ul>
+				<h3 class="attachments">Bifogade dokument</h3>
+				<ul class="attachments">
+					<li id="item_HIHHHFXY">Koschke och Bazrafshan - 2016 - Software-Clone Rates in Open-Source Programs Writt.pdf						<div class="note"><div><p>Författarna analyserar förekomsten av kloner i C/C++-kod från följande 3 källor:</p>
+<ul>
+<li>Audris Mockus' dataset (se separat artikel)</li>
+<li>Iman Keivanloo's dataset&nbsp; (oklart vad det innehåller)</li>
+<li>All Ubuntu-C-kod (hämtad med apt-get)</li>
+</ul>
+<p>De exkluderar alla projektdubletter, samt den autogenererade kod de 
+hittade. Några bibliotek används av väldigt många av projekten de 
+analyserar. Dessa extraherar de och räknar som egna projekt, så att 
+deras kod bara ska räknas en gång. De ignorerar blank- och 
+kommentarsrader. De använder en egen, token-based, klondetektor ("cfp"),
+ som kan identifiera typ 1- och typ 2-kloner. De filtrerar klonerna 
+enligt olika konfigurationer för att minska mängden "spurious clones". 
+Konfigurationerna är alla möjliga kombinationer av:</p>
+<ul>
+<li>minsta antal token = 30, 50 resp 100 (Detta ska motsvara ungefär 5, 8 respektive 16 rader)</li>
+<li>olika klonidentifieringsorakel:
+<ul>
+<li>inget filter -räkna allt cfp identifierar som kloner (n)</li>
+<li>strict (s) eller majority mode (m): använd MI med olika strikt utvalda kloner som träningsdata</li>
+<li>tillåt bara typ 1-kloner</li>
+</ul>
+</li>
+</ul>
+<p>Med n30 (generösast konfiguration; en övre gräns) kommer de fram till
+ att ca 40% av koden är klonad medan så mycket som 97% av projekten 
+innehåller minst 1 klon. Deras tolkning är bland annat att den stora 
+mängden "spurious clones" som lär förekomma här indikerar någon sorts 
+"naturlig likhet" mellan program.</p>
+<p>Skillnaden mellan s och m är minimal och i snitt identifieras ca 11 
+respektive 22 % av koden som klonad med minimumlängd 100 respektive 30 
+token. 80 respektive 95% av projekten innehåller minst 1 klon.</p>
+<p>Antalet typ 1-kloner visar sig vara lågt: i snitt ca drygt 1% 
+respektive ca 2,5% när de sätter minstorleken till 100 respektive 30 
+token. Andelen projekt med minst 1 klon är i de här fallen 44 respektive
+ 79 %.</p>
+<p>I samtliga fall har C++-kod högre klonfrekvens än C-dito 
+(p&lt;0,001). De anser detta vara förvånande eftersom C++ har fler 
+"expressive language features", vilket borde hjälpa utvecklaren att 
+undvika kloning.</p>
+<p>De konstaterar att många projekt med exceptionellt hög klonfrekvens 
+är små projekt där ett par filer har kopierats och modifierats.</p>
+<p>Tidigare studier rapporterar i regel högre klonfrekvenser, även när 
+de har högre minimum-klonlängd. De drar slutsatsen att dessa inte är 
+representativa.</p>
+<p>&nbsp;</p></div>
+					</div>					</li>
+				</ul>
+			</li>
+
+
+			<li id="item_ZRVW2ZLQ" class="item conferencePaper">
+			<h2>SOTorrent: reconstructing and analyzing the evolution of stack overflow posts</h2>
+				<table>
+					<tbody><tr>
+						<th>Typ</th>
+						<td>Konferensartikel</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Sebastian Baltes</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Lorik Dumani</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Christoph Treude</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Stephan Diehl</td>
+					</tr>
+					<tr>
+					<th>Webbadress</th>
+						<td><a href="http://dl.acm.org/citation.cfm?doid=3196398.3196430">http://dl.acm.org/citation.cfm?doid=3196398.3196430</a></td>
+					</tr>
+					<tr>
+					<th>Ort</th>
+						<td>Gothenburg, Sweden</td>
+					</tr>
+					<tr>
+					<th>Utgivare</th>
+						<td>ACM Press</td>
+					</tr>
+					<tr>
+					<th>Sidor</th>
+						<td>319-330</td>
+					</tr>
+					<tr>
+					<th>ISBN</th>
+						<td>978-1-4503-5716-6</td>
+					</tr>
+					<tr>
+					<th>Datum</th>
+						<td>2018</td>
+					</tr>
+					<tr>
+					<th>DOI</th>
+						<td><a href="http://doi.org/10.1145/3196398.3196430">10.1145/3196398.3196430</a></td>
+					</tr>
+					<tr>
+					<th>Hämtad den</th>
+						<td>2019-09-30 13:21:19</td>
+					</tr>
+					<tr>
+					<th>Bibliotekskatalog</th>
+						<td>Crossref</td>
+					</tr>
+					<tr>
+					<th>Namn på konferens</th>
+						<td>the 15th International Conference</td>
+					</tr>
+					<tr>
+					<th>Språk</th>
+						<td>en</td>
+					</tr>
+					<tr>
+					<th>Sammanfattning</th>
+						<td>Stack Overflow (SO) is the most popular question-and-answer 
+website for software developers, providing a large amount of code 
+snippets and free-form text on a wide variety of topics. Like other 
+software artifacts, questions and answers on SO evolve over time, for 
+example when bugs in code snippets are fixed, code is updated to work 
+with a more recent library version, or text surrounding a code snippet 
+is edited for clarity. To be able to analyze how content on SO evolves, 
+we built SOTorrent, an open dataset based on the official SO data dump. 
+SOTorrent provides access to the version history of SO content at the 
+level of whole posts and individual text or code blocks. It connects SO 
+posts to other platforms by aggregating URLs from text blocks and by 
+collecting references from GitHub files to SO posts. In this paper, we 
+describe how we built SOTorrent, and in particular how we evaluated 134 
+different string similarity metrics regarding their applicability for 
+reconstructing the version history of text and code blocks. Based on a 
+first analysis using the dataset, we present insights into the evolution
+ of SO posts, e.g., that post edits are usually small, happen soon after
+ the initial creation of the post, and that code is rarely changed 
+without also updating the surrounding text. Further, our analysis 
+revealed a close relationship between post edits and comments. Our 
+vision is that researchers will use SOTorrent to investigate and 
+understand the evolution of SO posts and their relation to other 
+platforms such as GitHub.</td>
+					</tr>
+					<tr>
+					<th>Protokolltitel</th>
+						<td>Proceedings of the 15th International Conference on Mining Software Repositories  - MSR '18</td>
+					</tr>
+					<tr>
+					<th>Kort titel</th>
+						<td>SOTorrent</td>
+					</tr>
+					<tr>
+					<th>Tillagd den</th>
+						<td>2019-09-30 13:21:19</td>
+					</tr>
+					<tr>
+					<th>Ändrad den</th>
+						<td>2019-10-31 12:57:59</td>
+					</tr>
+				</tbody></table>
+				<h3 class="tags">Etiketter:</h3>
+				<ul class="tags">
+					<li>StackOverflow</li>
+					<li>GitHub mining</li>
+				</ul>
+				<h3 class="attachments">Bifogade dokument</h3>
+				<ul class="attachments">
+					<li id="item_5MJB3FNZ">Baltes m. fl. - 2018 - SOTorrent reconstructing and analyzing the evolut.pdf						<div class="note"><div><p>[Översiktligt läst]</p>
+<p>Presenterar "SOTorrent", ett öppet dataset med versionshistorik för 
+StackOverflow-poster. Det innehåller även information om kopplingar 
+(länkar) till andra webplatser, samt länkar från GitHub till 
+StackOverflow.</p>
+<p>Artikeln beskriver hur de har byggt upp SOTorrent, samt hur de har 
+testat 134 "string similarity metrics" för rekonstruktion av 
+versionshistoriken.</p>
+<p>De kommer vidare fram till att:</p>
+<ul>
+<li>redigeringar av SO-poster är generellt små och görs en kort tid efter att posten skapades.</li>
+<li>när kodsnippets i en post uppdateras, uppdateras vanligen omkringliggande text också.</li>
+<li>det finns ett samband mellan kommentarer och postredigeringar.</li>
+</ul></div>
+					</div>					</li>
+				</ul>
+			</li>
+
+
+			<li id="item_F9RNR7HM" class="item conferencePaper">
+			<h2>SourcererCC and SourcererCC-I: tools to detect clones in batch mode and during software development</h2>
+				<table>
+					<tbody><tr>
+						<th>Typ</th>
+						<td>Konferensartikel</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Vaibhav Saini</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Hitesh Sajnani</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Jaewoo Kim</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Cristina Lopes</td>
+					</tr>
+					<tr>
+					<th>Webbadress</th>
+						<td><a href="http://dl.acm.org/citation.cfm?doid=2889160.2889165">http://dl.acm.org/citation.cfm?doid=2889160.2889165</a></td>
+					</tr>
+					<tr>
+					<th>Ort</th>
+						<td>Austin, Texas</td>
+					</tr>
+					<tr>
+					<th>Utgivare</th>
+						<td>ACM Press</td>
+					</tr>
+					<tr>
+					<th>Sidor</th>
+						<td>597-600</td>
+					</tr>
+					<tr>
+					<th>ISBN</th>
+						<td>978-1-4503-4205-6</td>
+					</tr>
+					<tr>
+					<th>Datum</th>
+						<td>2016</td>
+					</tr>
+					<tr>
+					<th>DOI</th>
+						<td><a href="http://doi.org/10.1145/2889160.2889165">10.1145/2889160.2889165</a></td>
+					</tr>
+					<tr>
+					<th>Hämtad den</th>
+						<td>2019-10-03 14:57:37</td>
+					</tr>
+					<tr>
+					<th>Bibliotekskatalog</th>
+						<td>Crossref</td>
+					</tr>
+					<tr>
+					<th>Namn på konferens</th>
+						<td>the 38th International Conference</td>
+					</tr>
+					<tr>
+					<th>Språk</th>
+						<td>en</td>
+					</tr>
+					<tr>
+					<th>Sammanfattning</th>
+						<td>Given the availability of large source-code repositories, 
+there has been a large number of applications for large-scale clone 
+detection. Unfortunately, despite a decade of active research, there is a
+ marked lack in clone detectors that scale to big software systems or 
+large repositories, speciﬁcally for detecting near-miss (Type 3) clones 
+where signiﬁcant editing activities may take place in the cloned code.</td>
+					</tr>
+					<tr>
+					<th>Protokolltitel</th>
+						<td>Proceedings of the 38th International Conference on Software Engineering Companion - ICSE '16</td>
+					</tr>
+					<tr>
+					<th>Kort titel</th>
+						<td>SourcererCC and SourcererCC-I</td>
+					</tr>
+					<tr>
+					<th>Tillagd den</th>
+						<td>2019-10-03 14:57:37</td>
+					</tr>
+					<tr>
+					<th>Ändrad den</th>
+						<td>2019-10-31 13:59:03</td>
+					</tr>
+				</tbody></table>
+				<h3 class="tags">Etiketter:</h3>
+				<ul class="tags">
+					<li>Cloning</li>
+					<li>Clone detection tools</li>
+				</ul>
+				<h3 class="attachments">Bifogade dokument</h3>
+				<ul class="attachments">
+					<li id="item_SY526XWX">Saini m. fl. - 2016 - SourcererCC and SourcererCC-I tools to detect clo.pdf						<div class="note"><div><p>Beskriver SourcererCC samt ett Eclipse-plugin SourcererCC-I som bygger på det förstnämnda, med fokus på SourcererCC-I.</p>
+<p>Angående SourcererCC:</p>
+<ol>
+<li>Det finns en parser med stöd för Pythonkod</li>
+<li>De skriver att bäst precision + recall fås om tröskelvärdet sätts till 70%</li>
+</ol>
+<p>De beskriver hur man ska installera Eclipsepluginet, men URL:en som 
+man ska ange pekar på den server som innehåller SourcererCC-VM:en och 
+för tillfället ligger nere.</p></div>
+					</div>					</li>
+				</ul>
+			</li>
+
+
+			<li id="item_3U5WY7GY" class="item conferencePaper">
+			<h2>SourcererCC: scaling code clone detection to big-code</h2>
+				<table>
+					<tbody><tr>
+						<th>Typ</th>
+						<td>Konferensartikel</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Hitesh Sajnani</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Vaibhav Saini</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Jeffrey Svajlenko</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Chanchal K. Roy</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Cristina V. Lopes</td>
+					</tr>
+					<tr>
+					<th>Webbadress</th>
+						<td><a href="http://dl.acm.org/citation.cfm?doid=2884781.2884877">http://dl.acm.org/citation.cfm?doid=2884781.2884877</a></td>
+					</tr>
+					<tr>
+					<th>Ort</th>
+						<td>Austin, Texas</td>
+					</tr>
+					<tr>
+					<th>Utgivare</th>
+						<td>ACM Press</td>
+					</tr>
+					<tr>
+					<th>Sidor</th>
+						<td>1157-1168</td>
+					</tr>
+					<tr>
+					<th>ISBN</th>
+						<td>978-1-4503-3900-1</td>
+					</tr>
+					<tr>
+					<th>Datum</th>
+						<td>2016</td>
+					</tr>
+					<tr>
+					<th>DOI</th>
+						<td><a href="http://doi.org/10.1145/2884781.2884877">10.1145/2884781.2884877</a></td>
+					</tr>
+					<tr>
+					<th>Hämtad den</th>
+						<td>2019-09-27 15:00:47</td>
+					</tr>
+					<tr>
+					<th>Bibliotekskatalog</th>
+						<td>Crossref</td>
+					</tr>
+					<tr>
+					<th>Namn på konferens</th>
+						<td>the 38th International Conference</td>
+					</tr>
+					<tr>
+					<th>Språk</th>
+						<td>en</td>
+					</tr>
+					<tr>
+					<th>Sammanfattning</th>
+						<td>Despite a decade of active research, there has been a marked 
+lack in clone detection techniques that scale to large repositories for 
+detecting near-miss clones. In this paper, we present a token-based 
+clone detector, SourcererCC, that can detect both exact and near-miss 
+clones from large interproject repositories using a standard 
+workstation. It exploits an optimized inverted-index to quickly query 
+the potential clones of a given code block. Filtering heuristics based 
+on token ordering are used to signiﬁcantly reduce the size of the index,
+ the number of code-block comparisons needed to detect the clones, as 
+well as the number of required token-comparisons needed to judge a 
+potential clone. We evaluate the scalability, execution time, recall and
+ precision of SourcererCC, and compare it to four publicly available and
+ state-of-the-art tools. To measure recall, we use two recent 
+benchmarks: (1) a big benchmark of real clones, BigCloneBench, and (2) a
+ Mutation/Injection-based framework of thousands of ﬁne-grained 
+artiﬁcial clones. We ﬁnd SourcererCC has both high recall and precision,
+ and is able to scale to a large inter-project repository (25K projects,
+ 250MLOC) using a standard workstation.</td>
+					</tr>
+					<tr>
+					<th>Protokolltitel</th>
+						<td>Proceedings of the 38th International Conference on Software Engineering - ICSE '16</td>
+					</tr>
+					<tr>
+					<th>Kort titel</th>
+						<td>SourcererCC</td>
+					</tr>
+					<tr>
+					<th>Tillagd den</th>
+						<td>2019-09-27 15:00:47</td>
+					</tr>
+					<tr>
+					<th>Ändrad den</th>
+						<td>2019-11-01 16:37:10</td>
+					</tr>
+				</tbody></table>
+				<h3 class="tags">Etiketter:</h3>
+				<ul class="tags">
+					<li>Cloning</li>
+					<li>Clone detection tools</li>
+				</ul>
+				<h3 class="attachments">Bifogade dokument</h3>
+				<ul class="attachments">
+					<li id="item_862T8X8D">Sajnani m. fl. - 2016 - SourcererCC scaling code clone detection to big-c.pdf						<div class="note"><div><p>Presenterar
+ klondetekteringsverktyget SourcererCC, som kan identifiera både exakta 
+och "near-miss"-kloner. Målet är att verktyget ska skala effektivt för 
+stora inter-projekt-repron.</p>
+<p>Refererar till 2 artiklar som säger att få klondetekteringsverktyg 
+skalar till "very large" kodbaser, samt till 3 artiklar som säger att 
+typ 3-kloner är mer frekvent förkommande än andra typer.</p>
+<p>Definition av olika typer av kloner:</p>
+<ul>
+<li>Typ 1: identiska modulo white-space layout och kommentarer</li>
+<li>Typ 2: skillnad endast i identfier-namn och literals, plus skillnader som tillåts för typ 1</li>
+<li>Typ 3: Samma skillnader som ovan, plus att enstaka uttryck kan ha lagts till/tagits bort/ändrats.</li>
+<li>Typ 4: Syntaktiskt olika kodfragment som implementerar samma funktionalitet</li>
+</ul>
+<p>För att få klondetekteringen att skala bättre än state-of-the-art 
+börjar de med att filtrera bort par av kodblock som inte kan vara kloner
+ genom att titta på hur lika deras subblock är.</p>
+<p>De jämför sitt verktyg med CCFinderX, som bara identifierar typ 1- 
+och 2-kloner, men har använts i många studier. De jämför också med 
+Deckard, iClones och NiCad, som alla tre har stöd för typ 3-kloner. 
+Enligt dem själva (med referens till egen artikel) är detta de verktyg 
+som har bäst skalning, recall och/eller unika prestandaaspekter.</p>
+<p>För sina benchmarks använder de ett Javarepro som innehåller filer 
+från 25 000 open source-projekt. Totalt innehåller det 3 000 000 
+källkodsfiler och 250 000 000 rader kod.</p>
+<p>De gör analysen på en vanlig arbetsstation och begränsar minnesanvändningen till 10GB (vilket ju knappast vi behöver göra).</p>
+<p>NiCad vägrar exekvera hela lasten på grund av någon intern gräns. 
+Deckard och iClones får slut på minne (vilket iofs borde gå att lösa med
+ en lite generösare minnesgräns).</p>
+<p>SourcererCC behövde 4 dagar och 12 timmar för att processa hela 
+datasetet, och hittade då 146 000 000 klonpar (då nedre 
+klonstorleksgränsen sattes till 10 rader). CCFinderX kraschade efter 2 
+dagar för att den hade för lite disk (100GB), men författarnas 
+uppskattning är att verktyget skulle behöva tiotals dagar för att 
+processa hela datasetet (med tillräckligt mycket diskutrymme).</p>
+<p>&nbsp;</p>
+<p>De kör ett benchmark för att utvärdera recall och kommer fram till 
+att SourcererCC har 100% recall i samtliga experiment (Java/C/ C#, typ 
+1-, 2- och 3-kloner), vilket inget annat av de utvärderade verktygen 
+har, även om NiCad är nära.</p>
+<p>I ett benchmark med verkliga kloner preseterar NiCad bättre för typ 
+1-kloner, typ 2-kloner och "very similar" (90-100% överlapp) typ 3- 
+kloner: NiCad hittar 100% av förekomsterna, medan SourcererCC hitar 
+86-100% beroende på klontyp och om det är intra- eller 
+inter-projekt-kloner man tittar på.</p>
+<p>De uppskattar SourcererCC:s precision till 83%, vilket är näst högst 
+bland de undersökta verktygen. iClones har 91% precision, men å andra 
+sidan väldigt låg recall för typ 3-kloner. Enligt literaturen ska 83% 
+vara väldigt bra precision för klondetekteringsverktyg.</p>
+<p>&nbsp;</p></div>
+					</div>					</li>
+				</ul>
+			</li>
+
+
+			<li id="item_IZQZZWLN" class="item conferencePaper">
+			<h2>Stack Overflow in Github: Any Snippets There?</h2>
+				<table>
+					<tbody><tr>
+						<th>Typ</th>
+						<td>Konferensartikel</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Di Yang</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Pedro Martins</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Vaibhav Saini</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Cristina Lopes</td>
+					</tr>
+					<tr>
+					<th>Webbadress</th>
+						<td><a href="http://ieeexplore.ieee.org/document/7962378/">http://ieeexplore.ieee.org/document/7962378/</a></td>
+					</tr>
+					<tr>
+					<th>Ort</th>
+						<td>Buenos Aires, Argentina</td>
+					</tr>
+					<tr>
+					<th>Utgivare</th>
+						<td>IEEE</td>
+					</tr>
+					<tr>
+					<th>Sidor</th>
+						<td>280-290</td>
+					</tr>
+					<tr>
+					<th>ISBN</th>
+						<td>978-1-5386-1544-7</td>
+					</tr>
+					<tr>
+					<th>Datum</th>
+						<td>5/2017</td>
+					</tr>
+					<tr>
+					<th>DOI</th>
+						<td><a href="http://doi.org/10.1109/MSR.2017.13">10.1109/MSR.2017.13</a></td>
+					</tr>
+					<tr>
+					<th>Hämtad den</th>
+						<td>2019-09-30 13:37:44</td>
+					</tr>
+					<tr>
+					<th>Bibliotekskatalog</th>
+						<td>Crossref</td>
+					</tr>
+					<tr>
+					<th>Namn på konferens</th>
+						<td>2017 IEEE/ACM 14th International Conference on Mining Software Repositories (MSR)</td>
+					</tr>
+					<tr>
+					<th>Språk</th>
+						<td>en</td>
+					</tr>
+					<tr>
+					<th>Sammanfattning</th>
+						<td>When programmers look for how to achieve certain programming 
+tasks, Stack Overﬂow is a popular destination in search engine results. 
+Over the years, Stack Overﬂow has accumulated an impressive knowledge 
+base of snippets of code that are amply documented. We are interested in
+ studying how programmers use these snippets of code in their projects. 
+Can we ﬁnd Stack Overﬂow snippets in real projects? When snippets are 
+used, is this copy literal or does it suffer adaptations? And are these 
+adaptations specializations required by the idiosyncrasies of the target
+ artifact, or are they motivated by speciﬁc requirements of the 
+programmer? The large-scale study presented on this paper analyzes 909k 
+non-fork Python projects hosted on Github, which contain 290M function 
+deﬁnitions, and 1.9M Python snippets captured in Stack Overﬂow. Results 
+are presented as quantitative analysis of block-level code cloning intra
+ and inter Stack Overﬂow and GitHub, and as an analysis of programming 
+behaviors through the qualitative analysis of our ﬁndings.</td>
+					</tr>
+					<tr>
+					<th>Protokolltitel</th>
+						<td>2017 IEEE/ACM 14th International Conference on Mining Software Repositories (MSR)</td>
+					</tr>
+					<tr>
+					<th>Kort titel</th>
+						<td>Stack Overflow in Github</td>
+					</tr>
+					<tr>
+					<th>Tillagd den</th>
+						<td>2019-09-30 13:37:44</td>
+					</tr>
+					<tr>
+					<th>Ändrad den</th>
+						<td>2019-10-31 13:00:16</td>
+					</tr>
+				</tbody></table>
+				<h3 class="tags">Etiketter:</h3>
+				<ul class="tags">
+					<li>Cloning</li>
+					<li>StackOverflow</li>
+					<li>GitHub mining</li>
+				</ul>
+				<h3 class="attachments">Bifogade dokument</h3>
+				<ul class="attachments">
+					<li id="item_WY9XARMI">Yang m. fl. - 2017 - Stack Overflow in Github Any Snippets There.pdf						<div class="note"><div><p>Analyserar 909 000 icke-forkade Pythonprojekt på GitHub, totalt 290 000 000 funktioner, uppdelade på 31 000 000 filer.</p>
+<p>Bland dessa finns det endast 40 000 000 distinkta 
+funktions-blockhashar, d.v.s 86% av alla funktioner är exakta kopior av 
+någon av de resterande 14%:en. Tittar man på tokenhashar för 
+funktionerna sjunker andelen unika funktioner till ca 36 000 000 (ca 
+12%).</p>
+<p>61 000 funktioner har samma blockhash och 3 800 000 funktioner har 
+samma tokenhash som någon kodsnippet på StackOverflow. Detta motsvarar 
+0,02 respektive 1,3% av funktionerna. Notera dock att det absoluta 
+antalet är ganska högt!</p>
+<p>De hittar ca 13 000 000 typ 3-kloner i GitHubkorpusen när de utesluter typ 1-klonerna beskrivna ovan.</p>
+<p>&nbsp;</p>
+<p>De flesta GitHubkloner som även finns på Stack Overflow är små och 
+generiska och kan enligt författarna inte antas ha kommit från Stack 
+Overflow.</p>
+<p>Vid jämförelse av block- och tokenhashar verkar det oftast vara 
+whitespaces och inte kommentarer som skiljer token- men inte 
+block-hashklonerna åt,.</p>
+<p>Den vanligaste typ 3-klonen inom GitHub är 80 452 versioner av samma funktion i en och samma fil.</p>
+<p>Typ 3-kloner visar sig framförallt skilja i funktionsnamn, parametrar och variabler.</p>
+<p>&nbsp;</p>
+<p>Större funktionskloner inom GitHub, som dessutom finns på Stack 
+Overflow, är mer ovanliga, men fortfarande tusentals och författarna 
+säger sig ha visat att många av dessa har kommit från Stack Overflow 
+till GitHub. I vissa fall är detta till och med explicit skrivet i 
+kommentarer.</p>
+<p>De lite större typ 3-klonerna skiljer sig i variabler, funktionsnamn,
+ parametrar, villkorssatser (tillagda, borttagna eller ändrade) och 
+klassdefinitioner (tillagda eller borttagna).</p>
+<p>&nbsp;</p>
+<p>Angående metodiken:</p>
+<p>De använder SourcererCC för att identifiera kloner. För typ 1-kloner 
+analyserar de block- respektive token-hashar (output från tokenizern), 
+där den förstnämnda är en hash av hela blocket, inklusive kommentarer 
+och whitespaces. Den senare är en hash av resultatet av tokeniseringen 
+(utan kommentarer, whitespaces och specialtecken).</p>
+<p>För typ 3-kloner använder de SourcererCC med ett tröskelvärde på 80%,
+ vilket är default. Artikeln innehåller även en motivering av användning
+ av SourcererCC.</p>
+<p>När de exkluderar de minsta fuktionerna utsluter de dito med 30, 35 
+respektive 35 token när de tittar på blockhashar, tokenhashar respektive
+ typ 3-kloner.</p></div>
+					</div>					</li>
+				</ul>
+			</li>
+
+
+			<li id="item_UMUYJWHB" class="item journalArticle">
+			<h2>Survey of Research on Software Clones</h2>
+				<table>
+					<tbody><tr>
+						<th>Typ</th>
+						<td>Tidskriftsartikel</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Rainer Koschke</td>
+					</tr>
+					<tr>
+					<th>Sidor</th>
+						<td>24</td>
+					</tr>
+					<tr>
+					<th>Bibliotekskatalog</th>
+						<td>Zotero</td>
+					</tr>
+					<tr>
+					<th>Språk</th>
+						<td>en</td>
+					</tr>
+					<tr>
+					<th>Sammanfattning</th>
+						<td>This report summarizes my overview talk on software clone 
+detection research. It ﬁrst discusses the notion of software redundancy,
+ cloning, duplication, and similarity. Then, it describes various 
+categorizations of clone types, empirical studies on the root causes for
+ cloning, current opinions and wisdom of consequences of cloning, 
+empirical studies on the evolution of clones, ways to remove, to avoid, 
+and to detect them, empirical evaluations of existing automatic clone 
+detector performance (such as recall, precision, time and space 
+consumption) and their ﬁtness for a particular purpose, benchmarks for 
+clone detector evaluations, presentation issues, and last but not least 
+application of clone detection in other related ﬁelds.</td>
+					</tr>
+					<tr>
+					<th>Tillagd den</th>
+						<td>2019-12-06 14:14:44</td>
+					</tr>
+					<tr>
+					<th>Ändrad den</th>
+						<td>2019-12-18 15:39:36</td>
+					</tr>
+				</tbody></table>
+				<h3 class="tags">Etiketter:</h3>
+				<ul class="tags">
+					<li>Literature study</li>
+					<li>Cloning</li>
+					<li>Clone detection tools</li>
+				</ul>
+				<h3 class="attachments">Bifogade dokument</h3>
+				<ul class="attachments">
+					<li id="item_NDC5R7IE">Koschke - Survey of Research on Software Clones.pdf						<div class="note"><div><p>[Översiktligt läst]</p>
+<p>En sammanfattning av ett föredrag om kodkloningsdetekteringsforskning, <strong>år 2007</strong>.</p>
+<p>Diskuterar skillnaden mellan kloner och par av kodstycken som bara råkar vara lika eller till och med identiska.</p>
+<p>Nämner kort 3 studier som rapporterar 7-23% kodduplicering, och en 
+som hittar 59%. Underlaget för dessa verkar dock mycket mindre än de 
+senare studier (räknat i rader kod och/eller antalet studerade system).</p>
+<p>Diskuterar argument för och emot kloning, men när artikeln skrevs 
+fanns det (troligtvis) bara en studie om samband mellan kloning och 
+förvaltningsbarhet.</p></div>
+					</div>					</li>
+				</ul>
+			</li>
+
+
+			<li id="item_MNYRQGUP" class="item conferencePaper">
+			<h2>The promises and perils of mining GitHub</h2>
+				<table>
+					<tbody><tr>
+						<th>Typ</th>
+						<td>Konferensartikel</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Eirini Kalliamvakou</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Georgios Gousios</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Kelly Blincoe</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Leif Singer</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Daniel M. German</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Daniela Damian</td>
+					</tr>
+					<tr>
+					<th>Webbadress</th>
+						<td><a href="http://dl.acm.org/citation.cfm?doid=2597073.2597074">http://dl.acm.org/citation.cfm?doid=2597073.2597074</a></td>
+					</tr>
+					<tr>
+					<th>Ort</th>
+						<td>Hyderabad, India</td>
+					</tr>
+					<tr>
+					<th>Utgivare</th>
+						<td>ACM Press</td>
+					</tr>
+					<tr>
+					<th>Sidor</th>
+						<td>92-101</td>
+					</tr>
+					<tr>
+					<th>ISBN</th>
+						<td>978-1-4503-2863-0</td>
+					</tr>
+					<tr>
+					<th>Datum</th>
+						<td>2014</td>
+					</tr>
+					<tr>
+					<th>DOI</th>
+						<td><a href="http://doi.org/10.1145/2597073.2597074">10.1145/2597073.2597074</a></td>
+					</tr>
+					<tr>
+					<th>Hämtad den</th>
+						<td>2019-09-27 14:53:59</td>
+					</tr>
+					<tr>
+					<th>Bibliotekskatalog</th>
+						<td>Crossref</td>
+					</tr>
+					<tr>
+					<th>Namn på konferens</th>
+						<td>the 11th Working Conference</td>
+					</tr>
+					<tr>
+					<th>Språk</th>
+						<td>en</td>
+					</tr>
+					<tr>
+					<th>Sammanfattning</th>
+						<td>With over 10 million git repositories, GitHub is becoming one 
+of the most important source of software artifacts on the Internet. 
+Researchers are starting to mine the information stored in GitHub’s 
+event logs, trying to understand how its users employ the site to 
+collaborate on software. However, so far there have been no studies 
+describing the quality and properties of the data available from GitHub.
+ We document the results of an empirical study aimed at understanding 
+the characteristics of the repositories in GitHub and how users take 
+advantage of GitHub’s main features—namely commits, pull requests, and 
+issues. Our results indicate that, while GitHub is a rich source of data
+ on software development, mining GitHub for research purposes should 
+take various potential perils into consideration. We show, for example, 
+that the majority of the projects are personal and inactive; that GitHub
+ is also being used for free storage and as a Web hosting service; and 
+that almost 40% of all pull requests do not appear as merged, even 
+though they were. We provide a set of recommendations for software 
+engineering researchers on how to approach the data in GitHub.</td>
+					</tr>
+					<tr>
+					<th>Protokolltitel</th>
+						<td>Proceedings of the 11th Working Conference on Mining Software Repositories - MSR 2014</td>
+					</tr>
+					<tr>
+					<th>Tillagd den</th>
+						<td>2019-09-27 14:53:59</td>
+					</tr>
+					<tr>
+					<th>Ändrad den</th>
+						<td>2019-12-17 17:04:37</td>
+					</tr>
+				</tbody></table>
+				<h3 class="tags">Etiketter:</h3>
+				<ul class="tags">
+					<li>Research methodology</li>
+					<li>GitHub mining</li>
+				</ul>
+				<h3 class="attachments">Bifogade dokument</h3>
+				<ul class="attachments">
+					<li id="item_HNS7XZBI">Kalliamvakou m. fl. - 2014 - The promises and perils of mining GitHub.pdf						<div class="note"><div><p>Författarna diskuerar saker man bör tänka på när man utvinner information från GitHub:</p>
+<ol>
+<li>Ett projekt kan bestå av flera repron. Om en commit görs i en fork 
+som sedan pullas till huvudreprot via en GitHubpullrequest syns inte de 
+commits som gjordes till forken i huvudreprots commitlog. Slutsats: <strong>Titta även på forkade repron när du analyserar commithistoriken för ett projekt.</strong>
+ Likaså, om någon gör en pullrequest, får en kommentar på denna, 
+uppdaterar sitt bidrag och gör en ny pullrequest syns bara den sista 
+pullrequesten.</li>
+<li>De flesta projekt har väldigt få commits och/eller är inaktiva: När 
+artikeln skrevs hade 54% av projekten varit inaktiva det senaste 
+halvåret. 32% av alla repron på GitHub hade bara varit aktiva under 1 
+dag.</li>
+<li>Många projekt innehåller inte mjukvara (=kod som man kan bygga 
+verktyg av), utan används exempelvis för demos och tutorials, eller för 
+att hosta websidor eller lagra data för eget bruk.</li>
+<li>2/3 av alla projekt är personliga, d.v.s. används (commitas till) bara av 1 person.</li>
+<li>Väldigt få projekt (även av de icke-personliga) har pull-requests. 
+Ändå var det 1700 projekt som fick &gt;100 pull-requests under 2013, så 
+det existerar data om man vill studera samarbete, men man ska&nbsp; vara
+ medveten om att de flesta projekt inte är relevanta för detta.</li>
+<li>Om man mergear en fork med git (utanför GitHub) ser det ut på GitHub
+ som att den är omergead. Författarna har ett antal tumregler som man 
+kan använda för att hitta i alla fall en del av dessa fall. (Troligtvis 
+inget vi behöver göra.)</li>
+<li>Många projekt har aktivitet (så som utveckling och ärendehantering) pågående utanför GitHub.</li>
+</ol>
+<p>Författarna lyfter dock fram att detta inte påverkar exempelvis analyser av språk och verktygstyper.</p>
+<p>GitHubs innehåll växer (växte) snabbt: När artikeln skrevs (juli 
+2013) hade 34% av alla GitHubprojekt skapats de senaste 6 månaderna!</p>
+<p>&nbsp;</p>
+<p>Verktyg för att utvinna metadata från GitHub:</p>
+<ul>
+<li>GHTorrent (har recordat GitHubevents sedan 2012). Det finns en 
+referens till en källa som förklarar varför den inte kan innhålla allt 
+data.</li>
+<li>Gitminer (för historik från specifika repron).</li>
+</ul>
+<p>Vidare innehåller <a href="http://www.githubarchive.org/">http://www.githubarchive.org</a> historik över GitHub-events.</p></div>
+					</div>					</li>
+				</ul>
+			</li>
+
+
+			<li id="item_GN4AJA59" class="item conferencePaper">
+			<h2>The Story in the Notebook: Exploratory Data Science using a Literate Programming Tool</h2>
+				<table>
+					<tbody><tr>
+						<th>Typ</th>
+						<td>Konferensartikel</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Mary Beth Kery</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Marissa Radensky</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Mahima Arya</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Bonnie E. John</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Brad A. Myers</td>
+					</tr>
+					<tr>
+					<th>Webbadress</th>
+						<td><a href="http://dl.acm.org/citation.cfm?doid=3173574.3173748">http://dl.acm.org/citation.cfm?doid=3173574.3173748</a></td>
+					</tr>
+					<tr>
+					<th>Ort</th>
+						<td>Montreal QC, Canada</td>
+					</tr>
+					<tr>
+					<th>Utgivare</th>
+						<td>ACM Press</td>
+					</tr>
+					<tr>
+					<th>Sidor</th>
+						<td>1-11</td>
+					</tr>
+					<tr>
+					<th>ISBN</th>
+						<td>978-1-4503-5620-6</td>
+					</tr>
+					<tr>
+					<th>Datum</th>
+						<td>2018</td>
+					</tr>
+					<tr>
+					<th>DOI</th>
+						<td><a href="http://doi.org/10.1145/3173574.3173748">10.1145/3173574.3173748</a></td>
+					</tr>
+					<tr>
+					<th>Hämtad den</th>
+						<td>2019-10-04 15:43:06</td>
+					</tr>
+					<tr>
+					<th>Bibliotekskatalog</th>
+						<td>Crossref</td>
+					</tr>
+					<tr>
+					<th>Namn på konferens</th>
+						<td>the 2018 CHI Conference</td>
+					</tr>
+					<tr>
+					<th>Språk</th>
+						<td>en</td>
+					</tr>
+					<tr>
+					<th>Sammanfattning</th>
+						<td>Literate programming tools are used by millions of programmers
+ today, and are intended to facilitate presenting data analyses in the 
+form of a narrative. We interviewed 21 data scientists to study coding 
+behaviors in a literate programming environment and how data scientists 
+kept track of variants they explored. For participants who tried to keep
+ a detailed history of their experimentation, both informal and formal 
+versioning attempts led to problems, such as reduced notebook 
+readability. During iteration, participants actively curated their 
+notebooks into narratives, although primarily through cell structure 
+rather than markdown explanations. Next, we surveyed 45 data scientists 
+and asked them to envision how they might use their past history in a 
+future version control system. Based on these results, we give design 
+guidance for future literate programming tools, such as providing 
+history search based on how programmers recall their explorations, 
+through contextual details including images and parameters.</td>
+					</tr>
+					<tr>
+					<th>Protokolltitel</th>
+						<td>Proceedings of the 2018 CHI Conference on Human Factors in Computing Systems  - CHI '18</td>
+					</tr>
+					<tr>
+					<th>Kort titel</th>
+						<td>The Story in the Notebook</td>
+					</tr>
+					<tr>
+					<th>Tillagd den</th>
+						<td>2019-10-04 15:43:06</td>
+					</tr>
+					<tr>
+					<th>Ändrad den</th>
+						<td>2019-10-31 13:03:02</td>
+					</tr>
+				</tbody></table>
+				<h3 class="tags">Etiketter:</h3>
+				<ul class="tags">
+					<li>Notebooks</li>
+				</ul>
+				<h3 class="attachments">Bifogade dokument</h3>
+				<ul class="attachments">
+					<li id="item_APVPKBIG">Kery m. fl. - 2018 - The Story in the Notebook Exploratory Data Scienc.pdf						<div class="note"><div><p>[Översiktligt läst]</p>
+<p>Intervjuar data scientists om deras kodvanor och versionshantering i 
+"literate programming"-verktyg. Baserat på resultaten ger de 
+rekommendationer angående hur literate programming-verktyg bör designas.</p>
+<p>De kommer fram till att data scientists ofta skapar ett narrativ i 
+sina notebooks, men oftare genom att manipulera cellstrukturen än med 
+hjälp av markdownkommentarer. Precis som Rule et al kommer de också fram
+ till att narrativskapandet inte alltid&nbsp; går ihop med andra mål så 
+som att debugga eller att hålla koll på kodhistoriken. Dessa två 
+artiklar presenterades för övrigt på samma konferens.</p></div>
+					</div>					</li>
+				</ul>
+			</li>
+
+
+			<li id="item_RTPXXEVW" class="item journalArticle">
+			<h2>Usage and attribution of Stack Overflow code snippets in GitHub projects</h2>
+				<table>
+					<tbody><tr>
+						<th>Typ</th>
+						<td>Tidskriftsartikel</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Sebastian Baltes</td>
+					</tr>
+					<tr>
+						<th class="author">Författare</th>
+						<td>Stephan Diehl</td>
+					</tr>
+					<tr>
+					<th>Webbadress</th>
+						<td><a href="http://link.springer.com/10.1007/s10664-018-9650-5">http://link.springer.com/10.1007/s10664-018-9650-5</a></td>
+					</tr>
+					<tr>
+					<th>Band/Årgång</th>
+						<td>24</td>
+					</tr>
+					<tr>
+					<th>Nummer</th>
+						<td>3</td>
+					</tr>
+					<tr>
+					<th>Sidor</th>
+						<td>1259-1295</td>
+					</tr>
+					<tr>
+					<th>Publikation</th>
+						<td>Empirical Software Engineering</td>
+					</tr>
+					<tr>
+					<th>ISSN</th>
+						<td>1382-3256, 1573-7616</td>
+					</tr>
+					<tr>
+					<th>Datum</th>
+						<td>6/2019</td>
+					</tr>
+					<tr>
+					<th>DOI</th>
+						<td><a href="http://doi.org/10.1007/s10664-018-9650-5">10.1007/s10664-018-9650-5</a></td>
+					</tr>
+					<tr>
+					<th>Hämtad den</th>
+						<td>2019-10-03 15:00:16</td>
+					</tr>
+					<tr>
+					<th>Bibliotekskatalog</th>
+						<td>Crossref</td>
+					</tr>
+					<tr>
+					<th>Språk</th>
+						<td>en</td>
+					</tr>
+					<tr>
+					<th>Sammanfattning</th>
+						<td>Stack Overflow (SO) is the most popular question-and-answer 
+website for software developers, providing a large amount of copyable 
+code snippets. Using those snippets raises maintenance and legal issues.
+ SO’s license (CC BY-SA 3.0) requires attribution, i.e., referencing the
+ original question or answer, and requires derived work to adopt a 
+compatible license. While there is a heated debate on SO’s license model
+ for code snippets and the required attribution, little is known about 
+the extent to which snippets are copied from SO without proper 
+attribution. We present results of a large-scale empirical study 
+analyzing the usage and attribution of non-trivial Java code snippets 
+from SO answers in public GitHub (GH) projects. We followed three 
+different approaches to triangulate an estimate for the ratio of 
+unattributed usages and conducted two online surveys with software 
+developers to complement our results. For the different sets of projects
+ that we analyzed, the ratio of projects containing files with a 
+reference to SO varied between 3.3% and 11.9%. We found that at most 
+1.8% of all analyzed repositories containing code from SO used the code 
+in a way compatible with CC BY-SA 3.0. Moreover, we estimate that at 
+most a quarter of the copied code snippets from SO are attributed as 
+required. Of the surveyed developers, almost one half admitted copying 
+code from SO without attribution and about two thirds were not aware of 
+the license of SO code snippets and its implications.</td>
+					</tr>
+					<tr>
+					<th>Tillagd den</th>
+						<td>2019-10-03 15:00:16</td>
+					</tr>
+					<tr>
+					<th>Ändrad den</th>
+						<td>2019-10-31 13:01:05</td>
+					</tr>
+				</tbody></table>
+				<h3 class="tags">Etiketter:</h3>
+				<ul class="tags">
+					<li>Cloning</li>
+					<li>StackOverflow</li>
+					<li>GitHub mining</li>
+				</ul>
+				<h3 class="attachments">Bifogade dokument</h3>
+				<ul class="attachments">
+					<li id="item_8ST7BV6X">Baltes och Diehl - 2019 - Usage and attribution of Stack Overflow code snipp.pdf						<div class="note"><div><p>[Översiktligt läst]</p>
+<p>Analyserar hur ofta (icke-triviala) Java-snippets från StackOverflow 
+förekommer på GitHub, och ifall folk då refererar till motsvarande 
+SO-fråga (vilket man måste enligt deras villkor).</p>
+<p>De delar upp reprona i 3 olika grupper och kommer fram till att</p>
+<ul>
+<li>&lt;=1,8% av de repron som innehöll kopierad kod refererade till orginal-SO-posten så som villkoren föreskriver</li>
+<li>mellan 3,3 och 11,9% av filerna i ett projekt innehåller en referens till SO</li>
+<li>ca 1/4 av de kopierade snippetsen refererar inte till SO så som man ska göra</li>
+</ul>
+<p>De har även genomfört 2 webbaserade undersökningar med 
+mjukvaruutvecklare. Nästan hälften medgav att de hade kopierat kod från 
+SO någon gång. 2/3 kände inte till att villkoren föreskriver att man ska
+ referera till SO-posten när man kopierar kod.</p>
+<p>För att hitta (typ 1-) kloner använder de en detektor som heter PMC Copy-Paste Detector, som finns integrerad i IntelliJ.</p></div>
+					</div>					</li>
+				</ul>
+			</li>
+
+		</ul>
+	
+</body></html>
