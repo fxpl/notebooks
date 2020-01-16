@@ -153,9 +153,9 @@ public class AnalyzerTest {
 		kossa.add(new Snippet("nb_2.ipynb", 0));
 		kossa.add(new Snippet("nb_2.ipynb", 2));
 		expectedClones.put(new SnippetCode(1, "0120F99AA7C49E1CD5F4EE4A6BB1CC4A"), kossa);
-		List<Snippet> unique = new ArrayList<Snippet>(1);
-		unique.add(new Snippet("nb_2.ipynb", 1));
-		expectedClones.put(new SnippetCode(1, "A2D53E3DA394A52271CF00632C961D2A"), unique);
+		List<Snippet> nonUnique = new ArrayList<Snippet>(1);
+		nonUnique.add(new Snippet("nb_2.ipynb", 1));
+		expectedClones.put(new SnippetCode(1, "8D91DA91141E24A95233199750861876"), nonUnique);
 		List<Snippet> somePackage = new ArrayList<Snippet>(2);
 		somePackage.add(new Snippet("nb_7.ipynb", 2));
 		expectedClones.put(new SnippetCode(1, "5CA918CC7C216AF51875415D3FE5C21F"), somePackage);
@@ -320,10 +320,10 @@ public class AnalyzerTest {
 		String notebookFile = "nb_2.ipynb";
 		String reproFile = "repros.csv";
 		String kossaHash = "0120F99AA7C49E1CD5F4EE4A6BB1CC4A";
-		String uniqueHash = "A2D53E3DA394A52271CF00632C961D2A";
+		String nonUniqueHash = "8D91DA91141E24A95233199750861876";
 		String[] expectedFile2HashesLines = {
 			file2hashesHeader(),
-			notebookFile + ", " + kossaHash + ", " + uniqueHash + ", " + kossaHash
+			notebookFile + ", " + kossaHash + ", " + nonUniqueHash + ", " + kossaHash
 		};
 		// hash2Files is hard to test since we don't know in which order the hashes are stored
 		String[] expectedFrequencyLines = {
@@ -362,7 +362,7 @@ public class AnalyzerTest {
 				"nb_5.ipynb, 3, 1.5000, 1, 1.0000, 1, 0, 1.0000, 1.0000",
 				"nb_1.ipynb, 6, 3.0000, 6, 3.0000, 2, 2, 4.0000, 4.0000",
 				"nb_2.ipynb, 7, 2.3333, 7, 2.3333, 3, 3, 4.0000, 4.0000",
-				"nb_3.ipynb, 1, 1.0000, 1, 1.0000, 1, 1, 0.0000, 0.0000",
+				"nb_3.ipynb, 1, 0.5000, 1, 0.5000, 1, 1, 0.0000, 0.0000",
 				"nb_100.ipynb, 0, 0.0000, 0, 0.0000, 0, 0, 0.0000, 0.0000",
 				"nb_6.ipynb, 4, 2.0000, 4, 2.0000, 4, 4, 0.0000, 0.0000",
 				"nb_7.ipynb, 5, 1.6667, 5, 1.6667, 2, 2, 1.5000, 1.5000",
