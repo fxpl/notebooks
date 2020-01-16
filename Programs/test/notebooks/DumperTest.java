@@ -6,7 +6,7 @@ import java.io.File;
 
 public class DumperTest {
 	private boolean deleteTargetAtTearDown = false;
-	protected String targetDir = "test/PythonDumperTestOutput";
+	protected String targetDir = "test/DumperTestOutput";
 	protected Dumper dumper;
 
 	/**
