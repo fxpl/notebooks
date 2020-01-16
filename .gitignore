@@ -7,3 +7,6 @@ logs
 # Output directory
 Output
 
+# From R studio
+.Rhistory
+
