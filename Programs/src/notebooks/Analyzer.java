@@ -4,6 +4,7 @@ import java.io.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -144,6 +145,157 @@ public class Analyzer {
 		Map<SnippetCode, List<Snippet>> clones = getClones(snippets);
 		printCloneFiles(snippets, clones);
 		return clones;
+	}
+	
+	/**
+	 * TODO
+	 * @throws IOException 
+	 */
+	public Map<SnippetCode, List<Snippet>> clones(String sccPairFile, String sccStatsFile) throws IOException {
+		// TODO: Testa!
+		Map<String, Integer> snippetsPerFile = new HashMap<String, Integer>();
+		Map<SnippetCode, List<Snippet>> snippet2file = getClones(sccPairFile, sccStatsFile, snippetsPerFile);
+		Map<String, SnippetCode[]> file2snippet = getSnippets(snippet2file, snippetsPerFile);
+		printCloneFiles(file2snippet, snippet2file);
+		return snippet2file;
+	}
+	
+	/**
+	 * TODO
+	 */
+	private Map<SnippetCode, List<Snippet>> getClones(String sccPairFile, String sccStatFile,
+			Map<String, Integer> snippetsPerFile) throws IOException {	// TODO: Går det att lösa på något snyggare sätt än att skicka med den här mappen?!
+		List<List<SccSnippetId>> clones = getCloneLists(sccPairFile);
+		return getCloneMap(clones, sccStatFile, snippetsPerFile);
+	}
+	
+	// TODO: Refaktorera (när det hela funkar)!
+	private Map<SnippetCode, List<Snippet>> getCloneMap(
+			List<List<SccSnippetId>> clones, String sccStatsFile, Map<String, Integer> snippetsPerFile)
+			throws FileNotFoundException {
+		// Maps needed for analysis
+		// TODO: Borde jag använda Integer istället?!
+		Map<SccSnippetId, String> notebookNumbers = new HashMap<SccSnippetId, String>();
+		Map<SccSnippetId, String> snippetIndices = new HashMap<SccSnippetId, String>();
+		Map<SccSnippetId, Integer> linesOfCode = new HashMap<SccSnippetId, Integer>();
+		Scanner statsScanner = new Scanner(new File(sccStatsFile));
+		while(statsScanner.hasNextLine()) {
+			String line = statsScanner.nextLine();
+			String[] columns = line.split(",");
+			int id1 = Integer.parseInt(columns[0]);
+			int id2 = Integer.parseInt(columns[1]);
+			SccSnippetId id = new SccSnippetId(id1, id2);
+			String path = columns[2];
+			// Remove directories from filename
+			String snippetFileName = path.substring(path.lastIndexOf('/') + 1);
+			// Remove suffix
+			snippetFileName = snippetFileName.substring(0, snippetFileName.lastIndexOf('.'));
+			String[] snippetSubStrings = snippetFileName.split("_");
+			notebookNumbers.put(id, snippetSubStrings[1]);
+			snippetIndices.put(id, snippetSubStrings[2]);
+			// TODO: This is inconsistent! SCC ignores comments but we don't. Comments and empty will be considered the same. (OK since SCC treats them as clones!?)
+			int loc = Integer.parseInt(columns[8]);
+			linesOfCode.put(id, loc);
+		}
+		statsScanner.close();
+				
+		// Clones snippets
+		Map<SnippetCode, List<Snippet>> result = new HashMap<SnippetCode, List<Snippet>>(clones.size());
+		int hashIndex = 0;
+		for (List<SccSnippetId> cloned: clones) {
+			List<Snippet> snippets = new ArrayList<Snippet>();
+			for (SccSnippetId id: cloned) {
+				String nbName = "nb_" + notebookNumbers.remove(id) + ".ipynb";
+				addOrIncrease(snippetsPerFile, nbName); // TODO: Filnamn eller nummer som nyckel?!
+				String snippetIndex = snippetIndices.remove(id);
+				Snippet snippet = new Snippet(nbName, Integer.parseInt(snippetIndex));
+				snippets.add(snippet);
+			}
+			int loc = linesOfCode.get(cloned.get(0));	 // TODO: Borde göras på något smartare sätt. Max? Min? Medel?
+			SnippetCode hash = new SnippetCode(loc, Integer.toString(hashIndex++));
+			result.put(hash, snippets);
+		}
+		
+		// Remaining snippets are unique. Add them!
+		// TODO: Get rid of duplication!
+		for (SccSnippetId id: notebookNumbers.keySet()) {
+			List<Snippet> snippets = new ArrayList<>(1);
+			String nbName = "nb_" + notebookNumbers.get(id) + ".ipynb";
+			addOrIncrease(snippetsPerFile, nbName);
+			String snippetIndex = snippetIndices.remove(id);
+			snippets.add(new Snippet(nbName, Integer.parseInt(snippetIndex)));
+			int loc = linesOfCode.get(id);
+			SnippetCode hash = new SnippetCode(loc, Integer.toString(hashIndex++));
+			result.put(hash, snippets);
+		}
+		return result;
+	}
+
+	private void addOrIncrease(Map<String, Integer> map, String key) {
+		if (map.containsKey(key)) {
+			map.put(key, map.get(key) + 1);
+		} else {
+			map.put(key, 1);
+		}
+	}
+
+	// TODO: Refaktorera!
+	private List<List<SccSnippetId>> getCloneLists(String sccPairFile) throws FileNotFoundException {
+		List<List<SccSnippetId>> clones;
+		clones = new ArrayList<List<SccSnippetId>>();	// TODO: Sorterad!?
+		Scanner scanner = new Scanner(new File(sccPairFile));
+		scanner.nextLine();
+		while (scanner.hasNextLine()) {
+			String line = scanner.nextLine();
+			assert(line.matches("[0-9]+,[0-9]+,[0-9]+,[0-9]+"));
+			String[] numbers = line.split(",");
+			SccSnippetId id1 = new SccSnippetId(Integer.parseInt(numbers[0]), Integer.parseInt(numbers[1]));
+			SccSnippetId id2 = new SccSnippetId(Integer.parseInt(numbers[2]), Integer.parseInt(numbers[3]));
+			boolean bothStored = false;
+			Iterator<List<SccSnippetId>> it = clones.iterator();
+			while (!bothStored && it.hasNext()) {
+				List<SccSnippetId> existing = it.next();
+				boolean id1stored = existing.contains(id1);
+				boolean id2stored = existing.contains(id2); 
+				if(id1stored && id2stored) {
+					bothStored = true;
+				} else if (id1stored && !id2stored) {
+					existing.add(id2);
+					bothStored = true;
+				} else if(id2stored && !id1stored) {
+					existing.add(id1);
+					bothStored = true;
+				}
+			}
+			if (!bothStored) {
+				List<SccSnippetId> newCloneList = new ArrayList<SccSnippetId>();
+				newCloneList.add(id1);
+				newCloneList.add(id2);
+				clones.add(newCloneList);
+			}
+		}
+		scanner.close();
+		return clones;
+	}
+
+	// TODO: Refaktorera(?)
+	private Map<String, SnippetCode[]> getSnippets(Map<SnippetCode, List<Snippet>> snippet2file,
+			Map<String, Integer> snippetsPerFile) {
+		Map<String, SnippetCode[]> result = new HashMap<String, SnippetCode[]>(snippetsPerFile.size());
+
+		// Create arrays for snippets
+		for (String notebook: snippetsPerFile.keySet()) {
+			result.put(new String(notebook), new SnippetCode[snippetsPerFile.get(notebook)]);
+		}
+		
+		for (SnippetCode hash: snippet2file.keySet()) {
+			for (Snippet snippet: snippet2file.get(hash)) {
+				SnippetCode[] snippetsInFile = result.get(snippet.getFileName());
+				snippetsInFile[snippet.getSnippetIndex()] = new SnippetCode(hash);
+			}
+		}
+
+		return result;
 	}
 
 	/**
