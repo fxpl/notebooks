@@ -141,6 +141,7 @@ public class Analyzer {
 	 * @throws IOException On problems handling the output file.
 	 */
 	public Map<SnippetCode, List<Snippet>> clones() throws IOException {
+		// TODO: Tomma notebooks kommer inte med här! Är det ett problem?
 		Map<String, SnippetCode[]> snippets = getSnippets();
 		Map<SnippetCode, List<Snippet>> clones = getClones(snippets);
 		printCloneFiles(snippets, clones);
@@ -244,7 +245,6 @@ public class Analyzer {
 		List<List<SccSnippetId>> clones;
 		clones = new ArrayList<List<SccSnippetId>>();	// TODO: Sorterad!?
 		Scanner scanner = new Scanner(new File(sccPairFile));
-		scanner.nextLine();
 		while (scanner.hasNextLine()) {
 			String line = scanner.nextLine();
 			assert(line.matches("[0-9]+,[0-9]+,[0-9]+,[0-9]+"));
@@ -586,7 +586,7 @@ public class Analyzer {
 	 * @return Header for the connections csv file
 	 */
 	private String connectionsHeader() {
-		return "file, connections, connections normalized, non-empty connections, non-empty connections normalized"
+		return "file, connections, connections normalized, non-empty connections, non-empty connections normalized, "
 				+ "intra repro connections, non-empty intra repro connections, mean inter repro connections, mean non-empty inter repro connections\n";
 	}
 	
@@ -786,6 +786,7 @@ public class Analyzer {
 	 * Parse command line arguments and perform actions accordingly.
 	 */
 	private void analyze(String[] args) {
+		// TODO: Även klonanalys med SCC-filer!
 		boolean all = false,
 				count = false,
 				lang = false,
