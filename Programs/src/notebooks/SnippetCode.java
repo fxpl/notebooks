@@ -14,6 +14,10 @@ public class SnippetCode {
 		this.hash = hash;
 	}
 	
+	public SnippetCode(SnippetCode model) {
+		this(model.getLOC(), model.getHash());
+	}
+
 	public String getHash() {
 		return hash;
 	}
