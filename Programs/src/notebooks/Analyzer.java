@@ -118,14 +118,13 @@ public class Analyzer {
 		}
 		/* Language summary is not printed here, since the information can
 		   easily be extracted from the CSV file. */
-		Map<SnippetCode, List<Snippet>> clones = getClones(snippets);
-		printCloneFiles(snippets, clones);
-		
-		// TODO: Dessa kan stängas innan klonanalysen!
 		codeCellsWriter.close();
 		LOCWriter.close();
 		langWriter.close();
 		allLangWriter.close();
+		
+		Map<SnippetCode, List<Snippet>> clones = getClones(snippets);
+		printCloneFiles(snippets, clones);
 	}
 	
 	/**
@@ -136,8 +135,12 @@ public class Analyzer {
 	 * the hash of each snippet in the notebook to the file 
 	 * file2hashes<current-date-time>.csv.
 	 * Print each hash and the corresponding snippets (name, index) on a
-	 * separate line in the file hash2files<current-date-time>.csv. Start the
-	 * csv files with a header.
+	 * separate line in the file hash2files<current-date-time>.csv.
+	 * Print the number of clones and unique snippets, and the clone frequency,
+	 * for each notebook to cloneFrequency<current-date-time>.csv.
+	 * Print the number of connections for each notebook to
+	 * connections <current-date-time>.csv. See header of the csv file for
+	 * details. Start each csv file with a header.
 	 * @return The map described above
 	 * @throws IOException On problems handling the output file.
 	 */
@@ -174,9 +177,6 @@ public class Analyzer {
 		snippets.put(fileName, snippetsInNotebook);
 	}
 	
-	/**
-	 * @return A map from snippets to files
-	 */
 	private Map<SnippetCode, List<Snippet>> getClones(Map<String, SnippetCode[]> fileMap) throws IOException {
 		int numAnalyzed = 0;
 		Map<SnippetCode, List<Snippet>> clones = new HashMap<SnippetCode, List<Snippet>>();
@@ -199,22 +199,27 @@ public class Analyzer {
 		return clones;
 	}
 	
-	/**
-	 * TODO
-	 * @throws IOException 
+	 /**
+	 * Perform the clone analysis based on SourcererCC output files. Write
+	 * file2hashes<current-date-time>.csv, hash2files<current-date-time>.csv,
+	 * cloneFrequencies<current-date-time>.csv and
+	 * connections<current-date-time>.csv accordingly.
+	 * Note that the ''hashes'' written by this method are not the MD5 hashes
+	 * of the snippets, but just the value of a counter. However, all instances
+	 * of the ''hash'' of a snippet are the same.
+	 * @param sccPairFile: Output file with clone pairs from the SourcererCC clone detection
+	 * @param sccStatsFile: File stats file created by the SourcererCC tokenizer
+	 * @return A map from snippets to files
+	 * @throws IOException
 	 */
 	public Map<SnippetCode, List<Snippet>> clones(String sccPairFile, String sccStatsFile) throws IOException {
-		// TODO: Testa!
 		Map<String, Integer> snippetsPerFile = new HashMap<String, Integer>();
 		Map<SnippetCode, List<Snippet>> snippet2file = getClones(sccPairFile, sccStatsFile, snippetsPerFile);
 		Map<String, SnippetCode[]> file2snippet = getSnippets(snippet2file, snippetsPerFile);
 		printCloneFiles(file2snippet, snippet2file);
 		return snippet2file;
 	}
-	
-	/**
-	 * TODO
-	 */
+
 	private Map<SnippetCode, List<Snippet>> getClones(String sccPairFile, String sccStatFile,
 			Map<String, Integer> snippetsPerFile) throws IOException {	// TODO: Går det att lösa på något snyggare sätt än att skicka med den här mappen?!
 		List<List<SccSnippetId>> clones = getCloneLists(sccPairFile);
@@ -296,7 +301,7 @@ public class Analyzer {
 			List<Snippet> snippets = new ArrayList<Snippet>();
 			for (SccSnippetId id: cloned) {
 				String nbName = "nb_" + notebookNumbers.remove(id) + ".ipynb";
-				addOrIncrease(snippetsPerFile, nbName); // TODO: Filnamn eller nummer som nyckel?!
+				addOrIncrease(snippetsPerFile, nbName);
 				String snippetIndex = snippetIndices.remove(id);
 				Snippet snippet = new Snippet(nbName, Integer.parseInt(snippetIndex));
 				snippets.add(snippet);
