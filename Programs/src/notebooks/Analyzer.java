@@ -150,6 +150,56 @@ public class Analyzer {
 	}
 	
 	/**
+	 * @return A map from file names to snippets
+	 */
+	private Map<String, SnippetCode[]> getSnippets() throws IOException {
+		Map<String, SnippetCode[]> snippets = new HashMap<String, SnippetCode[]>();
+		for (int i=0; i<notebooks.size(); i++) {
+			if (0 == i%10000) {
+				System.out.println("Hashing snippets in notebook " + i);
+			}
+			getSnippetsFrom(notebooks.get(i), snippets);
+		}
+		return snippets;
+	}
+
+	/**
+	 * Get all snippets from a notebook and put them in the snippets map.
+	 * @param notebook Notebook to find snippets in
+	 * @param snippets Map to put the snippets in
+	 */
+	private void getSnippetsFrom(Notebook notebook, Map<String, SnippetCode[]> snippets) {
+		String fileName = notebook.getName();
+		SnippetCode[] snippetsInNotebook = employ(new HashExtractor(notebook));
+		snippets.put(fileName, snippetsInNotebook);
+	}
+	
+	/**
+	 * @return A map from snippets to files
+	 */
+	private Map<SnippetCode, List<Snippet>> getClones(Map<String, SnippetCode[]> fileMap) throws IOException {
+		int numAnalyzed = 0;
+		Map<SnippetCode, List<Snippet>> clones = new HashMap<SnippetCode, List<Snippet>>();
+		for (String fileName: fileMap.keySet()) {
+			if (0 == numAnalyzed%10000) {
+				System.out.println("Finding clones in notebook " + numAnalyzed);
+			}
+			SnippetCode[] snippetCodes = fileMap.get(fileName);
+			for (int j=0; j<snippetCodes.length; j++) {
+				if (clones.containsKey(snippetCodes[j])) {
+					clones.get(snippetCodes[j]).add(new Snippet(fileName, j));
+				} else {
+					List<Snippet> snippets = new ArrayList<Snippet>();
+					snippets.add(new Snippet(fileName, j));
+					clones.put(snippetCodes[j], snippets);
+				}
+			}
+			numAnalyzed++;
+		}
+		return clones;
+	}
+	
+	/**
 	 * TODO
 	 * @throws IOException 
 	 */
@@ -169,6 +219,44 @@ public class Analyzer {
 			Map<String, Integer> snippetsPerFile) throws IOException {	// TODO: Går det att lösa på något snyggare sätt än att skicka med den här mappen?!
 		List<List<SccSnippetId>> clones = getCloneLists(sccPairFile);
 		return getCloneMap(clones, sccStatFile, snippetsPerFile);
+	}
+	
+	// TODO: Refaktorera!
+	private List<List<SccSnippetId>> getCloneLists(String sccPairFile) throws FileNotFoundException {
+		List<List<SccSnippetId>> clones;
+		clones = new ArrayList<List<SccSnippetId>>();	// TODO: Sorterad!?
+		Scanner scanner = new Scanner(new File(sccPairFile));
+		while (scanner.hasNextLine()) {
+			String line = scanner.nextLine();
+			assert(line.matches("[0-9]+,[0-9]+,[0-9]+,[0-9]+"));
+			String[] numbers = line.split(",");
+			SccSnippetId id1 = new SccSnippetId(Integer.parseInt(numbers[0]), Integer.parseInt(numbers[1]));
+			SccSnippetId id2 = new SccSnippetId(Integer.parseInt(numbers[2]), Integer.parseInt(numbers[3]));
+			boolean bothStored = false;
+			Iterator<List<SccSnippetId>> it = clones.iterator();
+			while (!bothStored && it.hasNext()) {
+				List<SccSnippetId> existing = it.next();
+				boolean id1stored = existing.contains(id1);
+				boolean id2stored = existing.contains(id2); 
+				if(id1stored && id2stored) {
+					bothStored = true;
+				} else if (id1stored && !id2stored) {
+					existing.add(id2);
+					bothStored = true;
+				} else if(id2stored && !id1stored) {
+					existing.add(id1);
+					bothStored = true;
+				}
+			}
+			if (!bothStored) {
+				List<SccSnippetId> newCloneList = new ArrayList<SccSnippetId>();
+				newCloneList.add(id1);
+				newCloneList.add(id2);
+				clones.add(newCloneList);
+			}
+		}
+		scanner.close();
+		return clones;
 	}
 	
 	// TODO: Refaktorera (när det hela funkar)!
@@ -241,44 +329,6 @@ public class Analyzer {
 		}
 	}
 
-	// TODO: Refaktorera!
-	private List<List<SccSnippetId>> getCloneLists(String sccPairFile) throws FileNotFoundException {
-		List<List<SccSnippetId>> clones;
-		clones = new ArrayList<List<SccSnippetId>>();	// TODO: Sorterad!?
-		Scanner scanner = new Scanner(new File(sccPairFile));
-		while (scanner.hasNextLine()) {
-			String line = scanner.nextLine();
-			assert(line.matches("[0-9]+,[0-9]+,[0-9]+,[0-9]+"));
-			String[] numbers = line.split(",");
-			SccSnippetId id1 = new SccSnippetId(Integer.parseInt(numbers[0]), Integer.parseInt(numbers[1]));
-			SccSnippetId id2 = new SccSnippetId(Integer.parseInt(numbers[2]), Integer.parseInt(numbers[3]));
-			boolean bothStored = false;
-			Iterator<List<SccSnippetId>> it = clones.iterator();
-			while (!bothStored && it.hasNext()) {
-				List<SccSnippetId> existing = it.next();
-				boolean id1stored = existing.contains(id1);
-				boolean id2stored = existing.contains(id2); 
-				if(id1stored && id2stored) {
-					bothStored = true;
-				} else if (id1stored && !id2stored) {
-					existing.add(id2);
-					bothStored = true;
-				} else if(id2stored && !id1stored) {
-					existing.add(id1);
-					bothStored = true;
-				}
-			}
-			if (!bothStored) {
-				List<SccSnippetId> newCloneList = new ArrayList<SccSnippetId>();
-				newCloneList.add(id1);
-				newCloneList.add(id2);
-				clones.add(newCloneList);
-			}
-		}
-		scanner.close();
-		return clones;
-	}
-
 	// TODO: Refaktorera(?)
 	private Map<String, SnippetCode[]> getSnippets(Map<SnippetCode, List<Snippet>> snippet2file,
 			Map<String, Integer> snippetsPerFile) {
@@ -297,56 +347,6 @@ public class Analyzer {
 		}
 
 		return result;
-	}
-
-	/**
-	 * @return A map from file names to snippets
-	 */
-	private Map<String, SnippetCode[]> getSnippets() throws IOException {
-		Map<String, SnippetCode[]> snippets = new HashMap<String, SnippetCode[]>();
-		for (int i=0; i<notebooks.size(); i++) {
-			if (0 == i%10000) {
-				System.out.println("Hashing snippets in notebook " + i);
-			}
-			getSnippetsFrom(notebooks.get(i), snippets);
-		}
-		return snippets;
-	}
-
-	/**
-	 * Get all snippets from a notebook and put them in the snippets map.
-	 * @param notebook Notebook to find snippets in
-	 * @param snippets Map to put the snippets in
-	 */
-	private void getSnippetsFrom(Notebook notebook, Map<String, SnippetCode[]> snippets) {
-		String fileName = notebook.getName();
-		SnippetCode[] snippetsInNotebook = employ(new HashExtractor(notebook));
-		snippets.put(fileName, snippetsInNotebook);
-	}
-	
-	/**
-	 * @return A map from snippets to files
-	 */
-	private Map<SnippetCode, List<Snippet>> getClones(Map<String, SnippetCode[]> fileMap) throws IOException {
-		int numAnalyzed = 0;
-		Map<SnippetCode, List<Snippet>> clones = new HashMap<SnippetCode, List<Snippet>>();
-		for (String fileName: fileMap.keySet()) {
-			if (0 == numAnalyzed%10000) {
-				System.out.println("Finding clones in notebook " + numAnalyzed);
-			}
-			SnippetCode[] snippetCodes = fileMap.get(fileName);
-			for (int j=0; j<snippetCodes.length; j++) {
-				if (clones.containsKey(snippetCodes[j])) {
-					clones.get(snippetCodes[j]).add(new Snippet(fileName, j));
-				} else {
-					List<Snippet> snippets = new ArrayList<Snippet>();
-					snippets.add(new Snippet(fileName, j));
-					clones.put(snippetCodes[j], snippets);
-				}
-			}
-			numAnalyzed++;
-		}
-		return clones;
 	}
 	
 	/**
