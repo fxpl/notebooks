@@ -28,6 +28,10 @@ public class Snippet {
 		return fileName;
 	}
 	
+	int getSnippetIndex() {
+		return snippetIndex;
+	}
+	
 	@Override
 	public int hashCode() {
 		return Objects.hash(fileName, snippetIndex);

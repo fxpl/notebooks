@@ -153,9 +153,9 @@ public class AnalyzerTest {
 		kossa.add(new Snippet("nb_2.ipynb", 0));
 		kossa.add(new Snippet("nb_2.ipynb", 2));
 		expectedClones.put(new SnippetCode(1, "0120F99AA7C49E1CD5F4EE4A6BB1CC4A"), kossa);
-		List<Snippet> unique = new ArrayList<Snippet>(1);
-		unique.add(new Snippet("nb_2.ipynb", 1));
-		expectedClones.put(new SnippetCode(1, "A2D53E3DA394A52271CF00632C961D2A"), unique);
+		List<Snippet> nonUnique = new ArrayList<Snippet>(1);
+		nonUnique.add(new Snippet("nb_2.ipynb", 1));
+		expectedClones.put(new SnippetCode(1, "8D91DA91141E24A95233199750861876"), nonUnique);
 		List<Snippet> somePackage = new ArrayList<Snippet>(2);
 		somePackage.add(new Snippet("nb_7.ipynb", 2));
 		expectedClones.put(new SnippetCode(1, "5CA918CC7C216AF51875415D3FE5C21F"), somePackage);
@@ -320,10 +320,10 @@ public class AnalyzerTest {
 		String notebookFile = "nb_2.ipynb";
 		String reproFile = "repros.csv";
 		String kossaHash = "0120F99AA7C49E1CD5F4EE4A6BB1CC4A";
-		String uniqueHash = "A2D53E3DA394A52271CF00632C961D2A";
+		String nonUniqueHash = "8D91DA91141E24A95233199750861876";
 		String[] expectedFile2HashesLines = {
 			file2hashesHeader(),
-			notebookFile + ", " + kossaHash + ", " + uniqueHash + ", " + kossaHash
+			notebookFile + ", " + kossaHash + ", " + nonUniqueHash + ", " + kossaHash
 		};
 		// hash2Files is hard to test since we don't know in which order the hashes are stored
 		String[] expectedFrequencyLines = {
@@ -362,7 +362,7 @@ public class AnalyzerTest {
 				"nb_5.ipynb, 3, 1.5000, 1, 1.0000, 1, 0, 1.0000, 1.0000",
 				"nb_1.ipynb, 6, 3.0000, 6, 3.0000, 2, 2, 4.0000, 4.0000",
 				"nb_2.ipynb, 7, 2.3333, 7, 2.3333, 3, 3, 4.0000, 4.0000",
-				"nb_3.ipynb, 1, 1.0000, 1, 1.0000, 1, 1, 0.0000, 0.0000",
+				"nb_3.ipynb, 1, 0.5000, 1, 0.5000, 1, 1, 0.0000, 0.0000",
 				"nb_100.ipynb, 0, 0.0000, 0, 0.0000, 0, 0, 0.0000, 0.0000",
 				"nb_6.ipynb, 4, 2.0000, 4, 2.0000, 4, 4, 0.0000, 0.0000",
 				"nb_7.ipynb, 5, 1.6667, 5, 1.6667, 2, 2, 1.5000, 1.5000",
@@ -381,6 +381,94 @@ public class AnalyzerTest {
 		deleteCloneCsvs();
 	}
 	
+	/**
+	 * Verify that connections are identified correctly at clone analysis based
+	 * on SourcererCC data.
+	 * @throws IOException 
+	 */
+	@Test
+	public void testConnectionsCsv_sccData() throws IOException {
+		String dataDir = "test/data/scc";
+		String statFile = "file_stats";
+		String cloneFile = "clone_pairs";
+		String reproMapPath = "test/data/hash/repros.csv";
+		
+		String[] expectedLines = {
+				connectionsHeader(),
+				"nb_4.ipynb, 2, 2.0000, 0, 0.0000, 1, 0, 1.0000, 0.0000",
+				"nb_5.ipynb, 3, 1.5000, 1, 1.0000, 1, 0, 1.0000, 1.0000",
+				"nb_1.ipynb, 6, 3.0000, 6, 3.0000, 2, 2, 4.0000, 4.0000",
+				"nb_2.ipynb, 7, 2.3333, 7, 2.3333, 3, 3, 4.0000, 4.0000",
+				"nb_3.ipynb, 1, 0.5000, 1, 0.5000, 1, 1, 0.0000, 0.0000",
+				"nb_6.ipynb, 4, 2.0000, 4, 2.0000, 4, 4, 0.0000, 0.0000",
+				"nb_7.ipynb, 5, 1.6667, 5, 1.6667, 2, 2, 1.5000, 1.5000",
+				"nb_10.ipynb, 2, 2.0000, 0, 0.0000, 0, 0, 2.0000, 0.0000",
+				"nb_8.ipynb, 1, 1.0000, 1, 1.0000, 0, 0, 1.0000, 1.0000",
+				"nb_9.ipynb, 4, 2.0000, 4, 2.0000, 2, 2, 2.0000, 2.0000",
+				"nb_11.ipynb, 1, 1.0000, 1, 1.0000, 0, 0, 1.0000, 1.0000",
+				
+		};
+
+		analyzer.initializeReproMap(reproMapPath);
+		analyzer.clones(dataDir + "/" + cloneFile, dataDir + "/" + statFile);
+		
+		checkCsv_anyOrder("connections", expectedLines);
+		
+		deleteCloneCsvs();
+	}
+	
+	/**
+	 * Verify that cloneFrequencies are computed correctly at clone analysis
+	 * based on SourcererCC data.
+	 * @throws IOException 
+	 */
+	@Test
+	public void testCloneFreqCsv_sccData() throws IOException {
+		String dataDir = "test/data/scc";
+		String statFile = "file_stats";
+		String cloneFile = "clone_pairs";
+		String reproMapPath = "test/data/hash/repros.csv";
+		
+		String[] expectedLines = {
+				cloneFrequencyHeader(),
+				"nb_1.ipynb, 2, 0, 1.0000",
+				"nb_2.ipynb, 3, 0, 1.0000",
+				"nb_3.ipynb, 1, 1, 0.5000",
+				"nb_4.ipynb, 1, 0, 1.0000",
+				"nb_5.ipynb, 2, 0, 1.0000",
+				"nb_6.ipynb, 2, 0, 1.0000",
+				"nb_7.ipynb, 3, 0, 1.0000",
+				"nb_8.ipynb, 1, 0, 1.0000",
+				"nb_9.ipynb, 2, 0, 1.0000",
+				"nb_10.ipynb, 1, 0, 1.0000",
+				"nb_11.ipynb, 1, 0, 1.0000"
+		};
+		
+		analyzer.initializeReproMap(reproMapPath);
+		analyzer.clones(dataDir + "/" + cloneFile, dataDir + "/" + statFile);
+		
+		checkCsv_anyOrder("cloneFrequency", expectedLines);
+		
+		deleteCloneCsvs();
+	}
+	
+	/**
+	 * Verify that an AssertionError is thrown when the clone pairs file is on
+	 * the wrong format.
+	 * @throws IOException
+	 */
+	/* TODO: Om jag ska kunna ha med det här testet måste jag enabla assertions!
+	@Test (expected = AssertionError.class)
+	public void testClones_corruptSccData() throws IOException {
+		String dataDir = "test/data/scc";
+		String statFile = "file_stats";
+		String cloneFile = "clone_pairs_corrupt";
+		String reproMapPath = "test/data/hash/repros.csv";
+		analyzer.initializeReproMap(reproMapPath);
+		analyzer.clones(dataDir + "/" + cloneFile, dataDir + "/" + statFile);
+	}*/
+	
+	// TODO: Borde man kolla file2hashes och hash2files också? Hur?!
 	
 	/**
 	 * Verify that the right languages are found in the notebooks.
@@ -547,7 +635,7 @@ public class AnalyzerTest {
 		outputReader.close();
 	}
 	
-	/**
+	/** TODO: Kolla även antalet rader!
 	 * Check that the most recent file <prefix><timestamp>.csv contains all
 	 * lines in expectedLines.
 	 * @param prefix First part of name of file to be analyzed (see above)
@@ -581,7 +669,7 @@ public class AnalyzerTest {
 	 * @return Expected header of connections files
 	 */
 	private static String connectionsHeader() {
-		return "file, connections, connections normalized, non-empty connections, non-empty connections normalized"
+		return "file, connections, connections normalized, non-empty connections, non-empty connections normalized, "
 				+ "intra repro connections, non-empty intra repro connections, mean inter repro connections, mean non-empty inter repro connections";
 	}
 	

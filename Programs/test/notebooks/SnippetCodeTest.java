@@ -9,8 +9,8 @@ import org.junit.Test;
 
 public class SnippetCodeTest {
 	SnippetCode code;
-	private int LOC = 4;
-	private String hash = "ABCD";
+	private final int LOC = 4;
+	private final String hash = "ABCD";
 	
 	@Before
 	public void setUp() {
@@ -21,6 +21,12 @@ public class SnippetCodeTest {
 	public void testConstructor() {
 		assertEquals("Wrong LOC in SnippetCode!", LOC, code.getLOC());
 		assertEquals("Wrong hash in SnippetCode!", hash, code.getHash());
+	}
+	
+	@Test
+	public void testCopyConstructor() {
+		SnippetCode copy = new SnippetCode(code);
+		assertEquals("Copy constructor returns different object!", code, copy);
 	}
 	
 	@SuppressWarnings("unlikely-arg-type")
@@ -51,5 +57,10 @@ public class SnippetCodeTest {
 	@Test
 	public void testHashCode() {
 		assertEquals("Wrong hash code returned!", Objects.hash(hash), code.hashCode());
+	}
+	
+	@Test
+	public void testToString() {
+		assertEquals("Wrong string representation!", hash, code.toString());
 	}
 }

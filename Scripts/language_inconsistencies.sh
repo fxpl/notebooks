@@ -8,7 +8,7 @@
 
 ################################################################################
 # Find notebooks where different languages are specified in metadata.language,
-# metadata.language_info.name, metadata.kernelspec.language and and/or code
+# metadata.language_info.name, metadata.kernelspec.language and/or code
 # cells.
 ################################################################################
 

@@ -52,6 +52,11 @@ public class SnippetTest {
 	}
 	
 	@Test
+	public void testGetSnippetIndex() {
+		assertEquals("Wrong snippet id returned for snippet!", index, snippet.getSnippetIndex());
+	}
+	
+	@Test
 	public void testHashCode() {
 		int expectedHashCode = Objects.hash(name, index);
 		assertEquals("Wrong hash code returned!", expectedHashCode, snippet.hashCode());
