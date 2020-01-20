@@ -120,6 +120,7 @@ public class Analyzer {
 		Map<SnippetCode, List<Snippet>> clones = getClones(snippets);
 		printCloneFiles(snippets, clones);
 		
+		// TODO: Dessa kan stängas innan klonanalysen!
 		codeCellsWriter.close();
 		LOCWriter.close();
 		langWriter.close();
@@ -688,7 +689,7 @@ public class Analyzer {
 				clones = true;
 				break;
 			case "-lang_all":
-				lang = true;
+				langAll = true;
 				break;
 			default:
 				System.err.println("Unknown argument: " + arg);
@@ -697,9 +698,6 @@ public class Analyzer {
 			
 		// Perform analyzes
 		try {
-			if (null != nbPath) {
-				this.initializeNotebooksFrom(nbPath);
-			}
 			if (null != reproFile) {
 				try {
 					this.initializeReproMap(reproFile);
@@ -707,6 +705,9 @@ public class Analyzer {
 					System.err.println("Repro file not found: " + e.getMessage());
 					System.err.println("Repro information not initialized!");
 				}
+			}
+			if (null != nbPath) {
+				this.initializeNotebooksFrom(nbPath);
 			}
 			if (null != outputDir) {
 				this.outputDir = outputDir;
