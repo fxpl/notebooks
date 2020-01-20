@@ -220,16 +220,19 @@ public class Analyzer {
 		return snippet2file;
 	}
 
+	/**
+	 * Create a mapping från snippets to notebooks (hash2files) using output
+	 * files from SourcererCC. Also count the number of snippets for each
+	 * notebook and store the result in snippetsPerFile (the third argument)
+	 */
 	private Map<SnippetCode, List<Snippet>> getClones(String sccPairFile, String sccStatFile,
-			Map<String, Integer> snippetsPerFile) throws IOException {	// TODO: Går det att lösa på något snyggare sätt än att skicka med den här mappen?!
+			Map<String, Integer> snippetsPerFile) throws IOException {
 		List<List<SccSnippetId>> clones = getCloneLists(sccPairFile);
 		return getCloneMap(clones, sccStatFile, snippetsPerFile);
 	}
 	
-	// TODO: Refaktorera!
 	private List<List<SccSnippetId>> getCloneLists(String sccPairFile) throws FileNotFoundException {
-		List<List<SccSnippetId>> clones;
-		clones = new ArrayList<List<SccSnippetId>>();	// TODO: Sorterad!?
+		List<List<SccSnippetId>> clones = new ArrayList<List<SccSnippetId>>();
 		Scanner scanner = new Scanner(new File(sccPairFile));
 		while (scanner.hasNextLine()) {
 			String line = scanner.nextLine();
@@ -264,15 +267,69 @@ public class Analyzer {
 		return clones;
 	}
 	
-	// TODO: Refaktorera (när det hela funkar)!
 	private Map<SnippetCode, List<Snippet>> getCloneMap(
 			List<List<SccSnippetId>> clones, String sccStatsFile, Map<String, Integer> snippetsPerFile)
 			throws FileNotFoundException {
 		// Maps needed for analysis
-		// TODO: Borde jag använda Integer istället?!
-		Map<SccSnippetId, String> notebookNumbers = new HashMap<SccSnippetId, String>();
-		Map<SccSnippetId, String> snippetIndices = new HashMap<SccSnippetId, String>();
+		Map<SccSnippetId, Integer> notebookNumbers = new HashMap<SccSnippetId, Integer>();
+		Map<SccSnippetId, Integer> snippetIndices = new HashMap<SccSnippetId, Integer>();
 		Map<SccSnippetId, Integer> linesOfCode = new HashMap<SccSnippetId, Integer>();
+		initializeMapsFromStatsFile(sccStatsFile, notebookNumbers, snippetIndices, linesOfCode);
+		return getCloneMap(clones, snippetsPerFile, notebookNumbers, snippetIndices, linesOfCode);
+	}
+
+	private Map<SnippetCode, List<Snippet>> getCloneMap(
+			List<List<SccSnippetId>> clones,
+			Map<String, Integer> snippetsPerFile,
+			Map<SccSnippetId, Integer> notebookNumbers,
+			Map<SccSnippetId, Integer> snippetIndices,
+			Map<SccSnippetId, Integer> linesOfCode) {
+		Map<SnippetCode, List<Snippet>> result = new HashMap<SnippetCode, List<Snippet>>(clones.size());
+		int hashIndex = 0;
+		
+		// Cloned snippets
+		for (List<SccSnippetId> cloned: clones) {
+			List<Snippet> snippets = new ArrayList<Snippet>();
+			for (SccSnippetId id: cloned) {
+				String nbName = "nb_" + notebookNumbers.remove(id) + ".ipynb";
+				addOrIncrease(snippetsPerFile, nbName);
+				int snippetIndex = snippetIndices.remove(id);
+				Snippet snippet = new Snippet(nbName, snippetIndex);
+				snippets.add(snippet);
+			}
+			int loc = linesOfCode.get(cloned.get(0));	 // TODO: Borde göras på något smartare sätt. Max? Min? Medel?
+			SnippetCode hash = new SnippetCode(loc, Integer.toString(hashIndex++));
+			result.put(hash, snippets);
+		}
+		
+		// TODO: Get rid of duplication!
+		// Remaining snippets are unique. Add them!
+		for (SccSnippetId id: notebookNumbers.keySet()) {
+			List<Snippet> snippets = new ArrayList<>(1);
+			String nbName = "nb_" + notebookNumbers.get(id) + ".ipynb";
+			addOrIncrease(snippetsPerFile, nbName);
+			int snippetIndex = snippetIndices.remove(id);
+			Snippet snippet = new Snippet(nbName, snippetIndex);
+			snippets.add(snippet);
+			int loc = linesOfCode.get(id);
+			SnippetCode hash = new SnippetCode(loc, Integer.toString(hashIndex++));
+			result.put(hash, snippets);
+		}
+		return result;
+	}
+
+	/**
+	 * @param sccStatsFile File stats file produced by the SourcererCC tokenizer
+	 * @param notebookNumbers Notebook number for each snippet
+	 * @param snippetIndices Index for each snippet
+	 * @param linesOfCode LOC for each snippet
+	 * @throws FileNotFoundException If the stats file doesn't exist
+	 */
+	private void initializeMapsFromStatsFile(String sccStatsFile,
+			Map<SccSnippetId, Integer> notebookNumbers,
+			Map<SccSnippetId, Integer> snippetIndices,
+			Map<SccSnippetId, Integer> linesOfCode)
+			throws FileNotFoundException {
 		Scanner statsScanner = new Scanner(new File(sccStatsFile));
 		while(statsScanner.hasNextLine()) {
 			String line = statsScanner.nextLine();
@@ -286,46 +343,24 @@ public class Analyzer {
 			// Remove suffix
 			snippetFileName = snippetFileName.substring(0, snippetFileName.lastIndexOf('.'));
 			String[] snippetSubStrings = snippetFileName.split("_");
-			notebookNumbers.put(id, snippetSubStrings[1]);
-			snippetIndices.put(id, snippetSubStrings[2]);
-			// TODO: This is inconsistent! SCC ignores comments but we don't. Comments and empty will be considered the same. (OK since SCC treats them as clones!?)
+			notebookNumbers.put(id, Integer.parseInt(snippetSubStrings[1]));
+			snippetIndices.put(id, Integer.parseInt(snippetSubStrings[2]));
+			/* Here we use the number of lines of source code (comments
+			   excluded), which is inconsistent with the clone analysis of the 
+			   notebook files, but so is the clone detection -SourcererCC
+			   doesn't consider comments in clone analysis. */
 			int loc = Integer.parseInt(columns[8]);
 			linesOfCode.put(id, loc);
 		}
 		statsScanner.close();
-				
-		// Clones snippets
-		Map<SnippetCode, List<Snippet>> result = new HashMap<SnippetCode, List<Snippet>>(clones.size());
-		int hashIndex = 0;
-		for (List<SccSnippetId> cloned: clones) {
-			List<Snippet> snippets = new ArrayList<Snippet>();
-			for (SccSnippetId id: cloned) {
-				String nbName = "nb_" + notebookNumbers.remove(id) + ".ipynb";
-				addOrIncrease(snippetsPerFile, nbName);
-				String snippetIndex = snippetIndices.remove(id);
-				Snippet snippet = new Snippet(nbName, Integer.parseInt(snippetIndex));
-				snippets.add(snippet);
-			}
-			int loc = linesOfCode.get(cloned.get(0));	 // TODO: Borde göras på något smartare sätt. Max? Min? Medel?
-			SnippetCode hash = new SnippetCode(loc, Integer.toString(hashIndex++));
-			result.put(hash, snippets);
-		}
-		
-		// Remaining snippets are unique. Add them!
-		// TODO: Get rid of duplication!
-		for (SccSnippetId id: notebookNumbers.keySet()) {
-			List<Snippet> snippets = new ArrayList<>(1);
-			String nbName = "nb_" + notebookNumbers.get(id) + ".ipynb";
-			addOrIncrease(snippetsPerFile, nbName);
-			String snippetIndex = snippetIndices.remove(id);
-			snippets.add(new Snippet(nbName, Integer.parseInt(snippetIndex)));
-			int loc = linesOfCode.get(id);
-			SnippetCode hash = new SnippetCode(loc, Integer.toString(hashIndex++));
-			result.put(hash, snippets);
-		}
-		return result;
 	}
 
+	/**
+	 * If map contains a value for key, increase it with 1. Else add an entry
+	 * with for key with the value 1.
+	 * @param map Map to modify as stated above
+	 * @param key Key for the entry that will be changed/added
+	 */
 	private void addOrIncrease(Map<String, Integer> map, String key) {
 		if (map.containsKey(key)) {
 			map.put(key, map.get(key) + 1);
@@ -334,16 +369,14 @@ public class Analyzer {
 		}
 	}
 
-	// TODO: Refaktorera(?)
 	private Map<String, SnippetCode[]> getSnippets(Map<SnippetCode, List<Snippet>> snippet2file,
 			Map<String, Integer> snippetsPerFile) {
 		Map<String, SnippetCode[]> result = new HashMap<String, SnippetCode[]>(snippetsPerFile.size());
-
 		// Create arrays for snippets
 		for (String notebook: snippetsPerFile.keySet()) {
 			result.put(new String(notebook), new SnippetCode[snippetsPerFile.get(notebook)]);
 		}
-		
+		// Put snippet in notebook to snippet map
 		for (SnippetCode hash: snippet2file.keySet()) {
 			for (Snippet snippet: snippet2file.get(hash)) {
 				SnippetCode[] snippetsInFile = result.get(snippet.getFileName());
