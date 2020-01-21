@@ -95,41 +95,41 @@ public class NotebookTest {
 			nb.dumpCodeAsZip(outputDir, suffix);
 		}
 
-    int totalSnippetId = 0;
-		// Check output
-		for (int i=0; i<expectedOutFiles.length; i++) {
-			String fileName = "./"  +  expectedOutFiles[i];
-      
-      ZipInputStream zip = new ZipInputStream(new BufferedInputStream(new FileInputStream(fileName)));
-
-      System.err.printf("%s\n", fileName);
-          
-      for (int snippetId=0; snippetId < expectedSnippets[i].length; snippetId += 1) {
-          ZipEntry entry = zip.getNextEntry();
-          assertEquals("Wrong filename for code snippet in " + fileName, expectedSnippets[i][snippetId], entry.getName());
-
-          BufferedReader reader = new BufferedReader(new InputStreamReader(zip));
-          for (int lineId = 0; lineId < expectedLines[totalSnippetId].length; lineId += 1) {
-              assertEquals("Wrong code dumped to " + fileName + " in " + entry.getName(), expectedLines[totalSnippetId][lineId], reader.readLine());
-          }
-
-          assertNull("Too many lines in " + fileName, reader.readLine());
-
-          totalSnippetId += 1;
-      }
-      
-      zip.close();
-    }
-    
-		// Clean up
-    for (String outFile: expectedOutFiles) {
-        new File(outFile).delete();
-    }
-  }
+	    int totalSnippetId = 0;
+			// Check output
+			for (int i=0; i<expectedOutFiles.length; i++) {
+				String fileName = "./"  +  expectedOutFiles[i];
+	      
+	      ZipInputStream zip = new ZipInputStream(new BufferedInputStream(new FileInputStream(fileName)));
+	
+	      System.err.printf("%s\n", fileName);
+	          
+	      for (int snippetId=0; snippetId < expectedSnippets[i].length; snippetId += 1) {
+	          ZipEntry entry = zip.getNextEntry();
+	          assertEquals("Wrong filename for code snippet in " + fileName, expectedSnippets[i][snippetId], entry.getName());
+	
+	          BufferedReader reader = new BufferedReader(new InputStreamReader(zip));
+	          for (int lineId = 0; lineId < expectedLines[totalSnippetId].length; lineId += 1) {
+	              assertEquals("Wrong code dumped to " + fileName + " in " + entry.getName(), expectedLines[totalSnippetId][lineId], reader.readLine());
+	          }
+	
+	          assertNull("Too many lines in " + fileName, reader.readLine());
+	
+	          totalSnippetId += 1;
+	      }
+	      
+	      zip.close();
+	    }
+	    
+			// Clean up
+	    for (String outFile: expectedOutFiles) {
+	        new File(outFile).delete();
+	    }
+	}
 	
 
 
-  /**
+	/**
 	 * Verify that getName returns the name of the notebook (without preceding
 	 * path).
 	 */
@@ -138,6 +138,8 @@ public class NotebookTest {
 		Notebook notebook = new Notebook("made/up/path/empty.ipynb");
 		assertEquals("Wrong name of notebook!" , "empty.ipynb", notebook.getName());
 	}
+	
+	/**
 	
 	/**
 	 * Verify that code snippets are hashed correctly.
