@@ -5,7 +5,7 @@ import static org.junit.Assert.*;
 import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
-
+import java.util.Objects;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -141,7 +141,28 @@ public class NotebookTest {
 	    }
 	}
 	
+	@Test
+	public void testEquals_diffType() {
+		Notebook notebook = new Notebook("");
+		String other = "";
+		assertFalse("Object of other type considered equal!", notebook.equals(other));
+	}
+	
+	@Test
+	public void testEquals_diffNames() {
+		Notebook notebook1 = new Notebook("notebook1.ipynb");
+		Notebook notebook2 = new Notebook("notebook2.ipynb");
+		assertFalse("Notebooks with different names considered equal!",
+				notebook1.equals(notebook2));
+	}
 
+	@Test
+	public void testEquals_equal() {
+		Notebook notebook1 = new Notebook("notebook.ipynb");
+		Notebook notebook2 = new Notebook("notebook.ipynb");
+		assertTrue("Equal notebooks considered different!",
+				notebook1.equals(notebook2));
+	}
 
 	/**
 	 * Verify that getName returns the name of the notebook (without preceding
@@ -151,6 +172,14 @@ public class NotebookTest {
 	public void testGetName() {
 		Notebook notebook = new Notebook("made/up/path/empty.ipynb");
 		assertEquals("Wrong name of notebook!" , "empty.ipynb", notebook.getName());
+	}
+	
+	@Test
+	public void testHashCode() {
+		String name = "notebook";
+		String path = "some/path/" + name;
+		Notebook notebook = new Notebook(path);
+		assertEquals("Wrong hash code returned!", Objects.hash(name), notebook.hashCode());
 	}
 	
 	/**

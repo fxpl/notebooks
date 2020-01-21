@@ -55,8 +55,8 @@ public class AnalyzerTest {
 		String[] expectedConnectionsLines = {connectionsHeader(),
 				notebookFile + ", 0, 0.0000, 0, 0.0000, 0, 0, 0.0000, 0.0000"};
 		
-		analyzer.initializeReproMap(testDir + "/" + reproFile);
 		analyzer.initializeNotebooksFrom(testDir + "/" + notebookFile);
+		analyzer.initializeReproMap(testDir + "/" + reproFile);
 		analyzer.allAnalyzes();
 		
 		checkCsv("code_cells", expectedCodeCellsLines);
@@ -295,10 +295,10 @@ public class AnalyzerTest {
 		expectedClones.put(new SnippetCode(1, "ECE926D8C0356205276A45266D361161"), f);
 		
 		// Actual values
-		analyzer.initializeReproMap(dataDir + "/" + reproFile);
 		for (String file: files) {
 			analyzer.initializeNotebooksFrom(dataDir + "/" + file);
 		}
+		analyzer.initializeReproMap(dataDir + "/" + reproFile);
 		Map<SnippetCode, List<Snippet>> clones = analyzer.clones();
 		
 		// Check values
@@ -340,8 +340,8 @@ public class AnalyzerTest {
 		};
 		
 		// Actual values
-		analyzer.initializeReproMap(dataDir + "/" + reproMapName);
 		analyzer.initializeNotebooksFrom(dataDir + "/" + notebookFile);
+		analyzer.initializeReproMap(dataDir + "/" + reproMapName);
 		analyzer.clones();
 		
 		checkCsv("file2hashes", expectedSnippetLines);
@@ -383,8 +383,8 @@ public class AnalyzerTest {
 		};
 		
 		// Actual values
-		analyzer.initializeReproMap(dataDir + "/" + reproFile);
 		analyzer.initializeNotebooksFrom(dataDir + "/" + notebookFile);
+		analyzer.initializeReproMap(dataDir + "/" + reproFile);
 		analyzer.clones();
 		
 		checkCsv("file2hashes", expectedSnippetLines);
@@ -426,8 +426,8 @@ public class AnalyzerTest {
 		};
 		
 		// Actual values
-		analyzer.initializeReproMap(dataDir + "/" + reproFile);
 		analyzer.initializeNotebooksFrom(dataDir + "/" + notebookFile);
+		analyzer.initializeReproMap(dataDir + "/" + reproFile);
 		analyzer.clones();
 		
 		checkCsv("file2hashes", expectedFile2HashesLines);
@@ -467,8 +467,8 @@ public class AnalyzerTest {
 		};
 		
 		// Actual values
-		analyzer.initializeReproMap(dataDir + "/" + reproFile);
 		analyzer.initializeNotebooksFrom(dataDir + "/" + notebookFile);
+		analyzer.initializeReproMap(dataDir + "/" + reproFile);
 		analyzer.clones();
 		
 		checkCsv("file2hashes", expectedFile2HashesLines);
@@ -503,8 +503,8 @@ public class AnalyzerTest {
 				"nb_11.ipynb, 1, 1.0000, 1, 1.0000, 0, 0, 1.0000, 1.0000"
 		};
 		
-		analyzer.initializeReproMap(dataDir + "/" + reproFile);
 		analyzer.initializeNotebooksFrom(dataDir);
+		analyzer.initializeReproMap(dataDir + "/" + reproFile);
 		analyzer.clones();
 		
 		checkCsv_anyOrder("connections", expectedLines);
@@ -540,7 +540,7 @@ public class AnalyzerTest {
 				
 		};
 
-		analyzer.initializeReproMap(reproMapPath);
+		analyzer.initializeReproMap(reproMapPath);	// TODO: Den här kommer inte att fungera!
 		analyzer.clones(dataDir + "/" + cloneFile, dataDir + "/" + statFile);
 		
 		checkCsv_anyOrder("connections", expectedLines);

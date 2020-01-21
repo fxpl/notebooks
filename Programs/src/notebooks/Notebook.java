@@ -35,6 +35,18 @@ public class Notebook {
 	}
 	
 	/**
+	 * @return true iff is a notebook with the same name as this
+	 */
+	@Override
+	public boolean equals(Object other) {
+		if (other.getClass() != this.getClass()) {
+			return false;
+		}
+		Notebook otherNotebook = (Notebook)other;
+		return this.getName().equals(otherNotebook.getName());
+	}
+	
+	/**
 	 * @return The file name of the notebook, without preceding path
 	 */
 	public String getName() {
@@ -69,6 +81,11 @@ public class Notebook {
 			}
 			writer.close();
 		}
+	}
+	
+	@Override
+	public int hashCode() {
+		return Objects.hash(this.getName());
 	}
 
 	/**

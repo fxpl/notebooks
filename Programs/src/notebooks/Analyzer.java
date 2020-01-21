@@ -121,7 +121,7 @@ public class Analyzer {
 		Writer allLangWriter = new FileWriter(outputDir + "/all_languages" + LocalDateTime.now() + ".csv");
 		allLangWriter.write(allLanguagesHeader());
 		
-		Map<String, SnippetCode[]> snippets = new HashMap<String, SnippetCode[]>();
+		Map<Notebook, SnippetCode[]> snippets = new HashMap<Notebook, SnippetCode[]>();
 		for (Notebook notebook: this.notebooks) {
 			numCodeCellsIn(notebook, codeCellsWriter);
 			LOCIn(notebook, LOCWriter);
@@ -158,7 +158,7 @@ public class Analyzer {
 	 * @throws IOException On problems handling the output file.
 	 */
 	public Map<SnippetCode, List<Snippet>> clones() throws IOException {
-		Map<String, SnippetCode[]> snippets = getSnippets();
+		Map<Notebook, SnippetCode[]> snippets = getSnippets();
 		Map<SnippetCode, List<Snippet>> clones = getClones(snippets);
 		printCloneFiles(snippets, clones);
 		return clones;
@@ -167,8 +167,8 @@ public class Analyzer {
 	/**
 	 * @return A map from file names to snippets
 	 */
-	private Map<String, SnippetCode[]> getSnippets() throws IOException {
-		Map<String, SnippetCode[]> snippets = new HashMap<String, SnippetCode[]>();
+	private Map<Notebook, SnippetCode[]> getSnippets() throws IOException {
+		Map<Notebook, SnippetCode[]> snippets = new HashMap<Notebook, SnippetCode[]>();
 		for (int i=0; i<notebooks.size(); i++) {
 			if (0 == i%10000) {
 				System.out.println("Hashing snippets in notebook " + i);
@@ -183,26 +183,26 @@ public class Analyzer {
 	 * @param notebook Notebook to find snippets in
 	 * @param snippets Map to put the snippets in
 	 */
-	private void getSnippetsFrom(Notebook notebook, Map<String, SnippetCode[]> snippets) {
-		String fileName = notebook.getName();
+	private void getSnippetsFrom(Notebook notebook, Map<Notebook, SnippetCode[]> snippets) {
 		SnippetCode[] snippetsInNotebook = employ(new HashExtractor(notebook));
-		snippets.put(fileName, snippetsInNotebook);
+		snippets.put(new Notebook(notebook), snippetsInNotebook);
 	}
 	
-	private Map<SnippetCode, List<Snippet>> getClones(Map<String, SnippetCode[]> fileMap) throws IOException {
+	private Map<SnippetCode, List<Snippet>> getClones(Map<Notebook, SnippetCode[]> fileMap) throws IOException {
 		int numAnalyzed = 0;
 		Map<SnippetCode, List<Snippet>> clones = new HashMap<SnippetCode, List<Snippet>>();
-		for (String fileName: fileMap.keySet()) {
+		for (Notebook notebook: fileMap.keySet()) {
 			if (0 == numAnalyzed%10000) {
 				System.out.println("Finding clones in notebook " + numAnalyzed);
 			}
-			SnippetCode[] snippetCodes = fileMap.get(fileName);
+			SnippetCode[] snippetCodes = fileMap.get(notebook);
 			for (int j=0; j<snippetCodes.length; j++) {
 				if (clones.containsKey(snippetCodes[j])) {
-					clones.get(snippetCodes[j]).add(new Snippet(fileName, j));
+					// TODO Konstruktor som tar notebook som argument istället?! Eller Lagra notebook i!
+					clones.get(snippetCodes[j]).add(new Snippet(notebook.getName(), notebook.getRepro(), j));
 				} else {
 					List<Snippet> snippets = new ArrayList<Snippet>();
-					snippets.add(new Snippet(fileName, j));
+					snippets.add(new Snippet(notebook.getName(), notebook.getRepro(), j));
 					clones.put(snippetCodes[j], snippets);
 				}
 			}
@@ -229,7 +229,11 @@ public class Analyzer {
 		System.out.println("NOTE THAT NOTEBOOKS WITHOUT SNIPPETS ARE NOT INCLUDED!");
 		Map<String, Integer> snippetsPerFile = new HashMap<String, Integer>();
 		Map<SnippetCode, List<Snippet>> snippet2file = getClones(sccPairFile, sccStatsFile, snippetsPerFile);
-		Map<String, SnippetCode[]> file2snippet = getSnippets(snippet2file, snippetsPerFile);
+		Map<Notebook, SnippetCode[]> file2snippet = getSnippets(snippet2file, snippetsPerFile);
+		// TODO: Lös detta snyggare!
+		for (Notebook notebook: file2snippet.keySet()) {
+			notebook.setRepro(repros.get(notebook.getName()));
+		}
 		printCloneFiles(file2snippet, snippet2file);
 		return snippet2file;
 	}
@@ -308,7 +312,7 @@ public class Analyzer {
 				String nbName = "nb_" + notebookNumbers.remove(id) + ".ipynb";
 				addOrIncrease(snippetsPerFile, nbName);
 				int snippetIndex = snippetIndices.remove(id);
-				Snippet snippet = new Snippet(nbName, snippetIndex);
+				Snippet snippet = new Snippet(nbName, repros.get(nbName), snippetIndex);
 				snippets.add(snippet);
 			}
 			int loc = linesOfCode.get(cloned.get(0));	 // TODO: Borde göras på något smartare sätt. Max? Min? Medel?
@@ -323,7 +327,7 @@ public class Analyzer {
 			String nbName = "nb_" + notebookNumbers.get(id) + ".ipynb";
 			addOrIncrease(snippetsPerFile, nbName);
 			int snippetIndex = snippetIndices.remove(id);
-			Snippet snippet = new Snippet(nbName, snippetIndex);
+			Snippet snippet = new Snippet(nbName, repros.get(nbName), snippetIndex);
 			snippets.add(snippet);
 			int loc = linesOfCode.get(id);
 			SnippetCode hash = new SnippetCode(loc, Integer.toString(hashIndex++));
@@ -383,17 +387,19 @@ public class Analyzer {
 		}
 	}
 
-	private Map<String, SnippetCode[]> getSnippets(Map<SnippetCode, List<Snippet>> snippet2file,
+	private Map<Notebook, SnippetCode[]> getSnippets(Map<SnippetCode, List<Snippet>> snippet2file,
 			Map<String, Integer> snippetsPerFile) {
-		Map<String, SnippetCode[]> result = new HashMap<String, SnippetCode[]>(snippetsPerFile.size());
+		Map<Notebook, SnippetCode[]> result = new HashMap<Notebook, SnippetCode[]>(snippetsPerFile.size());
 		// Create arrays for snippets
 		for (String notebook: snippetsPerFile.keySet()) {
-			result.put(new String(notebook), new SnippetCode[snippetsPerFile.get(notebook)]);
+			// TODO: Är det en dålig idé att skapa alla notebooks en gång till?!
+			result.put(new Notebook(notebook), new SnippetCode[snippetsPerFile.get(notebook)]);
 		}
 		// Put snippet in notebook to snippet map
 		for (SnippetCode hash: snippet2file.keySet()) {
 			for (Snippet snippet: snippet2file.get(hash)) {
-				SnippetCode[] snippetsInFile = result.get(snippet.getFileName());
+				// TODO: Lägg notebooken i snippet istället!
+				SnippetCode[] snippetsInFile = result.get(new Notebook(snippet.getFileName()));
 				snippetsInFile[snippet.getSnippetIndex()] = new SnippetCode(hash);
 			}
 		}
@@ -407,7 +413,7 @@ public class Analyzer {
 	 * @param clones A map from snippets to files
 	 * @throws IOException On problems handling the output files
 	 */
-	private void printCloneFiles(Map<String, SnippetCode[]> snippets,
+	private void printCloneFiles(Map<Notebook, SnippetCode[]> snippets,
 			Map<SnippetCode, List<Snippet>> clones) throws IOException {
 		printFile2hashes(snippets);
 		printHash2files(clones);
@@ -435,12 +441,12 @@ public class Analyzer {
 		return "hash, LOC, file, index, ...\n";
 	}
 	
-	private void printFile2hashes(Map<String, SnippetCode[]> files) throws IOException {
+	private void printFile2hashes(Map<Notebook, SnippetCode[]> files) throws IOException {
 		Writer writer = new FileWriter(outputDir + "/file2hashes" + LocalDateTime.now() + ".csv");
 		writer.write(file2hashesHeader());
-		for (String fileName: files.keySet()) {
-			writer.write(fileName);
-			SnippetCode[] code = files.get(fileName);
+		for (Notebook notebook: files.keySet()) {
+			writer.write(notebook.getName());
+			SnippetCode[] code = files.get(notebook);
 			for (SnippetCode snippet: code) {
 				writer.write(", " + snippet.getHash());
 			}
@@ -456,13 +462,13 @@ public class Analyzer {
 		return "file, snippets\n";
 	}
 	
-	private void printCloneFrequencies(Map<String, SnippetCode[]> file2Hashes,
+	private void printCloneFrequencies(Map<Notebook, SnippetCode[]> file2Hashes,
 			Map<SnippetCode, List<Snippet>> hash2Files) throws IOException {
 		Writer writer = new FileWriter(outputDir + "/cloneFrequency" + LocalDateTime.now() + ".csv");
 		writer.write(cloneFrequencyHeader());
-		for (String fileName: file2Hashes.keySet()) {
+		for (Notebook notebook: file2Hashes.keySet()) {
 			int numClones = 0, numUnique = 0;
-			SnippetCode[] code = file2Hashes.get(fileName);
+			SnippetCode[] code = file2Hashes.get(notebook);
 			for (SnippetCode snippet: code) {
 				if(isClone(snippet, hash2Files)) {
 					numClones++;
@@ -470,7 +476,7 @@ public class Analyzer {
 					numUnique++;
 				}
 			}
-			writer.write(fileName + ", " + numClones + ", " + numUnique + ", ");
+			writer.write(notebook.getName() + ", " + numClones + ", " + numUnique + ", ");
 			int numSnippets = numClones + numUnique;
 			if (0 != numSnippets) {
 				double cloneFrequency = (double)numClones / numSnippets;
@@ -511,23 +517,23 @@ public class Analyzer {
 	 * @param file2snippets Mapping from notebook name to snippets
 	 * @param snippet2files Mapping from snippets to position in notebooks
 	 */
-	private void printConnectionsFile(Map<String, SnippetCode[]> file2snippets,
+	private void printConnectionsFile(Map<Notebook, SnippetCode[]> file2snippets,
 			Map<SnippetCode, List<Snippet>> snippet2files) throws IOException {
 		Writer writer = new FileWriter(outputDir + "/connections" + LocalDateTime.now() + ".csv");
 		writer.write(connectionsHeader());
-		for (String fileName: file2snippets.keySet()) {
-			printConnections(fileName, file2snippets, snippet2files, writer);
+		for (Notebook notebook: file2snippets.keySet()) {
+			printConnections(notebook, file2snippets, snippet2files, writer);
 		}
 		writer.close();
 	}
 
 	/**
-	 * @param fileName Name of notebook file
-	 * @param file2snippets Mapping from notebook name to snippets
+	 * @param notebook Notebook to print connections for
+	 * @param file2snippets Mapping from notebook to snippets
 	 * @param snippets2files Mapping from snippets to position in notebooks
 	 * @param writer Writer that will print the result
 	 */
-	private void printConnections(String fileName, Map<String, SnippetCode[]> file2snippets,
+	private void printConnections(Notebook notebook, Map<Notebook, SnippetCode[]> file2snippets,
 			Map<SnippetCode, List<Snippet>> snippets2files, Writer writer)
 			throws IOException {
 		int connections = 0;
@@ -536,9 +542,8 @@ public class Analyzer {
 		int nonEmtpyIntraReproConnections = 0;
 		int interReproConnections = 0;
 		int nonEmptyInterReproConnections = 0;
-		// TODO: repros might be null!
-		String currentRepro = repros.get(fileName);
-		SnippetCode[] snippets = file2snippets.get(fileName);
+		String currentRepro = notebook.getRepro();
+		SnippetCode[] snippets = file2snippets.get(notebook);
 		Set<String> otherRepros = new TreeSet<String>();
 		Set<String> otherNonEmptyRepros = new TreeSet<String>();	// Other repros with non-empty friends
 		int numNonEmptySnippets = 0;
@@ -563,7 +568,7 @@ public class Analyzer {
 		double meanInterReproConnections = normalized(interReproConnections, otherRepros.size());
 		double meanNonEmptyInterReproConnections = normalized(nonEmptyInterReproConnections, otherNonEmptyRepros.size());
 		
-		writer.write(fileName + ", " + connections + ", "
+		writer.write(notebook.getName() + ", " + connections + ", "
 				+ String.format(Locale.US, "%.4f", normalizedConnections) + ", "
 				+ nonEmptyConnections + ", "
 				+ String.format(Locale.US, "%.4f", normalizedNonEmptyConnections) + ", "
@@ -590,7 +595,7 @@ public class Analyzer {
 	private int intraReproConnections(List<Snippet> locations, String currentRepro) {
 		int connections = 0;
 		for (Snippet friend: locations) {
-			String friendRepro = repros.get(friend.getFileName());
+			String friendRepro = friend.getRepro();
 			if (friendRepro.equals(currentRepro)) {
 				connections++;
 			}
@@ -611,8 +616,7 @@ public class Analyzer {
 	private int interReproConnections(List<Snippet> locations, String currentRepro, Set<String> otherRepros) {
 		int connections = 0;
 		for (Snippet friend: locations) {
-			String friendFileName = friend.getFileName();
-			String friendRepro = repros.get(friendFileName);
+			String friendRepro = friend.getRepro();
 			if (!friendRepro.equals(currentRepro)) {
 				connections++;
 				otherRepros.add(friendRepro);
@@ -925,6 +929,9 @@ public class Analyzer {
 			
 		// Perform analyzes
 		try {
+			if (null != nbPath) {
+				this.initializeNotebooksFrom(nbPath);
+			}
 			if (null != reproFile) {
 				try {
 					this.initializeReproMap(reproFile);
@@ -932,9 +939,6 @@ public class Analyzer {
 					System.err.println("Repro file not found: " + e.getMessage());
 					System.err.println("Repro information not initialized!");
 				}
-			}
-			if (null != nbPath) {
-				this.initializeNotebooksFrom(nbPath);
 			}
 			if (null != outputDir) {
 				this.outputDir = outputDir;
