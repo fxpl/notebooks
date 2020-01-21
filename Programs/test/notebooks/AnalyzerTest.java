@@ -130,18 +130,17 @@ public class AnalyzerTest {
 	@Test
 	public void testArgumentParsing_allAnalyses() throws IOException {
 		String[] arg = {"-all"};
-		analyzer.analyze(arg);
-		File[] expectedFiles = {
-				lastOutputFile("code_cells"),
-				lastOutputFile("loc"),
-				lastOutputFile("languages"),
-				lastOutputFile("all_languages"),
-				lastOutputFile("file2hashes"),
-				lastOutputFile("hash2files"),
-				lastOutputFile("cloneFrequency"),
-				lastOutputFile("connections")
+		String[] expectedFilePrefixes = {
+				"code_cells",
+				"loc",
+				"languages",
+				"all_languages",
+				"file2hashes",
+				"hash2files",
+				"cloneFrequency",
+				"connections"
 		};
-		testArgumentParsing(arg, expectedFiles);
+		testArgumentParsing(arg, expectedFilePrefixes);
 	}
 	
 	/**
@@ -152,13 +151,13 @@ public class AnalyzerTest {
 	@Test
 	public void testArgumentParsing_clones() throws IOException {
 		String[] arg = {"-clones"};	// Repro file not needed since nb_path is missing
-		File[] expectedFiles = {
-				lastOutputFile("file2hashes"),
-				lastOutputFile("hash2files"),
-				lastOutputFile("cloneFrequency"),
-				lastOutputFile("connections")
+		String[] expectedFilePrefixes = {
+				"file2hashes",
+				"hash2files",
+				"cloneFrequency",
+				"connections"
 		};
-		testArgumentParsing(arg, expectedFiles);
+		testArgumentParsing(arg, expectedFilePrefixes);
 	}
 	
 	/**
@@ -177,13 +176,13 @@ public class AnalyzerTest {
 				"-repro_file",
 				"test/data/hash/repros.csv"
 		};
-		File[] expectedFiles = {
-				lastOutputFile("file2hashes"),
-				lastOutputFile("hash2files"),
-				lastOutputFile("cloneFrequency"),
-				lastOutputFile("connections")
+		String[] expectedFilePrefixes = {
+				"file2hashes",
+				"hash2files",
+				"cloneFrequency",
+				"connections"
 		};
-		testArgumentParsing(args, expectedFiles);
+		testArgumentParsing(args, expectedFilePrefixes);
 	}
 	
 	/**
@@ -194,8 +193,8 @@ public class AnalyzerTest {
 	@Test
 	public void testArgumentParsing_count() throws IOException {
 		String[] arg = {"-count"};
-		File[] expectedFile = {lastOutputFile("code_cells")};
-		testArgumentParsing(arg, expectedFile);
+		String[] expectedFilePrefix = {"code_cells"};
+		testArgumentParsing(arg, expectedFilePrefix);
 	}
 	
 	/**
@@ -206,8 +205,8 @@ public class AnalyzerTest {
 	@Test
 	public void testArgumentParsing_lang() throws IOException {
 		String[] arg = {"-lang"};
-		File[] expectedFile = {lastOutputFile("languages")};
-		testArgumentParsing(arg, expectedFile);
+		String[] expectedFilePrefix = {"languages"};
+		testArgumentParsing(arg, expectedFilePrefix);
 	}
 	
 	/**
@@ -218,8 +217,8 @@ public class AnalyzerTest {
 	@Test
 	public void testArgumentParsing_lang_all() throws IOException {
 		String[] arg = {"-lang_all"};
-		File[] expectedFile = {lastOutputFile("all_languages")};
-		testArgumentParsing(arg, expectedFile);
+		String[] expectedFilePrefix = {"all_languages"};
+		testArgumentParsing(arg, expectedFilePrefix);
 	}
 	
 	/**
@@ -230,8 +229,8 @@ public class AnalyzerTest {
 	@Test
 	public void testArgumentParsing_loc() throws IOException {
 		String[] arg = {"-loc"};
-		File[] expectedFile = {lastOutputFile("loc")};
-		testArgumentParsing(arg, expectedFile);
+		String[] expectedFilePrefix = {"loc"};
+		testArgumentParsing(arg, expectedFilePrefix);
 	}
 	
 	/**
@@ -242,13 +241,13 @@ public class AnalyzerTest {
 	@Test
 	public void testArgumentParsing_severalArgs() throws IOException {
 		String[] args = {"-lang_all", "-lang", "-count", "-loc"};
-		File[] expectedFiles = {
-				lastOutputFile("all_languages"),
-				lastOutputFile("languages"),
-				lastOutputFile("code_cells"),
-				lastOutputFile("loc")
+		String[] expectedFilePrefixes = {
+				"all_languages",
+				"languages",
+				"code_cells",
+				"loc"
 		};
-		testArgumentParsing(args, expectedFiles);
+		testArgumentParsing(args, expectedFilePrefixes);
 	}
 	
 	// TODO: testArgumentParsing: output_dir, nb_path (med/utan värde), repro_file utan värde. okänt argument
@@ -862,13 +861,16 @@ public class AnalyzerTest {
 	}
 	
 	/**
-	 * Verify that all files in expectedFiles exist after a call to
+	 * Verify that all files prefixed in expectedFiles exist after a call to
 	 * analyzer.analyze with args as argument. Also remove all expected files.
+	 * @param args Argument vector
+	 * @param expectedFilePrefixes Prefixes for all expected files
 	 * throws IOException
 	 */
-	private void testArgumentParsing(String[] args, File[] expectedFiles) throws IOException {
+	private void testArgumentParsing(String[] args, String[] expectedFilePrefixes) throws IOException {
 		analyzer.analyze(args);
-		for (File expectedFile: expectedFiles) {
+		for (String prefix: expectedFilePrefixes) {
+			File expectedFile = lastOutputFile(prefix);
 			assertTrue("Expected output file " + expectedFile.getName() + " is missing!",
 					expectedFile.exists());
 			expectedFile.delete();
