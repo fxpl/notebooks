@@ -523,6 +523,7 @@ public class Analyzer {
 		int nonEmtpyIntraReproConnections = 0;
 		int interReproConnections = 0;
 		int nonEmptyInterReproConnections = 0;
+		// TODO: repros might be null!
 		String currentRepro = repros.get(fileName);
 		SnippetCode[] snippets = file2snippets.get(fileName);
 		Set<String> otherRepros = new TreeSet<String>();
@@ -825,17 +826,20 @@ public class Analyzer {
 	/**
 	 * Parse command line arguments and perform actions accordingly.
 	 */
-	private void analyze(String[] args) {
-		// TODO: Även klonanalys med SCC-filer!
+	void analyze(String[] args) {
+		// TODO: Testa!
 		boolean all = false,
 				count = false,
 				lang = false,
 				loc = false,
 				clones = false,
-				langAll = false;
+				langAll = false,
+				clonesScc = false;
 		String reproFile = null;
 		String nbPath = null;
 		String outputDir = null;
+		String sccStatsFile = null;
+		String sccPairFile = null;
 
 		// Read arguments
 		for (int i=0; i<args.length; i++) {
@@ -861,8 +865,22 @@ public class Analyzer {
 				try {
 					outputDir = args[++i];
 				} catch (ArrayIndexOutOfBoundsException e) {
-					System.err.println("Argument '-output_dir' must be followed the the path to the output dir!");
+					System.err.println("Argument '-output_dir' must be followed by the path to the output dir!");
 					System.err.println("Default output directory is used!");
+				}
+				break;
+			case "-scc_stats_file":
+				try {
+					sccStatsFile = args[++i];
+				} catch (ArrayIndexOutOfBoundsException e) {
+					System.err.println("Argument '-scc_stats_file' must be followed by the path to the SourcererCC file stats file!");
+				}
+				break;
+			case "-scc_clones_file":
+				try {
+					sccPairFile = args[++i];
+				} catch (ArrayIndexOutOfBoundsException e) {
+					System.err.println("Argument -scc_clones_file must be followed by the path to the SourcererCC clone pairs file!");
 				}
 				break;
 			case "-all":
@@ -879,6 +897,9 @@ public class Analyzer {
 				break;
 			case "-clones":
 				clones = true;
+				break;
+			case "-clones_scc":
+				clonesScc = true;
 				break;
 			case "-lang_all":
 				langAll = true;
@@ -926,6 +947,23 @@ public class Analyzer {
 			if (langAll) {
 				this.allLanguageValues();
 				System.out.println("File with all language values created!");
+			}
+			if (clonesScc) {
+				if (null != sccStatsFile && null != sccPairFile && null !=reproFile) {
+					this.clones(sccPairFile, sccStatsFile);
+					System.out.println("Clone files created!");
+				} else {
+					if (null == sccPairFile) {
+						System.err.println("SourcererCC clones pair file path not set!");
+					}
+					if (null == sccStatsFile) {
+						System.err.println("SourcererCC file statistics file path not set!");
+					}
+					if (null == reproFile) {
+						System.err.println("Repro mapping file path not set!");
+					}
+					System.err.println("Clone analysis will not be run!");
+				}
 			}
 		} catch (IOException e) {
 			System.err.println("I/O error: " + e.getMessage() + ". Operation interrupted.");
