@@ -29,6 +29,11 @@ public class Notebook {
 		this.path = path;
 	}
 	
+	public Notebook(Notebook model) {
+		this.path = model.path;
+		this.repro = model.repro;
+	}
+	
 	/**
 	 * @return The file name of the notebook, without preceding path
 	 */

@@ -18,6 +18,20 @@ import notebooks.NotebookException;
 
 public class NotebookTest {
 	
+	@Test
+	public void testCopyConstructor() {
+		String notebookName = "nb.ipynb";
+		String path = "dir/subdir/" + notebookName;
+		String reproName = "repro0";
+		Notebook model = new Notebook(path);
+		model.setRepro(reproName);
+		Notebook copy = new Notebook(model);
+		assertEquals("Copy constructor doesn't seem to set path correctly!",
+				notebookName, copy.getName());
+		assertEquals("Copy constructor doesn't set the repro name correctly!",
+				reproName, copy.getRepro());
+	}
+	
 	/**
 	 * Verify that each snippet in the input file is dumped  to a separate
 	 * output file, line by line, and that the output files are named
