@@ -827,7 +827,8 @@ public class Analyzer {
 	 * Parse command line arguments and perform actions accordingly.
 	 */
 	void analyze(String[] args) {
-		// TODO: Testa!
+		// TODO: Bättre testtäckning!
+		// TODO: mer enhetliga flagg/metod/variabelnamn
 		boolean all = false,
 				count = false,
 				lang = false,

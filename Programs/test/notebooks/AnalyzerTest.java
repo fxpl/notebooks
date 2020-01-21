@@ -120,6 +120,138 @@ public class AnalyzerTest {
 		checkCsv("all_languages", expectedLInes);
 		lastOutputFile("all_languages").delete();
 	}
+	
+	/**
+	 * Verify that the output files for number of code cells, loc, languages,
+	 * all language values, and clone output files are created when the
+	 * argument "-all" is given.
+	 * throws IOException
+	 */
+	@Test
+	public void testArgumentParsing_allAnalyses() throws IOException {
+		String[] arg = {"-all"};
+		analyzer.analyze(arg);
+		File[] expectedFiles = {
+				lastOutputFile("code_cells"),
+				lastOutputFile("loc"),
+				lastOutputFile("languages"),
+				lastOutputFile("all_languages"),
+				lastOutputFile("file2hashes"),
+				lastOutputFile("hash2files"),
+				lastOutputFile("cloneFrequency"),
+				lastOutputFile("connections")
+		};
+		testArgumentParsing(arg, expectedFiles);
+	}
+	
+	/**
+	 * Verify that the clone output files are created when the argument
+	 * "-clones" is given.
+	 * throws IOException
+	 */
+	@Test
+	public void testArgumentParsing_clones() throws IOException {
+		String[] arg = {"-clones"};	// Repro file not needed since nb_path is missing
+		File[] expectedFiles = {
+				lastOutputFile("file2hashes"),
+				lastOutputFile("hash2files"),
+				lastOutputFile("cloneFrequency"),
+				lastOutputFile("connections")
+		};
+		testArgumentParsing(arg, expectedFiles);
+	}
+	
+	/**
+	 * Verify that the clone output files are created when the argument
+	 * "-clones_scc" is given and paths are specified correctly.
+	 * @throws IOException 
+	 */
+	@Test
+	public void testArgumentParsing_clones_scc() throws IOException {
+		String args[] = {
+				"-clones_scc",
+				"-scc_stats_file",
+				"test/data/scc/file_stats",
+				"-scc_clones_file",
+				"test/data/scc/clone_pairs",
+				"-repro_file",
+				"test/data/hash/repros.csv"
+		};
+		File[] expectedFiles = {
+				lastOutputFile("file2hashes"),
+				lastOutputFile("hash2files"),
+				lastOutputFile("cloneFrequency"),
+				lastOutputFile("connections")
+		};
+		testArgumentParsing(args, expectedFiles);
+	}
+	
+	/**
+	 * Verify that output file with number of code cells are created when the
+	 * argument "-count" is given.
+	 * throws IOException
+	 */
+	@Test
+	public void testArgumentParsing_count() throws IOException {
+		String[] arg = {"-count"};
+		File[] expectedFile = {lastOutputFile("code_cells")};
+		testArgumentParsing(arg, expectedFile);
+	}
+	
+	/**
+	 * Verify that the language output file is created when the argument
+	 * "-lang" is given.
+	 * throws IOException
+	 */
+	@Test
+	public void testArgumentParsing_lang() throws IOException {
+		String[] arg = {"-lang"};
+		File[] expectedFile = {lastOutputFile("languages")};
+		testArgumentParsing(arg, expectedFile);
+	}
+	
+	/**
+	 * Verify that the all language values output file is created when the
+	 * argument "-lang_all" is given.
+	 * throws IOException
+	 */
+	@Test
+	public void testArgumentParsing_lang_all() throws IOException {
+		String[] arg = {"-lang_all"};
+		File[] expectedFile = {lastOutputFile("all_languages")};
+		testArgumentParsing(arg, expectedFile);
+	}
+	
+	/**
+	 * Verify that the loc output file is created when the argument "-loc" is
+	 * given.
+	 * throws IOException
+	 */
+	@Test
+	public void testArgumentParsing_loc() throws IOException {
+		String[] arg = {"-loc"};
+		File[] expectedFile = {lastOutputFile("loc")};
+		testArgumentParsing(arg, expectedFile);
+	}
+	
+	/**
+	 * Verify that all relevant files are created when several arguments are
+	 * given.
+	 * @throws IOException 
+	 */
+	@Test
+	public void testArgumentParsing_severalArgs() throws IOException {
+		String[] args = {"-lang_all", "-lang", "-count", "-loc"};
+		File[] expectedFiles = {
+				lastOutputFile("all_languages"),
+				lastOutputFile("languages"),
+				lastOutputFile("code_cells"),
+				lastOutputFile("loc")
+		};
+		testArgumentParsing(args, expectedFiles);
+	}
+	
+	// TODO: testArgumentParsing: output_dir, nb_path (med/utan värde), repro_file utan värde. okänt argument
 
 	/**
 	 * Verify that snippets are stored correctly in the clone hash map.
@@ -727,6 +859,20 @@ public class AnalyzerTest {
 	 */
 	private static String LOCHeader() {
 		return "file, total LOC, non-blank LOC, blank LOC";
+	}
+	
+	/**
+	 * Verify that all files in expectedFiles exist after a call to
+	 * analyzer.analyze with args as argument. Also remove all expected files.
+	 * throws IOException
+	 */
+	private void testArgumentParsing(String[] args, File[] expectedFiles) throws IOException {
+		analyzer.analyze(args);
+		for (File expectedFile: expectedFiles) {
+			assertTrue("Expected output file " + expectedFile.getName() + " is missing!",
+					expectedFile.exists());
+			expectedFile.delete();
+		}
 	}
 
 }
