@@ -140,6 +140,17 @@ public class NotebookTest {
 	}
 	
 	/**
+	 * Verify that setRepro and getRepro sets and gets the repro name
+	 * correctly.
+	 */
+	@Test
+	public void testSetGetRepro() {
+		String reproName = "someRepro";
+		Notebook notebook = new Notebook("");
+		notebook.setRepro(reproName);
+		assertEquals("Repro name not set or not fetched correctly!",
+				reproName, notebook.getRepro());
+	}
 	
 	/**
 	 * Verify that code snippets are hashed correctly.

@@ -63,11 +63,14 @@ public class Analyzer {
 	
 	/**
 	 * TODO: Lägga reproinfo i notebook istället, och använd notebookobjekt i file2hash-map!? Isf måste Snippetobjektet innehålla en notebook istf ett filnamn, för att man ska kunna hämta info om reprot!
-	 * Initialize the map from notebook name to repro.
+	 * Initialize the map from notebook name to repro, and add information about repro to each notebook.
 	 * @param fileName Name of file with mapping from notebook number to repro
 	 */
 	void initializeReproMap(String fileName) throws FileNotFoundException {
 		this.repros = createReproMap(fileName);
+		for (Notebook nb: notebooks) {
+			nb.setRepro(repros.get(nb.getName()));
+		}
 	}
 	
 	/**

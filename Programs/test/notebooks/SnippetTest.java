@@ -63,6 +63,14 @@ public class SnippetTest {
 	}
 	
 	@Test
+	public void testSetGetRepro() {
+		String reproName = "someRepro";
+		snippet.setRepro(reproName);
+		assertEquals("Repro name not set or not fetched correctly!",
+				reproName, snippet.getRepro());
+	}
+	
+	@Test
 	public void testToString() {
 		String expected = name + ", " + index;
 		assertEquals("Wrong string representation of snippet:", expected, snippet.toString());

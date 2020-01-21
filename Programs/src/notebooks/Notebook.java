@@ -18,6 +18,7 @@ import org.json.simple.parser.*;
  */
 public class Notebook {
 	private String path;
+	private String repro = "";
 	private int locTotal;		// Total number of lines of code
 	private int locBlank;		// Number of empty code lines
 	private int locContents;	// Number of non-empty code lines
@@ -34,6 +35,14 @@ public class Notebook {
 	public String getName() {
 		int namePos = path.lastIndexOf('/') + 1;
 		return path.substring(namePos);
+	}
+	
+	public String getRepro() {
+		return repro;
+	}
+	
+	public void setRepro(String reproName) {
+		this.repro = reproName;
 	}
 	
 	/**
