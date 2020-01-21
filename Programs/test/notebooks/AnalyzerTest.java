@@ -714,7 +714,7 @@ public class AnalyzerTest {
 		File directory = new File(".");
 		String outputFileName = prefix + ".csv";
 		for (String currentFileName: directory.list()) {
-			if (currentFileName.matches(prefix + "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}\\.csv")
+			if (currentFileName.matches(prefix + "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\.csv")
 					&& currentFileName.compareTo(outputFileName) > 0) {
 				outputFileName = currentFileName;
 			}
