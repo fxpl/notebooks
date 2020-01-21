@@ -67,7 +67,16 @@ public class Analyzer {
 	 * @param fileName Name of file with mapping from notebook number to repro
 	 */
 	void initializeReproMap(String fileName) throws FileNotFoundException {
-		repros = new HashMap<String, String>();
+		this.repros = createReproMap(fileName);
+	}
+	
+	/**
+	 * Create a map from notebook name to repro.
+	 * @param fileName Name of file with mapping from notebook number to repro
+	 * @return The map from notebook name to repro
+	 */
+	private static Map<String, String> createReproMap(String fileName) throws FileNotFoundException {
+		Map<String, String> result = new HashMap<String, String>();
 		Scanner scanner = new Scanner(new File(fileName));
 		while (scanner.hasNextLine()) {
 			String line = scanner.nextLine();
@@ -76,13 +85,14 @@ public class Analyzer {
 				int notebookNumber = Integer.parseInt(subStrings[0]);
 				String notebookName = "nb_" + notebookNumber + ".ipynb";
 				String reproName = subStrings[1];
-				repros.put(notebookName, reproName);
+				result.put(notebookName, reproName);
 			} catch (NumberFormatException e) {
 				System.err.println("Notebook numbers in repro file must be integers! Notebook with \"number\" '"
 						+ subStrings[0] + "' is excluded from mapping!");
 			}
 		}
 		scanner.close();
+		return result;
 	}
 	
 	/**
@@ -418,7 +428,7 @@ public class Analyzer {
 	/**
 	 * @return Header for the file2hashes csv file
 	 */
-	private String hash2filesHeader() {
+	private static String hash2filesHeader() {
 		return "hash, LOC, file, index, ...\n";
 	}
 	
@@ -439,7 +449,7 @@ public class Analyzer {
 	/**
 	 * @return Header for the file2hashes csv file
 	 */
-	private String file2hashesHeader() {
+	private static String file2hashesHeader() {
 		return "file, snippets\n";
 	}
 	
@@ -472,7 +482,7 @@ public class Analyzer {
 	/**
 	 * @return Header for the cloneFrequency csv file
 	 */
-	private String cloneFrequencyHeader() {
+	private static String cloneFrequencyHeader() {
 		return "file, clones, unique, clone frequency\n";
 	}
 	
@@ -564,7 +574,7 @@ public class Analyzer {
 	 * snippets in locations.
 	 * @param locations Locations where the current snippet can be found
 	 */
-	private int connections(List<Snippet> locations) {
+	private static int connections(List<Snippet> locations) {
 		return locations.size() - 1;	// -1 for current notebook
 	}
 	
@@ -615,7 +625,7 @@ public class Analyzer {
 	 * @param denominator
 	 * @return numerator normalized according to description above
 	 */
-	private double normalized(int numerator, int denominator) {
+	private static double normalized(int numerator, int denominator) {
 		if (0 == denominator) {
 			return 0;
 		} else {
@@ -626,7 +636,7 @@ public class Analyzer {
 	/**
 	 * @return Header for the connections csv file
 	 */
-	private String connectionsHeader() {
+	private static String connectionsHeader() {
 		return "file, connections, connections normalized, non-empty connections, non-empty connections normalized, "
 				+ "intra repro connections, non-empty intra repro connections, mean inter repro connections, mean non-empty inter repro connections\n";
 	}
@@ -636,7 +646,7 @@ public class Analyzer {
 	 * (that is, if the list of snippets is at least 2).
 	 * @return true if snippet is a clone, false otherwise
 	 */
-	private boolean isClone(SnippetCode snippet, Map<SnippetCode, List<Snippet>> clones) {
+	private static boolean isClone(SnippetCode snippet, Map<SnippetCode, List<Snippet>> clones) {
 		List<Snippet> snippets = clones.get(snippet);
 		return snippets.size() >= 2;
 	}
