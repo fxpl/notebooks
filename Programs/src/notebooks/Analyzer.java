@@ -145,7 +145,6 @@ public class Analyzer {
 	 * @throws IOException On problems handling the output file.
 	 */
 	public Map<SnippetCode, List<Snippet>> clones() throws IOException {
-		// TODO: Tomma notebooks kommer inte med här! Är det ett problem?
 		Map<String, SnippetCode[]> snippets = getSnippets();
 		Map<SnippetCode, List<Snippet>> clones = getClones(snippets);
 		printCloneFiles(snippets, clones);
@@ -199,7 +198,7 @@ public class Analyzer {
 		return clones;
 	}
 	
-	 /**
+	 /** TODO: Bryt ut SCC-analysen till en separat klass!
 	 * Perform the clone analysis based on SourcererCC output files. Write
 	 * file2hashes<current-date-time>.csv, hash2files<current-date-time>.csv,
 	 * cloneFrequencies<current-date-time>.csv and
@@ -213,6 +212,8 @@ public class Analyzer {
 	 * @throws IOException
 	 */
 	public Map<SnippetCode, List<Snippet>> clones(String sccPairFile, String sccStatsFile) throws IOException {
+		System.out.println("Analyzing clones based on SourcererCC output files!");
+		System.out.println("NOTE THAT NOTEBOOKS WITHOUT SNIPPETS ARE NOT INCLUDED!");
 		Map<String, Integer> snippetsPerFile = new HashMap<String, Integer>();
 		Map<SnippetCode, List<Snippet>> snippet2file = getClones(sccPairFile, sccStatsFile, snippetsPerFile);
 		Map<String, SnippetCode[]> file2snippet = getSnippets(snippet2file, snippetsPerFile);
