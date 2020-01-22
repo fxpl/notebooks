@@ -23,6 +23,7 @@ public class Notebook {
 	private int locContents;	// Number of non-empty code lines
 	private volatile boolean locCounted = false;
 	private LangSpec languageSpecIn;
+	private JSONObject contents;
 	
 	public Notebook(String path) {
 		this.path = path;
@@ -34,6 +35,14 @@ public class Notebook {
 	public String getName() {
 		int namePos = path.lastIndexOf('/') + 1;
 		return path.substring(namePos);
+	}
+	
+	/**
+	 * Reset the stored contents. This metod cat be used to decrease the
+	 * memory load.
+	 */
+	public void clearContents() {
+		contents = null;
 	}
 	
 	/**
@@ -525,26 +534,30 @@ public class Notebook {
 	 * @throws NotebookException If the file this.path could not be parsed
 	 */
 	private JSONObject getNotebook() throws NotebookException {
-		Reader reader;
-		JSONObject result;
-		try {
-			reader = new FileReader(this.path);
-		} catch (FileNotFoundException e) {
-			throw new NotebookException("Could not read " + this.path + ": " + e.toString());
+		if (null != contents) {
+			return contents;
+		} else {
+			Reader reader;
+			JSONObject result;
+			try {
+				reader = new FileReader(this.path);
+			} catch (FileNotFoundException e) {
+				throw new NotebookException("Could not read " + this.path + ": " + e.toString());
+			}
+			try {
+				result = (JSONObject)new JSONParser().parse(reader);
+			} catch (IOException | ParseException e) {
+				throw new NotebookException("Could not parse " + this.path + ": " + e.toString());
+			} catch (ClassCastException e) {
+				throw new NotebookException("Couldn't cast notebook to JSONObject in " + this.path + ": " + e.toString());
+			}
+			try {
+				reader.close();
+			} catch (IOException e) {
+				System.err.println("Warning: Could not close reader of " + this.path + ": " + e.toString());
+			}
+			return result;
 		}
-		try {
-			result = (JSONObject)new JSONParser().parse(reader);
-		} catch (IOException | ParseException e) {
-			throw new NotebookException("Could not parse " + this.path + ": " + e.toString());
-		} catch (ClassCastException e) {
-			throw new NotebookException("Couldn't cast notebook to JSONObject in " + this.path + ": " + e.toString());
-		}
-		try {
-			reader.close();
-		} catch (IOException e) {
-			System.err.println("Warning: Could not close reader of " + this.path + ": " + e.toString());
-		}
-		return result;
 	}
 	
 	/**
