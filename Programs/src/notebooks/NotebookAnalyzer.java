@@ -16,20 +16,20 @@ import java.util.concurrent.*;
 /**
  * Analyzer for Jupyter notebooks.
  */
-public class Analyzer {
+public class NotebookAnalyzer {
 	private ExecutorService executor;
 	private List<Notebook> notebooks;
 	private static LangSpec[] langSpecFields = {LangSpec.METADATA_LANGUAGE , LangSpec.METADATA_LANGUAGEINFO_NAME, 
 			LangSpec.METADATA_KERNELSPEC_LANGUAGE, LangSpec.METADATA_KERNELSPEC_NAME,
 			LangSpec.CODE_CELLS};
-	private Map<String, String> repros = null;
+	private Map<String, String> repros = null;	// TODO: Only needed for scc. Get rid of!
 	private String outputDir = ".";	// Default value
 	
 	/**
 	 * Note that when you are done with this Analyzer, you must call the method
 	 * shutDown!
 	 */
-	public Analyzer() {
+	public NotebookAnalyzer() {
 		this.notebooks = new ArrayList<Notebook>();
 		int cores = Runtime.getRuntime().availableProcessors();
 		System.out.println("Running " + (2*cores) + " threads.");
@@ -62,7 +62,6 @@ public class Analyzer {
 	}
 	
 	/**
-	 * TODO: Lägga reproinfo i notebook istället, och använd notebookobjekt i file2hash-map!? Isf måste Snippetobjektet innehålla en notebook istf ett filnamn, för att man ska kunna hämta info om reprot!
 	 * Initialize the map from notebook name to repro, and add information about repro to each notebook.
 	 * @param fileName Name of file with mapping from notebook number to repro
 	 */
@@ -1011,7 +1010,7 @@ public class Analyzer {
 	}
 
 	public static void main(String[] args) {
-		Analyzer analyzer = new Analyzer();
+		NotebookAnalyzer analyzer = new NotebookAnalyzer();
 		analyzer.analyze(args);
 		analyzer.shutDown();
 	}

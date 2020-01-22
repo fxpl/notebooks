@@ -10,5 +10,5 @@ mkdir -p $outputDirectory
 
 java -XX:+UnlockDiagnosticVMOptions -XX:NativeMemoryTracking=summary -XX:+PrintNMTStatistics -XX:+UseParallelGC \
 	-cp Programs/bin:Programs/external/json-simple-1.1.1.jar -Xmx36G \
-	notebooks.Analyzer -nb_path /proj/uppstore2019098/notebooks -repro_file /proj/uppstore2019098/notebooks/notebook-number_repo.csv -output_dir $outputDirectory -all
+	notebooks.NotebookAnalyzer -nb_path /proj/uppstore2019098/notebooks -repro_file /proj/uppstore2019098/notebooks/notebook-number_repo.csv -output_dir $outputDirectory -all
 

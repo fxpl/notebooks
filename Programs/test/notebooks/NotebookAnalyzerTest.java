@@ -10,18 +10,18 @@ import java.util.Map;
 import java.util.Scanner;
 
 import org.junit.*;
-import notebooks.Analyzer;
+import notebooks.NotebookAnalyzer;
 import notebooks.LangSpec;
 import notebooks.Language;
 import notebooks.Snippet;
 
-public class AnalyzerTest {
+public class NotebookAnalyzerTest {
 	
-	private Analyzer analyzer;
+	private NotebookAnalyzer analyzer;
 	
 	@Before
 	public void setUp() {
-		analyzer = new Analyzer();
+		analyzer = new NotebookAnalyzer();
 	}
 	
 	@After
