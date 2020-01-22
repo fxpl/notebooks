@@ -18,6 +18,7 @@ public abstract class Dumper {
 				dumpNotebook(src, target);
 			}
 		} else {
+			System.out.println("Traversing " + srcFile.getPath());
 			// This is a directory. Traverse.
 			String[] subFiles = srcFile.list();
 			String targetDirName = target + File.separatorChar + srcFile.getName();
