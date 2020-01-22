@@ -16,20 +16,19 @@ import java.util.concurrent.*;
 /**
  * Analyzer for Jupyter notebooks.
  */
-public class NotebookAnalyzer {
+public class NotebookAnalyzer extends Analyzer {
 	private ExecutorService executor;
 	private List<Notebook> notebooks;
 	private static LangSpec[] langSpecFields = {LangSpec.METADATA_LANGUAGE , LangSpec.METADATA_LANGUAGEINFO_NAME, 
 			LangSpec.METADATA_KERNELSPEC_LANGUAGE, LangSpec.METADATA_KERNELSPEC_NAME,
 			LangSpec.CODE_CELLS};
 	private Map<String, String> repros = null;	// TODO: Only needed for scc. Get rid of!
-	private String outputDir = ".";	// Default value
-	
 	/**
 	 * Note that when you are done with this Analyzer, you must call the method
 	 * shutDown!
 	 */
 	public NotebookAnalyzer() {
+		super();
 		this.notebooks = new ArrayList<Notebook>();
 		int cores = Runtime.getRuntime().availableProcessors();
 		System.out.println("Running " + (2*cores) + " threads.");
