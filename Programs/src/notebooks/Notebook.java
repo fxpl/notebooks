@@ -534,18 +534,15 @@ public class Notebook {
 	 * @throws NotebookException If the file this.path could not be parsed
 	 */
 	private JSONObject getNotebook() throws NotebookException {
-		if (null != contents) {
-			return contents;
-		} else {
+		if (null == contents) {
 			Reader reader;
-			JSONObject result;
 			try {
 				reader = new FileReader(this.path);
 			} catch (FileNotFoundException e) {
 				throw new NotebookException("Could not read " + this.path + ": " + e.toString());
 			}
 			try {
-				result = (JSONObject)new JSONParser().parse(reader);
+				contents = (JSONObject)new JSONParser().parse(reader);
 			} catch (IOException | ParseException e) {
 				throw new NotebookException("Could not parse " + this.path + ": " + e.toString());
 			} catch (ClassCastException e) {
@@ -556,8 +553,8 @@ public class Notebook {
 			} catch (IOException e) {
 				System.err.println("Warning: Could not close reader of " + this.path + ": " + e.toString());
 			}
-			return result;
 		}
+		return contents;
 	}
 	
 	/**
