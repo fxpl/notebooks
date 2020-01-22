@@ -12,7 +12,7 @@
 ################################################################################
 
 projDir="/proj/uppstore2019098/notebooks"
-notebookPathsFile="notebook_paths.txt"
+notebookPathsFile="$projDir/notebook_paths.txt"
 duplicates="./duplicates.txt"
 targetDir="/proj/uppstore2019098/duplicated_notebooks"
 
