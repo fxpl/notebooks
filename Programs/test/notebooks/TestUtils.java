@@ -1,6 +1,7 @@
 package notebooks;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.io.BufferedReader;
@@ -57,14 +58,43 @@ public class TestUtils {
 	}
 	
 	/**
-	 * Verify that all files prefixed in expectedFiles exist, and remove them.
+	 * Verify that no output file from the clone analysis exist.
+	 */
+	static void verifyAbsenceOfCloneFiles() {
+		String[] prefixes = {
+				"file2hashes",
+				"hash2files",
+				"cloneFrequency",
+				"connections"
+		};
+		
+		for (String prefix: prefixes) {
+			File outputFile = lastOutputFile(prefix);
+			assertFalse("Unexpected output file: " + outputFile.getName(), outputFile.exists());
+		}
+	}
+	
+	/**
+	 * Verify that all files prefixed in expectedFiles exist in the current
+	 * directory, and remove them.
 	 * @param expectedFilePrefixes Prefixes for all expected files
 	 * throws IOException
 	 */
-	static void checkExistenceAndRemove(String[] expectedFilePrefixes) throws IOException {
+	static void verifyExistenceAndRemove(String[] expectedFilePrefixes) throws IOException {
+		verifyExistenceAndRemove(".", expectedFilePrefixes);
+	}
+	
+	/**
+	 * Verify that all files prefixed in expectedFiles exist in the specified
+	 * directory, and remove them.
+	 * @param dir Directory to look for files in
+	 * @param expectedFilePrefixes Prefixes for all expected files
+	 * throws IOException
+	 */
+	static void verifyExistenceAndRemove(String dir, String[] expectedFilePrefixes) throws IOException {
 		for (String prefix: expectedFilePrefixes) {
-			File expectedFile = lastOutputFile(prefix);
-			assertTrue("Expected output file " + expectedFile.getName() + " is missing!",
+			File expectedFile = lastOutputFile(dir, prefix);
+			assertTrue("Expected output file " + expectedFile.getName() + " is missing in " + dir + "!",
 					expectedFile.exists());
 			expectedFile.delete();
 		}
@@ -79,15 +109,26 @@ public class TestUtils {
 		lastOutputFile("cloneFrequency").delete();
 		lastOutputFile("connections").delete();
 	}
+	
+	/**
+	 * Find the output file <prefix><timestamp>.csv with the greatest (latest)
+	 * time stamp in the current directory.
+	 * @param prefix First part of the output file
+	 * @return Output file described above
+	 */
+	static File lastOutputFile(String prefix) {
+		return lastOutputFile(".", prefix);
+	}
 
 	/**
 	 * Find the output file <prefix><timestamp>.csv with the greatest (latest)
-	 * time stamp.
+	 * time stamp in the directory given as argument.
 	 * @param prefix First part of the output file
+	 * @param dir Directory to look for file in.
 	 * @return Output file described above 
 	 */
-	static File lastOutputFile(String prefix) {
-		File directory = new File(".");
+	static File lastOutputFile(String dir, String prefix) {
+		File directory = new File(dir);
 		String outputFileName = prefix + ".csv";
 		for (String currentFileName: directory.list()) {
 			if (currentFileName.matches(prefix + "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\.csv")
@@ -95,6 +136,6 @@ public class TestUtils {
 				outputFileName = currentFileName;
 			}
 		}
-		return new File(outputFileName);
+		return new File(dir + "/" + outputFileName);
 	}
 }

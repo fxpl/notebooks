@@ -15,20 +15,16 @@ public class SccOutputAnalyzerTest {
 	}
 	
 	/**
-	 * Verify that the clone output files are created when the argument
-	 * "-clones_scc" is given and paths are specified correctly.
+	 * Verify that the clone output files are created when paths are specified
+	 * correctly.
 	 * @throws IOException 
 	 */
 	@Test
-	public void testArgumentParsing_clones_scc() throws IOException {
+	public void testArgumentParsing_correct() throws IOException {
 		String args[] = {
-				"-clones_scc",
-				"-scc_stats_file",
-				"test/data/scc/file_stats",
-				"-scc_clones_file",
-				"test/data/scc/clone_pairs",
-				"-repro_file",
-				"test/data/hash/repros.csv"
+				"--stats_file=test/data/scc/file_stats",
+				"--clones_file=test/data/scc/clone_pairs",
+				"--repro_file=test/data/hash/repros.csv"
 		};
 		String[] expectedFilePrefixes = {
 				"file2hashes",
@@ -37,10 +33,153 @@ public class SccOutputAnalyzerTest {
 				"connections"
 		};
 		analyzer.analyze(args);
-		TestUtils.checkExistenceAndRemove(expectedFilePrefixes);
+		TestUtils.verifyExistenceAndRemove(expectedFilePrefixes);
 	}
 	
-	// TODO: testArgumentParsing: output_dir, nb_path (med/utan värde), repro_file utan värde. okänt argument
+	/**
+	 * Verify that the output directory is set correctly when give as an
+	 * argument.
+	 * @throws IOException 
+	 */
+	@Test
+	public void testArgumentParsing_outputDir() throws IOException {
+		String outputDir = "test";
+		String args[] = {
+				"--stats_file=test/data/scc/file_stats",
+				"--clones_file=test/data/scc/clone_pairs",
+				"--repro_file=test/data/hash/repros.csv",
+				"--output_dir=" + outputDir
+		};
+		String[] expectedFilePrefixes = {
+				"file2hashes",
+				"hash2files",
+				"cloneFrequency",
+				"connections"
+		};
+		analyzer.analyze(args);
+		TestUtils.verifyExistenceAndRemove(outputDir, expectedFilePrefixes);
+	}
+	
+	/**
+	 * Verify that clone analysis is not run when statistics file is not
+	 * specified.
+	 */
+	@Test
+	public void testArgumentParsing_statsFileMissing() {
+		String args[] = {
+				"--clones_file=test/data/scc/clone_pairs",
+				"--repro_file=test/data/hash/repros.csv"
+		};
+		analyzer.analyze(args);
+		TestUtils.verifyAbsenceOfCloneFiles();
+	}
+	
+	/**
+	 * Verify that clone analysis is not run when statistics file value is not
+	 * specified.
+	 */
+	@Test
+	public void testArgumentParsing_statsFileValueMissing() {
+		String args[] = {
+				"--clones_file=test/data/scc/clone_pairs",
+				"--repro_file=test/data/hash/repros.csv",
+				"--stats_file"
+		};
+		analyzer.analyze(args);
+		TestUtils.verifyAbsenceOfCloneFiles();
+	}
+	
+	/**
+	 * Verify that clone analysis is not run when clone pair file is not
+	 * specified.
+	 */
+	@Test
+	public void testArgumentParsing_pairFileMissing() {
+		String[] args = {
+				"--stats_file=test/data/scc/file_stats",
+				"--repro_file=test/data/hash/repros.csv"
+		};
+		analyzer.analyze(args);
+		TestUtils.verifyAbsenceOfCloneFiles();
+	}
+	
+	/**
+	 * Verify that clone analysis is not run when clone pair file value is not
+	 * specified.
+	 */
+	@Test
+	public void testArgumentParsing_pairFileValueMissing() {
+		String[] args = {
+				"--stats_file=test/data/scc/file_stats",
+				"--repro_file=test/data/hash/repros.csv",
+				"--clones_file",
+		};
+		analyzer.analyze(args);
+		TestUtils.verifyAbsenceOfCloneFiles();
+	}
+	
+	/**
+	 * Verify that clone analysis is not run when clone pair file doesn't exist.
+	 */
+	@Test
+	public void testArgumentParsing_nonExistentPairFile() {
+		String args[] = {
+				"--stats_file=test/data/scc/file_stats",
+				"--clones_file=nonexistent/path/file.csv",
+				"--repro_file=test/data/hash/repros.csv"
+		};
+		analyzer.analyze(args);
+		TestUtils.verifyAbsenceOfCloneFiles();
+	}
+	
+	/**
+	 * Verify that clone analysis is not run when repro file is not specified.
+	 */
+	@Test
+	public void testArgumentParsing_reproFileMissing() {
+		String[] args = {
+				"--clones_file=test/data/scc/clone_pairs",
+				"--stats_file=test/data/scc/file_stats",
+		};
+		analyzer.analyze(args);
+		TestUtils.verifyAbsenceOfCloneFiles();
+	}
+	
+	/**
+	 * Verify that clone analysis is not run when repro file value is not
+	 * specified.
+	 */
+	@Test
+	public void testArgumentParsing_reproFileValueMissing() {
+		String[] args = {
+				"--repro_file",
+				"--stats_file=test/data/scc/file_stats",
+				"--clones_file=test/data/scc/clone_pairs"
+		};
+		analyzer.analyze(args);
+		TestUtils.verifyAbsenceOfCloneFiles();
+	}
+	
+	/**
+	 * Verify that analyze runs smooth also when an unknown argument is given.
+	 * @throws IOException 
+	 */
+	@Test
+	public void testArgumentParsing_unknownArg() throws IOException {
+		String[] args = {
+				"--stats_file=test/data/scc/file_stats",
+				"--clones_file=test/data/scc/clone_pairs",
+				"--repro_file=test/data/hash/repros.csv",
+				"--unknown"};
+		String[] expectedFilePrefixes = {
+				"file2hashes",
+				"hash2files",
+				"cloneFrequency",
+				"connections"
+		};
+		analyzer.analyze(args);
+		TestUtils.verifyExistenceAndRemove(expectedFilePrefixes);
+	}
 	
 	/**
 	 * Verify that connections are identified correctly at clone analysis based
@@ -48,7 +187,7 @@ public class SccOutputAnalyzerTest {
 	 * @throws IOException 
 	 */
 	@Test
-	public void testConnectionsCsv_sccData() throws IOException {
+	public void testConnectionsCsv() throws IOException {
 		String dataDir = "test/data/scc";
 		String statFile = "file_stats";
 		String cloneFile = "clone_pairs";
@@ -84,7 +223,7 @@ public class SccOutputAnalyzerTest {
 	 * @throws IOException 
 	 */
 	@Test
-	public void testCloneFreqCsv_sccData() throws IOException {
+	public void testCloneFreqCsv() throws IOException {
 		String dataDir = "test/data/scc";
 		String statFile = "file_stats";
 		String cloneFile = "clone_pairs";
@@ -119,7 +258,7 @@ public class SccOutputAnalyzerTest {
 	 * @throws IOException
 	 */
 	@Test (expected = AssertionError.class)
-	public void testClones_corruptSccData() throws IOException {
+	public void testClones_corruptPairData() throws IOException {
 		String dataDir = "test/data/scc";
 		String statFile = "file_stats";
 		String cloneFile = "clone_pairs_corrupt";

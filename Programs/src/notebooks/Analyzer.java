@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Scanner;
 
 public class Analyzer {
+	protected String outputDir = ".";
 
 	/**
 	 * Create a map from notebook name to repro.
@@ -33,6 +34,18 @@ public class Analyzer {
 		scanner.close();
 		return result;
 	}
-
-	protected String outputDir = ".";
+	
+	/**
+	 * Get the part of arg located after the (first) '=' sign. If the '=' is
+	 * missing, print an error message and return an empty string.
+	 */
+	protected String getValueFromArgument(String arg) {
+		int eqIndex = arg.indexOf('=');
+		if (-1 == eqIndex) {
+			System.err.println("Argument " + arg + " must be followed by '=' and value!");
+			return "";
+		} else {
+			return arg.substring(eqIndex + 1);
+		}
+	}
 }

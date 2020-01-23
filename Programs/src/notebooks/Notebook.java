@@ -12,6 +12,7 @@ import org.json.simple.*;
 import org.json.simple.parser.*;
 
 // TODO: Går det att hantera CastExceptions på något snyggare sätt?!
+// (Förmodligen är det bästa att använda ett vettigare jsonbibliotek.)
 
 /**
  * A Jupyter notebook.
@@ -169,7 +170,6 @@ public class Notebook {
 		LangSpec langSpecIn = this.languageSpecIn;
 		JSONObject notebook = this.getNotebook();
 		if (!notebook.containsKey("metadata")) {
-			// TODO(?): Bryt ut
 			result.put(LangSpec.METADATA_LANGUAGE, Language.UNKNOWN);
 			result.put(LangSpec.METADATA_LANGUAGEINFO_NAME, Language.UNKNOWN);
 			result.put(LangSpec.METADATA_KERNELSPEC_LANGUAGE, Language.UNKNOWN);

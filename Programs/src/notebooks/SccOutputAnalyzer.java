@@ -210,82 +210,56 @@ public class SccOutputAnalyzer extends Analyzer {
 		return result;
 	}
 	
-	// TODO: Se över vilka argument som ska skickas!
+	// TODO Clone file eller pair file?
 	void analyze(String[] args) {
-		String sccStatsFile = null;
-		String sccPairFile = null;
-		String reproFile = null;
+		String statsFile = null, pairFile = null;
 		
 		// Read arguments
 		for (int i=0; i<args.length; i++) {
 			String arg = args[i];
-			switch (arg) {	
-			case "-scc_stats_file":
+			if (arg.startsWith("--stats_file")) {
+				statsFile = getValueFromArgument(arg);
+			} else if (arg.startsWith("--clones_file")) {
+				pairFile = getValueFromArgument(arg);
+			} else if (arg.startsWith("--repro_file")) {
+				String reproFile = getValueFromArgument(arg);
 				try {
-					sccStatsFile = args[++i];
-				} catch (ArrayIndexOutOfBoundsException e) {
-					System.err.println("Argument '-scc_stats_file' must be followed by the path to the SourcererCC file stats file!");
-				}
-				break;
-			case "-scc_clones_file":
-				try {
-					sccPairFile = args[++i];
-				} catch (ArrayIndexOutOfBoundsException e) {
-					System.err.println("Argument -scc_clones_file must be followed by the path to the SourcererCC clone pairs file!");
-				}
-				break;
-				// TODO: Duplicerat från NotebookAnalyzer
-			case "-repro_file":
-				try {
-					reproFile = args[++i];
-				} catch (ArrayIndexOutOfBoundsException e) {
-					System.err.println("Argument '-repro_file' must be followed by the path to the repro file!");
+					this.initializeReproMap(reproFile);
+				} catch (FileNotFoundException e) {
+					System.err.println("Repro file not found: " + e.getMessage());
 					System.err.println("Repro information not initialized!");
 				}
-				break;
-			case "-output_dir":
-				try {
-					outputDir = args[++i];
-				} catch (ArrayIndexOutOfBoundsException e) {
-					System.err.println("Argument '-output_dir' must be followed by the path to the output dir!");
-					System.err.println("Default output directory is used!");
-				}
-				break;
-			default:
+			} else if (arg.startsWith("--output_dir")) {
+				outputDir = getValueFromArgument(arg);
+			} else {
 				System.err.println("Unknown argument: " + arg);
 			}
 		}
 		
-		if (null != reproFile) {
+		// Run
+		if (null != statsFile && "" != statsFile
+				&& null != pairFile && "" != pairFile && null !=this.repros) {
 			try {
-				this.initializeReproMap(reproFile);
-			} catch (FileNotFoundException e) {
-				System.err.println("Repro file not found: " + e.getMessage());
-				System.err.println("Repro information not initialized!");
-			}
-		}
-		if (null != sccStatsFile && null != sccPairFile && null !=reproFile) {
-			try {
-				this.clones(sccPairFile, sccStatsFile);
+				this.clones(pairFile, statsFile);
 				System.out.println("Clone files created!");
 			} catch (IOException e) {
 				System.err.println("I/O error: " + e.getMessage() + ". Operation interrupted.");
 			}
 		} else {
-			if (null == sccPairFile) {
+			if (null == pairFile || "" == pairFile) {
 				System.err.println("SourcererCC clones pair file path not set!");
 			}
-			if (null == sccStatsFile) {
+			if (null == statsFile || "" == statsFile) {
 				System.err.println("SourcererCC file statistics file path not set!");
 			}
-			if (null == reproFile) {
+			if (null == this.repros) {
 				System.err.println("Repro mapping file path not set!");
 			}
-			System.err.println("Clone analysis will not be run!");
+			System.err.println("Analysis will not be run!");
 		}
 	}
 	
 	public static void main(String[] args) {
-		
+		// TODO
 	}
 }

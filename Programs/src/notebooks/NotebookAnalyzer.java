@@ -59,7 +59,7 @@ public class NotebookAnalyzer extends Analyzer {
 	 * Initialize the map from notebook name to repro, and add information about repro to each notebook.
 	 * @param fileName Name of file with mapping from notebook number to repro
 	 */
-	void initializeReproMap(String fileName) throws FileNotFoundException {
+	void initializeReproInfo(String fileName) throws FileNotFoundException {
 		Map<String, String> reproMap = createReproMap(fileName);
 		for (Notebook nb: notebooks) {
 			nb.setRepro(reproMap.get(nb.getName()));
@@ -364,8 +364,6 @@ public class NotebookAnalyzer extends Analyzer {
 	 * Parse command line arguments and perform actions accordingly.
 	 */
 	void analyze(String[] args) {
-		// TODO: Bättre testtäckning!
-		// TODO: mer enhetliga flagg/metod/variabelnamn
 		boolean all = false,
 				count = false,
 				lang = false,
@@ -374,75 +372,61 @@ public class NotebookAnalyzer extends Analyzer {
 				langAll = false;
 		String reproFile = null;
 		String nbPath = null;
-		String outputDir = null;
-
+		
 		// Read arguments
 		for (int i=0; i<args.length; i++) {
 			String arg = args[i];
-			switch (arg) {
-			case "-nb_path":
-				try {
-					nbPath = args[++i];
-				} catch (ArrayIndexOutOfBoundsException e) {
-					System.err.println("Argument '-nb_path' must be followed by the path of the notebook(s)!");
-					System.err.println("No notebooks will be analyzed!");
+			if (arg.startsWith("--nb_path")) {
+				nbPath = getValueFromArgument(arg);
+			} else if (arg.startsWith("--output_dir")) {
+				this.outputDir = getValueFromArgument(arg);
+			} else if (arg.startsWith("--repro_file")) {
+				reproFile = getValueFromArgument(arg);
+			} else {
+				switch (arg) {
+				case "--all":
+					all = true;
+					break;
+				case "--count":
+					count = true;
+					break;
+				case "--lang":
+					lang = true;
+					break;
+				case "--loc":
+					loc = true;
+					break;
+				case "--clones":
+					clones = true;
+					break;
+				case "--lang_all":
+					langAll = true;
+					break;
+				default:
+					System.err.println("Unknown argument: " + arg);
 				}
-				break;
-			case "-repro_file":
-				try {
-					reproFile = args[++i];
-				} catch (ArrayIndexOutOfBoundsException e) {
-					System.err.println("Argument '-repro_file' must be followed by the path to the repro file!");
-					System.err.println("Repro information not initialized!");
-				}
-				break;
-			case "-output_dir":
-				try {
-					outputDir = args[++i];
-				} catch (ArrayIndexOutOfBoundsException e) {
-					System.err.println("Argument '-output_dir' must be followed by the path to the output dir!");
-					System.err.println("Default output directory is used!");
-				}
-				break;
-			case "-all":
-				all = true;
-				break;
-			case "-count":
-				count = true;
-				break;
-			case "-lang":
-				lang = true;
-				break;
-			case "-loc":
-				loc = true;
-				break;
-			case "-clones":
-				clones = true;
-				break;
-			case "-lang_all":
-				langAll = true;
-				break;
-			default:
-				System.err.println("Unknown argument: " + arg);
 			}
+		}
+			
+		// Set up
+		if (null != nbPath && "" != nbPath) {
+			this.initializeNotebooksFrom(nbPath);
+		} else {
+			System.err.println("Warning! Notebook path not set! No notebooks will be analyzed.");
+		}
+		if (null != reproFile && "" != reproFile) {
+			try {
+				this.initializeReproInfo(reproFile);
+			} catch (FileNotFoundException e) {
+				System.err.println("Repro file not found: " + e.getMessage());
+				System.err.println("Repro information not initialized!");
+			}
+		} else if (all || clones) {
+			System.err.println("Warning! Clone analysis run without repro information!");
 		}
 			
 		// Perform analyzes
 		try {
-			if (null != nbPath) {
-				this.initializeNotebooksFrom(nbPath);
-			}
-			if (null != reproFile) {
-				try {
-					this.initializeReproMap(reproFile);
-				} catch (FileNotFoundException e) {
-					System.err.println("Repro file not found: " + e.getMessage());
-					System.err.println("Repro information not initialized!");
-				}
-			}
-			if (null != outputDir) {
-				this.outputDir = outputDir;
-			}
 			if (all) {
 				this.allAnalyzes();
 				System.out.println("All analyzes made for " + this.numNotebooks() + " notebooks.");
