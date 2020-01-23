@@ -118,7 +118,6 @@ public class SccOutputAnalyzerTest {
 	 * the wrong format.
 	 * @throws IOException
 	 */
-	/* TODO: Om jag ska kunna ha med det här testet måste jag enabla assertions!
 	@Test (expected = AssertionError.class)
 	public void testClones_corruptSccData() throws IOException {
 		String dataDir = "test/data/scc";
@@ -127,9 +126,12 @@ public class SccOutputAnalyzerTest {
 		String reproMapPath = "test/data/hash/repros.csv";
 		analyzer.initializeReproMap(reproMapPath);
 		analyzer.clones(dataDir + "/" + cloneFile, dataDir + "/" + statFile);
-	}*/
+	}
 	
-	// TODO: Borde man kolla file2hashes och hash2files också? Hur?!
+	/* file2hashes and hash2files are not checked, since we don't know which
+	   snippet will get which index. If cloneFrequency and connections files
+	   are correct, it is very unlikely that the file-hash and hash-file maps
+	   are incorrect! */
 	
 	/**
 	 * @return Expected header of cloneFrequency files
