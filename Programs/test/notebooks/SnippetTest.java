@@ -14,11 +14,21 @@ public class SnippetTest {
 	private Snippet snippet;
 	private String name = "nb_1000000";
 	private int index = 2;
+	private String repro = "someRepro";
 	
 	
 	@Before
 	public void setUp() {
-		this.snippet = new Snippet(this.name, this.index);
+		this.snippet = new Snippet(this.name, repro, this.index);
+	}
+	
+	@Test
+	public void testConstructor_notebook() {
+		Notebook notebook = new Notebook(name, repro);
+		Snippet notebookSnippet = new Snippet(notebook, index);
+		assertEquals("Notebook name not initialized/fetched correctly!", name, notebookSnippet.getFileName());
+		assertEquals("Repro name not initialized/fetched correctly!", repro, notebookSnippet.getRepro());
+		assertEquals("Index not initialized/fetched correctly!", index, notebookSnippet.getSnippetIndex());
 	}
 
 	@Test
@@ -60,14 +70,6 @@ public class SnippetTest {
 	public void testHashCode() {
 		int expectedHashCode = Objects.hash(name, index);
 		assertEquals("Wrong hash code returned!", expectedHashCode, snippet.hashCode());
-	}
-	
-	@Test
-	public void testSetGetRepro() {
-		String reproName = "someRepro";
-		snippet.setRepro(reproName);
-		assertEquals("Repro name not set or not fetched correctly!",
-				reproName, snippet.getRepro());
 	}
 	
 	@Test

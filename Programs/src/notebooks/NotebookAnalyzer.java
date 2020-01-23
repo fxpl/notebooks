@@ -166,11 +166,10 @@ public class NotebookAnalyzer extends Analyzer {
 			SnippetCode[] snippetCodes = fileMap.get(notebook);
 			for (int j=0; j<snippetCodes.length; j++) {
 				if (clones.containsKey(snippetCodes[j])) {
-					// TODO Konstruktor som tar notebook som argument istället?! Eller Lagra notebook i!
-					clones.get(snippetCodes[j]).add(new Snippet(notebook.getName(), notebook.getRepro(), j));
+					clones.get(snippetCodes[j]).add(new Snippet(notebook, j));
 				} else {
 					List<Snippet> snippets = new ArrayList<Snippet>();
-					snippets.add(new Snippet(notebook.getName(), notebook.getRepro(), j));
+					snippets.add(new Snippet(notebook, j));
 					clones.put(snippetCodes[j], snippets);
 				}
 			}
