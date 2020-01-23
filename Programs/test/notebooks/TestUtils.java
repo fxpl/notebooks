@@ -101,6 +101,31 @@ public class TestUtils {
 	}
 	
 	/**
+	 * Verify that all clone analysis output files exist in the current
+	 * directory, and remove them.
+	 * @throws IOException 
+	 */
+	static void verifyExistenceOfAndRemoveCloneFiles() throws IOException {
+		verifyExistenceOfAndRemoveCloneFiles(".");
+	}
+	
+	/**
+	 * Verify that all clone analysis output files exist in the specified
+	 * directory, and remove them.
+	 * @param dir Name of directory to look in and remove from
+	 * @throws IOException 
+	 */
+	static void verifyExistenceOfAndRemoveCloneFiles(String dir) throws IOException {
+		String[] prefixes = {
+				"file2hashes",
+				"hash2files",
+				"cloneFrequency",
+				"connections"
+		};
+		verifyExistenceAndRemove(dir, prefixes);
+	}
+	
+	/**
 	 * Delete all CSV files created by the clone analysis. 
 	 */
 	static void deleteCloneCsvs() {

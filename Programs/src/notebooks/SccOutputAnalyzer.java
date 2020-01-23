@@ -214,7 +214,7 @@ public class SccOutputAnalyzer extends Analyzer {
 	void analyze(String[] args) {
 		String statsFile = null, pairFile = null;
 		
-		// Read arguments
+		// Set up
 		for (int i=0; i<args.length; i++) {
 			String arg = args[i];
 			if (arg.startsWith("--stats_file")) {

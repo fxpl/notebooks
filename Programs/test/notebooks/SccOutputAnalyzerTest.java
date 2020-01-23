@@ -26,14 +26,8 @@ public class SccOutputAnalyzerTest {
 				"--clones_file=test/data/scc/clone_pairs",
 				"--repro_file=test/data/hash/repros.csv"
 		};
-		String[] expectedFilePrefixes = {
-				"file2hashes",
-				"hash2files",
-				"cloneFrequency",
-				"connections"
-		};
 		analyzer.analyze(args);
-		TestUtils.verifyExistenceAndRemove(expectedFilePrefixes);
+		TestUtils.verifyExistenceOfAndRemoveCloneFiles();
 	}
 	
 	/**
@@ -50,14 +44,8 @@ public class SccOutputAnalyzerTest {
 				"--repro_file=test/data/hash/repros.csv",
 				"--output_dir=" + outputDir
 		};
-		String[] expectedFilePrefixes = {
-				"file2hashes",
-				"hash2files",
-				"cloneFrequency",
-				"connections"
-		};
 		analyzer.analyze(args);
-		TestUtils.verifyExistenceAndRemove(outputDir, expectedFilePrefixes);
+		TestUtils.verifyExistenceOfAndRemoveCloneFiles(outputDir);
 	}
 	
 	/**
@@ -171,14 +159,8 @@ public class SccOutputAnalyzerTest {
 				"--clones_file=test/data/scc/clone_pairs",
 				"--repro_file=test/data/hash/repros.csv",
 				"--unknown"};
-		String[] expectedFilePrefixes = {
-				"file2hashes",
-				"hash2files",
-				"cloneFrequency",
-				"connections"
-		};
 		analyzer.analyze(args);
-		TestUtils.verifyExistenceAndRemove(expectedFilePrefixes);
+		TestUtils.verifyExistenceOfAndRemoveCloneFiles();
 	}
 	
 	/**

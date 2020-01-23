@@ -154,16 +154,8 @@ public class NotebookAnalyzerTest {
 	@Test
 	public void testArgumentParsing_clones() throws IOException {
 		String[] arg = {"--clones"};
-		/* Repro file not needed since nb_path is missing => no analysis,
-		   we just check that the clones method is called! */
-		String[] expectedFilePrefixes = {
-				"file2hashes",
-				"hash2files",
-				"cloneFrequency",
-				"connections"
-		};
 		analyzer.analyze(arg);
-		TestUtils.verifyExistenceAndRemove(expectedFilePrefixes);
+		TestUtils.verifyExistenceOfAndRemoveCloneFiles();
 	}
 	
 	/**
