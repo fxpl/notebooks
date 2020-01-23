@@ -141,6 +141,7 @@ public class NotebookTest {
 	    }
 	}
 	
+	@SuppressWarnings("unlikely-arg-type")
 	@Test
 	public void testEquals_diffType() {
 		Notebook notebook = new Notebook("");
@@ -467,7 +468,7 @@ public class NotebookTest {
 	}
 	
 	/**
-	 * TODO
+	 * Verify that printSnippet prints a snippet correctly.
 	 */
 	@Test
 	public void testPrintSnippet() throws NotebookException, IOException {
