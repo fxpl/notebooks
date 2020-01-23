@@ -29,6 +29,11 @@ public class Notebook {
 		this.path = path;
 	}
 	
+	public Notebook(String path, String repro) {
+		this.path = path;
+		this.repro = repro;
+	}
+	
 	public Notebook(Notebook model) {
 		this.path = model.path;
 		this.repro = model.repro;

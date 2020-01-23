@@ -39,6 +39,7 @@
 			<batchtest todir="reports">
 				<fileset dir="test">
 					<exclude name="notebooks/DumperTest.java"/>
+					<exclude name="notebooks/TestUtils.java"/>
 				</fileset>
 			</batchtest>
 		</junit>

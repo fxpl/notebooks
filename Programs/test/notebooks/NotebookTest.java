@@ -196,6 +196,19 @@ public class NotebookTest {
 	}
 	
 	/**
+	 * Verify that the constructor that takes both path and repro as arguments
+	 * initializes the name and repro correctly
+	 */
+	@Test
+	public void testTwoArgConstructor() {
+		String name = "nb_0.ipynb";
+		String repro = "someRepro";
+		Notebook notebook = new Notebook(name, repro);
+		assertEquals("Name not initialized/fetched correctly!", name, notebook.getName());
+		assertEquals("Repro not initialized/fetched correctly!", repro, notebook.getRepro());
+	}
+	
+	/**
 	 * Verify that code snippets are hashed correctly.
 	 * @throws NotebookException
 	 */
