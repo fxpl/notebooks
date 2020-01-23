@@ -5,7 +5,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Scanner;
@@ -28,14 +27,20 @@ public class TestUtils {
 		outputReader.close();
 	}
 	
-	/** TODO: Kolla även antalet rader!
+	/**
 	 * Check that the most recent file <prefix><timestamp>.csv contains all
-	 * lines in expectedLines.
+	 * lines in expectedLines, and nothing more.
 	 * @param prefix First part of name of file to be analyzed (see above)
 	 * @param expectedLines Array of the lines expected to be found in the file, not necessarily in order
+	 * @throws IOException 
 	 */
-	static void checkCsv_anyOrder(String prefix, String[] expectedLines) throws FileNotFoundException {
+	static void checkCsv_anyOrder(String prefix, String[] expectedLines) throws IOException {
 		File outputFile = lastOutputFile(prefix);
+		BufferedReader reader = new BufferedReader(new FileReader(outputFile));
+		long linesInFile = reader.lines().count();
+		reader.close();
+		assertEquals("Wrong number of lines in " + outputFile.getName() +"!",
+				expectedLines.length, linesInFile);
 		for (int i=0; i<expectedLines.length; i++) {
 			String expectedLine = expectedLines[i];
 			boolean exists = false;
