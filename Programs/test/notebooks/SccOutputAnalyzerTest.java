@@ -23,7 +23,7 @@ public class SccOutputAnalyzerTest {
 	public void testArgumentParsing_correct() throws IOException {
 		String args[] = {
 				"--stats_file=test/data/scc/file_stats",
-				"--clones_file=test/data/scc/clone_pairs",
+				"--pair_file=test/data/scc/clone_pairs",
 				"--repro_file=test/data/hash/repros.csv"
 		};
 		analyzer.analyze(args);
@@ -40,7 +40,7 @@ public class SccOutputAnalyzerTest {
 		String outputDir = "test";
 		String args[] = {
 				"--stats_file=test/data/scc/file_stats",
-				"--clones_file=test/data/scc/clone_pairs",
+				"--pair_file=test/data/scc/clone_pairs",
 				"--repro_file=test/data/hash/repros.csv",
 				"--output_dir=" + outputDir
 		};
@@ -55,7 +55,7 @@ public class SccOutputAnalyzerTest {
 	@Test
 	public void testArgumentParsing_statsFileMissing() {
 		String args[] = {
-				"--clones_file=test/data/scc/clone_pairs",
+				"--pair_file=test/data/scc/clone_pairs",
 				"--repro_file=test/data/hash/repros.csv"
 		};
 		analyzer.analyze(args);
@@ -69,7 +69,7 @@ public class SccOutputAnalyzerTest {
 	@Test
 	public void testArgumentParsing_statsFileValueMissing() {
 		String args[] = {
-				"--clones_file=test/data/scc/clone_pairs",
+				"--pair_file=test/data/scc/clone_pairs",
 				"--repro_file=test/data/hash/repros.csv",
 				"--stats_file"
 		};
@@ -100,7 +100,7 @@ public class SccOutputAnalyzerTest {
 		String[] args = {
 				"--stats_file=test/data/scc/file_stats",
 				"--repro_file=test/data/hash/repros.csv",
-				"--clones_file",
+				"--pair_file",
 		};
 		analyzer.analyze(args);
 		TestUtils.verifyAbsenceOfCloneFiles();
@@ -113,7 +113,7 @@ public class SccOutputAnalyzerTest {
 	public void testArgumentParsing_nonExistentPairFile() {
 		String args[] = {
 				"--stats_file=test/data/scc/file_stats",
-				"--clones_file=nonexistent/path/file.csv",
+				"--pair_file=nonexistent/path/file.csv",
 				"--repro_file=test/data/hash/repros.csv"
 		};
 		analyzer.analyze(args);
@@ -126,7 +126,7 @@ public class SccOutputAnalyzerTest {
 	@Test
 	public void testArgumentParsing_reproFileMissing() {
 		String[] args = {
-				"--clones_file=test/data/scc/clone_pairs",
+				"--pair_file=test/data/scc/clone_pairs",
 				"--stats_file=test/data/scc/file_stats",
 		};
 		analyzer.analyze(args);
@@ -142,7 +142,7 @@ public class SccOutputAnalyzerTest {
 		String[] args = {
 				"--repro_file",
 				"--stats_file=test/data/scc/file_stats",
-				"--clones_file=test/data/scc/clone_pairs"
+				"--pair_file=test/data/scc/clone_pairs"
 		};
 		analyzer.analyze(args);
 		TestUtils.verifyAbsenceOfCloneFiles();
@@ -156,7 +156,7 @@ public class SccOutputAnalyzerTest {
 	public void testArgumentParsing_unknownArg() throws IOException {
 		String[] args = {
 				"--stats_file=test/data/scc/file_stats",
-				"--clones_file=test/data/scc/clone_pairs",
+				"--pair_file=test/data/scc/clone_pairs",
 				"--repro_file=test/data/hash/repros.csv",
 				"--unknown"};
 		analyzer.analyze(args);

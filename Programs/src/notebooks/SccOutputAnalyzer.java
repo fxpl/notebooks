@@ -210,7 +210,6 @@ public class SccOutputAnalyzer extends Analyzer {
 		return result;
 	}
 	
-	// TODO Clone file eller pair file?
 	void analyze(String[] args) {
 		String statsFile = null, pairFile = null;
 		
@@ -219,7 +218,7 @@ public class SccOutputAnalyzer extends Analyzer {
 			String arg = args[i];
 			if (arg.startsWith("--stats_file")) {
 				statsFile = getValueFromArgument(arg);
-			} else if (arg.startsWith("--clones_file")) {
+			} else if (arg.startsWith("--pair_file")) {
 				pairFile = getValueFromArgument(arg);
 			} else if (arg.startsWith("--repro_file")) {
 				String reproFile = getValueFromArgument(arg);
