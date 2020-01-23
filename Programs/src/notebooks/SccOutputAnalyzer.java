@@ -25,16 +25,16 @@ public class SccOutputAnalyzer extends Analyzer {
 	 * Note that the ''hashes'' written by this method are not the MD5 hashes
 	 * of the snippets, but just the value of a counter. However, all instances
 	 * of the ''hash'' of a snippet are the same.
-	 * @param sccPairFile: Output file with clone pairs from the SourcererCC clone detection
-	 * @param sccStatsFile: File stats file created by the SourcererCC tokenizer
+	 * @param pairFile: Output file with clone pairs from the SourcererCC clone detection
+	 * @param statsFile: File stats file created by the SourcererCC tokenizer
 	 * @return A map from snippets to files
 	 * @throws IOException
 	 */
-	public Map<SnippetCode, List<Snippet>> clones(String sccPairFile, String sccStatsFile) throws IOException {
+	public Map<SnippetCode, List<Snippet>> clones(String pairFile, String statsFile) throws IOException {
 		System.out.println("Analyzing clones based on SourcererCC output files!");
 		System.out.println("NOTE THAT NOTEBOOKS WITHOUT SNIPPETS ARE NOT INCLUDED!");
 		Map<String, Integer> snippetsPerFile = new HashMap<String, Integer>();
-		Map<SnippetCode, List<Snippet>> snippet2file = getClones(sccPairFile, sccStatsFile, snippetsPerFile);
+		Map<SnippetCode, List<Snippet>> snippet2file = getClones(pairFile, statsFile, snippetsPerFile);
 		Map<Notebook, SnippetCode[]> file2snippet = getSnippets(snippet2file, snippetsPerFile);
 		new CloneFileWriter(outputDir).write(file2snippet, snippet2file);
 		return snippet2file;
@@ -45,15 +45,15 @@ public class SccOutputAnalyzer extends Analyzer {
 	 * files from SourcererCC. Also count the number of snippets for each
 	 * notebook and store the result in snippetsPerFile (the third argument)
 	 */
-	private Map<SnippetCode, List<Snippet>> getClones(String sccPairFile, String sccStatFile,
+	private Map<SnippetCode, List<Snippet>> getClones(String pairFile, String statFile,
 			Map<String, Integer> snippetsPerFile) throws IOException {
-		List<List<SccSnippetId>> clones = getCloneLists(sccPairFile);
-		return getCloneMap(clones, sccStatFile, snippetsPerFile);
+		List<List<SccSnippetId>> clones = getCloneLists(pairFile);
+		return getCloneMap(clones, statFile, snippetsPerFile);
 	}
 	
-	private List<List<SccSnippetId>> getCloneLists(String sccPairFile) throws FileNotFoundException {
+	private List<List<SccSnippetId>> getCloneLists(String pairFile) throws FileNotFoundException {
 		List<List<SccSnippetId>> clones = new ArrayList<List<SccSnippetId>>();
-		Scanner scanner = new Scanner(new File(sccPairFile));
+		Scanner scanner = new Scanner(new File(pairFile));
 		while (scanner.hasNextLine()) {
 			String line = scanner.nextLine();
 			assert(line.matches("[0-9]+,[0-9]+,[0-9]+,[0-9]+"));
@@ -88,13 +88,13 @@ public class SccOutputAnalyzer extends Analyzer {
 	}
 	
 	private Map<SnippetCode, List<Snippet>> getCloneMap(
-			List<List<SccSnippetId>> clones, String sccStatsFile, Map<String, Integer> snippetsPerFile)
+			List<List<SccSnippetId>> clones, String statsFile, Map<String, Integer> snippetsPerFile)
 			throws FileNotFoundException {
 		// Maps needed for analysis
 		Map<SccSnippetId, Integer> notebookNumbers = new HashMap<SccSnippetId, Integer>();
 		Map<SccSnippetId, Integer> snippetIndices = new HashMap<SccSnippetId, Integer>();
 		Map<SccSnippetId, Integer> linesOfCode = new HashMap<SccSnippetId, Integer>();
-		initializeMapsFromStatsFile(sccStatsFile, notebookNumbers, snippetIndices, linesOfCode);
+		initializeMapsFromStatsFile(statsFile, notebookNumbers, snippetIndices, linesOfCode);
 		return getCloneMap(clones, snippetsPerFile, notebookNumbers, snippetIndices, linesOfCode);
 	}
 
@@ -139,18 +139,18 @@ public class SccOutputAnalyzer extends Analyzer {
 	}
 
 	/**
-	 * @param sccStatsFile File stats file produced by the SourcererCC tokenizer
+	 * @param statsFile File stats file produced by the SourcererCC tokenizer
 	 * @param notebookNumbers Notebook number for each snippet
 	 * @param snippetIndices Index for each snippet
 	 * @param linesOfCode LOC for each snippet
 	 * @throws FileNotFoundException If the stats file doesn't exist
 	 */
-	private void initializeMapsFromStatsFile(String sccStatsFile,
+	private void initializeMapsFromStatsFile(String statsFile,
 			Map<SccSnippetId, Integer> notebookNumbers,
 			Map<SccSnippetId, Integer> snippetIndices,
 			Map<SccSnippetId, Integer> linesOfCode)
 			throws FileNotFoundException {
-		Scanner statsScanner = new Scanner(new File(sccStatsFile));
+		Scanner statsScanner = new Scanner(new File(statsFile));
 		while(statsScanner.hasNextLine()) {
 			String line = statsScanner.nextLine();
 			String[] columns = line.split(",");
