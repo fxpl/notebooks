@@ -18,7 +18,7 @@ public class SccOutputAnalyzer extends Analyzer {
 	Map<SccSnippetId, Integer> linesOfCode;
 	// Information about each notebook
 	private Map<String, String> repros = null;
-	Map<String, Integer> snippetsPerFile = null;
+	Map<String, Integer> snippetsPerNotebook = null;
 	
 	/**
 	 * Perform the clone analysis based on SourcererCC output files. Write
@@ -50,7 +50,7 @@ public class SccOutputAnalyzer extends Analyzer {
 	 * @param fileName Name of file with mapping from notebook number to repro
 	 */
 	public void initializeReproMap(String fileName) throws FileNotFoundException {
-		this.repros = createReproMap(fileName);
+		repros = createReproMap(fileName);
 	}
 	
 	/**
@@ -63,7 +63,7 @@ public class SccOutputAnalyzer extends Analyzer {
 		notebookNumbers = new HashMap<SccSnippetId, Integer>();
 		snippetIndices = new HashMap<SccSnippetId, Integer>();
 		linesOfCode = new HashMap<SccSnippetId, Integer>();
-		snippetsPerFile = new HashMap<String, Integer>();
+		snippetsPerNotebook = new HashMap<String, Integer>();
 		while(statsScanner.hasNextLine()) {
 			String line = statsScanner.nextLine();
 			String[] columns = line.split(",");
@@ -77,8 +77,8 @@ public class SccOutputAnalyzer extends Analyzer {
 			snippetFileName = snippetFileName.substring(0, snippetFileName.lastIndexOf('.'));
 			String[] snippetSubStrings = snippetFileName.split("_");
 			int notebookNumber = Integer.parseInt(snippetSubStrings[1]);
-			String notebookName = "nb_" + notebookNumber + ".ipynb";	// TODO: Egen metod"
-			addOrIncrease(snippetsPerFile, notebookName);
+			String notebookName = getNotebookNameFromNumber(notebookNumber);
+			addOrIncrease(snippetsPerNotebook, notebookName);
 			notebookNumbers.put(id, notebookNumber);
 			snippetIndices.put(id, Integer.parseInt(snippetSubStrings[2]));
 			/* Here we use the number of lines of source code (comments
@@ -90,8 +90,21 @@ public class SccOutputAnalyzer extends Analyzer {
 		}
 		statsScanner.close();
 	}
-
 	
+	/**
+	 * If map contains a value for key, increase it with 1. Else add an entry
+	 * with for key with the value 1.
+	 * @param map Map to modify as stated above
+	 * @param key Key for the entry that will be changed/added
+	 */
+	private void addOrIncrease(Map<String, Integer> map, String key) {
+		if (map.containsKey(key)) {
+			map.put(key, map.get(key) + 1);
+		} else {
+			map.put(key, 1);
+		}
+	}
+
 	/**
 	 * Create a mapping från snippets to notebooks (hash2files) using output
 	 * files from SourcererCC.
@@ -137,67 +150,57 @@ public class SccOutputAnalyzer extends Analyzer {
 		return clones;
 	}
 	
-	private Map<SnippetCode, List<Snippet>> getCloneMap(
-			List<List<SccSnippetId>> clones)
+	private Map<SnippetCode, List<Snippet>> getCloneMap(List<List<SccSnippetId>> clones)
 			throws FileNotFoundException {
 		Map<SnippetCode, List<Snippet>> result = new HashMap<SnippetCode, List<Snippet>>(clones.size());
+		Set<SccSnippetId> snippetIdsToAdd = notebookNumbers.keySet();
 		int hashIndex = 0;
 		
 		// Cloned snippets
-		Set<SccSnippetId> snippetIds = notebookNumbers.keySet();	// To keep track of analyzed snippets.
 		for (List<SccSnippetId> cloned: clones) {
 			List<Snippet> snippets = new ArrayList<Snippet>();
 			for (SccSnippetId id: cloned) {
-				String nbName = "nb_" + notebookNumbers.get(id) + ".ipynb";
-				int snippetIndex = snippetIndices.get(id);
-				Snippet snippet = new Snippet(nbName, repros.get(nbName), snippetIndex);
-				snippets.add(snippet);
-				snippetIds.remove(id);
+				addSnippet(id, snippets);
+				snippetIdsToAdd.remove(id);
 			}
 			int loc = linesOfCode.get(cloned.get(0));	 // TODO: Borde göras på något smartare sätt. Max? Min? Medel?
 			SnippetCode hash = new SnippetCode(loc, Integer.toString(hashIndex++));
 			result.put(hash, snippets);
 		}
 		
-		// TODO: Get rid of duplication!
 		// Remaining snippets are unique. Add them!
-		for (SccSnippetId id: snippetIds) {
+		for (SccSnippetId id: snippetIdsToAdd) {
 			List<Snippet> snippets = new ArrayList<>(1);
-			String nbName = "nb_" + notebookNumbers.get(id) + ".ipynb";
-			int snippetIndex = snippetIndices.get(id);
-			Snippet snippet = new Snippet(nbName, repros.get(nbName), snippetIndex);
-			snippets.add(snippet);
+			addSnippet(id, snippets);
+			snippetIdsToAdd.remove(id);
 			int loc = linesOfCode.get(id);
 			SnippetCode hash = new SnippetCode(loc, Integer.toString(hashIndex++));
 			result.put(hash, snippets);
-			snippetIds.remove(id);
 		}
 		return result;
 	}
 
 	/**
-	 * If map contains a value for key, increase it with 1. Else add an entry
-	 * with for key with the value 1.
-	 * @param map Map to modify as stated above
-	 * @param key Key for the entry that will be changed/added
+	 * Add the snippet with the specified SourcererCC snippet id to the list
+	 * specified.
+	 * @param id SourcererCC snippet id of snippet to add
+	 * @param snippets List of snippets, to which the snippet will be added
 	 */
-	private void addOrIncrease(Map<String, Integer> map, String key) {
-		if (map.containsKey(key)) {
-			map.put(key, map.get(key) + 1);
-		} else {
-			map.put(key, 1);
-		}
+	private void addSnippet(SccSnippetId id, List<Snippet> snippets) {
+		String notebookName = getNotebookNameFromNumber(notebookNumbers.get(id)); 
+		int snippetIndex = snippetIndices.get(id);
+		snippets.add(new Snippet(notebookName, repros.get(notebookName), snippetIndex));
 	}
 	
 	private Map<Notebook, SnippetCode[]> getSnippets(Map<SnippetCode, List<Snippet>> snippet2file) {
-		Map<Notebook, SnippetCode[]> result = new HashMap<Notebook, SnippetCode[]>(snippetsPerFile.size());
+		Map<Notebook, SnippetCode[]> result = new HashMap<Notebook, SnippetCode[]>(snippetsPerNotebook.size());
 		// Create arrays for snippets
-		for (String notebookName: snippetsPerFile.keySet()) {
+		for (String notebookName: snippetsPerNotebook.keySet()) {
 			String repro = repros.get(notebookName);
-			result.put(new Notebook(notebookName, repro), new SnippetCode[snippetsPerFile.get(notebookName)]);
+			result.put(new Notebook(notebookName, repro), new SnippetCode[snippetsPerNotebook.get(notebookName)]);
 			
 		}
-		// Put snippet in notebook to snippet map
+		// Put snippet in notebook-to-snippet-map
 		for (SnippetCode hash: snippet2file.keySet()) {
 			for (Snippet snippet: snippet2file.get(hash)) {
 				SnippetCode[] snippetsInFile = result.get(new Notebook(snippet.getFileName()));
@@ -205,6 +208,10 @@ public class SccOutputAnalyzer extends Analyzer {
 			}
 		}
 		return result;
+	}
+	
+	private static String getNotebookNameFromNumber(int notebookNumber) {
+		return "nb_" + notebookNumber + ".ipynb";
 	}
 	
 	void analyze(String[] args) {
