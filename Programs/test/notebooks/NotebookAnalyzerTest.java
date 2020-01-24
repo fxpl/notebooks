@@ -7,21 +7,23 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Scanner;
-
 import org.junit.*;
-import notebooks.Analyzer;
+import notebooks.NotebookAnalyzer;
 import notebooks.LangSpec;
 import notebooks.Language;
 import notebooks.Snippet;
 
-public class AnalyzerTest {
+/**
+ * TODO: Skapa separat katalog för temporärt testdata!
+ */
+
+public class NotebookAnalyzerTest {
 	
-	private Analyzer analyzer;
+	private NotebookAnalyzer analyzer;
 	
 	@Before
 	public void setUp() {
-		analyzer = new Analyzer();
+		analyzer = new NotebookAnalyzer();
 	}
 	
 	@After
@@ -55,24 +57,24 @@ public class AnalyzerTest {
 		String[] expectedConnectionsLines = {connectionsHeader(),
 				notebookFile + ", 0, 0.0000, 0, 0.0000, 0, 0, 0.0000, 0.0000"};
 		
-		analyzer.initializeReproMap(testDir + "/" + reproFile);
 		analyzer.initializeNotebooksFrom(testDir + "/" + notebookFile);
+		analyzer.initializeReproInfo(testDir + "/" + reproFile);
 		analyzer.allAnalyzes();
 		
-		checkCsv("code_cells", expectedCodeCellsLines);
-		checkCsv("loc", expectedLOCLines);
-		checkCsv("languages", expectedLangLines);
-		checkCsv("all_languages", expectedAllLangLines);
-		checkCsv("file2hashes", expectedFile2hashesLines);
-		checkCsv("hash2files", expectedHash2filesLines);
-		checkCsv("cloneFrequency", expectedCloneFreqLines);
-		checkCsv("connections", expectedConnectionsLines);
+		TestUtils.checkCsv("code_cells", expectedCodeCellsLines);
+		TestUtils.checkCsv("loc", expectedLOCLines);
+		TestUtils.checkCsv("languages", expectedLangLines);
+		TestUtils.checkCsv("all_languages", expectedAllLangLines);
+		TestUtils.checkCsv("file2hashes", expectedFile2hashesLines);
+		TestUtils.checkCsv("hash2files", expectedHash2filesLines);
+		TestUtils.checkCsv("cloneFrequency", expectedCloneFreqLines);
+		TestUtils.checkCsv("connections", expectedConnectionsLines);
 		
-		lastOutputFile("code_cells").delete();
-		lastOutputFile("loc").delete();
-		lastOutputFile("languages").delete();
-		lastOutputFile("all_languages").delete();
-		deleteCloneCsvs();
+		TestUtils.lastOutputFile("code_cells").delete();
+		TestUtils.lastOutputFile("loc").delete();
+		TestUtils.lastOutputFile("languages").delete();
+		TestUtils.lastOutputFile("all_languages").delete();
+		TestUtils.deleteCloneCsvs();
 	}
 	
 	/**
@@ -95,8 +97,8 @@ public class AnalyzerTest {
 			analyzer.initializeNotebooksFrom(dataDir + "/" + file);
 		}
 		analyzer.allLanguageValues();
-		checkCsv("all_languages", expectedLines);
-		lastOutputFile("all_languages").delete();
+		TestUtils.checkCsv("all_languages", expectedLines);
+		TestUtils.lastOutputFile("all_languages").delete();
 		
 	}
 	
@@ -117,8 +119,8 @@ public class AnalyzerTest {
 		};
 		analyzer.initializeNotebooksFrom(dataDir + "/" + file);
 		analyzer.allLanguageValues();
-		checkCsv("all_languages", expectedLInes);
-		lastOutputFile("all_languages").delete();
+		TestUtils.checkCsv("all_languages", expectedLInes);
+		TestUtils.lastOutputFile("all_languages").delete();
 	}
 	
 	/**
@@ -129,7 +131,7 @@ public class AnalyzerTest {
 	 */
 	@Test
 	public void testArgumentParsing_allAnalyses() throws IOException {
-		String[] arg = {"-all"};
+		String[] arg = {"--all"};
 		String[] expectedFilePrefixes = {
 				"code_cells",
 				"loc",
@@ -140,7 +142,8 @@ public class AnalyzerTest {
 				"cloneFrequency",
 				"connections"
 		};
-		testArgumentParsing(arg, expectedFilePrefixes);
+		analyzer.analyze(arg);
+		TestUtils.verifyExistenceAndRemove(expectedFilePrefixes);
 	}
 	
 	/**
@@ -150,39 +153,9 @@ public class AnalyzerTest {
 	 */
 	@Test
 	public void testArgumentParsing_clones() throws IOException {
-		String[] arg = {"-clones"};	// Repro file not needed since nb_path is missing
-		String[] expectedFilePrefixes = {
-				"file2hashes",
-				"hash2files",
-				"cloneFrequency",
-				"connections"
-		};
-		testArgumentParsing(arg, expectedFilePrefixes);
-	}
-	
-	/**
-	 * Verify that the clone output files are created when the argument
-	 * "-clones_scc" is given and paths are specified correctly.
-	 * @throws IOException 
-	 */
-	@Test
-	public void testArgumentParsing_clones_scc() throws IOException {
-		String args[] = {
-				"-clones_scc",
-				"-scc_stats_file",
-				"test/data/scc/file_stats",
-				"-scc_clones_file",
-				"test/data/scc/clone_pairs",
-				"-repro_file",
-				"test/data/hash/repros.csv"
-		};
-		String[] expectedFilePrefixes = {
-				"file2hashes",
-				"hash2files",
-				"cloneFrequency",
-				"connections"
-		};
-		testArgumentParsing(args, expectedFilePrefixes);
+		String[] arg = {"--clones"};
+		analyzer.analyze(arg);
+		TestUtils.verifyExistenceOfAndRemoveCloneFiles();
 	}
 	
 	/**
@@ -192,9 +165,10 @@ public class AnalyzerTest {
 	 */
 	@Test
 	public void testArgumentParsing_count() throws IOException {
-		String[] arg = {"-count"};
+		String[] arg = {"--count"};
 		String[] expectedFilePrefix = {"code_cells"};
-		testArgumentParsing(arg, expectedFilePrefix);
+		analyzer.analyze(arg);
+		TestUtils.verifyExistenceAndRemove(expectedFilePrefix);
 	}
 	
 	/**
@@ -204,9 +178,10 @@ public class AnalyzerTest {
 	 */
 	@Test
 	public void testArgumentParsing_lang() throws IOException {
-		String[] arg = {"-lang"};
+		String[] arg = {"--lang"};
 		String[] expectedFilePrefix = {"languages"};
-		testArgumentParsing(arg, expectedFilePrefix);
+		analyzer.analyze(arg);
+		TestUtils.verifyExistenceAndRemove(expectedFilePrefix);
 	}
 	
 	/**
@@ -216,9 +191,10 @@ public class AnalyzerTest {
 	 */
 	@Test
 	public void testArgumentParsing_lang_all() throws IOException {
-		String[] arg = {"-lang_all"};
+		String[] arg = {"--lang_all"};
 		String[] expectedFilePrefix = {"all_languages"};
-		testArgumentParsing(arg, expectedFilePrefix);
+		analyzer.analyze(arg);
+		TestUtils.verifyExistenceAndRemove(expectedFilePrefix);
 	}
 	
 	/**
@@ -228,9 +204,10 @@ public class AnalyzerTest {
 	 */
 	@Test
 	public void testArgumentParsing_loc() throws IOException {
-		String[] arg = {"-loc"};
+		String[] arg = {"--loc"};
 		String[] expectedFilePrefix = {"loc"};
-		testArgumentParsing(arg, expectedFilePrefix);
+		analyzer.analyze(arg);
+		TestUtils.verifyExistenceAndRemove(expectedFilePrefix);
 	}
 	
 	/**
@@ -240,17 +217,160 @@ public class AnalyzerTest {
 	 */
 	@Test
 	public void testArgumentParsing_severalArgs() throws IOException {
-		String[] args = {"-lang_all", "-lang", "-count", "-loc"};
+		String[] args = {"--lang_all", "--lang", "--count", "--loc"};
 		String[] expectedFilePrefixes = {
 				"all_languages",
 				"languages",
 				"code_cells",
 				"loc"
 		};
-		testArgumentParsing(args, expectedFilePrefixes);
+		analyzer.analyze(args);
+		TestUtils.verifyExistenceAndRemove(expectedFilePrefixes);
 	}
 	
-	// TODO: testArgumentParsing: output_dir, nb_path (med/utan värde), repro_file utan värde. okänt argument
+	/**
+	 * Verify that analyze runs smooth when an unknown argument is given.
+	 */
+	@Test
+	public void testArguentParsing_unknownArg() {
+		String[] args = {"--unknown"};
+		analyzer.analyze(args);
+	}
+	
+	/**
+	 * Verify that the right notebook(s) are analyzed when the nb_path argument
+	 * is given.
+	 * @throws IOException 
+	 */
+	@Test
+	public void testArgumentParsing_nbPath() throws IOException {
+		String[] args = {
+				"--count",
+				"--nb_path=test/data/count/two.ipynb"
+		};
+		String[] expectedLines = {
+				codeCellsHeader(),
+				"two.ipynb, 2"
+		};
+		analyzer.analyze(args);
+		TestUtils.checkCsv("code_cells", expectedLines);
+		TestUtils.lastOutputFile("code_cells").delete();
+	}
+	
+	/**
+	 *  Verify that analyze runs smoothly when notebook path is not specified.
+	 */
+	@Test
+	public void testArgumentParsing_nbPathValueMissing() {
+		String[] args = {
+				"--nb_path"
+		};
+		analyzer.analyze(args);
+	}
+	
+	/**
+	 * Verify that the output directory is set correctly when given as an
+	 * argument.
+	 * @throws IOException 
+	 */
+	@Test
+	public void testArgumentParsing_outputDir() throws IOException {
+		String outputDir = "test";
+		String[] args = {
+				"--count",
+				"--output_dir=" + outputDir
+		};
+		String[] expectedOutputPrefix = {"code_cells"};
+		analyzer.analyze(args);
+		TestUtils.verifyExistenceAndRemove(outputDir, expectedOutputPrefix);
+	}
+	
+	/**
+	 * Verify that repro information is initialized correctly (=> connections
+	 * file is correct) when repro file path is specified.
+	 * @throws IOException 
+	 */
+	@Test
+	public void testArgumentParsing_reproFile() throws IOException {
+		String[] args = {
+				"--nb_path=test/data/arg",
+				"--repro_file=test/data/arg/repros.csv",
+				"--clones"
+		};
+		String[] expectedConnectionsLines = {
+				connectionsHeader(),
+				"nb_1.ipynb, 1, 1.0000, 1, 1.0000, 0, 0, 1.0000, 1.0000",
+				"nb_2.ipynb, 1, 1.0000, 1, 1.0000, 0, 0, 1.0000, 1.0000"
+		};
+		analyzer.analyze(args);
+		TestUtils.checkCsv_anyOrder("connections", expectedConnectionsLines);
+		TestUtils.deleteCloneCsvs();
+	}
+	
+	/**
+	 * Verify that clone analysis runs smoothly also when repro information is
+	 * missing.
+	 * @throws IOException 
+	 */
+	@Test
+	public void testArgumentParsing_clonesWithoutReproFile() throws IOException {
+		String[] args = {
+				"--clones",
+				"--nb_path=test/data/arg"
+		};
+		String[] expectedConnectionLines = {
+				connectionsHeader(),
+				"nb_1.ipynb, 1, 1.0000, 1, 1.0000, 1, 1, 0.0000, 0.0000",
+				"nb_2.ipynb, 1, 1.0000, 1, 1.0000, 1, 1, 0.0000, 0.0000"
+		};
+		analyzer.analyze(args);
+		TestUtils.checkCsv_anyOrder("connections", expectedConnectionLines);
+		TestUtils.deleteCloneCsvs();
+	}
+	
+	/**
+	 * Verify that clone analysis runs smoothly also when repro information is
+	 * missing. 
+	 * @throws IOException 
+	 */
+	@Test
+	public void testArgumentParsing_clonesWithoutReproFileValue() throws IOException {
+		String[] args = {
+				"--clones",
+				"--nb_path=test/data/arg",
+				"--repro_file"
+		};
+		String[] expectedConnectionLines = {
+				connectionsHeader(),
+				"nb_1.ipynb, 1, 1.0000, 1, 1.0000, 1, 1, 0.0000, 0.0000",
+				"nb_2.ipynb, 1, 1.0000, 1, 1.0000, 1, 1, 0.0000, 0.0000"
+		};
+		analyzer.analyze(args);
+		TestUtils.checkCsv_anyOrder("connections", expectedConnectionLines);
+		TestUtils.deleteCloneCsvs();
+	}
+	
+	/**
+	 * Verify that clone analysis runs smoothly also when repro file doesn't
+	 * exist.
+	 * @throws IOException 
+	 */
+	@Test
+	public void testArgumentParsing_nonExistentReproFile() throws IOException {
+		String[] args = {
+				"--clones",
+				"--nb_path=test/data/arg",
+				"--repro_file=nonexistent_file"
+		};
+		String[] expectedConnectionLines = {
+				connectionsHeader(),
+				"nb_1.ipynb, 1, 1.0000, 1, 1.0000, 1, 1, 0.0000, 0.0000",
+				"nb_2.ipynb, 1, 1.0000, 1, 1.0000, 1, 1, 0.0000, 0.0000"
+		};
+		analyzer.analyze(args);
+		TestUtils.checkCsv_anyOrder("connections", expectedConnectionLines);
+		TestUtils.deleteCloneCsvs();
+	}
 
 	/**
 	 * Verify that snippets are stored correctly in the clone hash map.
@@ -295,10 +415,10 @@ public class AnalyzerTest {
 		expectedClones.put(new SnippetCode(1, "ECE926D8C0356205276A45266D361161"), f);
 		
 		// Actual values
-		analyzer.initializeReproMap(dataDir + "/" + reproFile);
 		for (String file: files) {
 			analyzer.initializeNotebooksFrom(dataDir + "/" + file);
 		}
+		analyzer.initializeReproInfo(dataDir + "/" + reproFile);
 		Map<SnippetCode, List<Snippet>> clones = analyzer.clones();
 		
 		// Check values
@@ -309,7 +429,7 @@ public class AnalyzerTest {
 			assertEquals("Wrong number of snippets stored for " + snippetCode + ":", expectedSnippets.size(), actualSnippets.size());
 			assertTrue("Wrong snippets stored for " + snippetCode, actualSnippets.containsAll(expectedSnippets));
 		}
-		deleteCloneCsvs();
+		TestUtils.deleteCloneCsvs();
 	}
 	
 	/**
@@ -340,16 +460,16 @@ public class AnalyzerTest {
 		};
 		
 		// Actual values
-		analyzer.initializeReproMap(dataDir + "/" + reproMapName);
 		analyzer.initializeNotebooksFrom(dataDir + "/" + notebookFile);
+		analyzer.initializeReproInfo(dataDir + "/" + reproMapName);
 		analyzer.clones();
 		
-		checkCsv("file2hashes", expectedSnippetLines);
-		checkCsv("hash2files", expectedClonesLines);
-		checkCsv("cloneFrequency", expectedFrequencyLines);
-		checkCsv("connections", expectedConnectionsLines);
+		TestUtils.checkCsv("file2hashes", expectedSnippetLines);
+		TestUtils.checkCsv("hash2files", expectedClonesLines);
+		TestUtils.checkCsv("cloneFrequency", expectedFrequencyLines);
+		TestUtils.checkCsv("connections", expectedConnectionsLines);
 		
-		deleteCloneCsvs();
+		TestUtils.deleteCloneCsvs();
 	}
 	
 	/**
@@ -383,16 +503,16 @@ public class AnalyzerTest {
 		};
 		
 		// Actual values
-		analyzer.initializeReproMap(dataDir + "/" + reproFile);
 		analyzer.initializeNotebooksFrom(dataDir + "/" + notebookFile);
+		analyzer.initializeReproInfo(dataDir + "/" + reproFile);
 		analyzer.clones();
 		
-		checkCsv("file2hashes", expectedSnippetLines);
-		checkCsv("hash2files", expectedClonesLines);
-		checkCsv("cloneFrequency", expectedFrequencyLiens);
-		checkCsv("connections", expectedConnectionsLines);
+		TestUtils.checkCsv("file2hashes", expectedSnippetLines);
+		TestUtils.checkCsv("hash2files", expectedClonesLines);
+		TestUtils.checkCsv("cloneFrequency", expectedFrequencyLiens);
+		TestUtils.checkCsv("connections", expectedConnectionsLines);
 		
-		deleteCloneCsvs();
+		TestUtils.deleteCloneCsvs();
 	}
 	
 	/**
@@ -426,16 +546,16 @@ public class AnalyzerTest {
 		};
 		
 		// Actual values
-		analyzer.initializeReproMap(dataDir + "/" + reproFile);
 		analyzer.initializeNotebooksFrom(dataDir + "/" + notebookFile);
+		analyzer.initializeReproInfo(dataDir + "/" + reproFile);
 		analyzer.clones();
 		
-		checkCsv("file2hashes", expectedFile2HashesLines);
-		checkCsv("hash2files", expectedHash2FileLines);
-		checkCsv("cloneFrequency", expectedFrequencyLines);
-		checkCsv("connections", expectedConnectionsLines);
+		TestUtils.checkCsv("file2hashes", expectedFile2HashesLines);
+		TestUtils.checkCsv("hash2files", expectedHash2FileLines);
+		TestUtils.checkCsv("cloneFrequency", expectedFrequencyLines);
+		TestUtils.checkCsv("connections", expectedConnectionsLines);
 		
-		deleteCloneCsvs();
+		TestUtils.deleteCloneCsvs();
 	}
 	
 	/**
@@ -467,15 +587,15 @@ public class AnalyzerTest {
 		};
 		
 		// Actual values
-		analyzer.initializeReproMap(dataDir + "/" + reproFile);
 		analyzer.initializeNotebooksFrom(dataDir + "/" + notebookFile);
+		analyzer.initializeReproInfo(dataDir + "/" + reproFile);
 		analyzer.clones();
 		
-		checkCsv("file2hashes", expectedFile2HashesLines);
-		checkCsv("cloneFrequency", expectedFrequencyLines);
-		checkCsv("connections", expectedConnectionsLines);
+		TestUtils.checkCsv("file2hashes", expectedFile2HashesLines);
+		TestUtils.checkCsv("cloneFrequency", expectedFrequencyLines);
+		TestUtils.checkCsv("connections", expectedConnectionsLines);
 		
-		deleteCloneCsvs();
+		TestUtils.deleteCloneCsvs();
 	}
 	
 	/**
@@ -503,103 +623,14 @@ public class AnalyzerTest {
 				"nb_11.ipynb, 1, 1.0000, 1, 1.0000, 0, 0, 1.0000, 1.0000"
 		};
 		
-		analyzer.initializeReproMap(dataDir + "/" + reproFile);
 		analyzer.initializeNotebooksFrom(dataDir);
+		analyzer.initializeReproInfo(dataDir + "/" + reproFile);
 		analyzer.clones();
 		
-		checkCsv_anyOrder("connections", expectedLines);
+		TestUtils.checkCsv_anyOrder("connections", expectedLines);
 		
-		deleteCloneCsvs();
+		TestUtils.deleteCloneCsvs();
 	}
-	
-	/**
-	 * Verify that connections are identified correctly at clone analysis based
-	 * on SourcererCC data.
-	 * @throws IOException 
-	 */
-	@Test
-	public void testConnectionsCsv_sccData() throws IOException {
-		String dataDir = "test/data/scc";
-		String statFile = "file_stats";
-		String cloneFile = "clone_pairs";
-		String reproMapPath = "test/data/hash/repros.csv";
-		
-		String[] expectedLines = {
-				connectionsHeader(),
-				"nb_4.ipynb, 2, 2.0000, 0, 0.0000, 1, 0, 1.0000, 0.0000",
-				"nb_5.ipynb, 3, 1.5000, 1, 1.0000, 1, 0, 1.0000, 1.0000",
-				"nb_1.ipynb, 6, 3.0000, 6, 3.0000, 2, 2, 4.0000, 4.0000",
-				"nb_2.ipynb, 7, 2.3333, 7, 2.3333, 3, 3, 4.0000, 4.0000",
-				"nb_3.ipynb, 1, 0.5000, 1, 0.5000, 1, 1, 0.0000, 0.0000",
-				"nb_6.ipynb, 4, 2.0000, 4, 2.0000, 4, 4, 0.0000, 0.0000",
-				"nb_7.ipynb, 5, 1.6667, 5, 1.6667, 2, 2, 1.5000, 1.5000",
-				"nb_10.ipynb, 2, 2.0000, 0, 0.0000, 0, 0, 2.0000, 0.0000",
-				"nb_8.ipynb, 1, 1.0000, 1, 1.0000, 0, 0, 1.0000, 1.0000",
-				"nb_9.ipynb, 4, 2.0000, 4, 2.0000, 2, 2, 2.0000, 2.0000",
-				"nb_11.ipynb, 1, 1.0000, 1, 1.0000, 0, 0, 1.0000, 1.0000",
-				
-		};
-
-		analyzer.initializeReproMap(reproMapPath);
-		analyzer.clones(dataDir + "/" + cloneFile, dataDir + "/" + statFile);
-		
-		checkCsv_anyOrder("connections", expectedLines);
-		
-		deleteCloneCsvs();
-	}
-	
-	/**
-	 * Verify that cloneFrequencies are computed correctly at clone analysis
-	 * based on SourcererCC data.
-	 * @throws IOException 
-	 */
-	@Test
-	public void testCloneFreqCsv_sccData() throws IOException {
-		String dataDir = "test/data/scc";
-		String statFile = "file_stats";
-		String cloneFile = "clone_pairs";
-		String reproMapPath = "test/data/hash/repros.csv";
-		
-		String[] expectedLines = {
-				cloneFrequencyHeader(),
-				"nb_1.ipynb, 2, 0, 1.0000",
-				"nb_2.ipynb, 3, 0, 1.0000",
-				"nb_3.ipynb, 1, 1, 0.5000",
-				"nb_4.ipynb, 1, 0, 1.0000",
-				"nb_5.ipynb, 2, 0, 1.0000",
-				"nb_6.ipynb, 2, 0, 1.0000",
-				"nb_7.ipynb, 3, 0, 1.0000",
-				"nb_8.ipynb, 1, 0, 1.0000",
-				"nb_9.ipynb, 2, 0, 1.0000",
-				"nb_10.ipynb, 1, 0, 1.0000",
-				"nb_11.ipynb, 1, 0, 1.0000"
-		};
-		
-		analyzer.initializeReproMap(reproMapPath);
-		analyzer.clones(dataDir + "/" + cloneFile, dataDir + "/" + statFile);
-		
-		checkCsv_anyOrder("cloneFrequency", expectedLines);
-		
-		deleteCloneCsvs();
-	}
-	
-	/**
-	 * Verify that an AssertionError is thrown when the clone pairs file is on
-	 * the wrong format.
-	 * @throws IOException
-	 */
-	/* TODO: Om jag ska kunna ha med det här testet måste jag enabla assertions!
-	@Test (expected = AssertionError.class)
-	public void testClones_corruptSccData() throws IOException {
-		String dataDir = "test/data/scc";
-		String statFile = "file_stats";
-		String cloneFile = "clone_pairs_corrupt";
-		String reproMapPath = "test/data/hash/repros.csv";
-		analyzer.initializeReproMap(reproMapPath);
-		analyzer.clones(dataDir + "/" + cloneFile, dataDir + "/" + statFile);
-	}*/
-	
-	// TODO: Borde man kolla file2hashes och hash2files också? Hur?!
 	
 	/**
 	 * Verify that the right languages are found in the notebooks.
@@ -617,7 +648,7 @@ public class AnalyzerTest {
 		expected.put(Language.UNKNOWN, 9);
 		Map<Language, Integer> actual = analyzer.languages();
 		assertEquals("Error in language extraction:", expected, actual);
-		lastOutputFile("languages").delete();
+		TestUtils.lastOutputFile("languages").delete();
 	}
 	
 	/**
@@ -642,9 +673,9 @@ public class AnalyzerTest {
 		}
 		analyzer.languages();
 		
-		checkCsv("languages", expectedLines);
+		TestUtils.checkCsv("languages", expectedLines);
 		
-		lastOutputFile("languages").delete();
+		TestUtils.lastOutputFile("languages").delete();
 	}
 	
 	/**
@@ -656,7 +687,7 @@ public class AnalyzerTest {
 	public void testLOC_total() throws IOException {
 		analyzer.initializeNotebooksFrom("test/data/loc");
 		assertEquals("Wrong LOC!", 55, analyzer.LOC());
-		lastOutputFile("loc").delete();
+		TestUtils.lastOutputFile("loc").delete();
 	}
 	
 	/**
@@ -682,9 +713,9 @@ public class AnalyzerTest {
 		}
 		analyzer.LOC();
 		
-		checkCsv("loc", expectedLines);	
+		TestUtils.checkCsv("loc", expectedLines);	
 
-		lastOutputFile("loc").delete();
+		TestUtils.lastOutputFile("loc").delete();
 	}
 	
 	/**
@@ -696,7 +727,7 @@ public class AnalyzerTest {
 	public void testNumCodeCells_total() throws IOException {
 		analyzer.initializeNotebooksFrom("test/data/count");
 		assertEquals("Wrong number of cells found in notebooks!", 15, analyzer.numCodeCells());
-		lastOutputFile("code_cells").delete();
+		TestUtils.lastOutputFile("code_cells").delete();
 	}
 	
 	/**
@@ -720,9 +751,9 @@ public class AnalyzerTest {
 		}
 		analyzer.numCodeCells();
 		
-		checkCsv("code_cells", expectedLines);
+		TestUtils.checkCsv("code_cells", expectedLines);
 		
-		lastOutputFile("code_cells").delete();
+		TestUtils.lastOutputFile("code_cells").delete();
 	}
 	
 	/**
@@ -751,45 +782,6 @@ public class AnalyzerTest {
 	}
 	
 	/**
-	 * Check that the most recent file <prefix><timestamp>.csv has the right
-	 * content.
-	 * @param prefix First part of name of file to be analyzed (see above)
-	 * @param expectedLines Array of the lines expected to be found in the file, in order
-	 */
-	private void checkCsv(String prefix, String[] expectedLines) throws IOException {
-		File outputFile = lastOutputFile(prefix);
-		BufferedReader outputReader = new BufferedReader(new FileReader(outputFile));
-		for (int i=0; i<expectedLines.length; i++) {
-			String expectedLine = expectedLines[i];
-			assertEquals("Wrong line number " + (i+1) + " for " + prefix + " csv!", expectedLine, outputReader.readLine());
-		}
-		outputReader.close();
-	}
-	
-	/** TODO: Kolla även antalet rader!
-	 * Check that the most recent file <prefix><timestamp>.csv contains all
-	 * lines in expectedLines.
-	 * @param prefix First part of name of file to be analyzed (see above)
-	 * @param expectedLines Array of the lines expected to be found in the file, not necessarily in order
-	 */
-	private void checkCsv_anyOrder(String prefix, String[] expectedLines) throws FileNotFoundException {
-		File outputFile = lastOutputFile(prefix);
-		for (int i=0; i<expectedLines.length; i++) {
-			String expectedLine = expectedLines[i];
-			boolean exists = false;
-			Scanner outputReader = new Scanner(outputFile);
-			while (outputReader.hasNextLine() && false == exists) {
-				String nextLine = outputReader.nextLine();
-				if (nextLine.equals(expectedLine)) {
-					exists = true;
-				}
-			}
-			outputReader.close();
-			assertTrue("The line " + expectedLine + " cannot be found in " + prefix + " csv!", exists);
-		}
-	}
-	
-	/**
 	 * @return Expected header of cloneFrequency files
 	 */
 	private static String cloneFrequencyHeader() {
@@ -802,16 +794,6 @@ public class AnalyzerTest {
 	private static String connectionsHeader() {
 		return "file, connections, connections normalized, non-empty connections, non-empty connections normalized, "
 				+ "intra repro connections, non-empty intra repro connections, mean inter repro connections, mean non-empty inter repro connections";
-	}
-	
-	/**
-	 * Delete all CSV files created by the clone analysis. 
-	 */
-	private void deleteCloneCsvs() {
-		lastOutputFile("file2hashes").delete();
-		lastOutputFile("hash2files").delete();
-		lastOutputFile("cloneFrequency").delete();
-		lastOutputFile("connections").delete();
 	}
 	
 	/**
@@ -836,45 +818,9 @@ public class AnalyzerTest {
 	}
 	
 	/**
-	 * Find the output file <prefix><timestamp>.csv with the greatest (latest)
-	 * time stamp.
-	 * @param prefix First part of the output file
-	 * @return Output file described above 
-	 */
-	private File lastOutputFile(String prefix) {
-		File directory = new File(".");
-		String outputFileName = prefix + ".csv";
-		for (String currentFileName: directory.list()) {
-			if (currentFileName.matches(prefix + "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\.csv")
-					&& currentFileName.compareTo(outputFileName) > 0) {
-				outputFileName = currentFileName;
-			}
-		}
-		return new File(outputFileName);
-	}
-	
-	/**
 	 * @return Expected header of LOC file
 	 */
 	private static String LOCHeader() {
 		return "file, total LOC, non-blank LOC, blank LOC";
 	}
-	
-	/**
-	 * Verify that all files prefixed in expectedFiles exist after a call to
-	 * analyzer.analyze with args as argument. Also remove all expected files.
-	 * @param args Argument vector
-	 * @param expectedFilePrefixes Prefixes for all expected files
-	 * throws IOException
-	 */
-	private void testArgumentParsing(String[] args, String[] expectedFilePrefixes) throws IOException {
-		analyzer.analyze(args);
-		for (String prefix: expectedFilePrefixes) {
-			File expectedFile = lastOutputFile(prefix);
-			assertTrue("Expected output file " + expectedFile.getName() + " is missing!",
-					expectedFile.exists());
-			expectedFile.delete();
-		}
-	}
-
 }

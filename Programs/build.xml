@@ -27,7 +27,7 @@
 
 	<target name="test" depends="buildTest">
 		<mkdir dir="reports"/>
-		<junit printsummary="yes" haltonfailure="yes">
+		<junit fork="true" printsummary="yes" haltonfailure="yes">
 			<classpath>
 				<pathelement location="${bin}"/>
 				<pathelement location="${junit.path}"/>
@@ -36,9 +36,13 @@
 			</classpath>
 
 			<formatter type="plain"/>
+			<assertions>
+				<enable/>
+			</assertions>
 			<batchtest todir="reports">
 				<fileset dir="test">
 					<exclude name="notebooks/DumperTest.java"/>
+					<exclude name="notebooks/TestUtils.java"/>
 				</fileset>
 			</batchtest>
 		</junit>

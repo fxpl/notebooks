@@ -5,10 +5,23 @@ import java.util.Objects;
 public class Snippet {
 	private final String fileName;
 	private final int snippetIndex;
+	private String repro = "";
 	
 	public Snippet(String fileName, int snippetIndex) {
+		this(fileName, "", snippetIndex);
+	}
+	
+	public Snippet(String fileName, String reproName, int snippetIndex) {
 		this.fileName = fileName;
 		this.snippetIndex = snippetIndex;
+		this.repro = reproName;
+	}
+	
+	/**
+	 * Fetch file and repro name from the notebook given as argument
+	 */
+	public Snippet(Notebook notebook, int snippetIndex) {
+		this(notebook.getName(), notebook.getRepro(), snippetIndex);
 	}
 	
 	@Override
@@ -26,6 +39,10 @@ public class Snippet {
 	 */
 	String getFileName() {
 		return fileName;
+	}
+	
+	String getRepro() {
+		return repro;
 	}
 	
 	int getSnippetIndex() {

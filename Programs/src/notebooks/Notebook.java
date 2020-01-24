@@ -12,12 +12,14 @@ import org.json.simple.*;
 import org.json.simple.parser.*;
 
 // TODO: Går det att hantera CastExceptions på något snyggare sätt?!
+// (Förmodligen är det bästa att använda ett vettigare jsonbibliotek.)
 
 /**
  * A Jupyter notebook.
  */
 public class Notebook {
 	private String path;
+	private String repro = "";
 	private int locTotal;		// Total number of lines of code
 	private int locBlank;		// Number of empty code lines
 	private int locContents;	// Number of non-empty code lines
@@ -26,7 +28,28 @@ public class Notebook {
 	private JSONObject contents;
 	
 	public Notebook(String path) {
+		this(path, "");
+	}
+	
+	public Notebook(String path, String repro) {
 		this.path = path;
+		this.repro = repro;
+	}
+	
+	public Notebook(Notebook model) {
+		this(model.path, model.repro);
+	}
+	
+	/**
+	 * @return true iff is a notebook with the same name as this
+	 */
+	@Override
+	public boolean equals(Object other) {
+		if (other.getClass() != this.getClass()) {
+			return false;
+		}
+		Notebook otherNotebook = (Notebook)other;
+		return this.getName().equals(otherNotebook.getName());
 	}
 	
 	/**
@@ -35,6 +58,14 @@ public class Notebook {
 	public String getName() {
 		int namePos = path.lastIndexOf('/') + 1;
 		return path.substring(namePos);
+	}
+	
+	public String getRepro() {
+		return repro;
+	}
+	
+	public void setRepro(String reproName) {
+		this.repro = reproName;
 	}
 	
 	/**
@@ -64,6 +95,11 @@ public class Notebook {
 			}
 			writer.close();
 		}
+	}
+	
+	@Override
+	public int hashCode() {
+		return Objects.hash(this.getName());
 	}
 
 	/**
@@ -142,7 +178,6 @@ public class Notebook {
 		LangSpec langSpecIn = this.languageSpecIn;
 		JSONObject notebook = this.getNotebook();
 		if (!notebook.containsKey("metadata")) {
-			// TODO(?): Bryt ut
 			result.put(LangSpec.METADATA_LANGUAGE, Language.UNKNOWN);
 			result.put(LangSpec.METADATA_LANGUAGEINFO_NAME, Language.UNKNOWN);
 			result.put(LangSpec.METADATA_KERNELSPEC_LANGUAGE, Language.UNKNOWN);

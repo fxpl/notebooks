@@ -5,7 +5,7 @@ import static org.junit.Assert.*;
 import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
-
+import java.util.Objects;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -17,6 +17,20 @@ import notebooks.Notebook;
 import notebooks.NotebookException;
 
 public class NotebookTest {
+	
+	@Test
+	public void testCopyConstructor() {
+		String notebookName = "nb.ipynb";
+		String path = "dir/subdir/" + notebookName;
+		String reproName = "repro0";
+		Notebook model = new Notebook(path);
+		model.setRepro(reproName);
+		Notebook copy = new Notebook(model);
+		assertEquals("Copy constructor doesn't seem to set path correctly!",
+				notebookName, copy.getName());
+		assertEquals("Copy constructor doesn't set the repro name correctly!",
+				reproName, copy.getRepro());
+	}
 	
 	/**
 	 * Verify that each snippet in the input file is dumped  to a separate
@@ -95,41 +109,63 @@ public class NotebookTest {
 			nb.dumpCodeAsZip(outputDir, suffix);
 		}
 
-    int totalSnippetId = 0;
-		// Check output
-		for (int i=0; i<expectedOutFiles.length; i++) {
-			String fileName = "./"  +  expectedOutFiles[i];
-      
-      ZipInputStream zip = new ZipInputStream(new BufferedInputStream(new FileInputStream(fileName)));
-
-      System.err.printf("%s\n", fileName);
-          
-      for (int snippetId=0; snippetId < expectedSnippets[i].length; snippetId += 1) {
-          ZipEntry entry = zip.getNextEntry();
-          assertEquals("Wrong filename for code snippet in " + fileName, expectedSnippets[i][snippetId], entry.getName());
-
-          BufferedReader reader = new BufferedReader(new InputStreamReader(zip));
-          for (int lineId = 0; lineId < expectedLines[totalSnippetId].length; lineId += 1) {
-              assertEquals("Wrong code dumped to " + fileName + " in " + entry.getName(), expectedLines[totalSnippetId][lineId], reader.readLine());
-          }
-
-          assertNull("Too many lines in " + fileName, reader.readLine());
-
-          totalSnippetId += 1;
-      }
-      
-      zip.close();
-    }
-    
-		// Clean up
-    for (String outFile: expectedOutFiles) {
-        new File(outFile).delete();
-    }
-  }
+	    int totalSnippetId = 0;
+			// Check output
+			for (int i=0; i<expectedOutFiles.length; i++) {
+				String fileName = "./"  +  expectedOutFiles[i];
+	      
+	      ZipInputStream zip = new ZipInputStream(new BufferedInputStream(new FileInputStream(fileName)));
 	
+	      System.err.printf("%s\n", fileName);
+	          
+	      for (int snippetId=0; snippetId < expectedSnippets[i].length; snippetId += 1) {
+	          ZipEntry entry = zip.getNextEntry();
+	          assertEquals("Wrong filename for code snippet in " + fileName, expectedSnippets[i][snippetId], entry.getName());
+	
+	          BufferedReader reader = new BufferedReader(new InputStreamReader(zip));
+	          for (int lineId = 0; lineId < expectedLines[totalSnippetId].length; lineId += 1) {
+	              assertEquals("Wrong code dumped to " + fileName + " in " + entry.getName(), expectedLines[totalSnippetId][lineId], reader.readLine());
+	          }
+	
+	          assertNull("Too many lines in " + fileName, reader.readLine());
+	
+	          totalSnippetId += 1;
+	      }
+	      
+	      zip.close();
+	    }
+	    
+			// Clean up
+	    for (String outFile: expectedOutFiles) {
+	        new File(outFile).delete();
+	    }
+	}
+	
+	@SuppressWarnings("unlikely-arg-type")
+	@Test
+	public void testEquals_diffType() {
+		Notebook notebook = new Notebook("");
+		String other = "";
+		assertFalse("Object of other type considered equal!", notebook.equals(other));
+	}
+	
+	@Test
+	public void testEquals_diffNames() {
+		Notebook notebook1 = new Notebook("notebook1.ipynb");
+		Notebook notebook2 = new Notebook("notebook2.ipynb");
+		assertFalse("Notebooks with different names considered equal!",
+				notebook1.equals(notebook2));
+	}
 
+	@Test
+	public void testEquals_equal() {
+		Notebook notebook1 = new Notebook("notebook.ipynb");
+		Notebook notebook2 = new Notebook("notebook.ipynb");
+		assertTrue("Equal notebooks considered different!",
+				notebook1.equals(notebook2));
+	}
 
-  /**
+	/**
 	 * Verify that getName returns the name of the notebook (without preceding
 	 * path).
 	 */
@@ -137,6 +173,40 @@ public class NotebookTest {
 	public void testGetName() {
 		Notebook notebook = new Notebook("made/up/path/empty.ipynb");
 		assertEquals("Wrong name of notebook!" , "empty.ipynb", notebook.getName());
+	}
+	
+	@Test
+	public void testHashCode() {
+		String name = "notebook";
+		String path = "some/path/" + name;
+		Notebook notebook = new Notebook(path);
+		assertEquals("Wrong hash code returned!", Objects.hash(name), notebook.hashCode());
+	}
+	
+	/**
+	 * Verify that setRepro and getRepro sets and gets the repro name
+	 * correctly.
+	 */
+	@Test
+	public void testSetGetRepro() {
+		String reproName = "someRepro";
+		Notebook notebook = new Notebook("");
+		notebook.setRepro(reproName);
+		assertEquals("Repro name not set or not fetched correctly!",
+				reproName, notebook.getRepro());
+	}
+	
+	/**
+	 * Verify that the constructor that takes both path and repro as arguments
+	 * initializes the name and repro correctly
+	 */
+	@Test
+	public void testTwoArgConstructor() {
+		String name = "nb_0.ipynb";
+		String repro = "someRepro";
+		Notebook notebook = new Notebook(name, repro);
+		assertEquals("Name not initialized/fetched correctly!", name, notebook.getName());
+		assertEquals("Repro not initialized/fetched correctly!", repro, notebook.getRepro());
 	}
 	
 	/**
@@ -398,7 +468,7 @@ public class NotebookTest {
 	}
 	
 	/**
-	 * TODO
+	 * Verify that printSnippet prints a snippet correctly.
 	 */
 	@Test
 	public void testPrintSnippet() throws NotebookException, IOException {

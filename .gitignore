@@ -10,3 +10,6 @@ Output
 # From R studio
 .Rhistory
 
+# Understand files
+*.udb
+
