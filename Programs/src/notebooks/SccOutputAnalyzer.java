@@ -9,14 +9,16 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.Set;
 
 public class SccOutputAnalyzer extends Analyzer {
 	// Information about each snippet
 	Map<SccSnippetId, Integer> notebookNumbers;
 	Map<SccSnippetId, Integer> snippetIndices;
 	Map<SccSnippetId, Integer> linesOfCode;
-	// Map from notebook name to repro name
+	// Information about each notebook
 	private Map<String, String> repros = null;
+	Map<String, Integer> snippetsPerFile = null;
 	
 	/**
 	 * Perform the clone analysis based on SourcererCC output files. Write
@@ -33,12 +35,12 @@ public class SccOutputAnalyzer extends Analyzer {
 	 * @return A map from snippets to files
 	 * @throws IOException
 	 */
+	// TODO: Version som tar alla 3 filerna!
 	public Map<SnippetCode, List<Snippet>> clones(String pairFile) throws IOException {
 		System.out.println("Analyzing clones based on SourcererCC output files!");
 		System.out.println("NOTE THAT NOTEBOOKS WITHOUT SNIPPETS ARE NOT INCLUDED!");
-		Map<String, Integer> snippetsPerFile = new HashMap<String, Integer>();
-		Map<SnippetCode, List<Snippet>> snippet2file = getClones(pairFile, snippetsPerFile);
-		Map<Notebook, SnippetCode[]> file2snippet = getSnippets(snippet2file, snippetsPerFile);
+		Map<SnippetCode, List<Snippet>> snippet2file = getClones(pairFile);
+		Map<Notebook, SnippetCode[]> file2snippet = getSnippets(snippet2file);
 		new CloneFileWriter(outputDir).write(file2snippet, snippet2file);
 		return snippet2file;
 	}
@@ -57,10 +59,11 @@ public class SccOutputAnalyzer extends Analyzer {
 	 * @throws FileNotFoundException If the stats file doesn't exist
 	 */
 	public void initializeSnippetInfo(String statsFile) throws FileNotFoundException {
+		Scanner statsScanner = new Scanner(new File(statsFile));
 		notebookNumbers = new HashMap<SccSnippetId, Integer>();
 		snippetIndices = new HashMap<SccSnippetId, Integer>();
 		linesOfCode = new HashMap<SccSnippetId, Integer>();
-		Scanner statsScanner = new Scanner(new File(statsFile));
+		snippetsPerFile = new HashMap<String, Integer>();
 		while(statsScanner.hasNextLine()) {
 			String line = statsScanner.nextLine();
 			String[] columns = line.split(",");
@@ -73,7 +76,10 @@ public class SccOutputAnalyzer extends Analyzer {
 			// Remove suffix
 			snippetFileName = snippetFileName.substring(0, snippetFileName.lastIndexOf('.'));
 			String[] snippetSubStrings = snippetFileName.split("_");
-			notebookNumbers.put(id, Integer.parseInt(snippetSubStrings[1]));
+			int notebookNumber = Integer.parseInt(snippetSubStrings[1]);
+			String notebookName = "nb_" + notebookNumber + ".py";	// TODO: Egen metod"
+			addOrIncrease(snippetsPerFile, notebookName);
+			notebookNumbers.put(id, notebookNumber);
 			snippetIndices.put(id, Integer.parseInt(snippetSubStrings[2]));
 			/* Here we use the number of lines of source code (comments
 			   excluded), which is inconsistent with the clone analysis of the 
@@ -88,13 +94,11 @@ public class SccOutputAnalyzer extends Analyzer {
 	
 	/**
 	 * Create a mapping från snippets to notebooks (hash2files) using output
-	 * files from SourcererCC. Also count the number of snippets for each
-	 * notebook and store the result in snippetsPerFile (the third argument)
+	 * files from SourcererCC.
 	 */
-	private Map<SnippetCode, List<Snippet>> getClones(String pairFile,
-			Map<String, Integer> snippetsPerFile) throws IOException {
+	private Map<SnippetCode, List<Snippet>> getClones(String pairFile) throws IOException {
 		List<List<SccSnippetId>> clones = getCloneLists(pairFile);
-		return getCloneMap(clones, snippetsPerFile);
+		return getCloneMap(clones);
 	}
 	
 	private List<List<SccSnippetId>> getCloneLists(String pairFile) throws FileNotFoundException {
@@ -134,21 +138,21 @@ public class SccOutputAnalyzer extends Analyzer {
 	}
 	
 	private Map<SnippetCode, List<Snippet>> getCloneMap(
-			List<List<SccSnippetId>> clones, Map<String, Integer> snippetsPerFile)
+			List<List<SccSnippetId>> clones)
 			throws FileNotFoundException {
 		Map<SnippetCode, List<Snippet>> result = new HashMap<SnippetCode, List<Snippet>>(clones.size());
 		int hashIndex = 0;
 		
 		// Cloned snippets
+		Set<SccSnippetId> snippetIds = notebookNumbers.keySet();	// To keep track of analyzed snippets.
 		for (List<SccSnippetId> cloned: clones) {
 			List<Snippet> snippets = new ArrayList<Snippet>();
 			for (SccSnippetId id: cloned) {
-				// TODO: Är remove en bra idé?!
-				String nbName = "nb_" + notebookNumbers.remove(id) + ".ipynb";
-				addOrIncrease(snippetsPerFile, nbName);
-				int snippetIndex = snippetIndices.remove(id);
+				String nbName = "nb_" + notebookNumbers.get(id) + ".ipynb";
+				int snippetIndex = snippetIndices.get(id);
 				Snippet snippet = new Snippet(nbName, repros.get(nbName), snippetIndex);
 				snippets.add(snippet);
+				snippetIds.remove(id);
 			}
 			int loc = linesOfCode.get(cloned.get(0));	 // TODO: Borde göras på något smartare sätt. Max? Min? Medel?
 			SnippetCode hash = new SnippetCode(loc, Integer.toString(hashIndex++));
@@ -157,16 +161,16 @@ public class SccOutputAnalyzer extends Analyzer {
 		
 		// TODO: Get rid of duplication!
 		// Remaining snippets are unique. Add them!
-		for (SccSnippetId id: notebookNumbers.keySet()) {
+		for (SccSnippetId id: snippetIds) {
 			List<Snippet> snippets = new ArrayList<>(1);
 			String nbName = "nb_" + notebookNumbers.get(id) + ".ipynb";
-			addOrIncrease(snippetsPerFile, nbName);
-			int snippetIndex = snippetIndices.remove(id);
+			int snippetIndex = snippetIndices.get(id);
 			Snippet snippet = new Snippet(nbName, repros.get(nbName), snippetIndex);
 			snippets.add(snippet);
 			int loc = linesOfCode.get(id);
 			SnippetCode hash = new SnippetCode(loc, Integer.toString(hashIndex++));
 			result.put(hash, snippets);
+			snippetIds.remove(id);
 		}
 		return result;
 	}
@@ -185,8 +189,7 @@ public class SccOutputAnalyzer extends Analyzer {
 		}
 	}
 	
-	private Map<Notebook, SnippetCode[]> getSnippets(Map<SnippetCode, List<Snippet>> snippet2file,
-			Map<String, Integer> snippetsPerFile) {
+	private Map<Notebook, SnippetCode[]> getSnippets(Map<SnippetCode, List<Snippet>> snippet2file) {
 		Map<Notebook, SnippetCode[]> result = new HashMap<Notebook, SnippetCode[]>(snippetsPerFile.size());
 		// Create arrays for snippets
 		for (String notebookName: snippetsPerFile.keySet()) {
