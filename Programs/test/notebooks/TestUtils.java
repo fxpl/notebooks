@@ -29,6 +29,24 @@ public class TestUtils {
 	}
 	
 	/**
+	 * Check that each line the most recent file <prefix><timestamp>.csv
+	 * matches (in a regular expression sense) the corresponding expected
+	 * lines.
+	 * @param prefix First part of name of file to be analyzed (see above)
+	 * @param expectedPatterns Array of the patterns expected to be found in the file, in order
+	 */
+	static void checkCsv_matches(String prefix, String[] expectedPatterns) throws IOException {
+		File outputFile = lastOutputFile(prefix);
+		BufferedReader outputReader = new BufferedReader(new FileReader(outputFile));
+		for (int i=0; i<expectedPatterns.length; i++) {
+			String expectedPattern = expectedPatterns[i];
+			boolean match = outputReader.readLine().matches(expectedPattern);
+			assertTrue("Wrong pattern of line number " + (i+1) + " for " + prefix + " csv!", match);
+		}
+		outputReader.close();
+	}
+	
+	/**
 	 * Check that the most recent file <prefix><timestamp>.csv contains all
 	 * lines in expectedLines, and nothing more.
 	 * @param prefix First part of name of file to be analyzed (see above)

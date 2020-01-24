@@ -7,7 +7,7 @@ import org.junit.Test;
 
 public class SccOutputAnalyzerTest {
 	private SccOutputAnalyzer analyzer;
-	
+	private final static String notebookNamePattern = "nb_[0-9]+\\.ipynb";
 	
 	@Before
 	public void setUp() {
@@ -237,6 +237,56 @@ public class SccOutputAnalyzerTest {
 	}
 	
 	/**
+	 * Verify that the right line count is reported when the number of clones
+	 * is odd.
+	 * @throws IOException 
+	 */
+	@Test
+	public void testLocComputation_odd() throws IOException {
+		String dataDir = "test/data/scc";
+		String statsFile = "file_stats_loc_odd";
+		String pairFile = "clone_pairs_loc_odd";
+		String reproMap = "repro_map_loc.csv";
+		
+		String[] expectedLines = {
+				hash2filesHeader(),
+				"[0-9,a-f]+, 13, " + notebookNamePattern + ", [0-9]+, " + notebookNamePattern + ", [0-9]+, " + notebookNamePattern + ", [0-9]+"
+		};
+		
+		analyzer.initializeSnippetInfo(dataDir + "/" + statsFile);
+		analyzer.initializeReproMap(dataDir + "/" + reproMap);
+		analyzer.clones(dataDir + "/" + pairFile);
+		TestUtils.checkCsv_matches("hash2files", expectedLines);
+		
+		TestUtils.deleteCloneCsvs();
+	}
+	
+	/**
+	 * Verify that the right line count is reported when the number of clones
+	 * is even.
+	 * @throws IOException 
+	 */
+	@Test
+	public void testLocComputation_even() throws IOException {
+		String dataDir = "test/data/scc";
+		String statsFile = "file_stats_loc_even";
+		String pairFile = "clone_pairs_loc_even";
+		String reproMap = "repro_map_loc.csv";
+		
+		String[] expectedLines = {
+				hash2filesHeader(),
+				"[0-9,a-f]+, 16, " + notebookNamePattern + ", [0-9]+, " + notebookNamePattern + ", [0-9]+, " + notebookNamePattern + ", [0-9]+, nb_[0-9]\\.ipynb, [0-9]"
+		};
+		
+		analyzer.initializeSnippetInfo(dataDir + "/" + statsFile);
+		analyzer.initializeReproMap(dataDir + "/" + reproMap);
+		analyzer.clones(dataDir + "/" + pairFile);
+		TestUtils.checkCsv_matches("hash2files", expectedLines);
+		
+		TestUtils.deleteCloneCsvs();
+	}
+	
+	/**
 	 * Verify that an AssertionError is thrown when the clone pairs file is on
 	 * the wrong format.
 	 * @throws IOException
@@ -270,5 +320,12 @@ public class SccOutputAnalyzerTest {
 	private static String connectionsHeader() {
 		return "file, connections, connections normalized, non-empty connections, non-empty connections normalized, "
 				+ "intra repro connections, non-empty intra repro connections, mean inter repro connections, mean non-empty inter repro connections";
+	}
+	
+	/**
+	 * @return Expected header of hash2files files
+	 */
+	private static String hash2filesHeader() {
+		return "hash, LOC, file, index, ...";
 	}
 }
