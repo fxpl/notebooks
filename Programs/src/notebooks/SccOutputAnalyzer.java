@@ -77,7 +77,7 @@ public class SccOutputAnalyzer extends Analyzer {
 			snippetFileName = snippetFileName.substring(0, snippetFileName.lastIndexOf('.'));
 			String[] snippetSubStrings = snippetFileName.split("_");
 			int notebookNumber = Integer.parseInt(snippetSubStrings[1]);
-			String notebookName = "nb_" + notebookNumber + ".py";	// TODO: Egen metod"
+			String notebookName = "nb_" + notebookNumber + ".ipynb";	// TODO: Egen metod"
 			addOrIncrease(snippetsPerFile, notebookName);
 			notebookNumbers.put(id, notebookNumber);
 			snippetIndices.put(id, Integer.parseInt(snippetSubStrings[2]));
