@@ -30,6 +30,14 @@ public class SnippetTest {
 		assertEquals("Repro name not initialized/fetched correctly!", repro, notebookSnippet.getRepro());
 		assertEquals("Index not initialized/fetched correctly!", index, notebookSnippet.getSnippetIndex());
 	}
+	
+	@Test
+	public void testConstructor_noRepro() {
+		Snippet noReproSnippet = new Snippet(name, index);
+		assertEquals("Notebook name not initialized/fetched correctly!", name, noReproSnippet.getFileName());
+		assertEquals("Repro name not initialized/fetched correctly!", "", noReproSnippet.getRepro());
+		assertEquals("Index not initialized/fetched correctly!", index, noReproSnippet.getSnippetIndex());
+	}
 
 	@Test
 	public void testEquals_equal() {
@@ -59,6 +67,11 @@ public class SnippetTest {
 	@Test
 	public void testGetName() {
 		assertEquals("Wrong file name returned for snippet!",  name, snippet.getFileName());
+	}
+	
+	@Test
+	public void testGetRepro() {
+		assertEquals("Wrong repro returned for snippet!", repro, snippet.getRepro());
 	}
 	
 	@Test

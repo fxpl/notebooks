@@ -5,15 +5,15 @@ import java.util.Objects;
 public class Snippet {
 	private final String fileName;
 	private final int snippetIndex;
-	private String repro;
+	private String repro = "";
 	
 	public Snippet(String fileName, int snippetIndex) {
-		this.fileName = fileName;
-		this.snippetIndex = snippetIndex;
+		this(fileName, "", snippetIndex);
 	}
 	
 	public Snippet(String fileName, String reproName, int snippetIndex) {
-		this(fileName, snippetIndex);
+		this.fileName = fileName;
+		this.snippetIndex = snippetIndex;
 		this.repro = reproName;
 	}
 	
