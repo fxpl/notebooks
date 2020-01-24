@@ -11,44 +11,90 @@ import java.util.Map;
 import java.util.Scanner;
 
 public class SccOutputAnalyzer extends Analyzer {
-	private Map<String, String> repros = null;	// TODO: Går det att bli av med denna?
-	
-	void initializeReproMap(String fileName) throws FileNotFoundException {
-		this.repros = createReproMap(fileName);
-	}
+	// Information about each snippet
+	Map<SccSnippetId, Integer> notebookNumbers;
+	Map<SccSnippetId, Integer> snippetIndices;
+	Map<SccSnippetId, Integer> linesOfCode;
+	// Map from notebook name to repro name
+	private Map<String, String> repros = null;
 	
 	/**
 	 * Perform the clone analysis based on SourcererCC output files. Write
 	 * file2hashes<current-date-time>.csv, hash2files<current-date-time>.csv,
 	 * cloneFrequencies<current-date-time>.csv and
 	 * connections<current-date-time>.csv accordingly.
+	 * Note that you have to initialize the snippet and repro information, by
+	 * calling initializeSnippetInfo and initializeReproMap respectively before
+	 * calling this method!
 	 * Note that the ''hashes'' written by this method are not the MD5 hashes
 	 * of the snippets, but just the value of a counter. However, all instances
 	 * of the ''hash'' of a snippet are the same.
 	 * @param pairFile: Output file with clone pairs from the SourcererCC clone detection
-	 * @param statsFile: File stats file created by the SourcererCC tokenizer
 	 * @return A map from snippets to files
 	 * @throws IOException
 	 */
-	public Map<SnippetCode, List<Snippet>> clones(String pairFile, String statsFile) throws IOException {
+	public Map<SnippetCode, List<Snippet>> clones(String pairFile) throws IOException {
 		System.out.println("Analyzing clones based on SourcererCC output files!");
 		System.out.println("NOTE THAT NOTEBOOKS WITHOUT SNIPPETS ARE NOT INCLUDED!");
 		Map<String, Integer> snippetsPerFile = new HashMap<String, Integer>();
-		Map<SnippetCode, List<Snippet>> snippet2file = getClones(pairFile, statsFile, snippetsPerFile);
+		Map<SnippetCode, List<Snippet>> snippet2file = getClones(pairFile, snippetsPerFile);
 		Map<Notebook, SnippetCode[]> file2snippet = getSnippets(snippet2file, snippetsPerFile);
 		new CloneFileWriter(outputDir).write(file2snippet, snippet2file);
 		return snippet2file;
 	}
+	
+	/**
+	 * Initialize repro information for each notebook.
+	 * @param fileName Name of file with mapping from notebook number to repro
+	 */
+	public void initializeReproMap(String fileName) throws FileNotFoundException {
+		this.repros = createReproMap(fileName);
+	}
+	
+	/**
+	 * Initialize the maps containing information about each snippet
+	 * @param statsFile File stats file produced by the SourcererCC tokenizer
+	 * @throws FileNotFoundException If the stats file doesn't exist
+	 */
+	public void initializeSnippetInfo(String statsFile) throws FileNotFoundException {
+		notebookNumbers = new HashMap<SccSnippetId, Integer>();
+		snippetIndices = new HashMap<SccSnippetId, Integer>();
+		linesOfCode = new HashMap<SccSnippetId, Integer>();
+		Scanner statsScanner = new Scanner(new File(statsFile));
+		while(statsScanner.hasNextLine()) {
+			String line = statsScanner.nextLine();
+			String[] columns = line.split(",");
+			int id1 = Integer.parseInt(columns[0]);
+			int id2 = Integer.parseInt(columns[1]);
+			SccSnippetId id = new SccSnippetId(id1, id2);
+			String path = columns[2];
+			// Remove directories from filename
+			String snippetFileName = path.substring(path.lastIndexOf('/') + 1);
+			// Remove suffix
+			snippetFileName = snippetFileName.substring(0, snippetFileName.lastIndexOf('.'));
+			String[] snippetSubStrings = snippetFileName.split("_");
+			notebookNumbers.put(id, Integer.parseInt(snippetSubStrings[1]));
+			snippetIndices.put(id, Integer.parseInt(snippetSubStrings[2]));
+			/* Here we use the number of lines of source code (comments
+			   excluded), which is inconsistent with the clone analysis of the 
+			   notebook files, but so is the clone detection -SourcererCC
+			   doesn't consider comments in clone analysis. */
+			int loc = Integer.parseInt(columns[8]);
+			linesOfCode.put(id, loc);
+		}
+		statsScanner.close();
+	}
 
+	
 	/**
 	 * Create a mapping från snippets to notebooks (hash2files) using output
 	 * files from SourcererCC. Also count the number of snippets for each
 	 * notebook and store the result in snippetsPerFile (the third argument)
 	 */
-	private Map<SnippetCode, List<Snippet>> getClones(String pairFile, String statFile,
+	private Map<SnippetCode, List<Snippet>> getClones(String pairFile,
 			Map<String, Integer> snippetsPerFile) throws IOException {
 		List<List<SccSnippetId>> clones = getCloneLists(pairFile);
-		return getCloneMap(clones, statFile, snippetsPerFile);
+		return getCloneMap(clones, snippetsPerFile);
 	}
 	
 	private List<List<SccSnippetId>> getCloneLists(String pairFile) throws FileNotFoundException {
@@ -88,22 +134,8 @@ public class SccOutputAnalyzer extends Analyzer {
 	}
 	
 	private Map<SnippetCode, List<Snippet>> getCloneMap(
-			List<List<SccSnippetId>> clones, String statsFile, Map<String, Integer> snippetsPerFile)
+			List<List<SccSnippetId>> clones, Map<String, Integer> snippetsPerFile)
 			throws FileNotFoundException {
-		// Maps needed for analysis
-		Map<SccSnippetId, Integer> notebookNumbers = new HashMap<SccSnippetId, Integer>();
-		Map<SccSnippetId, Integer> snippetIndices = new HashMap<SccSnippetId, Integer>();
-		Map<SccSnippetId, Integer> linesOfCode = new HashMap<SccSnippetId, Integer>();
-		initializeMapsFromStatsFile(statsFile, notebookNumbers, snippetIndices, linesOfCode);
-		return getCloneMap(clones, snippetsPerFile, notebookNumbers, snippetIndices, linesOfCode);
-	}
-
-	private Map<SnippetCode, List<Snippet>> getCloneMap(
-			List<List<SccSnippetId>> clones,
-			Map<String, Integer> snippetsPerFile,
-			Map<SccSnippetId, Integer> notebookNumbers,
-			Map<SccSnippetId, Integer> snippetIndices,
-			Map<SccSnippetId, Integer> linesOfCode) {
 		Map<SnippetCode, List<Snippet>> result = new HashMap<SnippetCode, List<Snippet>>(clones.size());
 		int hashIndex = 0;
 		
@@ -111,6 +143,7 @@ public class SccOutputAnalyzer extends Analyzer {
 		for (List<SccSnippetId> cloned: clones) {
 			List<Snippet> snippets = new ArrayList<Snippet>();
 			for (SccSnippetId id: cloned) {
+				// TODO: Är remove en bra idé?!
 				String nbName = "nb_" + notebookNumbers.remove(id) + ".ipynb";
 				addOrIncrease(snippetsPerFile, nbName);
 				int snippetIndex = snippetIndices.remove(id);
@@ -139,43 +172,6 @@ public class SccOutputAnalyzer extends Analyzer {
 	}
 
 	/**
-	 * @param statsFile File stats file produced by the SourcererCC tokenizer
-	 * @param notebookNumbers Notebook number for each snippet
-	 * @param snippetIndices Index for each snippet
-	 * @param linesOfCode LOC for each snippet
-	 * @throws FileNotFoundException If the stats file doesn't exist
-	 */
-	private void initializeMapsFromStatsFile(String statsFile,
-			Map<SccSnippetId, Integer> notebookNumbers,
-			Map<SccSnippetId, Integer> snippetIndices,
-			Map<SccSnippetId, Integer> linesOfCode)
-			throws FileNotFoundException {
-		Scanner statsScanner = new Scanner(new File(statsFile));
-		while(statsScanner.hasNextLine()) {
-			String line = statsScanner.nextLine();
-			String[] columns = line.split(",");
-			int id1 = Integer.parseInt(columns[0]);
-			int id2 = Integer.parseInt(columns[1]);
-			SccSnippetId id = new SccSnippetId(id1, id2);
-			String path = columns[2];
-			// Remove directories from filename
-			String snippetFileName = path.substring(path.lastIndexOf('/') + 1);
-			// Remove suffix
-			snippetFileName = snippetFileName.substring(0, snippetFileName.lastIndexOf('.'));
-			String[] snippetSubStrings = snippetFileName.split("_");
-			notebookNumbers.put(id, Integer.parseInt(snippetSubStrings[1]));
-			snippetIndices.put(id, Integer.parseInt(snippetSubStrings[2]));
-			/* Here we use the number of lines of source code (comments
-			   excluded), which is inconsistent with the clone analysis of the 
-			   notebook files, but so is the clone detection -SourcererCC
-			   doesn't consider comments in clone analysis. */
-			int loc = Integer.parseInt(columns[8]);
-			linesOfCode.put(id, loc);
-		}
-		statsScanner.close();
-	}
-
-	/**
 	 * If map contains a value for key, increase it with 1. Else add an entry
 	 * with for key with the value 1.
 	 * @param map Map to modify as stated above
@@ -194,7 +190,6 @@ public class SccOutputAnalyzer extends Analyzer {
 		Map<Notebook, SnippetCode[]> result = new HashMap<Notebook, SnippetCode[]>(snippetsPerFile.size());
 		// Create arrays for snippets
 		for (String notebookName: snippetsPerFile.keySet()) {
-			// TODO: Är det en dålig idé att skapa alla notebooks en gång till?!
 			String repro = repros.get(notebookName);
 			result.put(new Notebook(notebookName, repro), new SnippetCode[snippetsPerFile.get(notebookName)]);
 			
@@ -202,7 +197,6 @@ public class SccOutputAnalyzer extends Analyzer {
 		// Put snippet in notebook to snippet map
 		for (SnippetCode hash: snippet2file.keySet()) {
 			for (Snippet snippet: snippet2file.get(hash)) {
-				// TODO: Lägg notebooken i snippet istället!
 				SnippetCode[] snippetsInFile = result.get(new Notebook(snippet.getFileName()));
 				snippetsInFile[snippet.getSnippetIndex()] = new SnippetCode(hash);
 			}
@@ -211,23 +205,27 @@ public class SccOutputAnalyzer extends Analyzer {
 	}
 	
 	void analyze(String[] args) {
-		String statsFile = null, pairFile = null;
+		String pairFile = null;
 		
 		// Set up
 		for (int i=0; i<args.length; i++) {
 			String arg = args[i];
 			if (arg.startsWith("--stats_file")) {
-				statsFile = getValueFromArgument(arg);
-			} else if (arg.startsWith("--pair_file")) {
-				pairFile = getValueFromArgument(arg);
+				String statsFile = getValueFromArgument(arg);
+				try {
+					initializeSnippetInfo(statsFile);
+				} catch (FileNotFoundException e) {
+					System.err.println("Stats file not found: " + e.getMessage());
+				}
 			} else if (arg.startsWith("--repro_file")) {
 				String reproFile = getValueFromArgument(arg);
 				try {
 					this.initializeReproMap(reproFile);
 				} catch (FileNotFoundException e) {
 					System.err.println("Repro file not found: " + e.getMessage());
-					System.err.println("Repro information not initialized!");
 				}
+			} else if (arg.startsWith("--pair_file")) {
+				pairFile = getValueFromArgument(arg);
 			} else if (arg.startsWith("--output_dir")) {
 				outputDir = getValueFromArgument(arg);
 			} else {
@@ -236,10 +234,10 @@ public class SccOutputAnalyzer extends Analyzer {
 		}
 		
 		// Run
-		if (null != statsFile && "" != statsFile
-				&& null != pairFile && "" != pairFile && null !=this.repros) {
+		// (If notebookNumbers is null, none of the snippet info maps are initialized.)
+		if (null != pairFile && "" != pairFile && null != notebookNumbers &&  null !=this.repros) {
 			try {
-				this.clones(pairFile, statsFile);
+				this.clones(pairFile);
 				System.out.println("Clone files created!");
 			} catch (IOException e) {
 				System.err.println("I/O error: " + e.getMessage() + ". Operation interrupted.");
@@ -248,11 +246,11 @@ public class SccOutputAnalyzer extends Analyzer {
 			if (null == pairFile || "" == pairFile) {
 				System.err.println("SourcererCC clones pair file path not set!");
 			}
-			if (null == statsFile || "" == statsFile) {
-				System.err.println("SourcererCC file statistics file path not set!");
+			if (null == notebookNumbers) {
+				System.err.println("Snippet information is not initialized!");
 			}
 			if (null == this.repros) {
-				System.err.println("Repro mapping file path not set!");
+				System.err.println("Repro information is not initialized!");
 			}
 			System.err.println("Analysis will not be run!");
 		}

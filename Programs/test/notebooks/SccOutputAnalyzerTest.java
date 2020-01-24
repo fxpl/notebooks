@@ -171,7 +171,7 @@ public class SccOutputAnalyzerTest {
 	@Test
 	public void testConnectionsCsv() throws IOException {
 		String dataDir = "test/data/scc";
-		String statFile = "file_stats";
+		String statsFile = "file_stats";
 		String cloneFile = "clone_pairs";
 		String reproMapPath = "test/data/hash/repros.csv";
 		
@@ -192,7 +192,8 @@ public class SccOutputAnalyzerTest {
 		};
 
 		analyzer.initializeReproMap(reproMapPath);
-		analyzer.clones(dataDir + "/" + cloneFile, dataDir + "/" + statFile);
+		analyzer.initializeSnippetInfo(dataDir + "/" + statsFile);
+		analyzer.clones(dataDir + "/" + cloneFile);
 		
 		TestUtils.checkCsv_anyOrder("connections", expectedLines);
 		
@@ -207,7 +208,7 @@ public class SccOutputAnalyzerTest {
 	@Test
 	public void testCloneFreqCsv() throws IOException {
 		String dataDir = "test/data/scc";
-		String statFile = "file_stats";
+		String statsFile = "file_stats";
 		String cloneFile = "clone_pairs";
 		String reproMapPath = "test/data/hash/repros.csv";
 		
@@ -227,7 +228,8 @@ public class SccOutputAnalyzerTest {
 		};
 		
 		analyzer.initializeReproMap(reproMapPath);
-		analyzer.clones(dataDir + "/" + cloneFile, dataDir + "/" + statFile);
+		analyzer.initializeSnippetInfo(dataDir + "/" + statsFile);
+		analyzer.clones(dataDir + "/" + cloneFile);
 		
 		TestUtils.checkCsv_anyOrder("cloneFrequency", expectedLines);
 		
@@ -242,11 +244,12 @@ public class SccOutputAnalyzerTest {
 	@Test (expected = AssertionError.class)
 	public void testClones_corruptPairData() throws IOException {
 		String dataDir = "test/data/scc";
-		String statFile = "file_stats";
+		String statsFile = "file_stats";
 		String cloneFile = "clone_pairs_corrupt";
 		String reproMapPath = "test/data/hash/repros.csv";
+		analyzer.initializeSnippetInfo(dataDir + "/" + statsFile);
 		analyzer.initializeReproMap(reproMapPath);
-		analyzer.clones(dataDir + "/" + cloneFile, dataDir + "/" + statFile);
+		analyzer.clones(dataDir + "/" + cloneFile);
 	}
 	
 	/* file2hashes and hash2files are not checked, since we don't know which
