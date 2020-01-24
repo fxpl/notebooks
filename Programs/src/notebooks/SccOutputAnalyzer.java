@@ -60,7 +60,8 @@ public class SccOutputAnalyzer extends Analyzer {
 	 */
 	public Map<SnippetCode, List<Snippet>> clones(String pairFile) throws IOException {
 		System.out.println("Analyzing clones based on SourcererCC output files!");
-		System.out.println("NOTE THAT NOTEBOOKS WITHOUT SNIPPETS ARE NOT INCLUDED!");
+		System.out.println("NOTE THAT NOTEBOOKS WITHOUT SNIPPETS ARE NOT INCLUDED");
+		System.out.println("since they are not included in the SourcererCC data!");
 		Map<SnippetCode, List<Snippet>> snippet2file = getClones(pairFile);
 		Map<Notebook, SnippetCode[]> file2snippet = getSnippets(snippet2file);
 		new CloneFileWriter(outputDir).write(file2snippet, snippet2file);
@@ -294,6 +295,7 @@ public class SccOutputAnalyzer extends Analyzer {
 	}
 	
 	public static void main(String[] args) {
-		// TODO
+		SccOutputAnalyzer analyzer = new SccOutputAnalyzer();
+		analyzer.analyze(args);
 	}
 }
