@@ -26,17 +26,38 @@ public class SccOutputAnalyzer extends Analyzer {
 	 * file2hashes<current-date-time>.csv, hash2files<current-date-time>.csv,
 	 * cloneFrequencies<current-date-time>.csv and
 	 * connections<current-date-time>.csv accordingly.
+	 * This methods initializes snippet and repro information, so you shouldn't
+	 * do it explicitly before the call to this method.
+	 * Note that the ''hashes'' written by this method are not the MD5 hashes
+	 * of the snippets, but just the value of a counter. However, all instances
+	 * of the ''hash'' of a snippet are the same.
+	 * @param statsFile Path to file stats file produced by the SourcererCC tokenizer
+	 * @param reproFile Path to file with mapping from notebook number to repro
+	 * @param pairFile: Path to output file with clone pairs from the SourcererCC clone detection
+	 * @return A map from snippets to files
+	 * @throws IOException
+	 */
+	public Map<SnippetCode, List<Snippet>> clones(String statsFile, String reproFile, String pairFile) throws IOException {
+		initializeSnippetInfo(statsFile);
+		initializeReproMap(reproFile);
+		return clones(pairFile);
+	}
+	
+	/**
+	 * Perform the clone analysis based on SourcererCC output files. Write
+	 * file2hashes<current-date-time>.csv, hash2files<current-date-time>.csv,
+	 * cloneFrequencies<current-date-time>.csv and
+	 * connections<current-date-time>.csv accordingly.
 	 * Note that you have to initialize the snippet and repro information, by
 	 * calling initializeSnippetInfo and initializeReproMap respectively before
 	 * calling this method!
 	 * Note that the ''hashes'' written by this method are not the MD5 hashes
 	 * of the snippets, but just the value of a counter. However, all instances
 	 * of the ''hash'' of a snippet are the same.
-	 * @param pairFile: Output file with clone pairs from the SourcererCC clone detection
+	 * @param pairFile: Path to output file with clone pairs from the SourcererCC clone detection
 	 * @return A map from snippets to files
 	 * @throws IOException
 	 */
-	// TODO: Version som tar alla 3 filerna!
 	public Map<SnippetCode, List<Snippet>> clones(String pairFile) throws IOException {
 		System.out.println("Analyzing clones based on SourcererCC output files!");
 		System.out.println("NOTE THAT NOTEBOOKS WITHOUT SNIPPETS ARE NOT INCLUDED!");
@@ -48,7 +69,7 @@ public class SccOutputAnalyzer extends Analyzer {
 	
 	/**
 	 * Initialize repro information for each notebook.
-	 * @param fileName Name of file with mapping from notebook number to repro
+	 * @param fileName Path to file with mapping from notebook number to repro
 	 */
 	public void initializeReproMap(String fileName) throws FileNotFoundException {
 		repros = createReproMap(fileName);
@@ -56,7 +77,7 @@ public class SccOutputAnalyzer extends Analyzer {
 	
 	/**
 	 * Initialize the maps containing information about each snippet
-	 * @param statsFile File stats file produced by the SourcererCC tokenizer
+	 * @param statsFile Path to file stats file produced by the SourcererCC tokenizer
 	 * @throws FileNotFoundException If the stats file doesn't exist
 	 */
 	public void initializeSnippetInfo(String statsFile) throws FileNotFoundException {

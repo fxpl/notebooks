@@ -171,10 +171,9 @@ public class SccOutputAnalyzerTest {
 	@Test
 	public void testConnectionsCsv() throws IOException {
 		String dataDir = "test/data/scc";
-		String statsFile = "file_stats";
-		String cloneFile = "clone_pairs";
-		String reproMapPath = "test/data/hash/repros.csv";
-		
+		String statsFile = dataDir + "/file_stats";
+		String pairFile = dataDir + "/clone_pairs";
+		String reproFile = "test/data/hash/repros.csv";
 		String[] expectedLines = {
 				connectionsHeader(),
 				"nb_4.ipynb, 2, 2.0000, 0, 0.0000, 1, 0, 1.0000, 0.0000",
@@ -191,12 +190,8 @@ public class SccOutputAnalyzerTest {
 				
 		};
 
-		analyzer.initializeReproMap(reproMapPath);
-		analyzer.initializeSnippetInfo(dataDir + "/" + statsFile);
-		analyzer.clones(dataDir + "/" + cloneFile);
-		
+		analyzer.clones(statsFile, reproFile, pairFile);
 		TestUtils.checkCsv_anyOrder("connections", expectedLines);
-		
 		TestUtils.deleteCloneCsvs();
 	}
 	
@@ -208,9 +203,9 @@ public class SccOutputAnalyzerTest {
 	@Test
 	public void testCloneFreqCsv() throws IOException {
 		String dataDir = "test/data/scc";
-		String statsFile = "file_stats";
-		String cloneFile = "clone_pairs";
-		String reproMapPath = "test/data/hash/repros.csv";
+		String statsFile = dataDir + "/file_stats";
+		String pairFile = dataDir + "/clone_pairs";
+		String reproFile = "test/data/hash/repros.csv";
 		
 		String[] expectedLines = {
 				cloneFrequencyHeader(),
@@ -227,12 +222,8 @@ public class SccOutputAnalyzerTest {
 				"nb_11.ipynb, 1, 0, 1.0000"
 		};
 		
-		analyzer.initializeReproMap(reproMapPath);
-		analyzer.initializeSnippetInfo(dataDir + "/" + statsFile);
-		analyzer.clones(dataDir + "/" + cloneFile);
-		
+		analyzer.clones(statsFile, reproFile, pairFile);
 		TestUtils.checkCsv_anyOrder("cloneFrequency", expectedLines);
-		
 		TestUtils.deleteCloneCsvs();
 	}
 	
@@ -244,20 +235,17 @@ public class SccOutputAnalyzerTest {
 	@Test
 	public void testLocComputation_odd() throws IOException {
 		String dataDir = "test/data/scc";
-		String statsFile = "file_stats_loc_odd";
-		String pairFile = "clone_pairs_loc_odd";
-		String reproMap = "repro_map_loc.csv";
+		String statsFile = dataDir + "/file_stats_loc_odd";
+		String pairFile = dataDir + "/clone_pairs_loc_odd";
+		String reproMap = dataDir + "/repro_map_loc.csv";
 		
 		String[] expectedLines = {
 				hash2filesHeader(),
 				"[0-9,a-f]+, 13, " + notebookNamePattern + ", [0-9]+, " + notebookNamePattern + ", [0-9]+, " + notebookNamePattern + ", [0-9]+"
 		};
-		
-		analyzer.initializeSnippetInfo(dataDir + "/" + statsFile);
-		analyzer.initializeReproMap(dataDir + "/" + reproMap);
-		analyzer.clones(dataDir + "/" + pairFile);
+
+		analyzer.clones(statsFile, reproMap, pairFile);
 		TestUtils.checkCsv_matches("hash2files", expectedLines);
-		
 		TestUtils.deleteCloneCsvs();
 	}
 	
@@ -269,20 +257,17 @@ public class SccOutputAnalyzerTest {
 	@Test
 	public void testLocComputation_even() throws IOException {
 		String dataDir = "test/data/scc";
-		String statsFile = "file_stats_loc_even";
-		String pairFile = "clone_pairs_loc_even";
-		String reproMap = "repro_map_loc.csv";
+		String statsFile = dataDir + "/file_stats_loc_even";
+		String pairFile = dataDir + "/clone_pairs_loc_even";
+		String reproMap = dataDir + "/repro_map_loc.csv";
 		
 		String[] expectedLines = {
 				hash2filesHeader(),
 				"[0-9,a-f]+, 16, " + notebookNamePattern + ", [0-9]+, " + notebookNamePattern + ", [0-9]+, " + notebookNamePattern + ", [0-9]+, nb_[0-9]\\.ipynb, [0-9]"
 		};
-		
-		analyzer.initializeSnippetInfo(dataDir + "/" + statsFile);
-		analyzer.initializeReproMap(dataDir + "/" + reproMap);
-		analyzer.clones(dataDir + "/" + pairFile);
+
+		analyzer.clones(statsFile, reproMap, pairFile);
 		TestUtils.checkCsv_matches("hash2files", expectedLines);
-		
 		TestUtils.deleteCloneCsvs();
 	}
 	
@@ -294,12 +279,10 @@ public class SccOutputAnalyzerTest {
 	@Test (expected = AssertionError.class)
 	public void testClones_corruptPairData() throws IOException {
 		String dataDir = "test/data/scc";
-		String statsFile = "file_stats";
-		String cloneFile = "clone_pairs_corrupt";
+		String statsFile = dataDir + "/file_stats";
+		String pairFile = dataDir + "/clone_pairs_corrupt";
 		String reproMapPath = "test/data/hash/repros.csv";
-		analyzer.initializeSnippetInfo(dataDir + "/" + statsFile);
-		analyzer.initializeReproMap(reproMapPath);
-		analyzer.clones(dataDir + "/" + cloneFile);
+		analyzer.clones(statsFile, reproMapPath, pairFile);
 	}
 	
 	/* file2hashes and hash2files are not checked, since we don't know which
