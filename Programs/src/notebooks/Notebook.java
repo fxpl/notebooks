@@ -27,7 +27,7 @@ public class Notebook {
 	private LangSpec languageSpecIn;
 	
 	public Notebook(String path) {
-		this.path = path;
+		this(path, "");
 	}
 	
 	public Notebook(String path, String repro) {
@@ -36,8 +36,7 @@ public class Notebook {
 	}
 	
 	public Notebook(Notebook model) {
-		this.path = model.path;
-		this.repro = model.repro;
+		this(model.path, model.repro);
 	}
 	
 	/**
