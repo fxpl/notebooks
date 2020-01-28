@@ -46,3 +46,13 @@ logHist(bytes, "bytes")
 logHist(locTotalReduced, "loc")
 #logHist(locNonBlank, "Non-blank lines of code")
 logHist(locNonBlankReduced, "loc_non-blank")
+
+# LANGUAGES
+lang_percentages <- c(95.3537, 0.8215, 0.7885, 0.1896, 0.6663, 2.1804)
+labels <- c("Python", "Julia", "R", "Scala", "other", "unknown")
+colors <- c("blue", "green", "yellow", "purple", "brown", "gray")
+setEPS()
+postscript(paste(outputDir, "/languages.eps", sep=""))
+pie(lang_percentages, labels=NA,  col=colors)
+legend(x="topright", legend=labels, fill=colors)
+dev.off()
