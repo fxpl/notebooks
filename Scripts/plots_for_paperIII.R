@@ -2,6 +2,13 @@ setwd("~/github/fxpl/notebooks")
 rm(list=ls())
 
 outputDir <- "Output"
+
+printMeanAndPercentiles <- function(x) {
+  print(paste("Mean: ", mean(x), sep=""))
+  print("Percentiles:")
+  print(quantile(x, probs=c(0, 0.1, 0.25, 0.5, 0.75, 0.9, 1)))
+}
+
 ###############################################################################
 # Plot a histogram over data with logarithmic scale on the y axis. Save it as
 # Output/log_hist_<specifier>.eps.
@@ -23,21 +30,28 @@ logHist <- function(data, specifier="") {
   dev.off()
 }
 
-# TODO: Uppdatera med senaste efter körningar vecka 3!
 extCloneFreq <- read.csv("Output/extendedCloneFrequency.csv", header=TRUE)
 codeCells <- read.csv("Output/code_cells.csv", header=TRUE)
-loc <- read.csv("Output/loc.csv", header=TRUE)
 
-# TODO: Uppdatera kolumnnamn i enlighet med nya headers i analyzern!
+
+# SIZES
 cells <- codeCells[,"code.cells"]
-bytes <- extCloneFreq[,"blank"]   # Wrong names in temporary file... Should be "bytes", not "blank"
-locTotal <- loc[,"total.LOC"]
-max(locTotal)
+bytes <- extCloneFreq[,"bytes"]
+locTotal <- extCloneFreq[,"total.LOC"]
 locTotalReduced <- locTotal[locTotal<max(locTotal)]
-locNonBlank <- loc[,"non.blank.LOC"]
-max(locNonBlank)
+locNonBlank <- extCloneFreq[,"non.blank.LOC"]
 locNonBlankReduced <- locNonBlank[locNonBlank<max(locNonBlank)]
-# All 4 metrics decay to fast: an ordinary histogram looks like 1 single bar
+# All 4 metrics decay too fast: an ordinary histogram looks like 1 single bar
+
+# Statistics
+print("Cells:")
+printMeanAndPercentiles(cells)
+print("Bytes:")
+printMeanAndPercentiles(bytes)
+print("Non-empty LOC:")
+printMeanAndPercentiles(locNonBlank)
+print("Total LOC:")
+printMeanAndPercentiles(locTotal)
 
 # Histograms (with log scale on y axis)
 logHist(cells, "code_cells")
@@ -46,6 +60,7 @@ logHist(bytes, "bytes")
 logHist(locTotalReduced, "loc")
 #logHist(locNonBlank, "Non-blank lines of code")
 logHist(locNonBlankReduced, "loc_non-blank")
+
 
 # LANGUAGES
 lang_percentages <- c(95.3537, 0.8215, 0.7885, 0.1896, 0.6663, 2.1804)
