@@ -4,6 +4,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -19,17 +21,31 @@ public class CloneFileWriter {
 	
 	/**
 	 * Create and fill file2Hashes, hash2Files cloneFrequencies and connections
-	 * files
+	 * files with data for all notebooks.
 	 * @param snippets A map from file names to snippets
 	 * @param clones A map from snippets to files
 	 * @throws IOException On problems handling the output files
 	 */
 	public void write(Map<Notebook, SnippetCode[]> snippets,
 			Map<SnippetCode, List<Snippet>> clones) throws IOException {
+		write(snippets, clones, snippets.keySet().size());
+	}
+	
+	/**
+	 * Create and fill file2Hashes, hash2Files cloneFrequencies  files with
+	 * data for all notebooks. Create and fill connections file for
+	 * CONNECTION_NOTEBOOKS notebooks
+	 * @param snippets A map from file names to snippets
+	 * @param clones A map from snippets to files
+	 * @param CONNECTION_NOTEBOOKS Number of notebooks to print connection data for
+	 * @throws IOException On problems handling the output files
+	 */
+	public void write(Map<Notebook, SnippetCode[]> snippets,
+			Map<SnippetCode, List<Snippet>> clones, int CONNECTION_NOTEBOOKS) throws IOException {
 		printFile2hashes(snippets);
 		printHash2files(clones);
 		printCloneFrequencies(snippets, clones);
-		printConnectionsFile(snippets, clones);
+		printConnectionsFile(snippets, clones, CONNECTION_NOTEBOOKS);
 	}
 	
 	private void printFile2hashes(Map<Notebook, SnippetCode[]> files) throws IOException {
@@ -101,18 +117,24 @@ public class CloneFileWriter {
 	 * - mean number edges to other repros, incl. those representing empty snippets
 	 * - mean number edges to other repros, excl. those representing empty snippets
 	 * Print the values, in the order mentioned, separated with commas to the file
-	 * connections<current-date-time>.csv.
+	 * connections<current-date-time>.csv for a random sample of NUM_CONNECTIONS
+	 * notebooks in file2snippets (unless NUM_CONNECTIONS > number of notebooks
+	 * in the analysis --then data is printed for the whole set of notebooks).
 	 * Note that when computing the mean, only repros for which there is a
 	 * connection are included.
 	 * @param file2snippets Mapping from notebook name to snippets
 	 * @param snippet2files Mapping from snippets to position in notebooks
+	 * @param NUM_NOTEBOOKS Maximum number of notebooks to print connection information for
 	 */
 	private void printConnectionsFile(Map<Notebook, SnippetCode[]> file2snippets,
-			Map<SnippetCode, List<Snippet>> snippet2files) throws IOException {
+			Map<SnippetCode, List<Snippet>> snippet2files, final int NUM_CONNECTIONS) throws IOException {
 		Writer writer = new FileWriter(outputDir + "/connections" + LocalDateTime.now() + ".csv");
 		writer.write(connectionsHeader());
-		for (Notebook notebook: file2snippets.keySet()) {
-			printConnections(notebook, file2snippets, snippet2files, writer);
+		List<Notebook> notebooks = new ArrayList<Notebook>(file2snippets.keySet());
+		Collections.shuffle(notebooks);
+		int connectionsToPrint = Math.min(NUM_CONNECTIONS, file2snippets.size());
+		for (int i=0; i<connectionsToPrint; i++) {
+			printConnections(notebooks.get(i), file2snippets, snippet2files, writer);
 		}
 		writer.close();
 	}

@@ -17,6 +17,7 @@ public class NotebookAnalyzer extends Analyzer {
 	private static LangSpec[] langSpecFields = {LangSpec.METADATA_LANGUAGE , LangSpec.METADATA_LANGUAGEINFO_NAME, 
 			LangSpec.METADATA_KERNELSPEC_LANGUAGE, LangSpec.METADATA_KERNELSPEC_NAME,
 			LangSpec.CODE_CELLS};
+	private final int CONNECTION_NOTEBOOKS = 50000;
 	
 	/**
 	 * Note that when you are done with this Analyzer, you must call the method
@@ -105,7 +106,7 @@ public class NotebookAnalyzer extends Analyzer {
 		allLangWriter.close();
 		
 		Map<SnippetCode, List<Snippet>> clones = getClones(snippets);
-		new CloneFileWriter(outputDir).write(snippets, clones);
+		new CloneFileWriter(outputDir).write(snippets, clones, CONNECTION_NOTEBOOKS);
 	}
 	
 	/**
@@ -128,7 +129,7 @@ public class NotebookAnalyzer extends Analyzer {
 	public Map<SnippetCode, List<Snippet>> clones() throws IOException {
 		Map<Notebook, SnippetCode[]> snippets = getSnippets();
 		Map<SnippetCode, List<Snippet>> clones = getClones(snippets);
-		new CloneFileWriter(outputDir).write(snippets, clones);
+		new CloneFileWriter(outputDir).write(snippets, clones, CONNECTION_NOTEBOOKS);
 		return clones;
 	}
 	
