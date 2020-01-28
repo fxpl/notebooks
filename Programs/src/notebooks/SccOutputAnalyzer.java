@@ -194,6 +194,10 @@ public class SccOutputAnalyzer extends Analyzer {
 			int medianLoc = (loc[numClones/2] + loc[(numClones-1)/2]) / 2;
 			SnippetCode hash = new SnippetCode(medianLoc, Integer.toString(hashIndex++));
 			result.put(hash, snippets);
+			if (loc[0] != loc[loc.length-1]) {
+				System.out.println("Different line count for snippet " + hash
+						+ ". Min: " + loc[0] + ". Max: " + loc[loc.length-1] + ".");
+			}
 		}
 		
 		// Remaining snippets are unique. Add them!
