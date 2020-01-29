@@ -2,6 +2,7 @@ package notebooks;
 
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -61,7 +62,7 @@ public class Hack {
 }
 
 class LibraryAnalysis {
-    private static final HashMap<String, Integer> imports = new HashMap<String, Integer>();
+    private static final ConcurrentHashMap<String, Integer> imports = new ConcurrentHashMap<String, Integer>();
     private static final Pattern basicImportPattern = Pattern.compile("import\\s+(\\S+?)");
     private static final Pattern importAsPattern = Pattern.compile("import\\s+(\\S+?)\\s+as");
     private static final Pattern fromPattern = Pattern.compile("from\\s+(\\S+?)\\s+import");
@@ -69,8 +70,25 @@ class LibraryAnalysis {
 
     public static void displayResults() {
         System.out.printf("Results\n---------------\n");
-        for (String library : imports.keySet()) {
-            System.out.printf("%s: %d\n", library, imports.get(library));
+        // imports.forEach((lib, occ) -> System.out.printf("%s: %d\n", lib, occ));
+
+        /// 27 : lib1, lib2, ...
+        HashMap<Integer, List<String>> sortedResultTable = new HashMap<Integer, List<String>>();
+
+        /// Populate sortedResultTable from imports
+        imports.forEach((lib, occ) -> {
+                if (sortedResultTable.containsKey(occ) == false) sortedResultTable.put(occ, new ArrayList<String>());
+                sortedResultTable.get(occ).add(lib);
+            });
+        
+        /// Print top 100 sortedResultTable
+        int cutOff = 100;
+        for (int occurrences : (new TreeSet<Integer>(sortedResultTable.keySet()).descendingSet())) {
+            if (--cutOff >= 0) {
+                System.out.printf("%d: %s\n", occurrences, String.join(", ", sortedResultTable.get(occurrences)));
+            } else {
+                break;
+            }
         }
     }
     
@@ -89,9 +107,7 @@ class LibraryAnalysis {
                             final String library = matcher.group(1);
 
                             // TODO: keep a per thread count
-                            synchronized(imports) {
-                                imports.put(library, imports.getOrDefault(library, 0) + 1);
-                            }
+                            imports.put(library, imports.getOrDefault(library, 0) + 1);
                         }
                     }
                 }
