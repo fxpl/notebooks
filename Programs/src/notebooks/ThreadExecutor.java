@@ -1,5 +1,6 @@
 package notebooks;
 
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -31,6 +32,19 @@ public class ThreadExecutor {
 	}
 	
 	/**
+	 * Invoke a list of Callables
+	 */
+	public<T> List<Future<T>> invokeAll(List<Callable<T>> tasks) {
+		try {
+			return threadPool.invokeAll(tasks);
+		} catch (InterruptedException e) {
+			System.err.println("Thread interrupted: " + e.getMessage());
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	/**
 	 * Submit a task for execution.
 	 */
 	public<T> Future<T> submit(Callable<T> task) {
@@ -50,5 +64,6 @@ public class ThreadExecutor {
 	
 	private void shutDown() {
 		threadPool.shutdown();
+		// TODO: awaitTermination!
 	}
 }
