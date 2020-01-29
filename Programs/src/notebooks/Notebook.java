@@ -39,6 +39,12 @@ public class Notebook {
 	public Notebook(Notebook model) {
 		this(model.path, model.repro);
 	}
+
+    public static Notebook loadNotebookFromFile(String path) throws NotebookException {
+        Notebook b = new Notebook(path);
+        b.getNotebook();
+        return b;
+    }
 	
 	/**
 	 * @return true iff is a notebook with the same name as this
@@ -58,6 +64,10 @@ public class Notebook {
 	public String getName() {
 		int namePos = path.lastIndexOf('/') + 1;
 		return path.substring(namePos);
+	}
+	
+	public String getPath() {
+		return this.path;
 	}
 	
 	public String getRepro() {
@@ -661,4 +671,33 @@ public class Notebook {
 		}
 		return new String(hexChars);
 	}
+
+    public String getCodeSnippetsAsSingleFile() throws NotebookException {
+        StringBuilder sb = new StringBuilder();
+
+        for (JSONObject cell : getCodeCells()) {
+            final JSONArray lines = getSource(cell);
+            final int noLines = lines.size();
+            for (int i = 0; i < noLines; ++i) {
+                sb.append(lines.get(i));
+            }
+        }
+
+        return sb.toString();
+    }
+
+    public ArrayList<String> getCodeSnippetsLineByLine() throws NotebookException {
+        ArrayList<String> result = new ArrayList<String>();
+
+        for (JSONObject cell : getCodeCells()) {
+            final JSONArray lines = getSource(cell);
+            final int noLines = lines.size();
+            for (int i = 0; i < noLines; ++i) {
+                result.add(lines.get(i).toString());
+            }
+        }
+
+        return result;
+    }
+
 }
