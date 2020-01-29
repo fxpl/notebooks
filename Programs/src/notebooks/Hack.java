@@ -63,7 +63,7 @@ public class Hack {
 
 class LibraryAnalysis {
     private static final ConcurrentHashMap<String, Integer> imports = new ConcurrentHashMap<String, Integer>();
-    private static final Pattern basicImportPattern = Pattern.compile("import\\s+(\\S+?)");
+    private static final Pattern basicImportPattern = Pattern.compile("import\\s+(\\S+?)[\\s$]");
     private static final Pattern importAsPattern = Pattern.compile("import\\s+(\\S+?)\\s+as");
     private static final Pattern fromPattern = Pattern.compile("from\\s+(\\S+?)\\s+import");
     private static final Pattern[] importPatterns = { basicImportPattern, importAsPattern, fromPattern };
