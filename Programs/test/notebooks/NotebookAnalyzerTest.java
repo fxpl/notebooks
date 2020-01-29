@@ -26,9 +26,9 @@ public class NotebookAnalyzerTest {
 		analyzer = new NotebookAnalyzer();
 	}
 	
-	@After
-	public void tearDown() {
-		analyzer.shutDown();
+	@AfterClass
+	public static void tearDown() {
+		ThreadExecutor.tearDown();
 	}
 	
 	@Test

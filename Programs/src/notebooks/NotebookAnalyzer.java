@@ -12,7 +12,6 @@ import java.util.concurrent.*;
  * Analyzer for Jupyter notebooks.
  */
 public class NotebookAnalyzer extends Analyzer {
-	private ExecutorService executor;
 	private List<Notebook> notebooks;
 	private static LangSpec[] langSpecFields = {LangSpec.METADATA_LANGUAGE , LangSpec.METADATA_LANGUAGEINFO_NAME, 
 			LangSpec.METADATA_KERNELSPEC_LANGUAGE, LangSpec.METADATA_KERNELSPEC_NAME,
@@ -26,9 +25,6 @@ public class NotebookAnalyzer extends Analyzer {
 	public NotebookAnalyzer() {
 		super();
 		this.notebooks = new ArrayList<Notebook>();
-		int cores = Runtime.getRuntime().availableProcessors();
-		System.out.println("Running " + (2*cores) + " threads.");
-		executor = Executors.newFixedThreadPool(2*cores);
 	}
 	
 	/**
@@ -65,14 +61,6 @@ public class NotebookAnalyzer extends Analyzer {
 		for (Notebook nb: notebooks) {
 			nb.setRepro(reproMap.get(nb.getName()));
 		}
-	}
-	
-	/**
-	 * Shut the executor down. Must be called for each object when you are done
-	 * with it!
-	 */
-	public void shutDown() {
-		executor.shutdown();
 	}
 	
 	/**
@@ -466,7 +454,7 @@ public class NotebookAnalyzer extends Analyzer {
 	
 	private <T> T employ(Worker<T> worker) {
 		try {
-			Future<T> result = executor.submit(worker);
+			Future<T> result = ThreadExecutor.getInstance().submit(worker);
 			return result.get();
 		} catch (ExecutionException e) {
 			System.err.println(e.getMessage() + " Skipping notebook!");
@@ -481,6 +469,6 @@ public class NotebookAnalyzer extends Analyzer {
 	public static void main(String[] args) {
 		NotebookAnalyzer analyzer = new NotebookAnalyzer();
 		analyzer.analyze(args);
-		analyzer.shutDown();
+		ThreadExecutor.tearDown();
 	}
 }
