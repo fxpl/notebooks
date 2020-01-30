@@ -10,21 +10,21 @@ import java.util.concurrent.Callable;
 
 public class ConnectionsWriter implements Callable<Void> {
 	private Notebook notebook;
-	private Map <Notebook, SnippetCode[]> file2snippets;
-	private Map<SnippetCode, List<Snippet>> snippets2files;
+	private Map <Notebook, SnippetCode[]> file2hashes;
+	private Map<SnippetCode, List<Snippet>> hash2files;
 	private Writer writer;
 	
 	/**
 	 * @param notebook Notebook to print connections for
-	 * @param file2snippets Mapping from notebook to snippets
-	 * @param snippet2files Mapping from snippets to position in notebooks
+	 * @param file2hashes Mapping from notebook to snippets
+	 * @param hash2files Mapping from snippets to position in notebooks
 	 * @param writer Writer that will print the result
 	 */
-	public ConnectionsWriter(Notebook notebook, Map<Notebook, SnippetCode[]> file2snippets,
-			Map<SnippetCode, List<Snippet>> snippet2files, Writer writer) {
+	public ConnectionsWriter(Notebook notebook, Map<Notebook, SnippetCode[]> file2hashes,
+			Map<SnippetCode, List<Snippet>> hash2files, Writer writer) {
 		this.notebook = notebook;
-		this.file2snippets = file2snippets;
-		this.snippets2files = snippet2files;
+		this.file2hashes = file2hashes;
+		this.hash2files = hash2files;
 		this.writer = writer;
 	}
 
@@ -37,13 +37,13 @@ public class ConnectionsWriter implements Callable<Void> {
 		int interReproConnections = 0;
 		int nonEmptyInterReproConnections = 0;
 		String currentRepro = notebook.getRepro();
-		SnippetCode[] snippets = file2snippets.get(notebook);
+		SnippetCode[] snippets = file2hashes.get(notebook);
 		Set<String> otherRepros = new TreeSet<String>();
 		Set<String> otherNonEmptyRepros = new TreeSet<String>();	// Other repros with non-empty friends
 		int numNonEmptySnippets = 0;
 		for (SnippetCode snippet: snippets) {
 			// Locations where the current snippet can be found
-			List<Snippet> locations = snippets2files.get(snippet);
+			List<Snippet> locations = hash2files.get(snippet);
 			int connectionsForSnippet = connections(locations);
 			int intraReproConnectionsForSnippet = intraReproConnections(locations, currentRepro); 
 			connections += connectionsForSnippet;

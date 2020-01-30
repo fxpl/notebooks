@@ -23,38 +23,38 @@ public class CloneFileWriter {
 	/**
 	 * Create and fill file2Hashes, hash2Files cloneFrequencies and connections
 	 * files with data for all notebooks.
-	 * @param snippets A map from file names to snippets
-	 * @param clones A map from snippets to files
+	 * @param file2hashes A map from file names to snippets
+	 * @param hash2files A map from snippets to files
 	 * @throws IOException On problems handling the output files
 	 */
-	public void write(Map<Notebook, SnippetCode[]> snippets,
-			Map<SnippetCode, List<Snippet>> clones) throws IOException {
-		write(snippets, clones, snippets.keySet().size());
+	public void write(Map<Notebook, SnippetCode[]> file2hashes,
+			Map<SnippetCode, List<Snippet>> hash2files) throws IOException {
+		write(file2hashes, hash2files, file2hashes.keySet().size());
 	}
 	
 	/**
 	 * Create and fill file2Hashes, hash2Files cloneFrequencies  files with
 	 * data for all notebooks. Create and fill connections file for
 	 * CONNECTION_NOTEBOOKS notebooks
-	 * @param snippets A map from file names to snippets
-	 * @param clones A map from snippets to files
+	 * @param file2hashes A map from file names to snippets
+	 * @param hash2files A map from snippets to files
 	 * @param CONNECTION_NOTEBOOKS Number of notebooks to print connection data for
 	 * @throws IOException On problems handling the output files
 	 */
-	public void write(Map<Notebook, SnippetCode[]> snippets,
-			Map<SnippetCode, List<Snippet>> clones, int CONNECTION_NOTEBOOKS) throws IOException {
-		printFile2hashes(snippets);
-		printHash2files(clones);
-		printCloneFrequencies(snippets, clones);
-		printConnectionsFile(snippets, clones, CONNECTION_NOTEBOOKS);
+	public void write(Map<Notebook, SnippetCode[]> file2hashes,
+			Map<SnippetCode, List<Snippet>> hash2files, int CONNECTION_NOTEBOOKS) throws IOException {
+		printFile2hashes(file2hashes);
+		printHash2files(hash2files);
+		printCloneFrequencies(file2hashes, hash2files);
+		printConnectionsFile(file2hashes, hash2files, CONNECTION_NOTEBOOKS);
 	}
 	
-	private void printFile2hashes(Map<Notebook, SnippetCode[]> files) throws IOException {
+	private void printFile2hashes(Map<Notebook, SnippetCode[]> file2hashes) throws IOException {
 		Writer writer = new FileWriter(outputDir + "/file2hashes" + LocalDateTime.now() + ".csv");
 		writer.write(file2hashesHeader());
-		for (Notebook notebook: files.keySet()) {
+		for (Notebook notebook: file2hashes.keySet()) {
 			writer.write(notebook.getName());
-			SnippetCode[] code = files.get(notebook);
+			SnippetCode[] code = file2hashes.get(notebook);
 			for (SnippetCode snippet: code) {
 				writer.write(", " + snippet.getHash());
 			}
@@ -63,12 +63,12 @@ public class CloneFileWriter {
 		writer.close();
 	}
 	
-	private void printHash2files(Map<SnippetCode, List<Snippet>> clones) throws IOException {
+	private void printHash2files(Map<SnippetCode, List<Snippet>> hash2files) throws IOException {
 		Writer writer = new FileWriter(outputDir + "/hash2files" + LocalDateTime.now() + ".csv");
 		writer.write(hash2filesHeader());
-		for (SnippetCode code: clones.keySet()) {
+		for (SnippetCode code: hash2files.keySet()) {
 			writer.write(code.getHash() + ", " + code.getLOC());
-			for (Snippet s: clones.get(code)) {
+			for (Snippet s: hash2files.get(code)) {
 				writer.write(", " + s.toString());
 			}
 			writer.write("\n");
@@ -76,15 +76,15 @@ public class CloneFileWriter {
 		writer.close();
 	}
 	
-	private void printCloneFrequencies(Map<Notebook, SnippetCode[]> file2Hashes,
-			Map<SnippetCode, List<Snippet>> hash2Files) throws IOException {
+	private void printCloneFrequencies(Map<Notebook, SnippetCode[]> file2hashes,
+			Map<SnippetCode, List<Snippet>> hash2files) throws IOException {
 		Writer writer = new FileWriter(outputDir + "/cloneFrequency" + LocalDateTime.now() + ".csv");
 		writer.write(cloneFrequencyHeader());
-		for (Notebook notebook: file2Hashes.keySet()) {
+		for (Notebook notebook: file2hashes.keySet()) {
 			int numClones = 0, numUnique = 0;
-			SnippetCode[] code = file2Hashes.get(notebook);
+			SnippetCode[] code = file2hashes.get(notebook);
 			for (SnippetCode snippet: code) {
-				if(isClone(snippet, hash2Files)) {
+				if(isClone(snippet, hash2files)) {
 					numClones++;
 				} else {
 					numUnique++;
@@ -123,20 +123,20 @@ public class CloneFileWriter {
 	 * in the analysis --then data is printed for the whole set of notebooks).
 	 * Note that when computing the mean, only repros for which there is a
 	 * connection are included.
-	 * @param file2snippets Mapping from notebook name to snippets
-	 * @param snippet2files Mapping from snippets to position in notebooks
+	 * @param file2hashes Mapping from notebook name to snippets
+	 * @param hash2files Mapping from snippets to position in notebooks
 	 * @param NUM_NOTEBOOKS Maximum number of notebooks to print connection information for
 	 */
-	private void printConnectionsFile(Map<Notebook, SnippetCode[]> file2snippets,
-			Map<SnippetCode, List<Snippet>> snippet2files, final int NUM_CONNECTIONS) throws IOException {
+	private void printConnectionsFile(Map<Notebook, SnippetCode[]> file2hashes,
+			Map<SnippetCode, List<Snippet>> hash2files, final int NUM_CONNECTIONS) throws IOException {
 		Writer writer = new FileWriter(outputDir + "/connections" + LocalDateTime.now() + ".csv");
 		writer.write(connectionsHeader());
-		List<Notebook> notebooks = new ArrayList<Notebook>(file2snippets.keySet());
+		List<Notebook> notebooks = new ArrayList<Notebook>(file2hashes.keySet());
 		Collections.shuffle(notebooks);
-		int connectionsToPrint = Math.min(NUM_CONNECTIONS, file2snippets.size());
+		int connectionsToPrint = Math.min(NUM_CONNECTIONS, file2hashes.size());
 		List<Callable<Void>> tasks = new ArrayList<>(connectionsToPrint);
 		for (int i=0; i<connectionsToPrint; i++) {
-			tasks.add(new ConnectionsWriter(notebooks.get(i), file2snippets, snippet2files, writer));
+			tasks.add(new ConnectionsWriter(notebooks.get(i), file2hashes, hash2files, writer));
 		}
 		List<Future<Void>> result = ThreadExecutor.getInstance().invokeAll(tasks);
 		// Wait for all tasks to finish
@@ -148,7 +148,7 @@ public class CloneFileWriter {
 						+ " was interrupted! " + e.getMessage());
 			} catch (ExecutionException e) {
 				System.err.println("Printing connections for notebook "
-						+notebooks.get(i).getName() + " failed!" + e.toString());
+						+ notebooks.get(i).getName() + " failed!" + e.toString());
 			}
 		}
 		writer.close();
@@ -159,8 +159,8 @@ public class CloneFileWriter {
 	 * (that is, if the list of snippets is at least 2).
 	 * @return true if snippet is a clone, false otherwise
 	 */
-	private static boolean isClone(SnippetCode snippet, Map<SnippetCode, List<Snippet>> clones) {
-		List<Snippet> snippets = clones.get(snippet);
+	private static boolean isClone(SnippetCode snippet, Map<SnippetCode, List<Snippet>> hash2files) {
+		List<Snippet> snippets = hash2files.get(snippet);
 		return snippets.size() >= 2;
 	}
 	
