@@ -85,6 +85,7 @@ public class NotebookAnalyzer extends Analyzer {
 			languageIn(notebook, langWriter);
 			allLanguageValuesIn(notebook, allLangWriter);
 			getSnippetsFrom(notebook, snippets);
+			notebook.clearContents();
 		}
 		/* Language summary is not printed here, since the information can
 		   easily be extracted from the CSV file. */
@@ -131,6 +132,7 @@ public class NotebookAnalyzer extends Analyzer {
 				System.out.println("Hashing snippets in notebook " + i);
 			}
 			getSnippetsFrom(notebooks.get(i), snippets);
+			notebooks.get(i).clearContents();
 		}
 		return snippets;
 	}
@@ -178,6 +180,7 @@ public class NotebookAnalyzer extends Analyzer {
 		writer.write(allLanguagesHeader());
 		for(Notebook notebook: notebooks) {
 			allLanguageValuesIn(notebook, writer);
+			notebook.clearContents();
 		}
 		writer.close();
 	}
@@ -227,9 +230,10 @@ public class NotebookAnalyzer extends Analyzer {
 		}
 		Writer writer = new FileWriter(outputDir + "/languages" + LocalDateTime.now() + ".csv");
 		writer.write(languagesHeader());
-		for (int i=0; i<notebooks.size(); i++) {
-			Language language = languageIn(notebooks.get(i), writer);
+		for (Notebook notebook: notebooks) {
+			Language language = languageIn(notebook, writer);
 			languages.put(language, languages.get(language) + 1);
+			notebook.clearContents();
 		}
 		writer.close();
 		return languages;
@@ -270,8 +274,9 @@ public class NotebookAnalyzer extends Analyzer {
 		int totalLOC = 0;
 		Writer writer = new FileWriter(outputDir + "/loc" + LocalDateTime.now() + ".csv");
 		writer.write(LOCHeader());
-		for (int i=0; i<notebooks.size(); i++) {
-			totalLOC += LOCIn(notebooks.get(i), writer);
+		for (Notebook notebook: notebooks) {
+			totalLOC += LOCIn(notebook, writer);
+			notebook.clearContents();
 		}
 		writer.close();
 		return totalLOC;
@@ -313,8 +318,9 @@ public class NotebookAnalyzer extends Analyzer {
 		int totalNumCodeCells = 0;
 		Writer writer = new FileWriter(outputDir + "/code_cells" + LocalDateTime.now() + ".csv");
 		writer.write(numCodeCellsHeader());
-		for (int i=0; i<notebooks.size(); i++) {
-			totalNumCodeCells += numCodeCellsIn(notebooks.get(i), writer);
+		for (Notebook notebook: notebooks) {
+			totalNumCodeCells += numCodeCellsIn(notebook, writer);
+			notebook.clearContents();
 		}
 		writer.close();
 		return totalNumCodeCells;
