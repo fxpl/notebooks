@@ -80,7 +80,7 @@ public class Notebook {
 	 * its suffix, if any), id is the index of the snippet in the notebook file
 	 * and suffix is given as an argument.
 	 */
-	public void dumpCode(String location, String suffix) throws NotebookException, IOException {
+	public void dumpCode(String location, String suffix) throws IOException {
 		List<JSONObject> cells = this.getCodeCells();
 		String noteBookName = getNameWithoutSuffix();
 		for (int i=0; i<cells.size(); i++) {
@@ -103,7 +103,7 @@ public class Notebook {
 	 * Works like dumpCode except that each notebook is turned into
 	 * a zip file with one file entry per snippet.
 	 */
-	public void dumpCodeAsZip(String location, String suffix) throws NotebookException, IOException {
+	public void dumpCodeAsZip(String location, String suffix) throws IOException {
 		String noteBookName = getNameWithoutSuffix();
 		List<JSONObject> cells = this.getCodeCells();
 		try {
@@ -131,7 +131,7 @@ public class Notebook {
 	 * code in each snippet, not the code itself.
 	 * @return Array containing a representation of the code of the snippets of the notebook
 	 */
-	public SnippetCode[] snippetCodes() throws NotebookException {
+	public SnippetCode[] snippetCodes() {
 		MessageDigest hasher;
 		try {
 			hasher = MessageDigest.getInstance("MD5");
@@ -165,7 +165,7 @@ public class Notebook {
 	 * (except NONE). Store in a Map with the LangSpec value being the key.
 	 * @return The map described above
 	 */
-	public Map<LangSpec, Language> allLanguageValues() throws NotebookException {
+	public Map<LangSpec, Language> allLanguageValues() {
 		Map<LangSpec, Language> result
 			= new HashMap<LangSpec, Language>(LangSpec.values().length-1);
 		LangSpec langSpecIn = this.languageSpecIn;
@@ -201,7 +201,7 @@ public class Notebook {
 	 * holds for its private helper methods.) 
 	 * @return The language of the notebook
 	 */
-	public Language language() throws NotebookException {
+	public Language language() {
 		JSONObject notebook = this.getNotebook();
 		this.languageSpecIn = LangSpec.NONE;
 		Language language = getLanguageFromMetadata(notebook);
@@ -217,7 +217,7 @@ public class Notebook {
 	/**
 	 * @return Identifier of the location from which the language is extracted
 	 */
-	public LangSpec langSpec() throws NotebookException {
+	public LangSpec langSpec() {
 		if (null == languageSpecIn) {
 			language();
 		}
@@ -226,43 +226,39 @@ public class Notebook {
 	
 	/**
 	 * @return Total lines of code for all code cells in the notebook
-	 * @throws NotebookException if the notebook file could not be parsed
 	 */
-	public int LOC() throws NotebookException {
+	public int LOC() {
 		countLinesIfNotDone();
 		return locTotal;
 	}
 	
 	/**
 	 * @return Number of blank code lines in the notebook
-	 * @throws NotebookException if the notebook file could not be parsed
 	 */
-	public int LOCBlank() throws NotebookException {
+	public int LOCBlank() {
 		countLinesIfNotDone();
 		return locBlank;
 	}
 	
 	/**
 	 * @return Number of non-blank code lines in the notebook
-	 * @throws NotebookException if the notebook file could not be parsed
 	 */
-	public int LOCNonBlank() throws NotebookException {
+	public int LOCNonBlank() {
 		countLinesIfNotDone();
 		return locContents;
 	}
 	
 	/**
 	 * @return Number of code cells in notebook
-	 * @throws NotebookException if the file could not be parsed
 	 */
-	public int numCodeCells() throws NotebookException {
+	public int numCodeCells() {
 		return getCodeCells().size();
 	}
 	
 	/**
 	 * @return An array with the number of characters in each snippet
 	 */
-	public int[] numCodeChars() throws NotebookException {
+	public int[] numCodeChars() {
 		List<JSONObject> codeCells = this.getCodeCells();
 		int[] result = new int[codeCells.size()];
 		for (int i=0; i<codeCells.size(); i++) {
@@ -283,7 +279,7 @@ public class Notebook {
 	 * followed by an empty line.
 	 * @param Index of snippet to print
 	 */
-	public void printSnippet(int index) throws NotebookException {
+	public void printSnippet(int index) {
 		JSONArray snippet = getSource(this.getCodeCells().get(index));
 		for (int i=0; i<snippet.length(); i++) {
 			System.out.print(snippet.getString(i));
@@ -293,9 +289,8 @@ public class Notebook {
 	
 	/**
 	 * Count lines of code and set all loc variables.
-	 * @throws NotebookException if the file could not be parsed
 	 */
-	private synchronized void countLinesIfNotDone() throws NotebookException {
+	private synchronized void countLinesIfNotDone() {
 		if (!locCounted) {
 			locTotal = 0;	// May have been partly counted before.
 			locBlank = 0;
@@ -329,9 +324,8 @@ public class Notebook {
 	 * but also an array of worksheets, each containing a cell array.
 	 * @param notebook Notebook/worksheet to extract cells from
 	 * @return Array containing all cells of the notebook
-	 * @throws NotebookException 
 	 */
-	private /*static*/ JSONArray getCellArray(JSONObject notebook) throws NotebookException {
+	private /*static*/ JSONArray getCellArray(JSONObject notebook) {
 		JSONArray cells;
 		if (notebook.has("cells")) {
 			cells = notebook.getJSONArray("cells");
@@ -354,7 +348,7 @@ public class Notebook {
 	/**
 	 * @return A list containing all code cells in the notebook represented by this object
 	 */
-	private List<JSONObject> getCodeCells() throws NotebookException {
+	private List<JSONObject> getCodeCells() {
 		JSONObject notebook = this.getNotebook();
 		return getCodeCells(notebook);
 	}
@@ -362,9 +356,8 @@ public class Notebook {
 	/**
 	 * @param notebook Notebook to extract code cells from
 	 * @return A list containing all code cells in notebook
-	 * @throws NotebookException 
 	 */
-	private List<JSONObject> getCodeCells(JSONObject notebook) throws NotebookException {
+	private List<JSONObject> getCodeCells(JSONObject notebook) {
 		JSONArray cells = getCellArray(notebook);
 		List<JSONObject> result = new ArrayList<JSONObject>();
 		for (int i=0; i<cells.length(); i++) {
@@ -405,9 +398,8 @@ public class Notebook {
 	/**
 	 * @param notebook Notebook to extract language from
 	 * @return The language specified in code cells, if it exists and is consistent. UNKNOWN otherwise.
-	 * @throws NotebookException 
 	 */
-	private Language getLanguageFromCodeCells(JSONObject notebook) throws NotebookException {
+	private Language getLanguageFromCodeCells(JSONObject notebook) {
 		List<JSONObject> codeCells = getCodeCells(notebook);
 		if (0 < codeCells.size()) {
 			String language = "";
@@ -525,19 +517,17 @@ public class Notebook {
 	
 	/**
 	 * @return A JSONObject containing the contents of the notebook
-	 * @throws NotebookException If the file this.path could not be parsed
 	 */
-	private JSONObject getNotebook() throws NotebookException {
+	private JSONObject getNotebook() {
 		if (null == contents) {
-			InputStream input;
 			try {
-				input = new DataInputStream(new FileInputStream(new File(this.path)));
-				// TODO: Felhantering!
+				InputStream input = new DataInputStream(new FileInputStream(new File(this.path)));
+				JSONTokener tokener = new JSONTokener(input);
+				contents = new JSONObject(tokener);
 			} catch (FileNotFoundException e) {
-				throw new NotebookException("Could not read " + this.path + ": " + e.toString());
+				System.err.println("Could not read " + this.path + ": " + e.toString());
+				contents = new JSONObject();
 			}
-			JSONTokener tokener = new JSONTokener(input);
-			contents = new JSONObject(tokener);
 		}
 		return contents;
 	}
@@ -545,9 +535,8 @@ public class Notebook {
 	/**
 	 * @param cell Code cell to fetch source code from
 	 * @return The source code stored in cell (with each line as a separate element), empty array if source code is missing 
-	 * @throws NotebookException When source is stored on an unknown format
 	 */
-	private JSONArray getSource(JSONObject cell) throws NotebookException {
+	private JSONArray getSource(JSONObject cell) {
 		// Source can be either a JSONArray or a string. :-/
 		Object source = null;
 		if (cell.has("source")) {
@@ -573,8 +562,9 @@ public class Notebook {
 			}
 			return result;
 		} else {
-			throw new NotebookException("Unknown source type in " + this.path
-					+ ": " + source.getClass() + "!");
+			System.err.println("Unknown source type in " + this.path
+					+ ": " + source.getClass() + "! Ignoring source.");
+			return new JSONArray();
 		}
 	}
 	

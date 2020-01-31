@@ -4,7 +4,7 @@ import java.io.IOException;
 
 public class TestDataZipDumper extends Dumper {
 	
-	protected void dump(Notebook src, String target) throws NotebookException, IOException {
+	protected void dump(Notebook src, String target) throws IOException {
 		src.dumpCodeAsZip(target, "py");
 	}
 

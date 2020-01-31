@@ -43,7 +43,7 @@ public class PythonDumperTest extends DumperTest {
 	 * notebook is not written in Python.
 	 */
 	@Test
-	public void testDump_nonPythonFile() throws NotebookException, IOException {
+	public void testDump_nonPythonFile() throws IOException {
 		String src = "test/data/dump/nbR.ipynb";
 		File outputFile = new File(targetDir + "/nbR_0.py");
 		
@@ -57,7 +57,7 @@ public class PythonDumperTest extends DumperTest {
 	 * Verify that dump dumps the snippets of a single notebook correctly.
 	 */
 	@Test
-	public void testDump_singleFile() throws NotebookException, IOException {
+	public void testDump_singleFile() throws IOException {
 		String src = "test/data/dump/nb1.ipynb";
 		String[] expectedOutputs = {"nb1_0.py", "nb1_1.py"};
 		
@@ -86,7 +86,7 @@ public class PythonDumperTest extends DumperTest {
 	 * correctly.
 	 */
 	@Test
-	public void testDump_wholeDir() throws NotebookException, IOException {
+	public void testDump_wholeDir() throws IOException {
 		String dir = "dump";
 		String src = "test/data/" + dir;
 		String[] expectedOutputs = {"nb1_0.py", "nb1_1.py", "nb2_0.py", "nb3_0.py"};
@@ -105,7 +105,7 @@ public class PythonDumperTest extends DumperTest {
 	 * Verify that dumper dumps notebooks in subdirectories correctly. 
 	 */
 	@Test
-	public void testDump_subDir() throws NotebookException, IOException {
+	public void testDump_subDir() throws IOException {
 		String dir = "dump";
 		String subDir = "sub";
 		String src = "test/data/" + dir;
