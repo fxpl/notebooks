@@ -5,14 +5,11 @@ import java.io.*;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.zip.ZipOutputStream;
+
 import java.util.zip.ZipEntry;
 import java.util.*;
 
-import org.json.simple.*;
-import org.json.simple.parser.*;
-
-// TODO: Går det att hantera CastExceptions på något snyggare sätt?!
-// (Förmodligen är det bästa att använda ett vettigare jsonbibliotek.)
+import org.json.*;
 
 /**
  * A Jupyter notebook.
@@ -90,8 +87,8 @@ public class Notebook {
 			String outputFile = location + "/" + noteBookName + "_" + i + "." + suffix;
 			Writer writer = new FileWriter(outputFile);
 			JSONArray lines = getSource(cells.get(i));
-			for (int j=0; j<lines.size(); j++) {
-				writer.write((String)lines.get(j));
+			for (int j=0; j<lines.length(); j++) {
+				writer.write(lines.getString(j));
 			}
 			writer.close();
 		}
@@ -103,35 +100,31 @@ public class Notebook {
 	}
 
 	/**
-   * Works like dumpCode except that each notebook is turned into
-   * a zip file with one file entry per snippet.
+	 * Works like dumpCode except that each notebook is turned into
+	 * a zip file with one file entry per snippet.
 	 */
-  public void dumpCodeAsZip(String location, String suffix) throws NotebookException, IOException {
-    String noteBookName = getNameWithoutSuffix();
-    List<JSONObject> cells = this.getCodeCells();
-
-    try {
-        FileOutputStream fos = new FileOutputStream(location + "/" + noteBookName + ".zip");
-        ZipOutputStream zos = new ZipOutputStream(fos);
-
-        for (int i=0; i<cells.size(); i++) {
-            ZipEntry entry = new ZipEntry(noteBookName + "_" + i + "." + suffix); 
-            zos.putNextEntry(entry);
-
-            for (Object line : getSource(cells.get(i))) {
-                zos.write(((String) line).getBytes());
-            }
-
-            zos.closeEntry();
-        }
-
-        zos.close();
-        fos.close();
-    } catch(IOException ioe) {
-        ioe.printStackTrace();
-    }
+	public void dumpCodeAsZip(String location, String suffix) throws NotebookException, IOException {
+		String noteBookName = getNameWithoutSuffix();
+		List<JSONObject> cells = this.getCodeCells();
+		try {
+			FileOutputStream fos = new FileOutputStream(location + "/" + noteBookName + ".zip");
+			ZipOutputStream zos = new ZipOutputStream(fos);
+			for (int i=0; i<cells.size(); i++) {
+				ZipEntry entry = new ZipEntry(noteBookName + "_" + i + "." + suffix); 
+				zos.putNextEntry(entry);
+				JSONArray lines = getSource(cells.get(i));
+				for (int j=0; j<lines.length(); j++) {
+					zos.write(lines.getString(j).getBytes());
+				}
+				zos.closeEntry();
+			}
+			zos.close();
+			fos.close();
+		} catch(IOException ioe) {
+			ioe.printStackTrace();
+		}
 	}
-    
+
 	/**
 	 * Return the code of all snippets of the notebook. For memory consumption
 	 * reasons, the result contains only the length (LOC) and the hash of the
@@ -153,8 +146,8 @@ public class Notebook {
 			String snippet = "";
 			JSONArray lines = getSource(codeCells.get(i));
 			int loc = 0;
-			for (int j=0; j<lines.size(); j++) {
-				String line = (String)lines.get(j);	// Type is checked in getSource.
+			for (int j=0; j<lines.length(); j++) {
+				String line = lines.getString(j);
 				line = line .replaceAll("\\s", "");
 				if(!"".equals(line)) {
 					loc++;	// Count non-empty lines
@@ -177,20 +170,20 @@ public class Notebook {
 			= new HashMap<LangSpec, Language>(LangSpec.values().length-1);
 		LangSpec langSpecIn = this.languageSpecIn;
 		JSONObject notebook = this.getNotebook();
-		if (!notebook.containsKey("metadata")) {
+		if (!notebook.has("metadata")) {
 			result.put(LangSpec.METADATA_LANGUAGE, Language.UNKNOWN);
 			result.put(LangSpec.METADATA_LANGUAGEINFO_NAME, Language.UNKNOWN);
 			result.put(LangSpec.METADATA_KERNELSPEC_LANGUAGE, Language.UNKNOWN);
 			result.put(LangSpec.METADATA_KERNELSPEC_NAME, Language.UNKNOWN);
 		} else {
-			JSONObject metadata = (JSONObject)notebook.get("metadata");
+			JSONObject metadata = notebook.getJSONObject("metadata");
 			result.put(LangSpec.METADATA_LANGUAGE, getLanguageFromLanguage(metadata));
 			result.put(LangSpec.METADATA_LANGUAGEINFO_NAME, getLanguageFromLanguageinfo(metadata));
-			if (!metadata.containsKey("kernelspec")) {
+			if (!metadata.has("kernelspec")) {
 				result.put(LangSpec.METADATA_KERNELSPEC_LANGUAGE, Language.UNKNOWN);
 				result.put(LangSpec.METADATA_KERNELSPEC_NAME, Language.UNKNOWN);
 			} else {
-				JSONObject kernelspec = (JSONObject)metadata.get("kernelspec");
+				JSONObject kernelspec = metadata.getJSONObject("kernelspec");
 				result.put(LangSpec.METADATA_KERNELSPEC_LANGUAGE, getLanguageFromKernelspecLanguage(kernelspec));
 				result.put(LangSpec.METADATA_KERNELSPEC_NAME, getLanguageFromKernelSpecName(kernelspec));
 			}
@@ -211,20 +204,9 @@ public class Notebook {
 	public Language language() throws NotebookException {
 		JSONObject notebook = this.getNotebook();
 		this.languageSpecIn = LangSpec.NONE;
-		Language language;
-		try {
-			language = getLanguageFromMetadata(notebook);
-		} catch (ClassCastException e) {
-			throw new NotebookException("Cast exception when retreiving language from metadata for "
-					+ this.path + ": " + e.toString());
-		}
+		Language language = getLanguageFromMetadata(notebook);
 		if (Language.UNKNOWN == language) {
-			try {
-				language = getLanguageFromCodeCells(notebook);
-			} catch (ClassCastException e) {
-				throw new NotebookException("Cast exception when retreiving language from code cells for "
-						+ this.path + ": " + e.toString());
-			}
+			language = getLanguageFromCodeCells(notebook);
 		}
 		if (Language.UNKNOWN == language) {
 			System.err.println("No language found in " + this.path);
@@ -287,8 +269,8 @@ public class Notebook {
 			JSONObject cell = codeCells.get(i);
 			JSONArray lines = getSource(cell);
 			result[i] = 0;
-			for (int j=0; j<lines.size(); j++) {
-				String line = (String)lines.get(j);	// Type is checked in getSource.
+			for (int j=0; j<lines.length(); j++) {
+				String line = lines.getString(j);	// Type is checked in getSource.
 				result[i] += line.length();
 			}
 			
@@ -303,8 +285,8 @@ public class Notebook {
 	 */
 	public void printSnippet(int index) throws NotebookException {
 		JSONArray snippet = getSource(this.getCodeCells().get(index));
-		for (int i=0; i<snippet.size(); i++) {
-			System.out.print((String)snippet.get(i));
+		for (int i=0; i<snippet.length(); i++) {
+			System.out.print(snippet.getString(i));
 		}
 	}
 	
@@ -331,9 +313,9 @@ public class Notebook {
 	 * Count lines in source.
 	 */
 	private synchronized void countLines(JSONArray source) {
-		locTotal += source.size();
-		for (int i=0; i<source.size(); i++) {
-			String line = ((String)source.get(i)).trim();
+		locTotal += source.length();
+		for (int i=0; i<source.length(); i++) {
+			String line = (source.getString(i)).trim();
 			if ("".equals(line)) {
 				locBlank++;
 			} else {
@@ -349,32 +331,21 @@ public class Notebook {
 	 * @return Array containing all cells of the notebook
 	 * @throws NotebookException 
 	 */
-	@SuppressWarnings("unchecked")	// The JSON library uses raw types internally
 	private /*static*/ JSONArray getCellArray(JSONObject notebook) throws NotebookException {
 		JSONArray cells;
-		if (notebook.containsKey("cells")) {
-			try {
-				// According to spec
-				cells = (JSONArray) notebook.get("cells");
-			} catch (ClassCastException e) {
-				throw new NotebookException("Couldn't cast cells in "
-						+ this.path + " to JSONArray: " + e.toString());
-			}
+		if (notebook.has("cells")) {
+			cells = notebook.getJSONArray("cells");
 		} else {
 			cells = new JSONArray();
 		}
-		if(notebook.containsKey("worksheets")) {
+		if (notebook.has("worksheets")) {
 			// Not according to spec, but occurring
-			JSONArray worksheets;
-			try {
-				worksheets = (JSONArray) notebook.get("worksheets");
-			} catch (ClassCastException e) {
-				throw new NotebookException("Couldn't cast worksheets in "
-						+ this.path + " to JSONArray: " + e.toString());
-			}
-			for (int i=0; i<worksheets.size(); i++) {
-				JSONArray worksSheetCells = getCellArray((JSONObject) worksheets.get(i));
-				cells.addAll(worksSheetCells);
+			JSONArray worksheets = notebook.getJSONArray("worksheets");
+			for (int i=0; i<worksheets.length(); i++) {
+				JSONArray workSheetCells = getCellArray(worksheets.getJSONObject(i));
+				for (int j=0; j<workSheetCells.length(); j++) {
+					cells.put(workSheetCells.getJSONObject(j));
+				}
 			}
 		}
 		return cells;
@@ -396,24 +367,12 @@ public class Notebook {
 	private List<JSONObject> getCodeCells(JSONObject notebook) throws NotebookException {
 		JSONArray cells = getCellArray(notebook);
 		List<JSONObject> result = new ArrayList<JSONObject>();
-		for (int i=0; i<cells.size(); i++) {
-			JSONObject cell;
-			try {
-				cell = (JSONObject) cells.get(i);
-			} catch (ClassCastException e) {
-				throw new NotebookException("Couldn't cast cell number " + i
-						+ " in " + this.path + "to JSONObject: " + e.toString());
-			}
-			if (cell.containsKey("cell_type")) {
-				try {
-					String type = (String) cell.get("cell_type");
-					if (type.equals("code")) {
-						result.add(cell);
-					}
-				} catch (Exception e) {
-					System.err.println("Couldn't cast cell type of cell number " + i
-							+ " in " + this.path + " to string: " + e.toString() + ". Skipping cell.");
-					
+		for (int i=0; i<cells.length(); i++) {
+			JSONObject cell = cells.getJSONObject(i);
+			if (cell.has("cell_type")) {
+				String type = cell.getString("cell_type");
+				if (type.equals("code")) {
+					result.add(cell);
 				}
 			} else {
 				System.err.println("Key \"cell_type\" is missing in a cell in " + this.path);
@@ -453,12 +412,12 @@ public class Notebook {
 		if (0 < codeCells.size()) {
 			String language = "";
 			JSONObject cell = codeCells.get(0);
-			if (cell.containsKey("language")) {
+			if (cell.has("language")) {
 				languageSpecIn = LangSpec.CODE_CELLS;
-				language = (String) cell.get("language");
+				language = cell.getString("language");
 				for (int i=1; i<codeCells.size(); i++) {
 					cell = codeCells.get(i);
-					if (!cell.containsKey("language") || !((String)cell.get("language")).equals(language)) {
+					if (!cell.has("language") || !(cell.getString("language")).equals(language)) {
 						System.err.println("Ambiguous language in " + this.path);
 						return Language.UNKNOWN;
 					}
@@ -475,8 +434,8 @@ public class Notebook {
 	 */
 	private Language getLanguageFromMetadata(JSONObject notebook) {
 		Language language = Language.UNKNOWN;
-		if (notebook.containsKey("metadata")) {
-			JSONObject metadata = (JSONObject) notebook.get("metadata");
+		if (notebook.has("metadata")) {
+			JSONObject metadata = notebook.getJSONObject("metadata");
 			language = getLanguageFromLanguageinfo(metadata);
 			if (Language.UNKNOWN == language) {
 				language = getLanguageFromLanguage(metadata);
@@ -495,8 +454,8 @@ public class Notebook {
 	 * @return The language specified in Get source code metadata->kernelspec. UNKNOWN otherwise.
 	 */
 	private Language getLanguageFromKernelspec(JSONObject metadata) {
-		if (metadata.containsKey("kernelspec")) {
-			JSONObject kernelspec = (JSONObject)metadata.get("kernelspec");
+		if (metadata.has("kernelspec")) {
+			JSONObject kernelspec = metadata.getJSONObject("kernelspec");
 			return getLanguageFromKernelspecLanguage(kernelspec);
 		}
 		return Language.UNKNOWN;
@@ -506,9 +465,9 @@ public class Notebook {
 	 * @param kernelspec
 	 */
 	private Language getLanguageFromKernelSpecName(JSONObject kernelspec) {
-		if (kernelspec.containsKey("name")) {
+		if (kernelspec.has("name")) {
 			languageSpecIn = LangSpec.METADATA_KERNELSPEC_NAME;
-			return getLanguage((String)kernelspec.get("name"));
+			return getLanguage(kernelspec.getString("name"));
 		}
 		return Language.UNKNOWN;
 	}
@@ -517,9 +476,9 @@ public class Notebook {
 	 * @param kernelspec
 	 */
 	private Language getLanguageFromKernelspecLanguage(JSONObject kernelspec) {
-		if (kernelspec.containsKey("language")) {
+		if (kernelspec.has("language")) {
 			languageSpecIn = LangSpec.METADATA_KERNELSPEC_LANGUAGE;
-			return getLanguage((String) kernelspec.get("language"));
+			return getLanguage(kernelspec.getString("language"));
 		}
 		return Language.UNKNOWN;
 	}
@@ -529,9 +488,9 @@ public class Notebook {
 	 * @return The language specified in metadata->language, if any. UNKNOWN otherwise.
 	 */
 	private Language getLanguageFromLanguage(JSONObject metadata) {
-		if (metadata.containsKey("language")) {
+		if (metadata.has("language")) {
 			languageSpecIn = LangSpec.METADATA_LANGUAGE;
-			return getLanguage((String)metadata.get("language"));
+			return getLanguage(metadata.getString("language"));
 		}
 		return Language.UNKNOWN;
 	}
@@ -541,11 +500,11 @@ public class Notebook {
 	 * @return The language specified in metadata->language_info, if any. UNKNOWN otherwise.
 	 */
 	private Language getLanguageFromLanguageinfo(JSONObject metadata) {
-		if (metadata.containsKey("language_info")) {
-			JSONObject languageinfo = (JSONObject)metadata.get("language_info");
-			if (languageinfo.containsKey("name")) {
+		if (metadata.has("language_info")) {
+			JSONObject languageinfo = metadata.getJSONObject("language_info");
+			if (languageinfo.has("name")) {
 				languageSpecIn = LangSpec.METADATA_LANGUAGEINFO_NAME;
-				return getLanguage((String)languageinfo.get("name"));
+				return getLanguage(languageinfo.getString("name"));
 			}
 		}
 		return Language.UNKNOWN;
@@ -570,24 +529,15 @@ public class Notebook {
 	 */
 	private JSONObject getNotebook() throws NotebookException {
 		if (null == contents) {
-			Reader reader;
+			InputStream input;
 			try {
-				reader = new FileReader(this.path);
+				input = new DataInputStream(new FileInputStream(new File(this.path)));
+				// TODO: Felhantering!
 			} catch (FileNotFoundException e) {
 				throw new NotebookException("Could not read " + this.path + ": " + e.toString());
 			}
-			try {
-				contents = (JSONObject)new JSONParser().parse(reader);
-			} catch (IOException | ParseException e) {
-				throw new NotebookException("Could not parse " + this.path + ": " + e.toString());
-			} catch (ClassCastException e) {
-				throw new NotebookException("Couldn't cast notebook to JSONObject in " + this.path + ": " + e.toString());
-			}
-			try {
-				reader.close();
-			} catch (IOException e) {
-				System.err.println("Warning: Could not close reader of " + this.path + ": " + e.toString());
-			}
+			JSONTokener tokener = new JSONTokener(input);
+			contents = new JSONObject(tokener);
 		}
 		return contents;
 	}
@@ -597,47 +547,29 @@ public class Notebook {
 	 * @return The source code stored in cell (with each line as a separate element), empty array if source code is missing 
 	 * @throws NotebookException When source is stored on an unknown format
 	 */
-	@SuppressWarnings("unchecked")	// The JSON library uses raw types internally
 	private JSONArray getSource(JSONObject cell) throws NotebookException {
+		// Source can be either a JSONArray or a string. :-/
 		Object source = null;
-		if (cell.containsKey("source")) {
+		if (cell.has("source")) {
 			source = cell.get("source");
-		} else if (cell.containsKey("input")) {
+		} else if (cell.has("input")) {
 			source = cell.get("input");
 		} else {
 			System.err.println("Keys \"source\" and \"input\" are missing in a cell in " + this.path);
 			source = new JSONArray();
 		}
 		if (source instanceof JSONArray) {
-			JSONArray result;
-			try {
-				result = (JSONArray) source;
-			} catch (ClassCastException e) {
-				throw new NotebookException("Couldn't convert source to JSONArray in a cell in "
-						+ this.path + ": " + e.toString());
-			}
+			JSONArray result = (JSONArray)source;
 			if (!result.isEmpty()) {
-				String lastLine;
-				try {
-					lastLine = (String)(result.get(result.size()-1));
-				} catch (ClassCastException e) {
-					throw new NotebookException("Couldn't convert last source line to string in a cell in "
-							+ this.path + ": " + e.toString());
-				}
-				result.set(result.size()-1, lastLine + "\n");
+				String lastLine = result.getString(result.length()-1);
+				result.put(result.length()-1, lastLine + "\n");
 			}
 			return result;
 		} else if (source instanceof String) {
 			JSONArray result = new JSONArray();
-			String[] lines;
-			try {
-				lines = ((String) source).split("\\n");
-			} catch (ClassCastException e) {
-				throw new NotebookException("Couldn't convert source to String in a cell in "
-						+ this.path + ": " + e.toString());
-			}
+			String[] lines = ((String) source).split("\\n");
 			for (String line: lines) {
-				result.add(line + "\n");
+				result.put(line + "\n");
 			}
 			return result;
 		} else {

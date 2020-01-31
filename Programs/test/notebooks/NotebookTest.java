@@ -9,6 +9,7 @@ import java.util.Objects;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import org.json.JSONException;
 import org.junit.Test;
 
 import notebooks.LangSpec;
@@ -512,7 +513,7 @@ public class NotebookTest {
 	 * Verify that a NotebookException is thrown if we try to count cells in a
 	 * notebook created from a file not containing JSON data.
 	 */
-	@Test (expected=NotebookException.class)
+	@Test (expected=JSONException.class)
 	public void testParsingEmptyFile() throws NotebookException {
 		Notebook notebook = new Notebook("test/data/count/empty.ipynb");
 		notebook.numCodeCells();

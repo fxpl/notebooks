@@ -463,7 +463,7 @@ public class NotebookAnalyzer extends Analyzer {
 			Future<T> result = ThreadExecutor.getInstance().submit(worker);
 			return result.get();
 		} catch (ExecutionException e) {
-			System.err.println(e.getMessage() + " Skipping notebook!");
+			System.err.println(e.getMessage() + " Skipping notebook " + worker.notebook.getName() + "!");
 			return worker.defaultValue();
 		} catch (InterruptedException e) {
 			System.err.println("A thread was interrupted: " +
