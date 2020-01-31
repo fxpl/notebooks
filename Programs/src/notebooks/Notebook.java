@@ -525,7 +525,7 @@ public class Notebook {
 				JSONTokener tokener = new JSONTokener(input);
 				contents = new JSONObject(tokener);
 			} catch (FileNotFoundException e) {
-				System.err.println("Could not read " + this.path + ": " + e.toString());
+				System.err.println("Could not read " + this.path + ": " + e + ". Skipping notebook!");
 				contents = new JSONObject();
 			}
 		}
@@ -563,7 +563,7 @@ public class Notebook {
 			return result;
 		} else {
 			System.err.println("Unknown source type in " + this.path
-					+ ": " + source.getClass() + "! Ignoring source.");
+					+ ": " + source.getClass() + "! Skipping source.");
 			return new JSONArray();
 		}
 	}

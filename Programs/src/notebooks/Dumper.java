@@ -33,10 +33,12 @@ public abstract class Dumper {
 		try {
 			dump(srcNb, target);
 		} catch (IOException e) {
-			System.err.println("I/O error when dumping python snippets: " + e.getMessage() + " Skipping!");
+			System.err.println("I/O error when dumping python snippets in "
+					+ srcNb.getName() + ": " + e + " Skipping notebook!");
 			e.printStackTrace();
 		} catch (RuntimeException e) {
-			System.err.println("Runtime error for notebook " + srcNb.getName() + ": " + e + " Skipping!");
+			System.err.println("Runtime error for notebook " + srcNb.getName()
+					+ ": " + e + " Skipping notebook!");
 			e.printStackTrace();
 		}
 	}
