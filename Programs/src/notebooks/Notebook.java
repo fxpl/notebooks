@@ -10,6 +10,7 @@ import java.util.*;
 import java.lang.ref.WeakReference;
 import org.json.simple.*;
 import org.json.simple.parser.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 // TODO: Går det att hantera CastExceptions på något snyggare sätt?!
 // (Förmodligen är det bästa att använda ett vettigare jsonbibliotek.)
@@ -25,7 +26,9 @@ public class Notebook {
 	private int locContents;	// Number of non-empty code lines
 	private volatile boolean locCounted = false;
 	private LangSpec languageSpecIn;
-	private WeakReference<JSONObject> contents;
+	private WeakReference<JSONObject> cache;
+    public static final AtomicInteger fileCacheHits = new AtomicInteger(0);
+    public static final AtomicInteger fileCacheMisses = new AtomicInteger(0);
 	
 	public Notebook(String path) {
 		this(path, "");
@@ -69,11 +72,11 @@ public class Notebook {
 	}
 	
 	/**
-	 * Reset the stored contents. This metod cat be used to decrease the
+	 * Reset the stored cache. This metod cat be used to decrease the
 	 * memory load.
 	 */
 	public void clearContents() {
-      contents.clear();
+      cache.clear();
 	}
 	
 	/**
@@ -565,12 +568,13 @@ public class Notebook {
 	}
 	
 	/**
-	 * @return A JSONObject containing the contents of the notebook
+	 * @return A JSONObject containing the cache of the notebook
 	 * @throws NotebookException If the file this.path could not be parsed
 	 */
 	private JSONObject getNotebook() throws NotebookException {
-      JSONObject notebook = contents.get();
+      JSONObject notebook = cache.get();
 		if (null == notebook) {
+        this.fileCacheMisses.incrementAndGet();
 			Reader reader;
 			try {
 				reader = new FileReader(this.path);
@@ -579,7 +583,7 @@ public class Notebook {
 			}
 			try {
 				notebook = (JSONObject)new JSONParser().parse(reader);
-        contents = new WeakReference<JSONObject>(notebook);
+        cache = new WeakReference<JSONObject>(notebook);
 			} catch (IOException | ParseException e) {
 				throw new NotebookException("Could not parse " + this.path + ": " + e.toString());
 			} catch (ClassCastException e) {
@@ -590,7 +594,9 @@ public class Notebook {
 			} catch (IOException e) {
 				System.err.println("Warning: Could not close reader of " + this.path + ": " + e.toString());
 			}
-		}
+		} else {
+        fileCacheHits.incrementAndGet();
+    }
 		return notebook;
 	}
 	

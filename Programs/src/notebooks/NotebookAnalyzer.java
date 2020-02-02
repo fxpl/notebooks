@@ -14,6 +14,7 @@ import java.util.concurrent.*;
 public class NotebookAnalyzer extends Analyzer {
 	private ExecutorService executor;
 	private List<Notebook> notebooks;
+    private final String now = LocalDateTime.now().toString();
 	private static LangSpec[] langSpecFields = {LangSpec.METADATA_LANGUAGE , LangSpec.METADATA_LANGUAGEINFO_NAME, 
 			LangSpec.METADATA_KERNELSPEC_LANGUAGE, LangSpec.METADATA_KERNELSPEC_NAME,
 			LangSpec.CODE_CELLS};
@@ -80,25 +81,42 @@ public class NotebookAnalyzer extends Analyzer {
 	 * @throws IOException On problems handling the output file
 	 */
 	public void allAnalyzes() throws IOException {
-		Writer codeCellsWriter = new FileWriter(outputDir + "/code_cells" + LocalDateTime.now() + ".csv");
+		Writer codeCellsWriter = new FileWriter(outputDir + "/code_cells" + now + ".csv");
 		codeCellsWriter.write(numCodeCellsHeader());
-		Writer LOCWriter = new FileWriter(outputDir + "/loc" + LocalDateTime.now() + ".csv");
+		Writer LOCWriter = new FileWriter(outputDir + "/loc" + now + ".csv");
 		LOCWriter.write(LOCHeader());
-		Writer langWriter = new FileWriter(outputDir + "/languages" + LocalDateTime.now() + ".csv");
+		Writer langWriter = new FileWriter(outputDir + "/languages" + now + ".csv");
 		langWriter.write(languagesHeader());
-		Writer allLangWriter = new FileWriter(outputDir + "/all_languages" + LocalDateTime.now() + ".csv");
+		Writer allLangWriter = new FileWriter(outputDir + "/all_languages" + now + ".csv");
 		allLangWriter.write(allLanguagesHeader());
 		
-		Map<Notebook, SnippetCode[]> snippets = new HashMap<Notebook, SnippetCode[]>();
+		Map<Notebook, SnippetCode[]> snippets = new ConcurrentHashMap<Notebook, SnippetCode[]>();
+    CountDownLatch latch = new CountDownLatch(this.notebooks.size());
+
 		for (Notebook notebook: this.notebooks) {
-			numCodeCellsIn(notebook, codeCellsWriter);
-			LOCIn(notebook, LOCWriter);
-			languageIn(notebook, langWriter);
-			allLanguageValuesIn(notebook, allLangWriter);
-			getSnippetsFrom(notebook, snippets);
-		}
+        executor.execute(() -> {
+                try {
+                    numCodeCellsIn(notebook, codeCellsWriter);
+                    LOCIn(notebook, LOCWriter);
+                    languageIn(notebook, langWriter);
+                    allLanguageValuesIn(notebook, allLangWriter);
+                    getSnippetsFrom(notebook, snippets);
+                } catch (Exception e) {
+                    e.printStackTrace(System.err);
+                } finally {
+                    latch.countDown();
+                }
+            });
+    }
 		/* Language summary is not printed here, since the information can
 		   easily be extracted from the CSV file. */
+
+    try {
+        latch.await();
+    } catch (Exception e) {
+        e.printStackTrace(System.err);
+    }
+
 		codeCellsWriter.close();
 		LOCWriter.close();
 		langWriter.close();
@@ -106,6 +124,11 @@ public class NotebookAnalyzer extends Analyzer {
 		
 		Map<SnippetCode, List<Snippet>> clones = getClones(snippets);
 		new CloneFileWriter(outputDir).write(snippets, clones);
+
+    System.out.printf("File cache hits: ..... %d\n" + 
+                      "File cache misses: ... %d\n",
+                      Notebook.fileCacheHits.get(),
+                      Notebook.fileCacheMisses.get());
 	}
 	
 	/**
@@ -185,7 +208,7 @@ public class NotebookAnalyzer extends Analyzer {
 	 * @throws IOException 
 	 */
 	public void allLanguageValues() throws IOException {
-		Writer writer = new FileWriter(outputDir + "/all_languages" + LocalDateTime.now() + ".csv");
+		Writer writer = new FileWriter(outputDir + "/all_languages" + now + ".csv");
 		writer.write(allLanguagesHeader());
 		for(Notebook notebook: notebooks) {
 			allLanguageValuesIn(notebook, writer);
@@ -216,11 +239,13 @@ public class NotebookAnalyzer extends Analyzer {
 	private void allLanguageValuesIn(Notebook notebook, Writer writer) throws IOException {
 		Map<LangSpec, Language> languages = employ(new AllLanguagesExtractor(notebook));
 		String name = notebook.getName();
-		writer.write(name);
-		for (LangSpec field: langSpecFields) {
-			writer.write(", " + languages.get(field));
-		}
-		writer.write("\n");
+    synchronized (writer) {
+        writer.write(name);
+        for (LangSpec field: langSpecFields) {
+            writer.write(", " + languages.get(field));
+        }
+        writer.write("\n");
+    }
 	}
 
 	/**
@@ -236,7 +261,7 @@ public class NotebookAnalyzer extends Analyzer {
 		for (Language language: Language.values()) {
 			languages.put(language, 0);
 		}
-		Writer writer = new FileWriter(outputDir + "/languages" + LocalDateTime.now() + ".csv");
+		Writer writer = new FileWriter(outputDir + "/languages" + now + ".csv");
 		writer.write(languagesHeader());
 		for (int i=0; i<notebooks.size(); i++) {
 			Language language = languageIn(notebooks.get(i), writer);
@@ -265,7 +290,9 @@ public class NotebookAnalyzer extends Analyzer {
 		Language language = employ(new LanguageExtractor(notebook));
 		LangSpec langSpec = employ(new LangSpecExtractor(notebook));
 		String name = notebook.getName();
-		writer.write(name + ", " + language + ", " + langSpec + "\n");
+    synchronized (writer) {
+        writer.write(name + ", " + language + ", " + langSpec + "\n");
+    }
 		return language;
 	}
 
@@ -309,7 +336,9 @@ public class NotebookAnalyzer extends Analyzer {
 		int LOCNonBlank = employ(new NonBlankLOCCounter(currentNotebook));
 		int LOCBlank = employ(new BlankLOCCounter(currentNotebook));
 		String name = currentNotebook.getName();
-		writer.write(name + ", " + LOC + ", " + LOCNonBlank + ", " + LOCBlank + "\n");
+    synchronized (writer) {
+        writer.write(name + ", " + LOC + ", " + LOCNonBlank + ", " + LOCBlank + "\n");
+    }
 		return LOC;
 	}
 	
@@ -349,7 +378,9 @@ public class NotebookAnalyzer extends Analyzer {
 	private int numCodeCellsIn(Notebook notebook, Writer csvWriter) 
 			throws IOException {
 		int numCodeCells = employ(new CodeCellCounter(notebook));
-		csvWriter.write(notebook.getName() + ", " + numCodeCells + "\n");
+    synchronized (csvWriter) {
+        csvWriter.write(notebook.getName() + ", " + numCodeCells + "\n");
+    }
 		return numCodeCells;
 	}
 	
@@ -464,6 +495,16 @@ public class NotebookAnalyzer extends Analyzer {
 	}
 	
 	private <T> T employ(Worker<T> worker) {
+      try {
+          return worker.call();
+      } catch (Throwable e) {
+          System.out.println("Error " + e.getMessage());
+          e.printStackTrace();
+          return worker.defaultValue();
+      }
+	}
+
+	private <T> T employOld(Worker<T> worker) {
 		try {
 			Future<T> result = executor.submit(worker);
 			return result.get();
@@ -476,7 +517,7 @@ public class NotebookAnalyzer extends Analyzer {
 			return employ(worker);
 		}
 	}
-
+    
 	public static void main(String[] args) {
 		NotebookAnalyzer analyzer = new NotebookAnalyzer();
 		analyzer.analyze(args);
