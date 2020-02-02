@@ -31,17 +31,26 @@ public class Hack {
         throws FileNotFoundException, IOException {
 
         try (BufferedReader br = new BufferedReader(new FileReader(fileListFile))) {
+	    int i = 0;
             for(String path; (path = br.readLine()) != null; ) {
+		boolean x = false;
                 try {
                     final Notebook b = Notebook.loadNotebookFromFile(path);
                     queuedJobs.incrementAndGet();
+		    x = true;
                     executor.submit(() -> { task.accept(b); done(); });
+		    System.out.printf("\b\b\b\b\b\b\b\b\b\b%d", ++i);
                 } catch (NotebookException nbe) {
                     System.err.printf("Error processing notebook %s\n", path);
+		    if (x) done();
+                } catch (Exception e) {
+                    System.err.printf("Exception not prepared for in notebook %s.\n\tType: %s\n\tMsg:  %s\n", path, e.getClass().getName(), e.getMessage());
+		    if (x) done();
                 }
             }
         }
 
+	System.out.println("\nDONE queueing all jobs");
         done(); // Ensures finishedJobs > queuedJobs
     }
 
