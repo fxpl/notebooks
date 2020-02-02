@@ -1,7 +1,7 @@
 package notebooks;
 
 import java.io.*;
-
+import java.lang.ref.WeakReference;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.zip.ZipOutputStream;
@@ -26,8 +26,8 @@ public class Notebook {
 	private int locContents;	// Number of non-empty code lines
 	private volatile boolean locCounted = false;
 	private LangSpec languageSpecIn;
-	private JSONObject contents;
-	ReentrantLock contentsLock = new ReentrantLock();
+	private WeakReference<JSONObject> contents;
+	private ReentrantLock contentsLock = new ReentrantLock();
 	
 	public Notebook(String path) {
 		this(path, "");
@@ -68,14 +68,6 @@ public class Notebook {
 	
 	public void setRepro(String reproName) {
 		this.repro = reproName;
-	}
-	
-	/**
-	 * Reset the stored contents. This metod cat be used to decrease the
-	 * memory load.
-	 */
-	public void clearContents() {
-		contents = null;
 	}
 	
 	/**
@@ -572,7 +564,7 @@ public class Notebook {
 	 */
 	private JSONObject getNotebook() throws NotebookException {
 		contentsLock.lock();
-		if (null == contents) {
+		if (null == contents || null == contents.get()) {
 			Reader reader;
 			try {
 				reader = new FileReader(this.path);
@@ -581,7 +573,8 @@ public class Notebook {
 				throw new NotebookException("Could not read " + this.path + ": " + e.toString());
 			}
 			try {
-				contents = (JSONObject)new JSONParser().parse(reader);
+				JSONObject contentsReferent = (JSONObject)new JSONParser().parse(reader);
+				contents = new WeakReference<JSONObject>(contentsReferent);
 			} catch (IOException | ParseException e) {
 				throw new NotebookException("Could not parse " + this.path + ": " + e.toString());
 			} catch (ClassCastException e) {
@@ -595,7 +588,7 @@ public class Notebook {
 			}
 		}
 		contentsLock.unlock();
-		return contents;
+		return contents.get();
 	}
 	
 	/**
