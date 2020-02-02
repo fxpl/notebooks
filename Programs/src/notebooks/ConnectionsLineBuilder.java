@@ -1,6 +1,5 @@
 package notebooks;
 
-import java.io.Writer;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -8,11 +7,14 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.Callable;
 
-public class ConnectionsWriter implements Callable<Void> {
+/**
+ * Class for building a line to be written in a connections CSV file for a
+ * certain notebook.
+ */
+public class ConnectionsLineBuilder implements Callable<String> {
 	private Notebook notebook;
 	private Map <Notebook, SnippetCode[]> file2snippets;
 	private Map<SnippetCode, List<Snippet>> snippets2files;
-	private Writer writer;
 	
 	/**
 	 * @param notebook Notebook to print connections for
@@ -20,16 +22,15 @@ public class ConnectionsWriter implements Callable<Void> {
 	 * @param snippet2files Mapping from snippets to position in notebooks
 	 * @param writer Writer that will print the result
 	 */
-	public ConnectionsWriter(Notebook notebook, Map<Notebook, SnippetCode[]> file2snippets,
-			Map<SnippetCode, List<Snippet>> snippet2files, Writer writer) {
+	public ConnectionsLineBuilder(Notebook notebook, Map<Notebook, SnippetCode[]> file2snippets,
+			Map<SnippetCode, List<Snippet>> snippet2files) {
 		this.notebook = notebook;
 		this.file2snippets = file2snippets;
 		this.snippets2files = snippet2files;
-		this.writer = writer;
 	}
 
 	@Override
-	public Void call() throws Exception {
+	public String call() throws Exception {
 		int connections = 0;
 		int nonEmptyConnections = 0;	// Connections excluding empty snippets
 		int intraReproConnections = 0;
@@ -62,16 +63,13 @@ public class ConnectionsWriter implements Callable<Void> {
 		double meanInterReproConnections = normalized(interReproConnections, otherRepros.size());
 		double meanNonEmptyInterReproConnections = normalized(nonEmptyInterReproConnections, otherNonEmptyRepros.size());
 		
-		synchronized (writer) {
-			writer.write(notebook.getName() + ", " + connections + ", "
-					+ String.format(Locale.US, "%.4f", normalizedConnections) + ", "
-					+ nonEmptyConnections + ", "
-					+ String.format(Locale.US, "%.4f", normalizedNonEmptyConnections) + ", "
-					+ intraReproConnections + ", " + nonEmtpyIntraReproConnections + ", "
-					+ String.format(Locale.US, "%.4f", meanInterReproConnections) + ", "
-					+ String.format(Locale.US, "%.4f", meanNonEmptyInterReproConnections) + "\n");
-		}
-		return null;
+		return notebook.getName() + ", " + connections + ", "
+				+ String.format(Locale.US, "%.4f", normalizedConnections) + ", "
+				+ nonEmptyConnections + ", "
+				+ String.format(Locale.US, "%.4f", normalizedNonEmptyConnections) + ", "
+				+ intraReproConnections + ", " + nonEmtpyIntraReproConnections + ", "
+				+ String.format(Locale.US, "%.4f", meanInterReproConnections) + ", "
+				+ String.format(Locale.US, "%.4f", meanNonEmptyInterReproConnections) + "\n";
 	}
 	
 	/**

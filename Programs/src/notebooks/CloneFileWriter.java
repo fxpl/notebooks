@@ -134,21 +134,20 @@ public class CloneFileWriter {
 		List<Notebook> notebooks = new ArrayList<Notebook>(file2snippets.keySet());
 		Collections.shuffle(notebooks);
 		int connectionsToPrint = Math.min(NUM_CONNECTIONS, file2snippets.size());
-		List<Callable<Void>> tasks = new ArrayList<>(connectionsToPrint);
+		List<Callable<String>> tasks = new ArrayList<Callable<String>>(connectionsToPrint);
 		for (int i=0; i<connectionsToPrint; i++) {
-			tasks.add(new ConnectionsWriter(notebooks.get(i), file2snippets, snippet2files, writer));
+			tasks.add(new ConnectionsLineBuilder(notebooks.get(i), file2snippets, snippet2files));
 		}
-		List<Future<Void>> result = ThreadExecutor.getInstance().invokeAll(tasks);
-		// Wait for all tasks to finish
+		List<Future<String>> result = ThreadExecutor.getInstance().invokeAll(tasks);
 		for (int i=0; i<connectionsToPrint; i++) {
 			try {
-				result.get(i).get();
+				writer.write(result.get(i).get());
 			} catch (InterruptedException e) {
 				System.err.println("Printing of connections for notebook " + notebooks.get(i).getName()
 						+ " was interrupted! " + e.getMessage());
 			} catch (ExecutionException e) {
 				System.err.println("Printing connections for notebook "
-						+notebooks.get(i).getName() + " failed!" + e.toString());
+						+ notebooks.get(i).getName() + " failed!" + e.toString());
 			}
 		}
 		writer.close();
