@@ -7,7 +7,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.zip.ZipOutputStream;
 import java.util.zip.ZipEntry;
 import java.util.*;
-
+import java.lang.ref.WeakReference;
 import org.json.simple.*;
 import org.json.simple.parser.*;
 
@@ -25,7 +25,7 @@ public class Notebook {
 	private int locContents;	// Number of non-empty code lines
 	private volatile boolean locCounted = false;
 	private LangSpec languageSpecIn;
-	private JSONObject contents;
+	private WeakReference<JSONObject> contents;
 	
 	public Notebook(String path) {
 		this(path, "");
@@ -73,7 +73,7 @@ public class Notebook {
 	 * memory load.
 	 */
 	public void clearContents() {
-		contents = null;
+      contents.clear();
 	}
 	
 	/**
@@ -569,7 +569,8 @@ public class Notebook {
 	 * @throws NotebookException If the file this.path could not be parsed
 	 */
 	private JSONObject getNotebook() throws NotebookException {
-		if (null == contents) {
+      JSONObject notebook = contents.get();
+		if (null == notebook) {
 			Reader reader;
 			try {
 				reader = new FileReader(this.path);
@@ -577,7 +578,8 @@ public class Notebook {
 				throw new NotebookException("Could not read " + this.path + ": " + e.toString());
 			}
 			try {
-				contents = (JSONObject)new JSONParser().parse(reader);
+				notebook = (JSONObject)new JSONParser().parse(reader);
+        contents = new WeakReference<JSONObject>(notebook);
 			} catch (IOException | ParseException e) {
 				throw new NotebookException("Could not parse " + this.path + ": " + e.toString());
 			} catch (ClassCastException e) {
@@ -589,7 +591,7 @@ public class Notebook {
 				System.err.println("Warning: Could not close reader of " + this.path + ": " + e.toString());
 			}
 		}
-		return contents;
+		return notebook;
 	}
 	
 	/**
