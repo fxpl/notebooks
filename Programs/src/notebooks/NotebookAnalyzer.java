@@ -510,6 +510,8 @@ public class NotebookAnalyzer extends Analyzer {
 			return result.get();
 		} catch (ExecutionException e) {
 			System.err.println(e.getMessage() + " Skipping notebook!");
+			e.getCause().printStackTrace(System.err);
+			// System.exit(-1);
 			return worker.defaultValue();
 		} catch (InterruptedException e) {
 			System.err.println("A thread was interrupted: " +

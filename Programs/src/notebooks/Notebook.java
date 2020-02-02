@@ -572,7 +572,7 @@ public class Notebook {
 	 * @throws NotebookException If the file this.path could not be parsed
 	 */
 	private JSONObject getNotebook() throws NotebookException {
-      JSONObject notebook = cache.get();
+	    JSONObject notebook = contents == null ? null : contents.get();
 		if (null == notebook) {
         this.fileCacheMisses.incrementAndGet();
 			Reader reader;
