@@ -7,6 +7,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.zip.ZipOutputStream;
 import java.util.zip.ZipEntry;
 import java.util.*;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.json.simple.*;
 import org.json.simple.parser.*;
@@ -26,6 +27,7 @@ public class Notebook {
 	private volatile boolean locCounted = false;
 	private LangSpec languageSpecIn;
 	private JSONObject contents;
+	ReentrantLock contentsLock = new ReentrantLock();
 	
 	public Notebook(String path) {
 		this(path, "");
@@ -569,11 +571,13 @@ public class Notebook {
 	 * @throws NotebookException If the file this.path could not be parsed
 	 */
 	private JSONObject getNotebook() throws NotebookException {
+		contentsLock.lock();
 		if (null == contents) {
 			Reader reader;
 			try {
 				reader = new FileReader(this.path);
 			} catch (FileNotFoundException e) {
+				contentsLock.unlock();
 				throw new NotebookException("Could not read " + this.path + ": " + e.toString());
 			}
 			try {
@@ -581,6 +585,7 @@ public class Notebook {
 			} catch (IOException | ParseException e) {
 				throw new NotebookException("Could not parse " + this.path + ": " + e.toString());
 			} catch (ClassCastException e) {
+				contentsLock.unlock();
 				throw new NotebookException("Couldn't cast notebook to JSONObject in " + this.path + ": " + e.toString());
 			}
 			try {
@@ -589,6 +594,7 @@ public class Notebook {
 				System.err.println("Warning: Could not close reader of " + this.path + ": " + e.toString());
 			}
 		}
+		contentsLock.unlock();
 		return contents;
 	}
 	
