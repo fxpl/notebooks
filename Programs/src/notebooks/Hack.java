@@ -45,6 +45,7 @@ public class Hack {
 		    if (x) done();
                 } catch (Exception e) {
                     System.err.printf("Exception not prepared for in notebook %s.\n\tType: %s\n\tMsg:  %s\n", path, e.getClass().getName(), e.getMessage());
+		    // e.printStackTrace(System.err);
 		    if (x) done();
                 }
             }
