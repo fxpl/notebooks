@@ -3,6 +3,7 @@ package notebooks;
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -126,6 +127,37 @@ class LibraryAnalysis {
             }
         } catch (NotebookException e) {
             System.err.printf("Error processing notebook %s\n", n.getName());
+        } catch (Exception e) {
+            e.printStackTrace(System.err);
+        }
+    }
+}
+
+class LOCAnalysis {
+    private static final ConcurrentSkipListSet<String> results = new ConcurrentSkipListSet<String>();
+
+    public static void displayResults() {
+        System.out.printf("name, LOC, LOCBlank, LOCNonBlank, numCodeCells, Language");
+        results.forEach((result) -> System.out.println(result));
+    }
+    
+    public static void process(final Notebook notebook) {
+        try {
+	    StringBuilder sb = new StringBuilder();
+	    sb.append(notebook.getName());
+	    sb.append(",");
+	    sb.append(notebook.LOC());
+	    sb.append(",");
+	    sb.append(notebook.LOCBlank());
+	    sb.append(",");
+	    sb.append(notebook.LOCNonBlank());
+	    sb.append(",");
+	    sb.append(notebook.numCodeCells());
+	    sb.append(",");
+	    sb.append(notebook.language().name());
+	    results.add(sb.toString());
+        } catch (NotebookException e) {
+            System.err.printf("Error processing notebook %s\n", notebook.getName());
         } catch (Exception e) {
             e.printStackTrace(System.err);
         }
