@@ -9,9 +9,4 @@ class LanguageExtractor extends Worker<Language> {
 	public Language call() throws Exception {
 		return notebook.language();
 	}
-
-	@Override
-	protected Language defaultValue() {
-		return Language.UNKNOWN;
-	}
 }

@@ -11,9 +11,4 @@ class HashExtractor extends Worker<SnippetCode[]> {
 	public SnippetCode[] call() throws Exception {
 		return notebook.snippetCodes();
 	}
-
-	@Override
-	protected SnippetCode[] defaultValue() {
-		return new SnippetCode[0];
-	}
 }
