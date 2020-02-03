@@ -9,6 +9,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.HashSet;
+import java.util.concurrent.*;
 
 public class CloneFileWriter {
 	private String outputDir;
@@ -107,15 +108,38 @@ public class CloneFileWriter {
 	 * @param file2snippets Mapping from notebook name to snippets
 	 * @param snippet2files Mapping from snippets to position in notebooks
 	 */
-	private void printConnectionsFile(Map<Notebook, SnippetCode[]> file2snippets,
-			Map<SnippetCode, List<Snippet>> snippet2files) throws IOException {
-		Writer writer = new FileWriter(outputDir + "/connections" + LocalDateTime.now() + ".csv");
-		writer.write(connectionsHeader());
-		for (Notebook notebook: file2snippets.keySet()) {
-			printConnections(notebook, file2snippets, snippet2files, writer);
-		}
-		writer.close();
+    private void printConnectionsFile(final Map<Notebook, SnippetCode[]> file2snippets,
+				      final Map<SnippetCode, List<Snippet>> snippet2files) throws IOException {
+
+	final CountDownLatch latch = new CountDownLatch(file2snippets.keySet().size());
+	final ConcurrentSkipListSet<String> result = new ConcurrentSkipListSet<String>();
+	    
+	for (Notebook notebook: file2snippets.keySet()) {
+	    NotebookAnalyzer.executor.submit(() -> { printConnections(notebook, file2snippets, snippet2files, result); latch.countDown(); });
+
+	    long count = latch.getCount();
+	    if (count % 10000 == 0) System.out.printf("Count: %d\n", count);
 	}
+
+	System.out.println("All connection tasks queued ... waiting ...");
+
+	try {
+	    while (true) {
+		latch.await(10, TimeUnit.SECONDS);
+
+		long count = latch.getCount();
+		System.out.printf("Count: %d\n", count);
+		if (count == 0) break;
+	    }
+	} catch (Exception e) {
+	    e.printStackTrace(System.err);
+	}
+
+	Writer writer = new FileWriter(outputDir + "/connections" + LocalDateTime.now() + ".csv");
+	writer.write(connectionsHeader());
+	result.forEach(line -> { try { writer.write(line); } catch (IOException e) { e.printStackTrace(System.err); } });
+	writer.close();
+    }
 
 	/**
 	 * @param notebook Notebook to print connections for
@@ -124,8 +148,8 @@ public class CloneFileWriter {
 	 * @param writer Writer that will print the result
 	 */
 	private void printConnections(Notebook notebook, Map<Notebook, SnippetCode[]> file2snippets,
-			Map<SnippetCode, List<Snippet>> snippets2files, Writer writer)
-			throws IOException {
+				      Map<SnippetCode, List<Snippet>> snippets2files, ConcurrentSkipListSet<String> result)
+			{
 		int connections = 0;
 		int nonEmptyConnections = 0;	// Connections excluding empty snippets
 		int intraReproConnections = 0;
@@ -158,7 +182,7 @@ public class CloneFileWriter {
 		double meanInterReproConnections = normalized(interReproConnections, otherRepros.size());
 		double meanNonEmptyInterReproConnections = normalized(nonEmptyInterReproConnections, otherNonEmptyRepros.size());
 		
-		writer.write(notebook.getName() + ", " + connections + ", "
+		result.add(notebook.getName() + ", " + connections + ", "
 				+ String.format(Locale.US, "%.4f", normalizedConnections) + ", "
 				+ nonEmptyConnections + ", "
 				+ String.format(Locale.US, "%.4f", normalizedNonEmptyConnections) + ", "
@@ -203,21 +227,24 @@ public class CloneFileWriter {
 	 * @param currentRepro Name of the repro where the current snippet reside
 	 * @param otherRepros Set that will contain all other repros that the snippet is connected to
 	 */
-	private int interReproConnections(List<Snippet> locations, String currentRepro, Set<String> otherRepros) {
-		int connections = 0;
-		for (Snippet friend: locations) {
-			String friendRepro = friend.getRepro();
+    private int interReproConnections(List<Snippet> locations, String currentRepro, Set<String> otherRepros) {
+	int connections = 0;
+	for (Snippet friend: locations) {
+	    String friendRepro = friend.getRepro();
 
-      // Guard against stupid mistakes
-      assert(friendRepro == friendRepro.intern());
+	    // Guard against stupid mistakes
+	    assert(friendRepro == friendRepro.intern());
 
-			if (friendRepro != currentRepro) {
-				connections++;
-				otherRepros.add(friendRepro);
-			}
-		}
-		return connections;
+	    if (friendRepro != currentRepro) {
+		connections++;
+		otherRepros.add(friendRepro);
+	    }
 	}
+
+	// System.out.printf("LOC,%d,OTHER,%d,CONN,%d\n", locations.size(), otherRepros.size(), connections);
+
+	return connections;
+    }
 	
 	/**
 	 * Look in clones to decide whether snippet is a clone or a unique snippet

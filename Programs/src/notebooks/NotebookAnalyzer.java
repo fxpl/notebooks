@@ -13,7 +13,8 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Analyzer for Jupyter notebooks.
  */
 public class NotebookAnalyzer extends Analyzer {
-	private ExecutorService executor;
+    private static final int cores = Runtime.getRuntime().availableProcessors();
+    public static final ExecutorService executor = Executors.newFixedThreadPool(cores);
 	private List<Notebook> notebooks;
     private final String now = LocalDateTime.now().toString();
 	private static LangSpec[] langSpecFields = {LangSpec.METADATA_LANGUAGE , LangSpec.METADATA_LANGUAGEINFO_NAME, 
@@ -27,9 +28,7 @@ public class NotebookAnalyzer extends Analyzer {
 	public NotebookAnalyzer() {
 		super();
 		this.notebooks = new ArrayList<Notebook>();
-		int cores = Runtime.getRuntime().availableProcessors();
-		System.out.println("Running " + (2*cores) + " threads.");
-		executor = Executors.newFixedThreadPool(2*cores);
+		System.out.println("Running " + (cores) + " threads.");
 	}
 	
 	/**
