@@ -20,7 +20,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class Notebook {
 	private String path;
-	private String repro = "";
+    private String repro = "".intern();
 	private int locTotal;		// Total number of lines of code
 	private int locBlank;		// Number of empty code lines
 	private int locContents;	// Number of non-empty code lines
@@ -35,8 +35,8 @@ public class Notebook {
 	}
 	
 	public Notebook(String path, String repro) {
-		this.path = path;
-		this.repro = repro;
+      this.path = path.intern();
+      this.repro = repro.intern();
 	}
 	
 	public Notebook(Notebook model) {
@@ -68,7 +68,7 @@ public class Notebook {
 	}
 	
 	public void setRepro(String reproName) {
-		this.repro = reproName;
+      this.repro = reproName.intern();
 	}
 	
 	/**

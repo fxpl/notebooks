@@ -207,7 +207,11 @@ public class CloneFileWriter {
 		int connections = 0;
 		for (Snippet friend: locations) {
 			String friendRepro = friend.getRepro();
-			if (!friendRepro.equals(currentRepro)) {
+
+      // Guard against stupid mistakes
+      assert(friendRepro == friendRepro.intern());
+
+			if (friendRepro != currentRepro) {
 				connections++;
 				otherRepros.add(friendRepro);
 			}
