@@ -32,13 +32,13 @@ public abstract class Dumper {
 		Notebook srcNb = new Notebook(src);
 		try {
 			dump(srcNb, target);
-		} catch (NotebookException e) {
-			System.err.println("Couldn't dump notebook " + srcNb.getName() + ": " + e.getMessage() + " Skipping!");
 		} catch (IOException e) {
-			System.err.println("I/O error when dumping python snippets: " + e.getMessage());
+			System.err.println("I/O error when dumping python snippets in "
+					+ srcNb.getName() + ": " + e + " Skipping notebook!");
 			e.printStackTrace();
 		} catch (RuntimeException e) {
-			System.err.println("Runtime error for notebook " + srcNb.getName() + ": " + e);
+			System.err.println("Runtime error for notebook " + srcNb.getName()
+					+ ": " + e + " Skipping notebook!");
 			e.printStackTrace();
 		}
 	}
@@ -48,7 +48,7 @@ public abstract class Dumper {
 	 * @param src Path to a notebook to dump
 	 * @param target Path to directory where dumps will be stored
 	 */
-	protected abstract void dump(Notebook src, String target) throws NotebookException, IOException;
+	protected abstract void dump(Notebook src, String target) throws IOException;
 
 	/**
 	 * Create a directory if it doesn't already exist. Also create its parent

@@ -1,7 +1,7 @@
 <project>
 	<property name="junit.path" value="./external/junit4.jar"/>
 	<property name="junit.path" value="./external/hamcrest-all.jar"/>
-	<property name="json.path" value="./external/json-simple-1.1.1.jar"/>
+	<property name="json.path" value="./external/json-20190722.jar"/>
 	<property name="bin" value="./bin"/>
 	<property name="dbg" value="on"/>
 

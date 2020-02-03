@@ -9,12 +9,12 @@ import java.util.Objects;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import org.json.JSONException;
 import org.junit.Test;
 
 import notebooks.LangSpec;
 import notebooks.Language;
 import notebooks.Notebook;
-import notebooks.NotebookException;
 
 public class NotebookTest {
 	
@@ -37,10 +37,9 @@ public class NotebookTest {
 	 * output file, line by line, and that the output files are named
 	 * correctly.
 	 * @throws IOException 
-	 * @throws NotebookException 
 	 */
 	@Test
-	public void testDumpCode() throws IOException, NotebookException {
+	public void testDumpCode() throws IOException {
 		String dataDir = "test/data/dump";
 		String[] inFiles = {"nb1.ipynb", "nb1_str.ipynb", "nb2.ipynb", "nb3.ipynb"};
 		String outputDir = ".";
@@ -80,7 +79,7 @@ public class NotebookTest {
 	}
 	
 	@Test
-	public void testDumpCodeAsZip() throws IOException, NotebookException {
+	public void testDumpCodeAsZip() throws IOException {
 		String dataDir = "test/data/dump";
 		String[] inFiles = {"nb1.ipynb", "nb1_str.ipynb", "nb2.ipynb", "nb3.ipynb"};
 		String outputDir = ".";
@@ -211,10 +210,9 @@ public class NotebookTest {
 	
 	/**
 	 * Verify that code snippets are hashed correctly.
-	 * @throws NotebookException
 	 */
 	@Test
-	public void testSnippetCodes() throws NotebookException {
+	public void testSnippetCodes() {
 		String dataDir = "test/data/hash";
 		String[] files = {"nb_4.ipynb", "nb_5.ipynb",
 				"nb_6.ipynb", "nb_7.ipynb"};
@@ -238,10 +236,9 @@ public class NotebookTest {
 	
 	/**
 	 * Verify that language is extracted correctly from notebooks.
-	 * @throws NotebookException 
 	 */
 	@Test
-	public void testLanguage() throws NotebookException {
+	public void testLanguage() {
 		String dataDir = "test/data/lang";
 		String[] files = {"empty.ipynb", "empty_metadata.ipynb", "k_l_cpp.ipynb",
 				"k_l_python.ipynb", "k_l_python3.ipynb", "k_l_julia.ipynb",
@@ -270,10 +267,9 @@ public class NotebookTest {
 	/**
 	 * Verify that the correct language specification field is returned by
 	 * langSpec().
-	 * @throws NotebookException
 	 */
 	@Test
-	public void testLangSpec() throws NotebookException {
+	public void testLangSpec() {
 		String dataDir = "test/data/lang";
 		String[] files = {"empty.ipynb", "empty_metadata.ipynb",
 				"k_l_cpp.ipynb", "k_l_python.ipynb",
@@ -296,10 +292,9 @@ public class NotebookTest {
 	/**
 	 * Verify that the right language is found in each language specification
 	 * field in a notebook where all such fields are initialized.
-	 * @throws NotebookException
 	 */
 	@Test
-	public void testAllLanguageValues_initialized() throws NotebookException {
+	public void testAllLanguageValues_initialized() {
 		String fileName = "test/data/langFields/all_lang_specs.ipynb";
 		final int NUM_LANG_FIELDS = LangSpec.values().length - 1;
 		Map<LangSpec, Language> expected
@@ -318,10 +313,9 @@ public class NotebookTest {
 	/**
 	 * Verify that "UNKNOWN" is set as the language by langFieldValues when the
 	 * language specification fields in a notebook are missing.
-	 * @throws NotebookException
 	 */
 	@Test
-	public void testAllLanguageValues_empty() throws NotebookException {
+	public void testAllLanguageValues_empty() {
 		String fileName = "test/data/langFields/empty.ipynb";
 		final int NUM_LANG_FIELDS = LangSpec.values().length - 1;
 		Map<LangSpec, Language> expected
@@ -340,10 +334,9 @@ public class NotebookTest {
 	/**
 	 * Verify that "UNKNOWN" is set as the language for the KERNELSPEC fields by
 	 * langFieldValues when a notebook contains metadata, but not kernelspec.
-	 * @throws NotebookException
 	 */
 	@Test
-	public void testAllLanguageValues_noKernelSpec() throws NotebookException {
+	public void testAllLanguageValues_noKernelSpec() {
 		String fileName = "test/data/langFields/no_kernelspec.ipynb";
 		final int NUM_LANG_FIELDS = LangSpec.values().length - 1;
 		Map<LangSpec, Language> expected
@@ -361,10 +354,9 @@ public class NotebookTest {
 	
 	/**
 	 * Verify that the language spec value is not changed by langFieldValues.
-	 * @throws NotebookException
 	 */
 	@Test
-	public void testAllLanguageValues_langSpec() throws NotebookException {
+	public void testAllLanguageValues_langSpec() {
 		String fileName = "test/data/langFields/all_lang_specs.ipynb";
 		Notebook notebook = new Notebook(fileName);
 		notebook.language();
@@ -376,10 +368,9 @@ public class NotebookTest {
 	/**
 	 * Verify that the correct total number of lines of code are found in JSON
 	 * files.
-	 * @throws NotebookException 
 	 */
 	@Test
-	public void testLOCTotal() throws NotebookException {
+	public void testLOCTotal() {
 		String dataDir = "test/data/loc";
 		String[] files = {"markdownCells.ipynb", "one_codeCell_6loc_arr.ipynb",
 				"one_codeCell_6loc_str.ipynb", "two_codeCells_13loc.ipynb",
@@ -395,10 +386,9 @@ public class NotebookTest {
 	/**
 	 * Verify that the correct total number of blank code lines are found in
 	 * JSON files.
-	 * @throws NotebookException 
 	 */
 	@Test
-	public void testLOCBlank() throws NotebookException {
+	public void testLOCBlank() {
 		Notebook notebook = new Notebook("test/data/loc/two_codeCells_13loc.ipynb");
 		assertEquals("Wrong number of blank lines!", 2, notebook.LOCBlank());
 	}
@@ -406,10 +396,9 @@ public class NotebookTest {
 	/**
 	 * Verify that the correct total number of non-blank code lines are found
 	 * in JSON files.
-	 * @throws NotebookException 
 	 */
 	@Test
-	public void testLOCNonBlank() throws NotebookException {
+	public void testLOCNonBlank() {
 		Notebook notebook = new Notebook("test/data/loc/two_codeCells_13loc.ipynb");
 		assertEquals("Wrong number of non-blank lines!", 11, notebook.LOCNonBlank());
 	}
@@ -417,10 +406,9 @@ public class NotebookTest {
 	/**
 	 * Verify that all kinds of lines of code are counted correctly, also when
 	 * the methods are called after each other.
-	 * @throws NotebookException 
 	 */
 	@Test
-	public void testLOCAll() throws NotebookException {
+	public void testLOCAll() {
 		Notebook notebook = new Notebook("test/data/loc/two_codeCells_13loc.ipynb");
 		assertEquals("Wrong LOC!", 13, notebook.LOC());
 		assertEquals("Wrong second LOC!", 13, notebook.LOC());
@@ -430,10 +418,9 @@ public class NotebookTest {
 	
 	/**
 	 * Verify that the correct number of code cells are found in JSON files.
-	 * @throws NotebookException 
 	 */
 	@Test
-	public void testNumCodeCells() throws NotebookException {
+	public void testNumCodeCells() {
 		String dataDir = "test/data/count";
 		String[] files = {"zero.ipynb", "one.ipynb", "two.ipynb",
 				"three_with_md.ipynb", "three_in_worksheets.ipynb",
@@ -450,10 +437,9 @@ public class NotebookTest {
 	/**
 	 * Verify that the correct number of code characters are returned by
 	 * numCodeChars.
-	 * @throws NotebookException 
 	 */
 	@Test
-	public void testNumCodeChars() throws NotebookException {
+	public void testNumCodeChars() {
 		String dataDir = "test/data/codeChars";
 		int[][] expectedNumChars = {{15, 30}, {15, 30}, {14}};
 		String[] files = {"nb1.ipynb", "nb1_str.ipynb", "nb2.ipynb"};
@@ -471,7 +457,7 @@ public class NotebookTest {
 	 * Verify that printSnippet prints a snippet correctly.
 	 */
 	@Test
-	public void testPrintSnippet() throws NotebookException, IOException {
+	public void testPrintSnippet() throws IOException {
 		// Redirect stdout
 		PrintStream stdout = System.out;
 		OutputStream output = new ByteArrayOutputStream();
@@ -485,45 +471,39 @@ public class NotebookTest {
 		
 		// Verify behavior
 		Notebook notebook = new Notebook(dataDir + "/" + file);
-		try {
-			notebook.printSnippet(snippetIndex);
-			assertEquals("Wrong code printed", expectedOutput, output.toString());
-		} catch (NotebookException e) {
-			// Before failing, we have to reset stdout!
-			System.setOut(stdout);
-			throw e;
-		}
+		notebook.printSnippet(snippetIndex);
+		assertEquals("Wrong code printed", expectedOutput, output.toString());
 		
 		// Reset stdout
 		System.setOut(stdout);
 	}
 	
 	/**
-	 * Verify that a NotebookException is thrown if we try to extract a source
-	 * value that is not a string or an array.
+	 * Verify that no lines are found if we try to extract a source value that
+	 * is not a string or an array.
 	 */
-	@Test (expected=NotebookException.class)
-	public void testParsingUnknownSourceType() throws NotebookException {
+	@Test
+	public void testParsingUnknownSourceType() {
 		Notebook notebook = new Notebook("test/data/loc/unknown_source_type.ipynb");
 		notebook.LOC();
 	}
 
 	/**
-	 * Verify that a NotebookException is thrown if we try to count cells in a
+	 * Verify that a JSONException is thrown if we try to count cells in a
 	 * notebook created from a file not containing JSON data.
 	 */
-	@Test (expected=NotebookException.class)
-	public void testParsingEmptyFile() throws NotebookException {
+	@Test (expected=JSONException.class)
+	public void testParsingEmptyFile() {
 		Notebook notebook = new Notebook("test/data/count/empty.ipynb");
 		notebook.numCodeCells();
 	}
 	
 	/**
-	 * Verify that a NotebookException is thrown if we try to count cells in a
-	 * notebook created from a missing file.
+	 * Verify that 0 code cells are found in a notebook created from a missing
+	 * file.
 	 */
-	@Test (expected=NotebookException.class)
-	public void testParsingMissingFile() throws NotebookException  {
+	@Test
+	public void testParsingMissingFile()  {
 		Notebook notebook = new Notebook("nonexistent_file.txt");
 		notebook.numCodeCells();
 	}

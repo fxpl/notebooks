@@ -13,7 +13,7 @@ public class SnippetPrinter {
 		} catch (NumberFormatException e) {
 			System.err.println("Second argument must be an integer!");
 			System.exit(1);
-		} catch (NotebookException e) {
+		} catch (RuntimeException e) {
 			System.err.println("Couldn't print snippet: " + e.toString());
 			System.exit(1);
 		}
