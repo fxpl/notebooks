@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Analyzer for Jupyter notebooks.
@@ -74,7 +75,14 @@ public class NotebookAnalyzer extends Analyzer {
 	public void shutDown() {
 		executor.shutdown();
 	}
-	
+
+    private AtomicInteger progress = new AtomicInteger();
+    private void reportIn() {
+        if (progress.incrementAndGet() % 1000 == 0) {
+            System.out.printf("\b\b\b\b\b\b\b\b%s\n", progress.get());
+        }
+    }
+    
 	/**
 	 * Create CSV files with information about LOC, languages (actual one and
 	 * all defined ones respectively) and clones.
@@ -101,6 +109,7 @@ public class NotebookAnalyzer extends Analyzer {
                     languageIn(notebook, langWriter);
                     allLanguageValuesIn(notebook, allLangWriter);
                     getSnippetsFrom(notebook, snippets);
+                    reportIn();
                 } catch (Exception e) {
                     e.printStackTrace(System.err);
                 } finally {
@@ -121,7 +130,9 @@ public class NotebookAnalyzer extends Analyzer {
 		LOCWriter.close();
 		langWriter.close();
 		allLangWriter.close();
-		
+
+    System.out.println("Clone post processing starts");
+    
 		Map<SnippetCode, List<Snippet>> clones = getClones(snippets);
 		new CloneFileWriter(outputDir).write(snippets, clones);
 
