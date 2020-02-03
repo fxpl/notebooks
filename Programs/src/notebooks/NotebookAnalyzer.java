@@ -161,7 +161,7 @@ public class NotebookAnalyzer extends Analyzer {
 	private Map<Notebook, SnippetCode[]> getSnippets() throws IOException {
 		Map<Notebook, SnippetCode[]> snippets = new HashMap<Notebook, SnippetCode[]>();
 		for (int i=0; i<notebooks.size(); i++) {
-			if (0 == i%10000) {
+			if (0 == i%100000) {
 				System.out.println("Hashing snippets in notebook " + i);
 			}
 			getSnippetsFrom(notebooks.get(i), snippets);
@@ -183,7 +183,7 @@ public class NotebookAnalyzer extends Analyzer {
 		int numAnalyzed = 0;
 		Map<SnippetCode, List<Snippet>> clones = new HashMap<SnippetCode, List<Snippet>>();
 		for (Notebook notebook: fileMap.keySet()) {
-			if (0 == numAnalyzed%10000) {
+			if (0 == numAnalyzed%100000) {
 				System.out.println("Finding clones in notebook " + numAnalyzed);
 			}
 			SnippetCode[] snippetCodes = fileMap.get(notebook);
@@ -498,7 +498,7 @@ public class NotebookAnalyzer extends Analyzer {
       try {
           return worker.call();
       } catch (Throwable e) {
-          System.out.println("Error " + e.getMessage());
+          System.err.println("Error " + e.getMessage());
           e.printStackTrace();
           return worker.defaultValue();
       }
