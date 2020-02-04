@@ -69,7 +69,7 @@ public class NotebookAnalyzer extends Analyzer {
 	 * @throws IOException On problems handling the output file
 	 */
 	public void allAnalyzes() throws IOException {
-		final int NUM_WORKERS = 8;
+		final int TASKS_PER_NOTEBOOK = 7;
 		List<Callable<Object>> tasks = new ArrayList<>(notebooks.size()); 
 		for (Notebook notebook: this.notebooks) {
 			tasks.add(new CodeCellCounterWrapper(notebook));
@@ -77,7 +77,6 @@ public class NotebookAnalyzer extends Analyzer {
 			tasks.add(new NonBlankLOCCounterWrapper(notebook));
 			tasks.add(new BlankLOCCounterWrapper(notebook));
 			tasks.add(new LanguageExtractorWrapper(notebook));
-			tasks.add(new LangSpecExtractorWrapper(notebook));
 			tasks.add(new AllLanguagesExtractorWrapper(notebook));
 			tasks.add(new HashExtractorWrapper(notebook));
 		}
@@ -95,12 +94,12 @@ public class NotebookAnalyzer extends Analyzer {
 		
 		for (int i=0; i<notebooks.size(); i++) {
 			Notebook notebook = notebooks.get(i);
-			int index = i * NUM_WORKERS;
+			int index = i * TASKS_PER_NOTEBOOK;
 			writeCodeCellsLine(result.get(index), notebook, codeCellsWriter);
 			writeLocLine(result.get(index+1), result.get(index+2), result.get(index+3), notebook, LOCWriter);
-			writeLanguagesLine(result.get(index+4), result.get(index+5), notebook, langWriter);
-			writeallLanguagesLine(result.get(index+6), notebook, allLangWriter);
-			storeHashes(result.get(index+7), notebook, snippets);
+			writeLanguagesLine(result.get(index+4), notebook, langWriter);
+			writeallLanguagesLine(result.get(index+5), notebook, allLangWriter);
+			storeHashes(result.get(index+6), notebook, snippets);
 		}
 		
 		/* Language summary is not printed here, since the information can
@@ -268,18 +267,15 @@ public class NotebookAnalyzer extends Analyzer {
 		for (LangName language: LangName.values()) {
 			languages.put(language, 0);
 		}
-		List<Callable<LangName>> langTasks = new ArrayList<>(notebooks.size());
-		List<Callable<LangSpec>> specTasks = new ArrayList<>(notebooks.size());
+		List<Callable<Language>> tasks = new ArrayList<>(notebooks.size());
 		for (Notebook notebook: notebooks) {
-			langTasks.add(new LanguageExtractor(notebook));
-			specTasks.add(new LangSpecExtractor(notebook));
+			tasks.add(new LanguageExtractor(notebook));
 		}
-		List<Future<LangName>> langResult = ThreadExecutor.getInstance().invokeAll(langTasks);
-		List<Future<LangSpec>> specResult = ThreadExecutor.getInstance().invokeAll(specTasks);
+		List<Future<Language>> langResult = ThreadExecutor.getInstance().invokeAll(tasks);
 		Writer writer = new FileWriter(outputDir + "/languages" + LocalDateTime.now() + ".csv");
 		writer.write(languagesHeader());
 		for (int i=0; i<notebooks.size(); i++) {
-			LangName language = writeLanguagesLine(langResult.get(i), specResult.get(i), notebooks.get(i), writer);
+			LangName language = writeLanguagesLine(langResult.get(i), notebooks.get(i), writer);
 			languages.put(language, languages.get(language) + 1);
 		}
 		writer.close();
@@ -288,22 +284,20 @@ public class NotebookAnalyzer extends Analyzer {
 	
 	/**
 	 * Write the data for one notebook to the languages file.
-	 * @param langResult Wrapper around languages value
-	 * @param specResult Wrapper around lang spec values
+	 * @param language Wrapper around languages value
 	 * @param notebook Notebook to write information for
 	 * @param writer Writer that appends text to the languages file
 	 */
-	private<T1,T2> LangName writeLanguagesLine(Future<T1> langResult, Future<T2> specResult, Notebook notebook, Writer writer) throws IOException {
-		LangName language = LangName.UNKNOWN;
-		LangSpec spec = LangSpec.NONE;
+	private<T1,T2> LangName writeLanguagesLine(Future<T1> language, Notebook notebook, Writer writer) throws IOException {
+		Language languageValue;
 		try {
-			language = (LangName) langResult.get();
-			spec = (LangSpec) specResult.get();
+			languageValue = (Language) language.get();
 		} catch (InterruptedException | ExecutionException e) {
 			System.err.println("Could not get language information for " + notebook.getName() + ": " + e);
+			languageValue = new Language();
 		}
-		writer.write(notebook.getName() + ", " + language + ", " + spec + "\n");
-		return language;
+		writer.write(notebook.getName() + ", " + languageValue.toString() + "\n");
+		return languageValue.getName();
 	}
 	
 	/**

@@ -64,6 +64,5 @@ public class ThreadExecutor {
 	
 	private void shutDown() {
 		threadPool.shutdown();
-		// TODO: awaitTermination!
 	}
 }

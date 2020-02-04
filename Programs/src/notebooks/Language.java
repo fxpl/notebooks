@@ -26,6 +26,7 @@ public class Language {
 		return LangSpec.NONE != this.spec;
 	}
 	
+	@Override
 	public String toString() {
 		return this.name + ", " + this.spec;
 	}

@@ -1,12 +1,12 @@
 package notebooks;
 
-class LanguageExtractor extends Worker<LangName> {
+class LanguageExtractor extends Worker<Language> {
 	public LanguageExtractor(Notebook notebook) {
 		super(notebook);
 	}
 	
 	@Override
-	public LangName call() throws Exception {
-		return notebook.language().getName();
+	public Language call() throws Exception {
+		return notebook.language();
 	}
 }

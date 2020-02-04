@@ -154,12 +154,11 @@ public class Notebook {
 	}
 	
 	/**
-	 * Fetch the language defined by each of the fields defined by LangSpec
+	 * Fetch the language name defined by each of the fields defined by LangSpec
 	 * (except NONE). Store in a Map with the LangSpec value being the key.
 	 * @return The map described above
 	 */
 	public Map<LangSpec, LangName> allLanguageValues() {
-		// TODO: Kan göras till 1D-struktur!
 		Map<LangSpec, LangName> result
 			= new HashMap<LangSpec, LangName>(LangSpec.values().length-1);
 		JSONObject notebook = this.getNotebook();
@@ -182,8 +181,7 @@ public class Notebook {
 			}
 		}
 		result.put(LangSpec.CODE_CELLS, getLanguageFromCodeCells(notebook).getName());
-		
-		// Reset langSpecIn
+
 		return result;
 	}
 	
