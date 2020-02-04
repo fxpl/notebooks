@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
+import java.util.HashSet;
 import java.util.concurrent.Callable;
 
 /**
@@ -38,8 +38,8 @@ public class ConnectionsLineBuilder implements Callable<String> {
 		int nonEmptyInterReproConnections = 0;
 		String currentRepro = notebook.getRepro();
 		SnippetCode[] snippets = file2hashes.get(notebook);
-		Set<String> otherRepros = new TreeSet<String>();
-		Set<String> otherNonEmptyRepros = new TreeSet<String>();	// Other repros with non-empty friends
+		Set<String> otherRepros = new HashSet<String>();
+		Set<String> otherNonEmptyRepros = new HashSet<String>();	// Other repros with non-empty friends
 		int numNonEmptySnippets = 0;
 		for (SnippetCode snippet: snippets) {
 			// Locations where the current snippet can be found
