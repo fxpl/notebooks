@@ -10,7 +10,7 @@ import java.util.Map;
 import org.junit.*;
 import notebooks.NotebookAnalyzer;
 import notebooks.LangSpec;
-import notebooks.Language;
+import notebooks.LangName;
 import notebooks.Snippet;
 
 /**
@@ -42,11 +42,11 @@ public class NotebookAnalyzerTest {
 		String[] expectedLOCLines = {LOCHeader(),
 				notebookFile + ", 2, 1, 1"};
 		String[] expectedLangLines = {languagesHeader(),
-					notebookFile + ", " + Language.JULIA + ", " + LangSpec.METADATA_LANGUAGEINFO_NAME
+					notebookFile + ", " + LangName.JULIA + ", " + LangSpec.METADATA_LANGUAGEINFO_NAME
 				};
 		String[] expectedAllLangLines = {allLanguagesHeader(),
-					notebookFile + ", " + Language.SCALA + ", " + Language.JULIA + ", "
-					+ Language.R + ", " + Language.OTHER + ", " + Language.PYTHON
+					notebookFile + ", " + LangName.SCALA + ", " + LangName.JULIA + ", "
+					+ LangName.R + ", " + LangName.OTHER + ", " + LangName.PYTHON
 				};
 		String[] expectedFile2hashesLines = {file2hashesHeader(),
 				notebookFile + ", " + snippetHash};
@@ -88,9 +88,9 @@ public class NotebookAnalyzerTest {
 		String[] files = {"all_lang_specs.ipynb", "empty.ipynb", "no_kernelspec.ipynb"};
 		String[] expectedLines = {
 				allLanguagesHeader(),
-				files[0] + ", " + Language.JULIA + ", " + Language.PYTHON + ", "	+ Language.R + ", " + Language.OTHER + ", " + Language.SCALA, 
-				files[1] + ", " + Language.UNKNOWN + ", " + Language.UNKNOWN + ", "	+ Language.UNKNOWN + ", " + Language.UNKNOWN + ", " + Language.UNKNOWN,
-				files[2] + ", " + Language.R + ", " + Language.JULIA + ", "	+ Language.UNKNOWN + ", " + Language.UNKNOWN + ", " + Language.SCALA
+				files[0] + ", " + LangName.JULIA + ", " + LangName.PYTHON + ", "	+ LangName.R + ", " + LangName.OTHER + ", " + LangName.SCALA, 
+				files[1] + ", " + LangName.UNKNOWN + ", " + LangName.UNKNOWN + ", "	+ LangName.UNKNOWN + ", " + LangName.UNKNOWN + ", " + LangName.UNKNOWN,
+				files[2] + ", " + LangName.R + ", " + LangName.JULIA + ", "	+ LangName.UNKNOWN + ", " + LangName.UNKNOWN + ", " + LangName.SCALA
 		};
 		
 		for (String file: files) {
@@ -115,7 +115,7 @@ public class NotebookAnalyzerTest {
 				"file, " + LangSpec.METADATA_LANGUAGE + ", " + LangSpec.METADATA_LANGUAGEINFO_NAME
 				+ ", " + LangSpec.METADATA_KERNELSPEC_LANGUAGE + ", " + LangSpec.METADATA_KERNELSPEC_NAME
 				+ ", " + LangSpec.CODE_CELLS,	// header
-				file + ", " + Language.UNKNOWN + ", " + Language.UNKNOWN + ", "	+ Language.UNKNOWN + ", " + Language.UNKNOWN + ", " + Language.UNKNOWN
+				file + ", " + LangName.UNKNOWN + ", " + LangName.UNKNOWN + ", "	+ LangName.UNKNOWN + ", " + LangName.UNKNOWN + ", " + LangName.UNKNOWN
 		};
 		analyzer.initializeNotebooksFrom(dataDir + "/" + file);
 		analyzer.allLanguageValues();
@@ -639,14 +639,14 @@ public class NotebookAnalyzerTest {
 	@Test
 	public void testLanguage_values() throws IOException {
 		analyzer.initializeNotebooksFrom("test/data/lang");
-		Map<Language, Integer> expected = new HashMap<Language, Integer>();
-		expected.put(Language.PYTHON, 6);
-		expected.put(Language.JULIA, 3);
-		expected.put(Language.R, 2);
-		expected.put(Language.SCALA, 3);
-		expected.put(Language.OTHER, 1);
-		expected.put(Language.UNKNOWN, 9);
-		Map<Language, Integer> actual = analyzer.languages();
+		Map<LangName, Integer> expected = new HashMap<LangName, Integer>();
+		expected.put(LangName.PYTHON, 6);
+		expected.put(LangName.JULIA, 3);
+		expected.put(LangName.R, 2);
+		expected.put(LangName.SCALA, 3);
+		expected.put(LangName.OTHER, 1);
+		expected.put(LangName.UNKNOWN, 9);
+		Map<LangName, Integer> actual = analyzer.languages();
 		assertEquals("Error in language extraction:", expected, actual);
 		TestUtils.lastOutputFile("languages").delete();
 	}
@@ -660,7 +660,7 @@ public class NotebookAnalyzerTest {
 	public void testLanguage_csv() throws IOException {
 		String dataDir = "test/data/lang";
 		String[] files = {"k_l_cpp.ipynb", "k_l_R.ipynb", "li_n_python.ipynb"};
-		Language[] languages = {Language.OTHER, Language.R, Language.PYTHON};
+		LangName[] languages = {LangName.OTHER, LangName.R, LangName.PYTHON};
 		LangSpec[] langSpecs = {LangSpec.METADATA_KERNELSPEC_LANGUAGE, LangSpec.METADATA_KERNELSPEC_LANGUAGE, LangSpec.METADATA_LANGUAGEINFO_NAME};
 		String[] expectedLines = new String[languages.length+1];
 		expectedLines[0] = languagesHeader();

@@ -206,11 +206,11 @@ public class NotebookAnalyzer extends Analyzer {
 	 * @throws IOException 
 	 */
 	public void allLanguageValues() throws IOException {
-		List<Callable<Map<LangSpec, Language>>> tasks = new ArrayList<>(notebooks.size());
+		List<Callable<Map<LangSpec, LangName>>> tasks = new ArrayList<>(notebooks.size());
 		for (Notebook notebook: notebooks) {
 			tasks.add(new AllLanguagesExtractor(notebook));
 		}
-		List<Future<Map<LangSpec, Language>>> result = ThreadExecutor.getInstance().invokeAll(tasks);
+		List<Future<Map<LangSpec, LangName>>> result = ThreadExecutor.getInstance().invokeAll(tasks);
 		Writer writer = new FileWriter(outputDir + "/all_languages" + LocalDateTime.now() + ".csv");
 		writer.write(allLanguagesHeader());
 		for (int i=0; i<notebooks.size(); i++) {
@@ -242,7 +242,7 @@ public class NotebookAnalyzer extends Analyzer {
 		writer.write(notebook.getName());
 		try {
 			@SuppressWarnings("unchecked")
-			Map<LangSpec, Language> languageValues = (Map<LangSpec, Language>) languages.get();
+			Map<LangSpec, LangName> languageValues = (Map<LangSpec, LangName>) languages.get();
 			for (LangSpec field: langSpecFields) {
 				writer.write(", " + languageValues.get(field));
 			}
@@ -263,23 +263,23 @@ public class NotebookAnalyzer extends Analyzer {
 	 * @return A map with the different languages as keys and the number of files written in this language as value
 	 * @throws IOException On problems with handling the output file
 	 */
-	public Map<Language, Integer> languages() throws IOException {
-		Map<Language, Integer> languages = new HashMap<Language, Integer>();
-		for (Language language: Language.values()) {
+	public Map<LangName, Integer> languages() throws IOException {
+		Map<LangName, Integer> languages = new HashMap<LangName, Integer>();
+		for (LangName language: LangName.values()) {
 			languages.put(language, 0);
 		}
-		List<Callable<Language>> langTasks = new ArrayList<>(notebooks.size());
+		List<Callable<LangName>> langTasks = new ArrayList<>(notebooks.size());
 		List<Callable<LangSpec>> specTasks = new ArrayList<>(notebooks.size());
 		for (Notebook notebook: notebooks) {
 			langTasks.add(new LanguageExtractor(notebook));
 			specTasks.add(new LangSpecExtractor(notebook));
 		}
-		List<Future<Language>> langResult = ThreadExecutor.getInstance().invokeAll(langTasks);
+		List<Future<LangName>> langResult = ThreadExecutor.getInstance().invokeAll(langTasks);
 		List<Future<LangSpec>> specResult = ThreadExecutor.getInstance().invokeAll(specTasks);
 		Writer writer = new FileWriter(outputDir + "/languages" + LocalDateTime.now() + ".csv");
 		writer.write(languagesHeader());
 		for (int i=0; i<notebooks.size(); i++) {
-			Language language = writeLanguagesLine(langResult.get(i), specResult.get(i), notebooks.get(i), writer);
+			LangName language = writeLanguagesLine(langResult.get(i), specResult.get(i), notebooks.get(i), writer);
 			languages.put(language, languages.get(language) + 1);
 		}
 		writer.close();
@@ -293,11 +293,11 @@ public class NotebookAnalyzer extends Analyzer {
 	 * @param notebook Notebook to write information for
 	 * @param writer Writer that appends text to the languages file
 	 */
-	private<T1,T2> Language writeLanguagesLine(Future<T1> langResult, Future<T2> specResult, Notebook notebook, Writer writer) throws IOException {
-		Language language = Language.UNKNOWN;
+	private<T1,T2> LangName writeLanguagesLine(Future<T1> langResult, Future<T2> specResult, Notebook notebook, Writer writer) throws IOException {
+		LangName language = LangName.UNKNOWN;
 		LangSpec spec = LangSpec.NONE;
 		try {
-			language = (Language) langResult.get();
+			language = (LangName) langResult.get();
 			spec = (LangSpec) specResult.get();
 		} catch (InterruptedException | ExecutionException e) {
 			System.err.println("Could not get language information for " + notebook.getName() + ": " + e);
@@ -355,9 +355,9 @@ public class NotebookAnalyzer extends Analyzer {
 	private<T> int writeLocLine(Future<T> loc, Future<T> nonBlankLoc, Future<T> blankLoc, Notebook notebook, Writer writer) throws IOException {
 		int locValue = 0, nonBlankLocValue = 0, blankLocValue = 0;
 		try {
-			locValue = (int) loc.get();
-			nonBlankLocValue = (int) nonBlankLoc.get();
-			blankLocValue = (int) blankLoc.get();
+			locValue = (Integer) loc.get();
+			nonBlankLocValue = (Integer) nonBlankLoc.get();
+			blankLocValue = (Integer) blankLoc.get();
 		} catch (InterruptedException | ExecutionException e) {
 			System.err.println("Could not get line count for " + notebook.getName() + ": " + e);
 		}
@@ -404,7 +404,7 @@ public class NotebookAnalyzer extends Analyzer {
 	private<T> int writeCodeCellsLine(Future<T> numCodeCells, Notebook notebook, Writer writer) throws IOException {
 		int numCodeCellsValue = 0;
 		try {
-			numCodeCellsValue =(int) numCodeCells.get();
+			numCodeCellsValue =(Integer) numCodeCells.get();
 		} catch (InterruptedException | ExecutionException e) {
 			System.err.println("Could not get cell count for " + notebook.getName() + ": " + e);
 		}
@@ -502,7 +502,7 @@ public class NotebookAnalyzer extends Analyzer {
 				System.out.println("Code cells: " + this.numCodeCells());
 			}
 			if (lang) {
-				Map<Language, Integer> languages = this.languages();
+				Map<LangName, Integer> languages = this.languages();
 				printLanguageSummary(languages);
 			}
 			if (loc) {
@@ -521,9 +521,9 @@ public class NotebookAnalyzer extends Analyzer {
 		}
 	}
 
-	private void printLanguageSummary(Map<Language, Integer> languages) {
+	private void printLanguageSummary(Map<LangName, Integer> languages) {
 		System.out.println("\nLANGUAGES:");
-		for (Language language: languages.keySet()) {
+		for (LangName language: languages.keySet()) {
 			System.out.println(language + ": " + languages.get(language));
 		}
 		System.out.println("");

@@ -13,7 +13,7 @@ import org.json.JSONException;
 import org.junit.Test;
 
 import notebooks.LangSpec;
-import notebooks.Language;
+import notebooks.LangName;
 import notebooks.Notebook;
 
 public class NotebookTest {
@@ -249,18 +249,18 @@ public class NotebookTest {
 				"li_n_empty.ipynb", "li_n_space.ipynb",
 				"code_cells_amb.ipynb", "code_cells_amb2.ipynb",
 				"code_cells_nolang.ipynb", "code_cells_python.ipynb"};
-		Language[] languages = {Language.UNKNOWN, Language.UNKNOWN, Language.OTHER,
-				Language.PYTHON, Language.PYTHON, Language.JULIA,
-				Language.R, Language.R,
-				Language.SCALA, Language.SCALA, Language.UNKNOWN,
-				Language.JULIA, Language.JULIA, Language.PYTHON, Language.SCALA,
-				Language.PYTHON, Language.PYTHON,
-				Language.UNKNOWN, Language.UNKNOWN,
-				Language.UNKNOWN, Language.UNKNOWN,
-				Language.UNKNOWN, Language.PYTHON};
+		LangName[] languages = {LangName.UNKNOWN, LangName.UNKNOWN, LangName.OTHER,
+				LangName.PYTHON, LangName.PYTHON, LangName.JULIA,
+				LangName.R, LangName.R,
+				LangName.SCALA, LangName.SCALA, LangName.UNKNOWN,
+				LangName.JULIA, LangName.JULIA, LangName.PYTHON, LangName.SCALA,
+				LangName.PYTHON, LangName.PYTHON,
+				LangName.UNKNOWN, LangName.UNKNOWN,
+				LangName.UNKNOWN, LangName.UNKNOWN,
+				LangName.UNKNOWN, LangName.PYTHON};
 		for (int i=0; i<files.length; i++) {
 			Notebook notebook = new Notebook(dataDir + "/" + files[i]);
-			assertEquals("Wrong language:", languages[i], notebook.language());
+			assertEquals("Wrong language:", languages[i], notebook.language().getName());
 		}
 	}
 	
@@ -285,7 +285,7 @@ public class NotebookTest {
 				LangSpec.CODE_CELLS, LangSpec.CODE_CELLS};
 		for (int i=0; i<files.length; i++) {
 			Notebook notebook = new Notebook(dataDir + "/" + files[i]);
-			assertEquals("Wrong language specification location:", langSpecs[i], notebook.langSpec());
+			assertEquals("Wrong language specification location:", langSpecs[i], notebook.language().getSpec());
 		}
 	}
 	
@@ -297,13 +297,13 @@ public class NotebookTest {
 	public void testAllLanguageValues_initialized() {
 		String fileName = "test/data/langFields/all_lang_specs.ipynb";
 		final int NUM_LANG_FIELDS = LangSpec.values().length - 1;
-		Map<LangSpec, Language> expected
-			= new HashMap<LangSpec, Language>(NUM_LANG_FIELDS);
-		expected.put(LangSpec.METADATA_LANGUAGE, Language.JULIA);
-		expected.put(LangSpec.METADATA_LANGUAGEINFO_NAME, Language.PYTHON);
-		expected.put(LangSpec.METADATA_KERNELSPEC_LANGUAGE, Language.R);
-		expected.put(LangSpec.METADATA_KERNELSPEC_NAME, Language.OTHER);
-		expected.put(LangSpec.CODE_CELLS, Language.SCALA);
+		Map<LangSpec, LangName> expected
+			= new HashMap<LangSpec, LangName>(NUM_LANG_FIELDS);
+		expected.put(LangSpec.METADATA_LANGUAGE, LangName.JULIA);
+		expected.put(LangSpec.METADATA_LANGUAGEINFO_NAME, LangName.PYTHON);
+		expected.put(LangSpec.METADATA_KERNELSPEC_LANGUAGE, LangName.R);
+		expected.put(LangSpec.METADATA_KERNELSPEC_NAME, LangName.OTHER);
+		expected.put(LangSpec.CODE_CELLS, LangName.SCALA);
 		
 		Notebook notebook = new Notebook(fileName);
 		assertEquals("Wrong language field values returned",
@@ -318,13 +318,13 @@ public class NotebookTest {
 	public void testAllLanguageValues_empty() {
 		String fileName = "test/data/langFields/empty.ipynb";
 		final int NUM_LANG_FIELDS = LangSpec.values().length - 1;
-		Map<LangSpec, Language> expected
-			= new HashMap<LangSpec, Language>(NUM_LANG_FIELDS);
-		expected.put(LangSpec.METADATA_LANGUAGE, Language.UNKNOWN);
-		expected.put(LangSpec.METADATA_LANGUAGEINFO_NAME, Language.UNKNOWN);
-		expected.put(LangSpec.METADATA_KERNELSPEC_LANGUAGE, Language.UNKNOWN);
-		expected.put(LangSpec.METADATA_KERNELSPEC_NAME, Language.UNKNOWN);
-		expected.put(LangSpec.CODE_CELLS, Language.UNKNOWN);
+		Map<LangSpec, LangName> expected
+			= new HashMap<LangSpec, LangName>(NUM_LANG_FIELDS);
+		expected.put(LangSpec.METADATA_LANGUAGE, LangName.UNKNOWN);
+		expected.put(LangSpec.METADATA_LANGUAGEINFO_NAME, LangName.UNKNOWN);
+		expected.put(LangSpec.METADATA_KERNELSPEC_LANGUAGE, LangName.UNKNOWN);
+		expected.put(LangSpec.METADATA_KERNELSPEC_NAME, LangName.UNKNOWN);
+		expected.put(LangSpec.CODE_CELLS, LangName.UNKNOWN);
 		
 		Notebook notebook = new Notebook(fileName);
 		assertEquals("Wrong language field values returned",
@@ -339,13 +339,13 @@ public class NotebookTest {
 	public void testAllLanguageValues_noKernelSpec() {
 		String fileName = "test/data/langFields/no_kernelspec.ipynb";
 		final int NUM_LANG_FIELDS = LangSpec.values().length - 1;
-		Map<LangSpec, Language> expected
-			= new HashMap<LangSpec, Language>(NUM_LANG_FIELDS);
-		expected.put(LangSpec.METADATA_LANGUAGE, Language.R);
-		expected.put(LangSpec.METADATA_LANGUAGEINFO_NAME, Language.JULIA);
-		expected.put(LangSpec.METADATA_KERNELSPEC_LANGUAGE, Language.UNKNOWN);
-		expected.put(LangSpec.METADATA_KERNELSPEC_NAME, Language.UNKNOWN);
-		expected.put(LangSpec.CODE_CELLS, Language.SCALA);
+		Map<LangSpec, LangName> expected
+			= new HashMap<LangSpec, LangName>(NUM_LANG_FIELDS);
+		expected.put(LangSpec.METADATA_LANGUAGE, LangName.R);
+		expected.put(LangSpec.METADATA_LANGUAGEINFO_NAME, LangName.JULIA);
+		expected.put(LangSpec.METADATA_KERNELSPEC_LANGUAGE, LangName.UNKNOWN);
+		expected.put(LangSpec.METADATA_KERNELSPEC_NAME, LangName.UNKNOWN);
+		expected.put(LangSpec.CODE_CELLS, LangName.SCALA);
 		
 		Notebook notebook = new Notebook(fileName);
 		assertEquals("Wrong language field values returned",
@@ -362,7 +362,7 @@ public class NotebookTest {
 		notebook.language();
 		notebook.allLanguageValues();
 		assertEquals("Language specification field changed by langFieldValues",
-				LangSpec.METADATA_LANGUAGEINFO_NAME, notebook.langSpec());
+				LangSpec.METADATA_LANGUAGEINFO_NAME, notebook.language().getSpec());
 	}
 	
 	/**

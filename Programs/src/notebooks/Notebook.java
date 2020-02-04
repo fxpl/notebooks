@@ -22,7 +22,6 @@ public class Notebook {
 	private int locBlank;		// Number of empty code lines
 	private int locContents;	// Number of non-empty code lines
 	private volatile boolean locCounted = false;
-	private LangSpec languageSpecIn;
 	private WeakReference<JSONObject> contents;
 	private ReentrantLock contentsLock = new ReentrantLock();
 	
@@ -159,63 +158,49 @@ public class Notebook {
 	 * (except NONE). Store in a Map with the LangSpec value being the key.
 	 * @return The map described above
 	 */
-	public Map<LangSpec, Language> allLanguageValues() {
-		Map<LangSpec, Language> result
-			= new HashMap<LangSpec, Language>(LangSpec.values().length-1);
-		LangSpec langSpecIn = this.languageSpecIn;
+	public Map<LangSpec, LangName> allLanguageValues() {
+		// TODO: Kan göras till 1D-struktur!
+		Map<LangSpec, LangName> result
+			= new HashMap<LangSpec, LangName>(LangSpec.values().length-1);
 		JSONObject notebook = this.getNotebook();
 		if (!notebook.has("metadata")) {
-			result.put(LangSpec.METADATA_LANGUAGE, Language.UNKNOWN);
-			result.put(LangSpec.METADATA_LANGUAGEINFO_NAME, Language.UNKNOWN);
-			result.put(LangSpec.METADATA_KERNELSPEC_LANGUAGE, Language.UNKNOWN);
-			result.put(LangSpec.METADATA_KERNELSPEC_NAME, Language.UNKNOWN);
+			result.put(LangSpec.METADATA_LANGUAGE, LangName.UNKNOWN);
+			result.put(LangSpec.METADATA_LANGUAGEINFO_NAME, LangName.UNKNOWN);
+			result.put(LangSpec.METADATA_KERNELSPEC_LANGUAGE, LangName.UNKNOWN);
+			result.put(LangSpec.METADATA_KERNELSPEC_NAME, LangName.UNKNOWN);
 		} else {
 			JSONObject metadata = notebook.getJSONObject("metadata");
-			result.put(LangSpec.METADATA_LANGUAGE, getLanguageFromLanguage(metadata));
-			result.put(LangSpec.METADATA_LANGUAGEINFO_NAME, getLanguageFromLanguageinfo(metadata));
+			result.put(LangSpec.METADATA_LANGUAGE, getLanguageFromLanguage(metadata).getName());
+			result.put(LangSpec.METADATA_LANGUAGEINFO_NAME, getLanguageFromLanguageinfo(metadata).getName());
 			if (!metadata.has("kernelspec")) {
-				result.put(LangSpec.METADATA_KERNELSPEC_LANGUAGE, Language.UNKNOWN);
-				result.put(LangSpec.METADATA_KERNELSPEC_NAME, Language.UNKNOWN);
+				result.put(LangSpec.METADATA_KERNELSPEC_LANGUAGE, LangName.UNKNOWN);
+				result.put(LangSpec.METADATA_KERNELSPEC_NAME, LangName.UNKNOWN);
 			} else {
 				JSONObject kernelspec = metadata.getJSONObject("kernelspec");
-				result.put(LangSpec.METADATA_KERNELSPEC_LANGUAGE, getLanguageFromKernelspecLanguage(kernelspec));
-				result.put(LangSpec.METADATA_KERNELSPEC_NAME, getLanguageFromKernelSpecName(kernelspec));
+				result.put(LangSpec.METADATA_KERNELSPEC_LANGUAGE, getLanguageFromKernelspecLanguage(kernelspec).getName());
+				result.put(LangSpec.METADATA_KERNELSPEC_NAME, getLanguageFromKernelSpecName(kernelspec).getName());
 			}
 		}
-		result.put(LangSpec.CODE_CELLS, getLanguageFromCodeCells(notebook));
+		result.put(LangSpec.CODE_CELLS, getLanguageFromCodeCells(notebook).getName());
 		
 		// Reset langSpecIn
-		this.languageSpecIn = langSpecIn;
 		return result;
 	}
 	
-	/**
-	 * This updates instance variables, but it will always set the same values
-	 * for a given object, so it doesn't have to be synchronized. (The same
-	 * holds for its private helper methods.) 
+	/** 
 	 * @return The language of the notebook
 	 */
 	public Language language() {
 		JSONObject notebook = this.getNotebook();
-		this.languageSpecIn = LangSpec.NONE;
+		
 		Language language = getLanguageFromMetadata(notebook);
-		if (Language.UNKNOWN == language) {
+		if (!language.isSet()) {
 			language = getLanguageFromCodeCells(notebook);
 		}
-		if (Language.UNKNOWN == language) {
+		if (!language.isSet()) {
 			System.err.println("No language found in " + this.path);
 		}
 		return language;
-	}
-	
-	/**
-	 * @return Identifier of the location from which the language is extracted
-	 */
-	public LangSpec langSpec() {
-		if (null == languageSpecIn) {
-			language();
-		}
-		return languageSpecIn;
 	}
 	
 	/**
@@ -369,82 +354,83 @@ public class Notebook {
 	}
 	
 	/**
-	 * Translate a string specifying the language to a Language value.
-	 * @param spec String specifying the language
-	 * @return The corresponding Language
+	 * Translate a string specifying the language to a LangName value.
+	 * @param language String specifying the language
+	 * @return The corresponding Language name
 	 */
-	private static Language getLanguage(String spec) {
-		if (spec.equals("julia") || spec.equals("Julia")) {
-			return Language.JULIA;
-		} else if (spec.startsWith("python") || spec.startsWith("Python")) {
-			return Language.PYTHON;
-		} else if (spec.equals("R") || spec.equals("r")) {
-			return Language.R;
-		} else if (spec.startsWith("scala") || spec.startsWith("Scala")) {
-			return Language.SCALA;
-		} else if (spec.trim().equals("")) {
-			return Language.UNKNOWN;
+	private static LangName getLangName(String language) {
+		if (language.equals("julia") || language.equals("Julia")) {
+			return LangName.JULIA;
+		} else if (language.startsWith("python") || language.startsWith("Python")) {
+			return LangName.PYTHON;
+		} else if (language.equals("R") || language.equals("r")) {
+			return LangName.R;
+		} else if (language.startsWith("scala") || language.startsWith("Scala")) {
+			return LangName.SCALA;
+		} else if (language.trim().equals("")) {
+			return LangName.UNKNOWN;
 		} else {
-			return Language.OTHER;
+			return LangName.OTHER;
 		}
 	}
 
 	/**
 	 * @param notebook Notebook to extract language from
-	 * @return The language specified in code cells, if it exists and is consistent. UNKNOWN otherwise.
+	 * @return The language specified in code cells, if it exists and is consistent. Unset language otherwise.
 	 */
 	private Language getLanguageFromCodeCells(JSONObject notebook) {
 		List<JSONObject> codeCells = getCodeCells(notebook);
 		if (0 < codeCells.size()) {
-			String language = "";
+			String langName = "";
 			JSONObject cell = codeCells.get(0);
 			if (cell.has("language")) {
-				languageSpecIn = LangSpec.CODE_CELLS;
-				language = cell.getString("language");
+				langName = cell.getString("language");
 				for (int i=1; i<codeCells.size(); i++) {
 					cell = codeCells.get(i);
-					if (!cell.has("language") || !(cell.getString("language")).equals(language)) {
+					if (!cell.has("language") || !(cell.getString("language")).equals(langName)) {
 						System.err.println("Ambiguous language in " + this.path);
-						return Language.UNKNOWN;
+						return new Language(LangName.UNKNOWN, LangSpec.CODE_CELLS);
 					}
 				}
-				return getLanguage(language);
+				return new Language (getLangName(langName), LangSpec.CODE_CELLS);
 			}
 		}
-		return Language.UNKNOWN;
+		return new Language();
 	}
 
 	/**
 	 * @param notebook Notebook to extract language from
-	 * @return The language specified in metadata, if any. UNKNOWN otherwise.
+	 * @return The language specified in metadata, if any. Unset language otherwise.
 	 */
 	private Language getLanguageFromMetadata(JSONObject notebook) {
-		Language language = Language.UNKNOWN;
 		if (notebook.has("metadata")) {
 			JSONObject metadata = notebook.getJSONObject("metadata");
-			language = getLanguageFromLanguageinfo(metadata);
-			if (Language.UNKNOWN == language) {
+			Language language = getLanguageFromLanguageinfo(metadata);
+			if (!language.isSet()) {
 				language = getLanguageFromLanguage(metadata);
 			}
-			if (Language.UNKNOWN == language) {
+			if (!language.isSet()) {
 				language = getLanguageFromKernelspec(metadata);
+			}
+			if (language.isSet()) {
+				return language;
 			}
 		} else {
 			System.err.println("No metadata in " + this.path);
 		}
-		return language;
+		return new Language();
 	}
 
 	/**
 	 * @param metadata Metadata to analyze
-	 * @return The language specified in Get source code metadata->kernelspec. UNKNOWN otherwise.
+	 * @return The language specified in Get source code metadata->kernelspec. Unset language otherwise.
 	 */
 	private Language getLanguageFromKernelspec(JSONObject metadata) {
 		if (metadata.has("kernelspec")) {
 			JSONObject kernelspec = metadata.getJSONObject("kernelspec");
 			return getLanguageFromKernelspecLanguage(kernelspec);
 		}
-		return Language.UNKNOWN;
+		return new Language();
 	}
 
 	/**
@@ -452,10 +438,10 @@ public class Notebook {
 	 */
 	private Language getLanguageFromKernelSpecName(JSONObject kernelspec) {
 		if (kernelspec.has("name")) {
-			languageSpecIn = LangSpec.METADATA_KERNELSPEC_NAME;
-			return getLanguage(kernelspec.getString("name"));
+			LangName name = getLangName(kernelspec.getString("name"));
+			return new Language(name, LangSpec.METADATA_KERNELSPEC_NAME);
 		}
-		return Language.UNKNOWN;
+		return new Language();
 	}
 
 	/**
@@ -463,10 +449,10 @@ public class Notebook {
 	 */
 	private Language getLanguageFromKernelspecLanguage(JSONObject kernelspec) {
 		if (kernelspec.has("language")) {
-			languageSpecIn = LangSpec.METADATA_KERNELSPEC_LANGUAGE;
-			return getLanguage(kernelspec.getString("language"));
+			LangName name = getLangName(kernelspec.getString("language"));
+			return new Language (name, LangSpec.METADATA_KERNELSPEC_LANGUAGE);
 		}
-		return Language.UNKNOWN;
+		return new Language();
 	}
 	
 	/**
@@ -475,25 +461,26 @@ public class Notebook {
 	 */
 	private Language getLanguageFromLanguage(JSONObject metadata) {
 		if (metadata.has("language")) {
-			languageSpecIn = LangSpec.METADATA_LANGUAGE;
-			return getLanguage(metadata.getString("language"));
+			LangName name = getLangName(metadata.getString("language"));
+			return new Language(name, LangSpec.METADATA_LANGUAGE);
+			
 		}
-		return Language.UNKNOWN;
+		return new Language();
 	}
 	
 	/**
 	 * @param metadata Metadata to analyze
-	 * @return The language specified in metadata->language_info, if any. UNKNOWN otherwise.
+	 * @return The language specified in metadata->language_info, if any. Unset language otherwise.
 	 */
-	private Language getLanguageFromLanguageinfo(JSONObject metadata) {
+	private  Language getLanguageFromLanguageinfo(JSONObject metadata) {
 		if (metadata.has("language_info")) {
 			JSONObject languageinfo = metadata.getJSONObject("language_info");
 			if (languageinfo.has("name")) {
-				languageSpecIn = LangSpec.METADATA_LANGUAGEINFO_NAME;
-				return getLanguage(languageinfo.getString("name"));
+				LangName name = getLangName(languageinfo.getString("name"));
+				return new Language(name, LangSpec.METADATA_LANGUAGEINFO_NAME);
 			}
 		}
-		return Language.UNKNOWN;
+		return new Language();
 	}
 	
 	/**

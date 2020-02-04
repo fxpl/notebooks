@@ -1,4 +1,5 @@
 package notebooks;
+// TODO: Slå ihop med LanguageExtractor!
 
 class LangSpecExtractor extends Worker<LangSpec> {
 	public LangSpecExtractor(Notebook notebook) {
@@ -7,6 +8,6 @@ class LangSpecExtractor extends Worker<LangSpec> {
 	
 	@Override
 	public LangSpec call() throws Exception {
-		return notebook.langSpec();
+		return notebook.language().getSpec();
 	}
 }

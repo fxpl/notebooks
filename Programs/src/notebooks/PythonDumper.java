@@ -5,7 +5,7 @@ import java.io.IOException;
 public class PythonDumper extends Dumper {
 
 	protected void dump(Notebook src, String target) throws IOException {
-		if (Language.PYTHON.equals(src.language())) {
+		if (LangName.PYTHON.equals(src.language().getName())) {
 			src.dumpCode(target, "py");
 		}
 	}
