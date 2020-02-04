@@ -564,30 +564,27 @@ public class Notebook {
 	 */
 	private JSONObject getNotebook() throws NotebookException {
 		contentsLock.lock();
-		if (null == contents || null == contents.get()) {
-			Reader reader;
-			try {
-				reader = new FileReader(this.path);
-			} catch (FileNotFoundException e) {
-				contentsLock.unlock();
-				throw new NotebookException("Could not read " + this.path + ": " + e.toString());
-			}
-			try {
+		try {
+			if (null == contents || null == contents.get()) {
+				contents = null;
+				Reader reader = new FileReader(this.path);
 				JSONObject contentsReferent = (JSONObject)new JSONParser().parse(reader);
 				contents = new WeakReference<JSONObject>(contentsReferent);
-			} catch (IOException | ParseException e) {
-				throw new NotebookException("Could not parse " + this.path + ": " + e.toString());
-			} catch (ClassCastException e) {
-				contentsLock.unlock();
-				throw new NotebookException("Couldn't cast notebook to JSONObject in " + this.path + ": " + e.toString());
-			}
-			try {
 				reader.close();
-			} catch (IOException e) {
+			}
+		} catch (FileNotFoundException e) {
+			throw new NotebookException("Could not read " + this.path + ": " + e.toString());
+		} catch (ClassCastException e) {
+			throw new NotebookException("Couldn't cast notebook to JSONObject in " + this.path + ": " + e.toString());
+		} catch (IOException | ParseException e) {
+			if (null == contents) {	// IOException was thrown by JSON parser.
+				throw new NotebookException("Could not parse " + this.path + ": " + e.toString());
+			} else {	// IOException was thrown by close method of reader.
 				System.err.println("Warning: Could not close reader of " + this.path + ": " + e.toString());
 			}
+		} finally {
+			contentsLock.unlock();
 		}
-		contentsLock.unlock();
 		return contents.get();
 	}
 	
