@@ -119,7 +119,7 @@ public class CloneFileWriter {
 	 * - mean number edges to other repros, excl. those representing empty snippets
 	 * Print the values, in the order mentioned, separated with commas to the file
 	 * connections<current-date-time>.csv for a random sample of NUM_CONNECTIONS
-	 * notebooks in file2snippets (unless NUM_CONNECTIONS > number of notebooks
+	 * notebooks in file2hashes (unless NUM_CONNECTIONS > number of notebooks
 	 * in the analysis --then data is printed for the whole set of notebooks).
 	 * Note that when computing the mean, only repros for which there is a
 	 * connection are included.
@@ -134,15 +134,14 @@ public class CloneFileWriter {
 		List<Notebook> notebooks = new ArrayList<Notebook>(file2hashes.keySet());
 		Collections.shuffle(notebooks);
 		int connectionsToPrint = Math.min(NUM_CONNECTIONS, file2hashes.size());
-		List<Callable<Void>> tasks = new ArrayList<>(connectionsToPrint);
+		List<Callable<String>> tasks = new ArrayList<Callable<String>>(connectionsToPrint);
 		for (int i=0; i<connectionsToPrint; i++) {
-			tasks.add(new ConnectionsWriter(notebooks.get(i), file2hashes, hash2files, writer));
+			tasks.add(new ConnectionsLineBuilder(notebooks.get(i), file2hashes, hash2files));
 		}
-		List<Future<Void>> result = ThreadExecutor.getInstance().invokeAll(tasks);
-		// Wait for all tasks to finish
+		List<Future<String>> result = ThreadExecutor.getInstance().invokeAll(tasks);
 		for (int i=0; i<connectionsToPrint; i++) {
 			try {
-				result.get(i).get();
+				writer.write(result.get(i).get());
 			} catch (InterruptedException e) {
 				System.err.println("Printing of connections for notebook " + notebooks.get(i).getName()
 						+ " was interrupted! " + e.getMessage());

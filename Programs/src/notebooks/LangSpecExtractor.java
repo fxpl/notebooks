@@ -9,9 +9,4 @@ class LangSpecExtractor extends Worker<LangSpec> {
 	public LangSpec call() throws Exception {
 		return notebook.langSpec();
 	}
-	
-	@Override
-	protected LangSpec defaultValue() {
-		return LangSpec.NONE;
-	}
 }

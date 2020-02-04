@@ -1,6 +1,6 @@
 package notebooks;
 
-class CodeCellCounter extends IntegerWorker {
+class CodeCellCounter extends Worker<Integer> {
 	public CodeCellCounter(Notebook notebook) {
 		super(notebook);
 	}

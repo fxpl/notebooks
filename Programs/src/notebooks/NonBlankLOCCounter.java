@@ -1,6 +1,6 @@
 package notebooks;
 
-class NonBlankLOCCounter extends IntegerWorker {
+class NonBlankLOCCounter extends Worker<Integer> {
 	public NonBlankLOCCounter(Notebook notebook) {
 		super(notebook);
 	}

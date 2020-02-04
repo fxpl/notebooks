@@ -69,6 +69,20 @@ public class NotebookAnalyzer extends Analyzer {
 	 * @throws IOException On problems handling the output file
 	 */
 	public void allAnalyzes() throws IOException {
+		final int NUM_WORKERS = 8;
+		List<Callable<Object>> tasks = new ArrayList<>(notebooks.size()); 
+		for (Notebook notebook: this.notebooks) {
+			tasks.add(new CodeCellCounterWrapper(notebook));
+			tasks.add(new TotalLOCCounterWrapper(notebook));
+			tasks.add(new NonBlankLOCCounterWrapper(notebook));
+			tasks.add(new BlankLOCCounterWrapper(notebook));
+			tasks.add(new LanguageExtractorWrapper(notebook));
+			tasks.add(new LangSpecExtractorWrapper(notebook));
+			tasks.add(new AllLanguagesExtractorWrapper(notebook));
+			tasks.add(new HashExtractorWrapper(notebook));
+		}
+		List<Future<Object>> result = ThreadExecutor.getInstance().invokeAll(tasks);
+		
 		Writer codeCellsWriter = new FileWriter(outputDir + "/code_cells" + LocalDateTime.now() + ".csv");
 		codeCellsWriter.write(numCodeCellsHeader());
 		Writer LOCWriter = new FileWriter(outputDir + "/loc" + LocalDateTime.now() + ".csv");
@@ -77,16 +91,18 @@ public class NotebookAnalyzer extends Analyzer {
 		langWriter.write(languagesHeader());
 		Writer allLangWriter = new FileWriter(outputDir + "/all_languages" + LocalDateTime.now() + ".csv");
 		allLangWriter.write(allLanguagesHeader());
-		
 		Map<Notebook, SnippetCode[]> snippets = new HashMap<Notebook, SnippetCode[]>();
-		for (Notebook notebook: this.notebooks) {
-			numCodeCellsIn(notebook, codeCellsWriter);
-			LOCIn(notebook, LOCWriter);
-			languageIn(notebook, langWriter);
-			allLanguageValuesIn(notebook, allLangWriter);
-			getSnippetsFrom(notebook, snippets);
-			notebook.clearContents();
+		
+		for (int i=0; i<notebooks.size(); i++) {
+			Notebook notebook = notebooks.get(i);
+			int index = i * NUM_WORKERS;
+			writeCodeCellsLine(result.get(index), notebook, codeCellsWriter);
+			writeLocLine(result.get(index+1), result.get(index+2), result.get(index+3), notebook, LOCWriter);
+			writeLanguagesLine(result.get(index+4), result.get(index+5), notebook, langWriter);
+			writeallLanguagesLine(result.get(index+6), notebook, allLangWriter);
+			storeHashes(result.get(index+7), notebook, snippets);
 		}
+		
 		/* Language summary is not printed here, since the information can
 		   easily be extracted from the CSV file. */
 		codeCellsWriter.close();
@@ -126,27 +142,41 @@ public class NotebookAnalyzer extends Analyzer {
 	 * @return A map from file names to snippets
 	 */
 	private Map<Notebook, SnippetCode[]> getSnippets() throws IOException {
+		List<Callable<SnippetCode[]>> tasks = new ArrayList<Callable<SnippetCode[]>>(notebooks.size());
+		for (Notebook notebook: notebooks) {
+			tasks.add(new HashExtractor(notebook));
+		}
+		List<Future<SnippetCode[]>> result = ThreadExecutor.getInstance().invokeAll(tasks);
 		Map<Notebook, SnippetCode[]> snippets = new HashMap<Notebook, SnippetCode[]>();
 		for (int i=0; i<notebooks.size(); i++) {
 			if (0 == i%10000) {
-				System.out.println("Hashing snippets in notebook " + i);
+				System.out.println("Retreiving hashes in notebook " + i);
 			}
-			getSnippetsFrom(notebooks.get(i), snippets);
-			notebooks.get(i).clearContents();
+			storeHashes(result.get(i), notebooks.get(i), snippets);
 		}
 		return snippets;
 	}
-
+	
 	/**
-	 * Get all snippets from a notebook and put them in the snippets map.
-	 * @param notebook Notebook to find snippets in
-	 * @param snippets Map to put the snippets in
+	 * Store the hash array wrapped in result with notebook as key in the map snippets.
+	 * @param hashes Wrapper around hashes
+	 * @param notebook Key to store in the map
+	 * @param snippets Map to store the result in
 	 */
-	private void getSnippetsFrom(Notebook notebook, Map<Notebook, SnippetCode[]> snippets) {
-		SnippetCode[] snippetsInNotebook = employ(new HashExtractor(notebook));
-		snippets.put(new Notebook(notebook), snippetsInNotebook);
+	private<T> void storeHashes(Future<T> hashes, Notebook notebook, Map<Notebook, SnippetCode[]> snippets) {
+		SnippetCode[] hashValues;
+		try {
+			hashValues = (SnippetCode[])hashes.get();
+		} catch (InterruptedException | ExecutionException e) {
+			System.err.println("Could not get snippets for " + notebook.getName() + ": " + e);
+			hashValues = new SnippetCode[0];
+		}
+		snippets.put(new Notebook(notebook), hashValues);
 	}
 	
+	/**
+	 * @return A map from snippet (hash and loc) to location in a notebook
+	 */
 	private Map<SnippetCode, List<Snippet>> getClones(Map<Notebook, SnippetCode[]> fileMap) throws IOException {
 		int numAnalyzed = 0;
 		Map<SnippetCode, List<Snippet>> clones = new HashMap<SnippetCode, List<Snippet>>();
@@ -176,11 +206,16 @@ public class NotebookAnalyzer extends Analyzer {
 	 * @throws IOException 
 	 */
 	public void allLanguageValues() throws IOException {
+		List<Callable<Map<LangSpec, Language>>> tasks = new ArrayList<>(notebooks.size());
+		for (Notebook notebook: notebooks) {
+			tasks.add(new AllLanguagesExtractor(notebook));
+		}
+		List<Future<Map<LangSpec, Language>>> result = ThreadExecutor.getInstance().invokeAll(tasks);
 		Writer writer = new FileWriter(outputDir + "/all_languages" + LocalDateTime.now() + ".csv");
 		writer.write(allLanguagesHeader());
-		for(Notebook notebook: notebooks) {
-			allLanguageValuesIn(notebook, writer);
-			notebook.clearContents();
+		for (int i=0; i<notebooks.size(); i++) {
+			Notebook notebook = notebooks.get(i);
+			writeallLanguagesLine(result.get(i), notebook, writer);
 		}
 		writer.close();
 	}
@@ -196,21 +231,26 @@ public class NotebookAnalyzer extends Analyzer {
 		result += "\n";
 		return result;
 	}
-
+	
 	/**
-	 * Find all language values specified in a notebook and write them to a file
-	 * on CSV format.
-	 * @param notebook Notebook to read language from
-	 * @param langSpecFields Fields that may specify language
-	 * @param writer Open writer that writes to the file mentioned above
-	 * @throws IOException On problems when writing to the CSV file
+	 * Write the data for one notebook to the all_languages file.
+	 * @param languages Wrapper around language values to write
+	 * @param notebook Notebook to write information for
+	 * @param writer Writer that appends text to the all_languages file
 	 */
-	private void allLanguageValuesIn(Notebook notebook, Writer writer) throws IOException {
-		Map<LangSpec, Language> languages = employ(new AllLanguagesExtractor(notebook));
-		String name = notebook.getName();
-		writer.write(name);
-		for (LangSpec field: langSpecFields) {
-			writer.write(", " + languages.get(field));
+	private<T> void writeallLanguagesLine(Future<T> languages, Notebook notebook, Writer writer) throws IOException {
+		writer.write(notebook.getName());
+		try {
+			@SuppressWarnings("unchecked")
+			Map<LangSpec, Language> languageValues = (Map<LangSpec, Language>) languages.get();
+			for (LangSpec field: langSpecFields) {
+				writer.write(", " + languageValues.get(field));
+			}
+		} catch (InterruptedException | ExecutionException e) {
+			for (int j=0; j<langSpecFields.length; j++) {
+				writer.write(", UNKNOWN");
+			}
+			System.err.println("Could not get language values for " + notebook.getName() + ": " + e);
 		}
 		writer.write("\n");
 	}
@@ -228,15 +268,42 @@ public class NotebookAnalyzer extends Analyzer {
 		for (Language language: Language.values()) {
 			languages.put(language, 0);
 		}
+		List<Callable<Language>> langTasks = new ArrayList<>(notebooks.size());
+		List<Callable<LangSpec>> specTasks = new ArrayList<>(notebooks.size());
+		for (Notebook notebook: notebooks) {
+			langTasks.add(new LanguageExtractor(notebook));
+			specTasks.add(new LangSpecExtractor(notebook));
+		}
+		List<Future<Language>> langResult = ThreadExecutor.getInstance().invokeAll(langTasks);
+		List<Future<LangSpec>> specResult = ThreadExecutor.getInstance().invokeAll(specTasks);
 		Writer writer = new FileWriter(outputDir + "/languages" + LocalDateTime.now() + ".csv");
 		writer.write(languagesHeader());
-		for (Notebook notebook: notebooks) {
-			Language language = languageIn(notebook, writer);
+		for (int i=0; i<notebooks.size(); i++) {
+			Language language = writeLanguagesLine(langResult.get(i), specResult.get(i), notebooks.get(i), writer);
 			languages.put(language, languages.get(language) + 1);
-			notebook.clearContents();
 		}
 		writer.close();
 		return languages;
+	}
+	
+	/**
+	 * Write the data for one notebook to the languages file.
+	 * @param langResult Wrapper around languages value
+	 * @param specResult Wrapper around lang spec values
+	 * @param notebook Notebook to write information for
+	 * @param writer Writer that appends text to the languages file
+	 */
+	private<T1,T2> Language writeLanguagesLine(Future<T1> langResult, Future<T2> specResult, Notebook notebook, Writer writer) throws IOException {
+		Language language = Language.UNKNOWN;
+		LangSpec spec = LangSpec.NONE;
+		try {
+			language = (Language) langResult.get();
+			spec = (LangSpec) specResult.get();
+		} catch (InterruptedException | ExecutionException e) {
+			System.err.println("Could not get language information for " + notebook.getName() + ": " + e);
+		}
+		writer.write(notebook.getName() + ", " + language + ", " + spec + "\n");
+		return language;
 	}
 	
 	/**
@@ -244,22 +311,6 @@ public class NotebookAnalyzer extends Analyzer {
 	 */
 	private static String languagesHeader() {
 		return "file, language, language spec in\n";
-	}
-
-	/**
-	 * Identify the language of a notebook and write it to a file on CSV format.
-	 * @param notebook Notebook to identify language in
-	 * @param writer Open writer that writes to the languages CSV file
-	 * @return Identified language in the notebook
-	 * @throws IOException On problems when writing to the CSV file
-	 */
-	private Language languageIn(Notebook notebook, Writer writer)
-			throws IOException {
-		Language language = employ(new LanguageExtractor(notebook));
-		LangSpec langSpec = employ(new LangSpecExtractor(notebook));
-		String name = notebook.getName();
-		writer.write(name + ", " + language + ", " + langSpec + "\n");
-		return language;
 	}
 
 	/**
@@ -271,15 +322,47 @@ public class NotebookAnalyzer extends Analyzer {
 	 * @throws IOException On problems with handling the output file
 	 */
 	public int LOC() throws IOException {
-		int totalLOC = 0;
+		List<Callable<Integer>> locTasks = new ArrayList<Callable<Integer>>(notebooks.size());
+		List<Callable<Integer>> nonBlankLocTasks = new ArrayList<Callable<Integer>>(notebooks.size());
+		List<Callable<Integer>> blankLocTasks = new ArrayList<Callable<Integer>>(notebooks.size());
+		for (Notebook notebook: notebooks) {
+			locTasks.add(new TotalLOCCounter(notebook));
+			nonBlankLocTasks.add(new NonBlankLOCCounter(notebook));
+			blankLocTasks.add(new BlankLOCCounter(notebook));
+		}
+		List<Future<Integer>> locResults = ThreadExecutor.getInstance().invokeAll(locTasks);
+		List<Future<Integer>> nonBlankLocResults = ThreadExecutor.getInstance().invokeAll(nonBlankLocTasks);
+		List<Future<Integer>> blankLocResults = ThreadExecutor.getInstance().invokeAll(blankLocTasks);
+		
 		Writer writer = new FileWriter(outputDir + "/loc" + LocalDateTime.now() + ".csv");
 		writer.write(LOCHeader());
-		for (Notebook notebook: notebooks) {
-			totalLOC += LOCIn(notebook, writer);
-			notebook.clearContents();
+		int totalLoc = 0;
+		for (int i=0; i<notebooks.size(); i++) {
+			totalLoc += writeLocLine(locResults.get(i), nonBlankLocResults.get(i), blankLocResults.get(i), notebooks.get(i), writer);
 		}
 		writer.close();
-		return totalLOC;
+		return totalLoc;
+	}
+	
+	/**
+	 * Write the data for one notebook to the loc file.
+	 * @param loc Wrapper around total number of lines in the notebook
+	 * @param nonBlankLoc Wrapper around the number of non blank lines in the notebook
+	 * @param blankLoc Wrapper around the number of blank lines in the notebook
+	 * @param notebook Notebook to write information for
+	 * @param writer Writer that appends text to the loc file
+	 */
+	private<T> int writeLocLine(Future<T> loc, Future<T> nonBlankLoc, Future<T> blankLoc, Notebook notebook, Writer writer) throws IOException {
+		int locValue = 0, nonBlankLocValue = 0, blankLocValue = 0;
+		try {
+			locValue = (int) loc.get();
+			nonBlankLocValue = (int) nonBlankLoc.get();
+			blankLocValue = (int) blankLoc.get();
+		} catch (InterruptedException | ExecutionException e) {
+			System.err.println("Could not get line count for " + notebook.getName() + ": " + e);
+		}
+		writer.write(notebook.getName() + ", " + locValue + ", " + nonBlankLocValue + ", " + blankLocValue + "\n");
+		return locValue;
 	}
 
 	/**
@@ -287,24 +370,6 @@ public class NotebookAnalyzer extends Analyzer {
 	 */
 	private static String LOCHeader() {
 		return "file, total LOC, non-blank LOC, blank LOC\n";
-	}
-
-	/**
-	 * Count the number of lines of code in a notebook, and write it to a file on
-	 * CSV format.
-	 * @param notebook Notebook to count lines in 
-	 * @param csvWriter Open writer that writes to the LOC CSV file
-	 * @return Total number of LOC in notebook
-	 * @throws IOException On problems when writing to the CSV file
-	 */
-	private int LOCIn(Notebook currentNotebook, Writer writer)
-			throws IOException {
-		int LOC = employ(new TotalLOCCounter(currentNotebook));
-		int LOCNonBlank = employ(new NonBlankLOCCounter(currentNotebook));
-		int LOCBlank = employ(new BlankLOCCounter(currentNotebook));
-		String name = currentNotebook.getName();
-		writer.write(name + ", " + LOC + ", " + LOCNonBlank + ", " + LOCBlank + "\n");
-		return LOC;
 	}
 	
 	/**
@@ -315,15 +380,36 @@ public class NotebookAnalyzer extends Analyzer {
 	 * @throws IOException On problems with handling the output file
 	 */
 	public int numCodeCells() throws IOException {
-		int totalNumCodeCells = 0;
+		List<Callable<Integer>> tasks = new ArrayList<Callable<Integer>>(notebooks.size());
+		for (Notebook notebook: notebooks) {
+			tasks.add(new CodeCellCounter(notebook));
+		}
 		Writer writer = new FileWriter(outputDir + "/code_cells" + LocalDateTime.now() + ".csv");
 		writer.write(numCodeCellsHeader());
-		for (Notebook notebook: notebooks) {
-			totalNumCodeCells += numCodeCellsIn(notebook, writer);
-			notebook.clearContents();
+		int totalNumCodeCells = 0;
+		List<Future<Integer>> result = ThreadExecutor.getInstance().invokeAll(tasks);
+		for (int i=0; i<notebooks.size(); i++) {
+			totalNumCodeCells += writeCodeCellsLine(result.get(i), notebooks.get(i), writer);
 		}
 		writer.close();
 		return totalNumCodeCells;
+	}
+	
+	/**
+	 * Write the data for one notebook to the code_cells file.
+	 * @param numCodeCells Wrapper around total number of code cells in the notebook
+	 * @param notebook Notebook to write information for
+	 * @param writer Writer that appends text to the code_cells file
+	 */
+	private<T> int writeCodeCellsLine(Future<T> numCodeCells, Notebook notebook, Writer writer) throws IOException {
+		int numCodeCellsValue = 0;
+		try {
+			numCodeCellsValue =(int) numCodeCells.get();
+		} catch (InterruptedException | ExecutionException e) {
+			System.err.println("Could not get cell count for " + notebook.getName() + ": " + e);
+		}
+		writer.write(notebook.getName() + ", " + numCodeCellsValue + "\n");
+		return numCodeCellsValue;
 	}
 	
 	/**
@@ -331,21 +417,6 @@ public class NotebookAnalyzer extends Analyzer {
 	 */
 	private String numCodeCellsHeader() {
 		return "file, code cells\n";
-	}
-
-	/**
-	 * Count the number of code cells in a notebook, and write it to a file on
-	 * CSV format.
-	 * @param notebook Notebook to count code cells in 
-	 * @param csvWriter Open writer that writes to the code cells CSV file
-	 * @return Number of code cells in notebook
-	 * @throws IOException On problems when writing to the CSV file
-	 */
-	private int numCodeCellsIn(Notebook notebook, Writer csvWriter) 
-			throws IOException {
-		int numCodeCells = employ(new CodeCellCounter(notebook));
-		csvWriter.write(notebook.getName() + ", " + numCodeCells + "\n");
-		return numCodeCells;
 	}
 	
 	/**
@@ -456,20 +527,6 @@ public class NotebookAnalyzer extends Analyzer {
 			System.out.println(language + ": " + languages.get(language));
 		}
 		System.out.println("");
-	}
-	
-	private <T> T employ(Worker<T> worker) {
-		try {
-			Future<T> result = ThreadExecutor.getInstance().submit(worker);
-			return result.get();
-		} catch (ExecutionException e) {
-			System.err.println(e.getMessage() + " Skipping notebook " + worker.notebook.getName() + "!");
-			return worker.defaultValue();
-		} catch (InterruptedException e) {
-			System.err.println("A thread was interrupted: " +
-					e.getMessage() + " Trying again!");
-			return employ(worker);
-		}
 	}
 
 	public static void main(String[] args) {

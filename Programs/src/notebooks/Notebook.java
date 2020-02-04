@@ -1,13 +1,14 @@
 package notebooks;
 
 import java.io.*;
-
+import java.lang.ref.WeakReference;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.zip.ZipOutputStream;
 
 import java.util.zip.ZipEntry;
 import java.util.*;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.json.*;
 
@@ -22,7 +23,8 @@ public class Notebook {
 	private int locContents;	// Number of non-empty code lines
 	private volatile boolean locCounted = false;
 	private LangSpec languageSpecIn;
-	private JSONObject contents;
+	private WeakReference<JSONObject> contents;
+	private ReentrantLock contentsLock = new ReentrantLock();
 	
 	public Notebook(String path) {
 		this(path, "");
@@ -63,14 +65,6 @@ public class Notebook {
 	
 	public void setRepro(String reproName) {
 		this.repro = reproName;
-	}
-	
-	/**
-	 * Reset the stored contents. This metod cat be used to decrease the
-	 * memory load.
-	 */
-	public void clearContents() {
-		contents = null;
 	}
 	
 	/**
@@ -519,17 +513,22 @@ public class Notebook {
 	 * @return A JSONObject containing the contents of the notebook
 	 */
 	private JSONObject getNotebook() {
-		if (null == contents) {
-			try {
+		contentsLock.lock();
+		try {
+			if (null == contents || null == contents.get()) {
+				contents = null;
 				InputStream input = new DataInputStream(new FileInputStream(new File(this.path)));
 				JSONTokener tokener = new JSONTokener(input);
-				contents = new JSONObject(tokener);
-			} catch (FileNotFoundException e) {
-				System.err.println("Could not read " + this.path + ": " + e + ". Skipping notebook!");
-				contents = new JSONObject();
+				JSONObject contentsReferent = new JSONObject(tokener);
+				contents = new WeakReference<JSONObject>(contentsReferent);
 			}
+		} catch (FileNotFoundException e) {
+			System.err.println("Could not read " + this.path + ": " + e + ". Skipping notebook!");
+			contents = new WeakReference<JSONObject>(new JSONObject());
+		} finally {
+			contentsLock.unlock();
 		}
-		return contents;
+		return contents.get();
 	}
 	
 	/**
