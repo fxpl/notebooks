@@ -18,10 +18,6 @@ public class NotebookAnalyzer extends Analyzer {
 			LangSpec.CODE_CELLS};
 	private final int CONNECTION_NOTEBOOKS = 50000;
 	
-	/**
-	 * Note that when you are done with this Analyzer, you must call the method
-	 * shutDown!
-	 */
 	public NotebookAnalyzer() {
 		super();
 		this.notebooks = new ArrayList<Notebook>();
