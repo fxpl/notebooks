@@ -15,21 +15,27 @@ public class ConnectionsLineBuilder implements Callable<String> {
 	private Notebook notebook;
 	private Map <Notebook, SnippetCode[]> file2hashes;
 	private Map<SnippetCode, List<Snippet>> hash2files;
+	private boolean heartBeat;
 	
 	/**
 	 * @param notebook Notebook to print connections for
 	 * @param file2hashes Mapping from notebook to snippets
 	 * @param hash2files Mapping from snippets to position in notebooks
+	 * @param heartBeat Tells whether a heart beat text should be printed for this notebook
 	 */
 	public ConnectionsLineBuilder(Notebook notebook, Map<Notebook, SnippetCode[]> file2hashes,
-			Map<SnippetCode, List<Snippet>> hash2files) {
+			Map<SnippetCode, List<Snippet>> hash2files, boolean heartBeat) {
 		this.notebook = notebook;
 		this.file2hashes = file2hashes;
 		this.hash2files = hash2files;
+		this.heartBeat = heartBeat;
 	}
 
 	@Override
 	public String call() throws Exception {
+		if (heartBeat) {
+			System.out.println("Analyzing connections of " + notebook.getName());
+		}
 		int connections = 0;
 		int nonEmptyConnections = 0;	// Connections excluding empty snippets
 		int intraReproConnections = 0;

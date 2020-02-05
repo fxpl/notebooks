@@ -98,7 +98,7 @@ public class NotebookAnalyzer extends Analyzer {
 			writeCodeCellsLine(result.get(index), notebook, codeCellsWriter);
 			writeLocLine(result.get(index+1), result.get(index+2), result.get(index+3), notebook, LOCWriter);
 			writeLanguagesLine(result.get(index+4), notebook, langWriter);
-			writeallLanguagesLine(result.get(index+5), notebook, allLangWriter);
+			writeAllLanguagesLine(result.get(index+5), notebook, allLangWriter);
 			storeHashes(result.get(index+6), notebook, snippets);
 		}
 		
@@ -148,10 +148,11 @@ public class NotebookAnalyzer extends Analyzer {
 		List<Future<SnippetCode[]>> result = ThreadExecutor.getInstance().invokeAll(tasks);
 		Map<Notebook, SnippetCode[]> snippets = new HashMap<Notebook, SnippetCode[]>();
 		for (int i=0; i<notebooks.size(); i++) {
+			Notebook notebook = notebooks.get(i);
 			if (0 == i%10000) {
-				System.out.println("Retreiving hashes in notebook " + i);
+				System.out.println("Retrieving hashes in " + notebook.getName());
 			}
-			storeHashes(result.get(i), notebooks.get(i), snippets);
+			storeHashes(result.get(i), notebook, snippets);
 		}
 		return snippets;
 	}
@@ -181,7 +182,7 @@ public class NotebookAnalyzer extends Analyzer {
 		Map<SnippetCode, List<Snippet>> clones = new HashMap<SnippetCode, List<Snippet>>();
 		for (Notebook notebook: fileMap.keySet()) {
 			if (0 == numAnalyzed%10000) {
-				System.out.println("Finding clones in notebook " + numAnalyzed);
+				System.out.println("Finding clones in " + notebook.getName());
 			}
 			SnippetCode[] snippetCodes = fileMap.get(notebook);
 			for (int j=0; j<snippetCodes.length; j++) {
@@ -214,7 +215,7 @@ public class NotebookAnalyzer extends Analyzer {
 		writer.write(allLanguagesHeader());
 		for (int i=0; i<notebooks.size(); i++) {
 			Notebook notebook = notebooks.get(i);
-			writeallLanguagesLine(result.get(i), notebook, writer);
+			writeAllLanguagesLine(result.get(i), notebook, writer);
 		}
 		writer.close();
 	}
@@ -237,7 +238,7 @@ public class NotebookAnalyzer extends Analyzer {
 	 * @param notebook Notebook to write information for
 	 * @param writer Writer that appends text to the all_languages file
 	 */
-	private<T> void writeallLanguagesLine(Future<T> languages, Notebook notebook, Writer writer) throws IOException {
+	private<T> void writeAllLanguagesLine(Future<T> languages, Notebook notebook, Writer writer) throws IOException {
 		writer.write(notebook.getName());
 		try {
 			@SuppressWarnings("unchecked")
