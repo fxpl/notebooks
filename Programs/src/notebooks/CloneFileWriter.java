@@ -136,7 +136,8 @@ public class CloneFileWriter {
 		int connectionsToPrint = Math.min(NUM_CONNECTIONS, file2hashes.size());
 		List<Callable<String>> tasks = new ArrayList<Callable<String>>(connectionsToPrint);
 		for (int i=0; i<connectionsToPrint; i++) {
-			tasks.add(new ConnectionsLineBuilder(notebooks.get(i), file2hashes, hash2files));
+			boolean heartBeat = 0 == i%10000;
+			tasks.add(new ConnectionsLineBuilder(notebooks.get(i), file2hashes, hash2files, heartBeat));
 		}
 		List<Future<String>> result = ThreadExecutor.getInstance().invokeAll(tasks);
 		for (int i=0; i<connectionsToPrint; i++) {
