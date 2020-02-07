@@ -10,8 +10,8 @@
 ################################################################################
 
 hashFile=`./get_latest_output.sh "hash2files"`
-projPath=/proj/uppstore2019098/notebooks
-pathFile=$projPath/notebook_paths.txt
+diskPath=/home/maka4186/notebook_disk
+pathFile=$diskPath/notebook_paths.txt
 numSnippets=100	# Number of snippets to print
 minLength=4	# Minimum number of lines in snippet
 
@@ -30,7 +30,7 @@ sed -n "2,$ p" $hashFile | grep -o ',' -n | uniq -c | sort -rn \
 		# Information about the snippet
 		notebook=`echo $line | cut -d',' -f3`
 		snippetIndex=`echo $line | cut -d',' -f4 | tr -d ' '`
-		notebookPath=$projPath"/"`grep $notebook $pathFile | cut -d'/' -f2-`
+		notebookPath=$diskPath"/"`grep $notebook $pathFile | cut -d'/' -f2-`
 
 		# Number of occurrences of the snippet
 		numOccurrences=`egrep "$notebook, $snippetIndex," $hashFile | grep -o ',' -n | uniq -c | rev | cut -d' ' -f2 | rev`

@@ -12,24 +12,31 @@
 # language at all, specified. Report result in pure numbers and percentages.
 ################################################################################
 
+LC_NUMERIC="en_US.UTF-8"
+
 languages=( PYTHON JULIA R SCALA OTHER UNKNOWN )
 file=`./get_latest_output.sh "languages"`
 total=`sed -n "2,$ p" $file | wc -l`
 percentages="("
+numbers="("
 
 i=0
 for language in ${languages[@]}; do
-	number=`sed -n "2,$ p" $file | cut -d',' -f2 | egrep " $language$" | wc -l`
-	perc=`echo 100*$number/$total | bc -l`
+	num=`sed -n "2,$ p" $file | cut -d',' -f2 | egrep " $language$" | wc -l`
+	perc=`echo 100*$num/$total | bc -l`
 	perc=`printf "%.4f" $perc`
-	echo "$language: $number/$total ($perc%)"
+	echo "$language: $num/$total ($perc%)"
 	if [ $i -gt 0 ]; then
 		percentages="$percentages,"
+		numbers="$numbers,"
 	fi
+	numbers="$numbers $num"
 	percentages="$percentages $perc"
 	((i++))
 done
+numbers="$numbers )"
 percentages="$percentages )"
 
+echo "Numbers: $numbers"
 echo "Percentages: $percentages"
 
