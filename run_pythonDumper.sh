@@ -5,7 +5,11 @@
 #SBATCH -p core -n 2
 #SBATCH -J notebook_pythonZipDumper
 
-java -XX:+UseParallelGC -cp Programs/bin:Programs/external/json-simple-1.1.1.jar -Xmx12G \
-	notebooks.PythonZipDumper /proj/uppstore2019098/notebooks /proj/uppstore2019098/snippets
+diskPath=/home/maka4186/notebook_disk
+nbPath=$diskPath/notebooks
+targetDir=$diskPath/snippets
+
+java -XX:+UseParallelGC -cp Programs/bin:Programs/external/json-20190722.jar -Xmx12G \
+	notebooks.PythonZipDumper $nbPath $targetDir
 
 
