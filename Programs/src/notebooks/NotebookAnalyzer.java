@@ -164,6 +164,7 @@ public class NotebookAnalyzer extends Analyzer {
 			hashValues = (SnippetCode[])hashes.get();
 		} catch (InterruptedException | ExecutionException e) {
 			System.err.println("Could not get snippets for " + notebook.getName() + ": " + e);
+			e.printStackTrace();
 			hashValues = new SnippetCode[0];
 		}
 		snippets.put(new Notebook(notebook), hashValues);
@@ -246,6 +247,7 @@ public class NotebookAnalyzer extends Analyzer {
 				writer.write(", UNKNOWN");
 			}
 			System.err.println("Could not get language values for " + notebook.getName() + ": " + e);
+			e.printStackTrace();
 		}
 		writer.write("\n");
 	}
@@ -290,6 +292,7 @@ public class NotebookAnalyzer extends Analyzer {
 			languageValue = (Language) language.get();
 		} catch (InterruptedException | ExecutionException e) {
 			System.err.println("Could not get language information for " + notebook.getName() + ": " + e);
+			e.printStackTrace();
 			languageValue = new Language();
 		}
 		writer.write(notebook.getName() + ", " + languageValue.toString() + "\n");
@@ -350,6 +353,7 @@ public class NotebookAnalyzer extends Analyzer {
 			blankLocValue = (Integer) blankLoc.get();
 		} catch (InterruptedException | ExecutionException e) {
 			System.err.println("Could not get line count for " + notebook.getName() + ": " + e);
+			e.printStackTrace();
 		}
 		writer.write(notebook.getName() + ", " + locValue + ", " + nonBlankLocValue + ", " + blankLocValue + "\n");
 		return locValue;
@@ -397,6 +401,7 @@ public class NotebookAnalyzer extends Analyzer {
 			numCodeCellsValue =(Integer) numCodeCells.get();
 		} catch (InterruptedException | ExecutionException e) {
 			System.err.println("Could not get cell count for " + notebook.getName() + ": " + e);
+			e.printStackTrace();
 		}
 		writer.write(notebook.getName() + ", " + numCodeCellsValue + "\n");
 		return numCodeCellsValue;
