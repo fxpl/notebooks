@@ -501,7 +501,6 @@ public class Notebook {
 		contentsLock.lock();
 		try {
 			if (null == contents || null == contents.get()) {
-				contents = null;
 				InputStream input = new DataInputStream(new FileInputStream(new File(this.path)));
 				JSONTokener tokener = new JSONTokener(input);
 				JSONObject contentsReferent = new JSONObject(tokener);
