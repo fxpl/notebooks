@@ -7,7 +7,7 @@
 
 diskPath="/home/maka4186/notebook_disk"
 srcDir="$diskPath/notebooks"
-logFile="../Logs/analyzer-all-some-missing.out"	# TODO!!!
+logFile="../Logs/analyzer-all-with-unparseable.out"
 unparseable="../Logs/unparseable.txt"
 targetDir="$diskPath/unparseable_notebooks"
 
