@@ -30,7 +30,7 @@ public class PythonZipDumperTest extends DumperTest {
 	 * Verify that dump creates one zip file per Python notebook.
 	 */
 	@Test
-	public void testDump_singleFile() throws IOException {
+	public void testDump_wholeDir() throws IOException {
 		String src = "test/data/dump";
 		String[] expectedZipFiles = {"dump/nb1.zip", "dump/nb1_str.zip",
 				"dump/nb2.zip", "dump/nb3.zip", "dump/sub/nb4.zip"};
