@@ -14,6 +14,7 @@
 
 LC_NUMERIC="en_US.UTF-8"
 
+# Langugaes
 languages=( PYTHON JULIA R SCALA OTHER UNKNOWN )
 file=`./get_latest_output.sh "languages"`
 total=`sed -n "2,$ p" $file | wc -l`
@@ -39,4 +40,15 @@ percentages="$percentages )"
 
 echo "Numbers: $numbers"
 echo "Percentages: $percentages"
+echo ""
+
+# Language specification
+specFields=( METADATA_LANGUAGEINFO_NAME METADATA_LANGUAGE METADATA_KERNELSPEC_LANGUAGE CODE_CELLS)
+for specField in ${specFields[@]}; do
+	num=`sed -n "2,$ p" $file | cut -d',' -f3 | egrep " $specField$" | wc -l`
+	perc=`echo 100*$num/$total | bc -l`
+	perc=`printf "%.4f" $perc`
+	echo "$specField: $num/$total ($perc%)"
+done
+echo ""
 
