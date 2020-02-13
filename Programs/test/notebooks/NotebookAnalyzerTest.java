@@ -53,7 +53,7 @@ public class NotebookAnalyzerTest {
 		String[] expectedHash2filesLines = {hash2filesHeader(),
 				snippetHash + ", 1, " + notebookFile + ", 0"};
 		String[] expectedCloneFreqLines = {cloneFrequencyHeader(),
-				notebookFile + ", 0, 1, 0.0000"};
+				notebookFile + ", 1, 0, 0, 0.0000, 0.0000"};
 		String[] expectedConnectionsLines = {connectionsHeader(),
 				notebookFile + ", 0, 0.0000, 0, 0.0000, 0, 0, 0.0000, 0.0000"};
 		
@@ -452,7 +452,7 @@ public class NotebookAnalyzerTest {
 		};
 		String[] expectedFrequencyLines = {
 				cloneFrequencyHeader(),
-				notebookFile + ", 0, 0, 0"
+				notebookFile + ", 0, 0, 0, 0, 0"
 		};
 		String[] expectedConnectionsLines = {
 				connectionsHeader(),
@@ -495,7 +495,7 @@ public class NotebookAnalyzerTest {
 		};
 		String[] expectedFrequencyLiens = {
 				cloneFrequencyHeader(),
-				notebookFile + ", 2, 0, 1.0000"
+				notebookFile + ", 0, 2, 2, 1.0000, 1.0000"
 		};
 		String[] expectedConnectionsLines = {
 				connectionsHeader(),
@@ -538,7 +538,7 @@ public class NotebookAnalyzerTest {
 		};
 		String[] expectedFrequencyLines = {
 				cloneFrequencyHeader(),
-				notebookFile + ", 2, 0, 1.0000"
+				notebookFile + ", 0, 2, 2, 1.0000, 1.0000"
 		};
 		String[] expectedConnectionsLines = {
 				connectionsHeader(),
@@ -579,7 +579,7 @@ public class NotebookAnalyzerTest {
 		// hash2Files is hard to test since we don't know in which order the hashes are stored
 		String[] expectedFrequencyLines = {
 			cloneFrequencyHeader(),
-			notebookFile + ", 2, 1, 0.6667"
+			notebookFile + ", 1, 2, 2, 0.6667, 0.6667"
 		};
 		String[] expectedConnectionsLines = {
 			connectionsHeader(),
@@ -785,7 +785,7 @@ public class NotebookAnalyzerTest {
 	 * @return Expected header of cloneFrequency files
 	 */
 	private static String cloneFrequencyHeader() {
-		return "file, clones, unique, clone frequency";
+		return "file, unique, clones, non-empty clones, clone frequency, non-empty clone frequency";
 	}
 	
 	/**

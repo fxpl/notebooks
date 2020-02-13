@@ -82,18 +82,29 @@ public class CloneFileWriter {
 		writer.write(cloneFrequencyHeader());
 		for (Notebook notebook: file2hashes.keySet()) {
 			int numClones = 0, numUnique = 0;
+			int numClonesNE = 0;
 			SnippetCode[] code = file2hashes.get(notebook);
 			for (SnippetCode snippet: code) {
 				if(isClone(snippet, hash2files)) {
 					numClones++;
+					if (!snippet.isEmpty()) {
+						numClonesNE++;
+					}
 				} else {
 					numUnique++;
 				}
 			}
-			writer.write(notebook.getName() + ", " + numClones + ", " + numUnique + ", ");
+			writer.write(notebook.getName() + ", " + numUnique + ", " + numClones + ", " + numClonesNE + ", ");
 			int numSnippets = numClones + numUnique;
+			int numSnippetsNE = numClonesNE + numUnique;
 			if (0 != numSnippets) {
 				double cloneFrequency = (double)numClones / numSnippets;
+				writer.write(String.format(Locale.US, "%.4f", cloneFrequency) + ", ");
+			} else {
+				writer.write("0, ");
+			}
+			if (0 != numSnippetsNE) {
+				double cloneFrequency = (double)numClonesNE / numSnippetsNE;
 				writer.write(String.format(Locale.US, "%.4f", cloneFrequency) + "\n");
 			} else {
 				writer.write("0\n");
@@ -182,7 +193,7 @@ public class CloneFileWriter {
 	 * @return Header for the cloneFrequency csv file
 	 */
 	private static String cloneFrequencyHeader() {
-		return "file, clones, unique, clone frequency\n";
+		return "file, unique, clones, non-empty clones, clone frequency, non-empty clone frequency\n";
 	}
 	
 	/**

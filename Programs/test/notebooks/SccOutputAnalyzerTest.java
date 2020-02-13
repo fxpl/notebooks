@@ -209,17 +209,17 @@ public class SccOutputAnalyzerTest {
 		
 		String[] expectedLines = {
 				cloneFrequencyHeader(),
-				"nb_1.ipynb, 2, 0, 1.0000",
-				"nb_2.ipynb, 3, 0, 1.0000",
-				"nb_3.ipynb, 1, 1, 0.5000",
-				"nb_4.ipynb, 1, 0, 1.0000",
-				"nb_5.ipynb, 2, 0, 1.0000",
-				"nb_6.ipynb, 2, 0, 1.0000",
-				"nb_7.ipynb, 3, 0, 1.0000",
-				"nb_8.ipynb, 1, 0, 1.0000",
-				"nb_9.ipynb, 2, 0, 1.0000",
-				"nb_10.ipynb, 1, 0, 1.0000",
-				"nb_11.ipynb, 1, 0, 1.0000"
+				"nb_1.ipynb, 0, 2, 2, 1.0000, 1.0000",
+				"nb_2.ipynb, 0, 3, 3, 1.0000, 1.0000",
+				"nb_3.ipynb, 1, 1, 1, 0.5000, 0.5000",
+				"nb_4.ipynb, 0, 1, 0, 1.0000, 0",
+				"nb_5.ipynb, 0, 2, 1, 1.0000, 1.0000",
+				"nb_6.ipynb, 0, 2, 2, 1.0000, 1.0000",
+				"nb_7.ipynb, 0, 3, 3, 1.0000, 1.0000",
+				"nb_8.ipynb, 0, 1, 1, 1.0000, 1.0000",
+				"nb_9.ipynb, 0, 2, 2, 1.0000, 1.0000",
+				"nb_10.ipynb, 0, 1, 0, 1.0000, 0",
+				"nb_11.ipynb, 0, 1, 1, 1.0000, 1.0000"
 		};
 		
 		analyzer.clones(statsFile, reproFile, pairFile);
@@ -294,7 +294,7 @@ public class SccOutputAnalyzerTest {
 	 * @return Expected header of cloneFrequency files
 	 */
 	private static String cloneFrequencyHeader() {
-		return "file, clones, unique, clone frequency";
+		return "file, unique, clones, non-empty clones, clone frequency, non-empty clone frequency";
 	}
 	
 	/**

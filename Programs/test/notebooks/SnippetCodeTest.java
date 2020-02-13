@@ -60,6 +60,23 @@ public class SnippetCodeTest {
 	}
 	
 	@Test
+	public void testIsEmpty() {
+		assertFalse("Non-empty snippet code  considered empty!", code.isEmpty());
+	}
+
+	@Test
+	public void testIsEmpty_emptyHash() {
+		SnippetCode emptyCode = new SnippetCode(1, "D41D8CD98F00B204E9800998ECF8427E");
+		assertTrue("Empty snippet code considered non-empty!", emptyCode.isEmpty());
+	}
+	
+	@Test
+	public void testIsEmpty_0loc() {
+		SnippetCode emptyCode = new SnippetCode(0, hash);
+		assertTrue("Empty snippet code considered non-empty!", emptyCode.isEmpty());
+	}
+	
+	@Test
 	public void testToString() {
 		assertEquals("Wrong string representation!", hash, code.toString());
 	}
