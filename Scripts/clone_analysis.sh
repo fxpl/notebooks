@@ -61,29 +61,3 @@ echo "Files containing no snippets: $noSnippets ($noSnippetsFrac)"
 echo "On average the following fraction of snippets in a file are clones:"
 echo "(`echo "$fractionClones" | paste -sd+`) / $numFiles" | bc -l
 
-# Report the number of snippets that are non-unique within each notebook.
-intraCloneFile="../Output/intra_clones.csv"
-echo "file, intra clones" > $intraCloneFile
-sed -n "2,$ p" $file2hashes | while read line;
-do
-	intraClones=0
-	notebook=`echo $line | cut -d',' -f1`
-	hashString=`echo $line | cut -d',' -f2-`
-	IFS=',' read -a hashes <<< $hashString
-	for i in "${!hashes[@]}";
-	do
-		for j in "${!hashes[@]}";
-		do
-			if [ $i -ne $j ] && [ "${hashes[$i]}" == "${hashes[$j]}" ];
-			then	
-				# Snippet number i has a clone.
-				intraClones=$((intraClones+1))
-				# Only count each cloned snippet once.
-				break
-			fi
-		done
-	done
-	echo "$notebook, $intraClones" >> $intraCloneFile
-done
-
-

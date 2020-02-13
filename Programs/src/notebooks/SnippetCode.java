@@ -61,6 +61,23 @@ public class SnippetCode {
 		}
 	}
 	
+	/**
+	 * @param snippetsInNotebook All snippet in the notebook
+	 * @returns True if snippet is an intra notebook clone
+	 */
+	public boolean isIntraClone(SnippetCode[] snippetsInNotebook) {
+		int copies = 0;
+		for (SnippetCode snippetInNotebook: snippetsInNotebook) {
+			if (this.equals(snippetInNotebook)) {
+				copies++;
+				if (1 < copies) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
 	@Override
 	public String toString() {
 		return hash;
