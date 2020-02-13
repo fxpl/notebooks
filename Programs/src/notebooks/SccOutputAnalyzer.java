@@ -23,7 +23,7 @@ public class SccOutputAnalyzer extends Analyzer {
 	
 	/**
 	 * Perform the clone analysis based on SourcererCC output files. Write
-	 * file2hashes<current-date-time>.csv, hash2files<current-date-time>.csv,
+	 * file2hashesA<current-date-time>.csv, hash2filesA<current-date-time>.csv,
 	 * cloneFrequencies<current-date-time>.csv and
 	 * connections<current-date-time>.csv accordingly.
 	 * This methods initializes snippet and repro information, so you shouldn't
@@ -45,7 +45,7 @@ public class SccOutputAnalyzer extends Analyzer {
 	
 	/**
 	 * Perform the clone analysis based on SourcererCC output files. Write
-	 * file2hashes<current-date-time>.csv, hash2files<current-date-time>.csv,
+	 * file2hashesA<current-date-time>.csv, hash2filesA<current-date-time>.csv,
 	 * cloneFrequencies<current-date-time>.csv and
 	 * connections<current-date-time>.csv accordingly.
 	 * Note that you have to initialize the snippet and repro information, by

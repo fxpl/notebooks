@@ -245,7 +245,7 @@ public class SccOutputAnalyzerTest {
 		};
 
 		analyzer.clones(statsFile, reproMap, pairFile);
-		TestUtils.checkCsv_matches("hash2files", expectedLines);
+		TestUtils.checkCsv_matches("hash2filesA", expectedLines);
 		TestUtils.deleteCloneCsvs();
 	}
 	
@@ -267,7 +267,7 @@ public class SccOutputAnalyzerTest {
 		};
 
 		analyzer.clones(statsFile, reproMap, pairFile);
-		TestUtils.checkCsv_matches("hash2files", expectedLines);
+		TestUtils.checkCsv_matches("hash2filesA", expectedLines);
 		TestUtils.deleteCloneCsvs();
 	}
 	

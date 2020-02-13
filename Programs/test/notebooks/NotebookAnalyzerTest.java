@@ -65,8 +65,8 @@ public class NotebookAnalyzerTest {
 		TestUtils.checkCsv("loc", expectedLOCLines);
 		TestUtils.checkCsv("languages", expectedLangLines);
 		TestUtils.checkCsv("all_languages", expectedAllLangLines);
-		TestUtils.checkCsv("file2hashes", expectedFile2hashesLines);
-		TestUtils.checkCsv("hash2files", expectedHash2filesLines);
+		TestUtils.checkCsv("file2hashesA", expectedFile2hashesLines);
+		TestUtils.checkCsv("hash2filesA", expectedHash2filesLines);
 		TestUtils.checkCsv("cloneFrequency", expectedCloneFreqLines);
 		TestUtils.checkCsv("connections", expectedConnectionsLines);
 		
@@ -137,8 +137,8 @@ public class NotebookAnalyzerTest {
 				"loc",
 				"languages",
 				"all_languages",
-				"file2hashes",
-				"hash2files",
+				"file2hashesA",
+				"hash2filesA",
 				"cloneFrequency",
 				"connections"
 		};
@@ -433,8 +433,8 @@ public class NotebookAnalyzerTest {
 	}
 	
 	/**
-	 * Verify that the output files file2hashes<current-date-time>.csv,
-	 * hash2files<current-date-time>.csv cloneFrequency<current-date-time>.csv
+	 * Verify that the output files file2hashesA<current-date-time>.csv,
+	 * hash2filesA<current-date-time>.csv cloneFrequency<current-date-time>.csv
 	 * and connections<current-date-time>.csv have the right content after
 	 * clone analysis of an empty notebook.
 	 * @throws IOException
@@ -464,8 +464,8 @@ public class NotebookAnalyzerTest {
 		analyzer.initializeReproInfo(dataDir + "/" + reproMapName);
 		analyzer.clones();
 		
-		TestUtils.checkCsv("file2hashes", expectedSnippetLines);
-		TestUtils.checkCsv("hash2files", expectedClonesLines);
+		TestUtils.checkCsv("file2hashesA", expectedSnippetLines);
+		TestUtils.checkCsv("hash2filesA", expectedClonesLines);
 		TestUtils.checkCsv("cloneFrequency", expectedFrequencyLines);
 		TestUtils.checkCsv("connections", expectedConnectionsLines);
 		
@@ -473,8 +473,8 @@ public class NotebookAnalyzerTest {
 	}
 	
 	/**
-	 * Verify that the output files file2hashes<current-date-time>.csv,
-	 * hash2files<current-date-time>.csv, cloneFrequency<current-date-time>.csv
+	 * Verify that the output files file2hashesA<current-date-time>.csv,
+	 * hash2filesA<current-date-time>.csv, cloneFrequency<current-date-time>.csv
 	 * and connections<current-date-time>.csv have the right content after
 	 * clone analysis of a notebook with a single snippet.
 	 * @throws IOException
@@ -507,8 +507,8 @@ public class NotebookAnalyzerTest {
 		analyzer.initializeReproInfo(dataDir + "/" + reproFile);
 		analyzer.clones();
 		
-		TestUtils.checkCsv("file2hashes", expectedSnippetLines);
-		TestUtils.checkCsv("hash2files", expectedClonesLines);
+		TestUtils.checkCsv("file2hashesA", expectedSnippetLines);
+		TestUtils.checkCsv("hash2filesA", expectedClonesLines);
 		TestUtils.checkCsv("cloneFrequency", expectedFrequencyLiens);
 		TestUtils.checkCsv("connections", expectedConnectionsLines);
 		
@@ -516,8 +516,8 @@ public class NotebookAnalyzerTest {
 	}
 	
 	/**
-	 * Verify that the output files file2hashes<current-date-time>.csv, 
-	 * hash2files<current-date-time>.csv, cloneFrequency<current-date-time>.csv
+	 * Verify that the output files file2hashesA<current-date-time>.csv, 
+	 * hash2filesA<current-date-time>.csv, cloneFrequency<current-date-time>.csv
 	 * and connections<current-date-time>.csv have the right content after
 	 * clone analysis of a notebooks with a clone.
 	 * @throws IOException
@@ -550,8 +550,8 @@ public class NotebookAnalyzerTest {
 		analyzer.initializeReproInfo(dataDir + "/" + reproFile);
 		analyzer.clones();
 		
-		TestUtils.checkCsv("file2hashes", expectedFile2HashesLines);
-		TestUtils.checkCsv("hash2files", expectedHash2FileLines);
+		TestUtils.checkCsv("file2hashesA", expectedFile2HashesLines);
+		TestUtils.checkCsv("hash2filesA", expectedHash2FileLines);
 		TestUtils.checkCsv("cloneFrequency", expectedFrequencyLines);
 		TestUtils.checkCsv("connections", expectedConnectionsLines);
 		
@@ -559,7 +559,7 @@ public class NotebookAnalyzerTest {
 	}
 	
 	/**
-	 * Verify that the output files file2hashes<current-date-time>.csv,
+	 * Verify that the output files file2hashesA<current-date-time>.csv,
 	 * cloneFrequency<current-date-time>.csv and
 	 * connections<current-date-time>.csv have the right content after clone
 	 * analysis of a notebooks with both clones and a unique snippet.
@@ -591,7 +591,7 @@ public class NotebookAnalyzerTest {
 		analyzer.initializeReproInfo(dataDir + "/" + reproFile);
 		analyzer.clones();
 		
-		TestUtils.checkCsv("file2hashes", expectedFile2HashesLines);
+		TestUtils.checkCsv("file2hashesA", expectedFile2HashesLines);
 		TestUtils.checkCsv("cloneFrequency", expectedFrequencyLines);
 		TestUtils.checkCsv("connections", expectedConnectionsLines);
 		
