@@ -217,12 +217,12 @@ public class NotebookTest {
 		String[] files = {"nb_4.ipynb", "nb_5.ipynb",
 				"nb_6.ipynb", "nb_7.ipynb"};
 		String[][] expectedHashStrings = {
-				{"D41D8CD98F00B204E9800998ECF8427E"},
+				{"D41D8CD98F00B204E9800998ECF8427E", "D41D8CD98F00B204E9800998ECF8427E"},
 				{"D41D8CD98F00B204E9800998ECF8427E"},
 				{"33BE8D72467938FBB23EF42CF8C9E85F"},
 				{"33BE8D72467938FBB23EF42CF8C9E85F", "6CABFDBC20F69189D4B8894A06C78F49"}
 		};
-		int[][] expectedLOC = {{0}, {0}, {1}, {1, 1}};
+		int[][] expectedLOC = {{0, 0}, {0}, {1}, {1, 1}};
 		
 		for (int i=0; i<files.length; i++) {
 			Notebook notebook = new Notebook(dataDir + "/" + files[i]);
