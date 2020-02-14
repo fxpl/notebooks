@@ -53,7 +53,7 @@ public class NotebookAnalyzerTest {
 		String[] expectedHash2filesLines = {hash2filesHeader(),
 				snippetHash + ", 1, " + notebookFile + ", 0"};
 		String[] expectedCloneFreqLines = {cloneFrequencyHeader(),
-				notebookFile + ", 0, 1, 0.0000"};
+				notebookFile + ", 1, 0, 0, 0.0000, 0.0000, 0, 0"};
 		String[] expectedConnectionsLines = {connectionsHeader(),
 				notebookFile + ", 0, 0.0000, 0, 0.0000, 0, 0, 0.0000, 0.0000"};
 		
@@ -65,8 +65,8 @@ public class NotebookAnalyzerTest {
 		TestUtils.checkCsv("loc", expectedLOCLines);
 		TestUtils.checkCsv("languages", expectedLangLines);
 		TestUtils.checkCsv("all_languages", expectedAllLangLines);
-		TestUtils.checkCsv("file2hashes", expectedFile2hashesLines);
-		TestUtils.checkCsv("hash2files", expectedHash2filesLines);
+		TestUtils.checkCsv("file2hashesA", expectedFile2hashesLines);
+		TestUtils.checkCsv("hash2filesA", expectedHash2filesLines);
 		TestUtils.checkCsv("cloneFrequency", expectedCloneFreqLines);
 		TestUtils.checkCsv("connections", expectedConnectionsLines);
 		
@@ -137,8 +137,8 @@ public class NotebookAnalyzerTest {
 				"loc",
 				"languages",
 				"all_languages",
-				"file2hashes",
-				"hash2files",
+				"file2hashesA",
+				"hash2filesA",
 				"cloneFrequency",
 				"connections"
 		};
@@ -386,8 +386,9 @@ public class NotebookAnalyzerTest {
 		String reproFile = "repros.csv";
 		// Expected values
 		Map<SnippetCode, List<Snippet>> expectedClones = new HashMap<SnippetCode, List<Snippet>>();
-		List<Snippet> emptySnippets = new ArrayList<Snippet>(2);
+		List<Snippet> emptySnippets = new ArrayList<Snippet>(3);
 		emptySnippets.add(new Snippet("nb_4.ipynb", 0));
+		emptySnippets.add(new Snippet("nb_4.ipynb", 1));
 		emptySnippets.add(new Snippet("nb_5.ipynb", 0));
 		expectedClones.put(new SnippetCode(0, "D41D8CD98F00B204E9800998ECF8427E"), emptySnippets);	// Empty
 		List<Snippet> numpy = new ArrayList<Snippet>(2);
@@ -433,8 +434,8 @@ public class NotebookAnalyzerTest {
 	}
 	
 	/**
-	 * Verify that the output files file2hashes<current-date-time>.csv,
-	 * hash2files<current-date-time>.csv cloneFrequency<current-date-time>.csv
+	 * Verify that the output files file2hashesA<current-date-time>.csv,
+	 * hash2filesA<current-date-time>.csv cloneFrequency<current-date-time>.csv
 	 * and connections<current-date-time>.csv have the right content after
 	 * clone analysis of an empty notebook.
 	 * @throws IOException
@@ -452,7 +453,7 @@ public class NotebookAnalyzerTest {
 		};
 		String[] expectedFrequencyLines = {
 				cloneFrequencyHeader(),
-				notebookFile + ", 0, 0, 0"
+				notebookFile + ", 0, 0, 0, 0, 0, 0, 0"
 		};
 		String[] expectedConnectionsLines = {
 				connectionsHeader(),
@@ -464,8 +465,8 @@ public class NotebookAnalyzerTest {
 		analyzer.initializeReproInfo(dataDir + "/" + reproMapName);
 		analyzer.clones();
 		
-		TestUtils.checkCsv("file2hashes", expectedSnippetLines);
-		TestUtils.checkCsv("hash2files", expectedClonesLines);
+		TestUtils.checkCsv("file2hashesA", expectedSnippetLines);
+		TestUtils.checkCsv("hash2filesA", expectedClonesLines);
 		TestUtils.checkCsv("cloneFrequency", expectedFrequencyLines);
 		TestUtils.checkCsv("connections", expectedConnectionsLines);
 		
@@ -473,8 +474,8 @@ public class NotebookAnalyzerTest {
 	}
 	
 	/**
-	 * Verify that the output files file2hashes<current-date-time>.csv,
-	 * hash2files<current-date-time>.csv, cloneFrequency<current-date-time>.csv
+	 * Verify that the output files file2hashesA<current-date-time>.csv,
+	 * hash2filesA<current-date-time>.csv, cloneFrequency<current-date-time>.csv
 	 * and connections<current-date-time>.csv have the right content after
 	 * clone analysis of a notebook with a single snippet.
 	 * @throws IOException
@@ -495,7 +496,7 @@ public class NotebookAnalyzerTest {
 		};
 		String[] expectedFrequencyLiens = {
 				cloneFrequencyHeader(),
-				notebookFile + ", 2, 0, 1.0000"
+				notebookFile + ", 0, 2, 2, 1.0000, 1.0000, 2, 2"
 		};
 		String[] expectedConnectionsLines = {
 				connectionsHeader(),
@@ -507,8 +508,8 @@ public class NotebookAnalyzerTest {
 		analyzer.initializeReproInfo(dataDir + "/" + reproFile);
 		analyzer.clones();
 		
-		TestUtils.checkCsv("file2hashes", expectedSnippetLines);
-		TestUtils.checkCsv("hash2files", expectedClonesLines);
+		TestUtils.checkCsv("file2hashesA", expectedSnippetLines);
+		TestUtils.checkCsv("hash2filesA", expectedClonesLines);
 		TestUtils.checkCsv("cloneFrequency", expectedFrequencyLiens);
 		TestUtils.checkCsv("connections", expectedConnectionsLines);
 		
@@ -516,8 +517,8 @@ public class NotebookAnalyzerTest {
 	}
 	
 	/**
-	 * Verify that the output files file2hashes<current-date-time>.csv, 
-	 * hash2files<current-date-time>.csv, cloneFrequency<current-date-time>.csv
+	 * Verify that the output files file2hashesA<current-date-time>.csv, 
+	 * hash2filesA<current-date-time>.csv, cloneFrequency<current-date-time>.csv
 	 * and connections<current-date-time>.csv have the right content after
 	 * clone analysis of a notebooks with a clone.
 	 * @throws IOException
@@ -538,7 +539,7 @@ public class NotebookAnalyzerTest {
 		};
 		String[] expectedFrequencyLines = {
 				cloneFrequencyHeader(),
-				notebookFile + ", 2, 0, 1.0000"
+				notebookFile + ", 0, 2, 2, 1.0000, 1.0000, 2, 2"
 		};
 		String[] expectedConnectionsLines = {
 				connectionsHeader(),
@@ -550,8 +551,8 @@ public class NotebookAnalyzerTest {
 		analyzer.initializeReproInfo(dataDir + "/" + reproFile);
 		analyzer.clones();
 		
-		TestUtils.checkCsv("file2hashes", expectedFile2HashesLines);
-		TestUtils.checkCsv("hash2files", expectedHash2FileLines);
+		TestUtils.checkCsv("file2hashesA", expectedFile2HashesLines);
+		TestUtils.checkCsv("hash2filesA", expectedHash2FileLines);
 		TestUtils.checkCsv("cloneFrequency", expectedFrequencyLines);
 		TestUtils.checkCsv("connections", expectedConnectionsLines);
 		
@@ -559,7 +560,7 @@ public class NotebookAnalyzerTest {
 	}
 	
 	/**
-	 * Verify that the output files file2hashes<current-date-time>.csv,
+	 * Verify that the output files file2hashesA<current-date-time>.csv,
 	 * cloneFrequency<current-date-time>.csv and
 	 * connections<current-date-time>.csv have the right content after clone
 	 * analysis of a notebooks with both clones and a unique snippet.
@@ -579,7 +580,7 @@ public class NotebookAnalyzerTest {
 		// hash2Files is hard to test since we don't know in which order the hashes are stored
 		String[] expectedFrequencyLines = {
 			cloneFrequencyHeader(),
-			notebookFile + ", 2, 1, 0.6667"
+			notebookFile + ", 1, 2, 2, 0.6667, 0.6667, 2, 2"
 		};
 		String[] expectedConnectionsLines = {
 			connectionsHeader(),
@@ -591,7 +592,7 @@ public class NotebookAnalyzerTest {
 		analyzer.initializeReproInfo(dataDir + "/" + reproFile);
 		analyzer.clones();
 		
-		TestUtils.checkCsv("file2hashes", expectedFile2HashesLines);
+		TestUtils.checkCsv("file2hashesA", expectedFile2HashesLines);
 		TestUtils.checkCsv("cloneFrequency", expectedFrequencyLines);
 		TestUtils.checkCsv("connections", expectedConnectionsLines);
 		
@@ -609,15 +610,15 @@ public class NotebookAnalyzerTest {
 		String reproFile = "repros.csv";
 		String[] expectedLines = {
 				connectionsHeader(),
-				"nb_4.ipynb, 2, 2.0000, 0, 0.0000, 1, 0, 1.0000, 0.0000",
-				"nb_5.ipynb, 3, 1.5000, 1, 1.0000, 1, 0, 1.0000, 1.0000",
+				"nb_4.ipynb, 6, 3.0000, 0, 0.0000, 4, 0, 2.0000, 0.0000",
+				"nb_5.ipynb, 4, 2.0000, 1, 1.0000, 2, 0, 1.0000, 1.0000",
 				"nb_1.ipynb, 6, 3.0000, 6, 3.0000, 2, 2, 4.0000, 4.0000",
 				"nb_2.ipynb, 7, 2.3333, 7, 2.3333, 3, 3, 4.0000, 4.0000",
 				"nb_3.ipynb, 1, 0.5000, 1, 0.5000, 1, 1, 0.0000, 0.0000",
 				"nb_100.ipynb, 0, 0.0000, 0, 0.0000, 0, 0, 0.0000, 0.0000",
 				"nb_6.ipynb, 4, 2.0000, 4, 2.0000, 4, 4, 0.0000, 0.0000",
 				"nb_7.ipynb, 5, 1.6667, 5, 1.6667, 2, 2, 1.5000, 1.5000",
-				"nb_10.ipynb, 2, 2.0000, 0, 0.0000, 0, 0, 2.0000, 0.0000",
+				"nb_10.ipynb, 3, 3.0000, 0, 0.0000, 0, 0, 3.0000, 0.0000",
 				"nb_8.ipynb, 1, 1.0000, 1, 1.0000, 0, 0, 1.0000, 1.0000",
 				"nb_9.ipynb, 4, 2.0000, 4, 2.0000, 2, 2, 2.0000, 2.0000",
 				"nb_11.ipynb, 1, 1.0000, 1, 1.0000, 0, 0, 1.0000, 1.0000"
@@ -785,7 +786,8 @@ public class NotebookAnalyzerTest {
 	 * @return Expected header of cloneFrequency files
 	 */
 	private static String cloneFrequencyHeader() {
-		return "file, clones, unique, clone frequency";
+		return "file, unique, clones, non-empty clones, clone frequency, non-empty clone frequency, "
+				+ "intra clones, non-empty intra clones";
 	}
 	
 	/**

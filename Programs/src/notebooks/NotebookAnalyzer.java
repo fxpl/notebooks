@@ -114,9 +114,9 @@ public class NotebookAnalyzer extends Analyzer {
 	 * snippets containing that code.
 	 * For each notebook, print the name of the notebook followed by a list of
 	 * the hash of each snippet in the notebook to the file 
-	 * file2hashes<current-date-time>.csv.
+	 * file2hashesA<current-date-time>.csv.
 	 * Print each hash and the corresponding snippets (name, index) on a
-	 * separate line in the file hash2files<current-date-time>.csv.
+	 * separate line in the file hash2filesA<current-date-time>.csv.
 	 * Print the number of clones and unique snippets, and the clone frequency,
 	 * for each notebook to cloneFrequency<current-date-time>.csv.
 	 * Print the number of connections for each notebook to

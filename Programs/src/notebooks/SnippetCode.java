@@ -1,5 +1,7 @@
 package notebooks;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Objects;
 
 /**
@@ -39,6 +41,41 @@ public class SnippetCode {
 	@Override
 	public int hashCode() {
 		return Objects.hash(hash);
+	}
+	
+	/**
+	 * @returns True if the snippet has 0 lines, or the hash represents an empty string, false otherwise
+	 */
+	public boolean isEmpty() {
+		if (0 == LOC) {
+			return true;
+		} else {
+			String emptyHash = "";
+			try {
+				MessageDigest hasher = MessageDigest.getInstance("MD5");
+				emptyHash = NotebookUtils.toHexString(hasher.digest("".getBytes()));
+			} catch (NoSuchAlgorithmException e) {
+				System.err.println("MessageDigest cannot hash using MD5!");
+			}
+			return emptyHash.equals(this.hash);
+		}
+	}
+	
+	/**
+	 * @param snippetsInNotebook All snippet in the notebook
+	 * @returns True if snippet is an intra notebook clone
+	 */
+	public boolean isIntraClone(SnippetCode[] snippetsInNotebook) {
+		int copies = 0;
+		for (SnippetCode snippetInNotebook: snippetsInNotebook) {
+			if (this.equals(snippetInNotebook)) {
+				copies++;
+				if (1 < copies) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 	
 	@Override

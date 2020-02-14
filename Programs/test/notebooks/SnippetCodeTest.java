@@ -60,6 +60,54 @@ public class SnippetCodeTest {
 	}
 	
 	@Test
+	public void testIsEmpty() {
+		assertFalse("Non-empty snippet code  considered empty!", code.isEmpty());
+	}
+
+	@Test
+	public void testIsEmpty_emptyHash() {
+		SnippetCode emptyCode = new SnippetCode(1, "D41D8CD98F00B204E9800998ECF8427E");
+		assertTrue("Empty snippet code considered non-empty!", emptyCode.isEmpty());
+	}
+	
+	@Test
+	public void testIsEmpty_0loc() {
+		SnippetCode emptyCode = new SnippetCode(0, hash);
+		assertTrue("Empty snippet code considered non-empty!", emptyCode.isEmpty());
+	}
+	
+	@Test
+	public void testIsIntraClone_unique() {
+		SnippetCode[] nbSnippets = {
+			new SnippetCode(1, "DEFG"),
+			new SnippetCode(code),
+			new SnippetCode(1, "DEFG"),
+			new SnippetCode(5, "HIJK")
+		};
+		assertFalse("Incorrect intra clone found!", code.isIntraClone(nbSnippets));
+	}
+	
+	@Test
+	public void testIsIntraClone_1copy() {
+		SnippetCode[] nbSnippets = {
+			new SnippetCode(code),
+			new SnippetCode(3, "BLAHA"),
+			new SnippetCode(code)
+		};
+		assertTrue("Intra clone missed!", code.isIntraClone(nbSnippets));
+	}
+	
+	@Test
+	public void testIsIntraClone_2copies() {
+		SnippetCode[] nbSnippets = {
+			new SnippetCode(code),
+			new SnippetCode(code),
+			new SnippetCode(code)
+		};
+		assertTrue("Intra clone missed!", code.isIntraClone(nbSnippets));
+	}
+	
+	@Test
 	public void testToString() {
 		assertEquals("Wrong string representation!", hash, code.toString());
 	}
