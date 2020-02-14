@@ -2,6 +2,7 @@
 slurm-*.out
 
 # Log and pstats directory
+Logs
 logs
 
 # Output directory
@@ -9,6 +10,7 @@ Output
 
 # From R studio
 .Rhistory
+.RData
 
 # Understand files
 *.udb
