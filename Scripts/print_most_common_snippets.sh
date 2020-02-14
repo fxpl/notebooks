@@ -30,7 +30,7 @@ sed -n "2,$ p" $hashFile | grep -o ',' -n | uniq -c | sort -rn \
 		# Information about the snippet
 		notebook=`echo $line | cut -d',' -f3`
 		snippetIndex=`echo $line | cut -d',' -f4 | tr -d ' '`
-		notebookPath=$diskPath"/"`grep $notebook $pathFile | cut -d'/' -f2-`
+		notebookPath=$diskPath"/"`grep $notebook $pathFile`
 
 		# Number of occurrences of the snippet
 		numOccurrences=`egrep "$notebook, $snippetIndex," $hashFile | grep -o ',' -n | uniq -c | rev | cut -d' ' -f2 | rev`
@@ -39,7 +39,7 @@ sed -n "2,$ p" $hashFile | grep -o ',' -n | uniq -c | sort -rn \
 		# Print snippet
 		echo ""
 		echo "$i ($numOccurrences occurrences). $notebookPath($snippetIndex) :"
-		java -XX:+UseParallelGC -cp ../Programs/bin:../Programs/external/json-simple-1.1.1.jar \
+		java -XX:+UseParallelGC -cp ../Programs/bin:../Programs/external/json-20190722.jar \
 			notebooks.SnippetPrinter $notebookPath $snippetIndex
 		echo "--------------------------------------------------------------------------------"
 
