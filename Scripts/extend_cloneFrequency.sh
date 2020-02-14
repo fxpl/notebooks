@@ -24,22 +24,25 @@ do
 done
 
 # Create csv file containing both sizes, language and clone frequencies
+codeCells=`./get_latest_output.sh "code_cells"`
 locFile=`./get_latest_output.sh "loc"`
 langFile=`./get_latest_output.sh "languages"`
 cloneFreq=`./get_latest_output.sh "cloneFrequency"`
 cloneFreqWithSizes="../Output/extendedCloneFrequency.csv"
 header1=`head -1 $cloneFreq | cut -d',' -f1`
-header2=`head -1 $locFile | cut -d',' -f2-3`
-header3=`head -1 $sizeFile | cut -d',' -f2`
-header4=`head -1 $langFile | cut -d',' -f2`
-header5=`head -1 $cloneFreq | cut -d',' -f2-4`
-echo "$header1, $header2, $header3", $header4, $header5 > $cloneFreqWithSizes
+header2=`head -1 $codeCells | cut -d',' -f2`
+header3=`head -1 $locFile | cut -d',' -f2-3`
+header4=`head -1 $sizeFile | cut -d',' -f2`
+header5=`head -1 $langFile | cut -d',' -f2`
+header6=`head -1 $cloneFreq | cut -d',' -f2-4`
+echo "$header1, $header2, $header3", $header4, $header5, $header6 > $cloneFreqWithSizes
 sed -n "2,$ p" $cloneFreq | while read line;
 do
 	notebook=`echo $line | cut -d',' -f1`
 	frequencies=`echo $line | cut -d',' -f2-4`
+	cells=`grep -F $notebook $codeCells | cut -d',' -f2`
 	loc=`grep -F $notebook $locFile | cut -d',' -f2-3`
 	size=`grep -F $notebook $sizeFile | cut -d',' -f2`
 	lang=`grep -F $notebook $langFile | cut -d',' -f2`
-	echo "$notebook, $loc, $size, $lang, $frequencies" >> $cloneFreqWithSizes
+	echo "$notebook,$cells,$loc,$size,$lang,$frequencies" >> $cloneFreqWithSizes
 done
