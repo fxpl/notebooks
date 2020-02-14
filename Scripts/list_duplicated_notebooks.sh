@@ -16,13 +16,13 @@
 f2h=`./get_latest_output.sh "file2hashes"`
 duplicates=../Output/duplicates_sorted.txt
 mostDuplicated=../Output/most_duplicated_notebooks.txt
-numSeq=1000
+#numSeq=1000
 
 # For each combination of hashes (snippets), find the notebooks containing
 # this combination (in order). Sort the output on the number of notebooks
 # (descending) and write the result to the file specified above
 # ($mostDuplicated)
-sed -n "2,$ p" $f2h | cut -d' ' -f2- | egrep -v "\.ipynb" | sort | uniq -c | sort -rn | head -$numSeq > $duplicates
+sed -n "2,$ p" $f2h | cut -d' ' -f2- | egrep -v "\.ipynb" | sort | uniq -c | sort -rn > $duplicates
 
 sed -E "s/([0-9]) ([A-F,0-9])/\1, \2/" $duplicates | cut -d',' -f2- | while read hashComb
 do
