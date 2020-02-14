@@ -13,7 +13,7 @@
 # cell sequence first.
 ################################################################################
 
-f2h=`./get_latest_output.sh "file2hashes"`
+f2h=`./get_latest_output.sh "file2hashesA"`
 duplicates=../Output/duplicates_sorted.txt
 mostDuplicated=../Output/most_duplicated_notebooks.txt
 #numSeq=1000

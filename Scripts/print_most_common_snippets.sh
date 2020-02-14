@@ -9,7 +9,7 @@
 # Dump the most common snippets to stdout.
 ################################################################################
 
-hashFile=`./get_latest_output.sh "hash2files"`
+hashFile=`./get_latest_output.sh "hash2filesA"`
 diskPath=/home/maka4186/notebook_disk
 pathFile=$diskPath/notebook_paths.txt
 numSnippets=100	# Number of snippets to print
