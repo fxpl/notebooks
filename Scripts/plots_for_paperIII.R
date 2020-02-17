@@ -1,10 +1,8 @@
 setwd("~/github/fxpl/notebooks")
 rm(list=ls())
 
-# TODO: Behövs denna?
-setEPS()
+# TODO: Städa
 
-# TODO: Analys både med och utan tom snippet!
 library(dunn.test)  # TODO: Är det här biblioteket jag vill använda?
 
 outputDir <- "Output"
@@ -49,7 +47,8 @@ codeCells <- read.csv("Output/code_cells.csv", header=TRUE, stringsAsFactors=FAL
 sizes <- read.csv("Output/notebook_sizes.csv", header=TRUE)
 loc <- read.csv("Output/loc.csv", header=TRUE, stringsAsFactors=FALSE)
 languages <- read.csv("Output/languages.csv", header=TRUE, stringsAsFactors=FALSE)
-snippetOccurrences <- read.csv("Output/filesPerSnippet.csv", header=FALSE, stringsAsFactors=FALSE)
+snippetOccurrencesA <- read.csv("Output/filesPerSnippetA.csv", header=FALSE, stringsAsFactors=FALSE)
+snippetOccurrencesNE <- read.csv("Output/filesPerSnippetNE.csv", header=FALSE, stringsAsFactors=FALSE)
 cloneFreq <- read.csv("Output/cloneFrequency.csv", header=TRUE, stringsAsFactors=FALSE)
 connections <-read.csv("Output/connections.csv", header=TRUE, stringsAsFactors=FALSE)
 nbData = merge(languages, cloneFreq, by="file")
@@ -75,12 +74,12 @@ printMeanAndPercentiles(locTotal)
 
 # Histograms (with log scale on y axis)
 # All 4 metrics decay too fast: an ordinary histogram looks like 1 single bar
-logHist(cells, "code_cells")
-logHist(bytes, "bytes")
-#logHist(locTotal, "Lines of code")
-logHist(locTotalReduced, "loc")
-#logHist(locNonBlank, "Non-blank lines of code")
-logHist(locNonBlankReduced, "loc_non-blank")
+logHist(cells, specifier="code_cells")
+logHist(bytes, specifier="bytes")
+#logHist(locTotal, specifier="Lines of code")
+logHist(locTotalReduced, specifier="loc")
+#logHist(locNonBlank, specifier="Non-blank lines of code")
+logHist(locNonBlankReduced, specifier="loc_non-blank")
 
 
 # LANGUAGES
@@ -95,23 +94,34 @@ dev.off()
 
 # CLONE FREQUENCY
 # Snippet occurences distribution
-logHist(occurrences[2,], objects="Snippets")
+logHist(snippetOccurrencesA[,2], specifier="snippetOccurencesA", objects="Snippets")
+logHist(snippetOccurrencesNE[,2], specifier="snippetOccurencesNE", objects="Snippets")
 
 # Clone frequencies
 frequencies <- nbData[,"clone.frequency"]
 print("Clone frequency")
 printMeanAndPercentiles(frequencies)
-histogram(frequencies, "clone_frequency") # Non-parametric test needed (Spearman!?) Liknande distribution för alla språk -> Kurskal-Wallis lämpligt för att jämföra medianer
+histogram(frequencies, "clone_frequencyA") # Non-parametric test needed (Spearman!?) Liknande distribution för alla språk -> Kurskal-Wallis lämpligt för att jämföra medianer
+frequencies <- nbData[,"non.empty.clone.frequency"]
+print("Clone frequency, empty snippets excluded")
+printMeanAndPercentiles(frequencies)
+histogram(frequencies, "clone_frequencyNE")
 
 # Correlation with size (=number of code cells)
-postscript(paste(outputDir, "/cells_frequency.eps", sep=""))
+postscript(paste(outputDir, "/cells_frequencyA.eps", sep=""))
 plot(clone.frequency~code.cells, data=nbData, xlab="Number of code cells", ylab="Clone frequency")
 dev.off()
+print("Correlation with size (all clones):")
 cor.test(nbData$code.cells, nbData$clone.frequency, alternative="two.sided", method="spearman")
+postscript(paste(outputDir, "/cells_frequencyNE.eps", sep=""))
+plot(non.empty.clone.frequency~code.cells, data=nbData, xlab="Number of code cells", ylab="Clone frequency")
+dev.off()
+print("Correlation with size (non-empty clones):")
+cor.test(nbData$code.cells, nbData$non.empty.clone.frequency, alternative="two.sided", method="spearman")
 
 # Association with language
 nbDataKnownLang <- nbData[nbData$language!=" UNKNOWN",]
-postscript(paste(outputDir, "/lang_frequency.eps", sep=""))
+postscript(paste(outputDir, "/lang_frequencyA.eps", sep=""))
 boxplot(clone.frequency~language, data=nbData)
 dev.off()
 langMdl <- lm(clone.frequency~language, data=nbDataKnownLang)
@@ -120,6 +130,16 @@ plot(langMdl$residuals~langMdl$fitted.values)
 kruskal.test(clone.frequency~as.factor(language), data=nbDataKnownLang)
 # Post hoc, since kruskal test indicated significant difference
 dunn.test(nbDataKnownLang$clone.frequency, g=as.factor(nbDataKnownLang$language), alpha=0.001, method="bonferroni")
+
+postscript(paste(outputDir, "/lang_frequencyNE.eps", sep=""))
+boxplot(non.empty.clone.frequency~language, data=nbData)
+dev.off()
+langMdl <- lm(non.empty.clone.frequency~language, data=nbDataKnownLang)
+hist(resid(langMdl))  # Non-parametric test needed (Kruskal-Wallis 1-way ANOVA!? --rapportera median)
+plot(langMdl$residuals~langMdl$fitted.values)
+kruskal.test(non.empty.clone.frequency~as.factor(language), data=nbDataKnownLang)
+# Post hoc, since kruskal test indicated significant difference
+dunn.test(nbDataKnownLang$non.empty.clone.frequency, g=as.factor(nbDataKnownLang$language), alpha=0.001, method="bonferroni")
 
 
 # CONNECTIONS
