@@ -7,29 +7,7 @@
 #SBATCH -M snowy
 
 
-# Create hash2files file without empty snippets
-emptyHash="D41D8CD98F00B204E9800998ECF8427E"
-hash2filesA=`./get_latest_output.sh "hash2filesA"`
-hash2filesNE=`echo $hash2filesA | sed -E "s/hash2filesA/hash2filesNE/"`
-sed "/^$emptyHash/d" $hash2filesA > $hash2filesNE
-
-# Perform analyses
-echo ""
-echo "NUMBER OF CLONES, ALL SNIPPETS:"
-countClones $hash2filesA
-echo ""
-echo "CLONE FREQUENCY DATA, ALL SNIPPETS:"
-cloneFrequency 5
-echo ""
-echo ""
-echo "NUMBER OF CLONES, EMPTY SNIPPETS EXCLUDED:"
-countClones $hash2filesNE
-echo ""
-echo "CLONE FREQUENCY DATA, EMPTY SNIPPETS EXCLUDED:"
-cloneFrequency 6
-echo ""
-echo ""
-
+### Functions ###
 
 ################################################################################
 # Count the number of clones and unique snippets.
@@ -55,11 +33,11 @@ countClones() {
 	$numSnippetsInSeveralFiles ($severalPercent %)."
 
 	# Number of clones and unique snippets respectively
-	numFilesFile="../Output/filesPerSnippet.csv"
+	numFilesFile="../Output/filesPerSnippet`date -Ins`.csv"
 	numFiles=`sed -n "2,$ p" $hash2files | grep -o ',' -n | uniq -c | sed -E "s/^\s*//" | cut -d' ' -f1 | sed -E "s/^([0-9]+)$/(\1-1)\/2/" | bc`
 	hashes=`sed -n "2,$ p" $hash2files | cut -d',' -f1`
 	paste <(echo "$hashes") <(echo "$numFiles") > $numFilesFile
-	sed -Ei "s/\t/ /" $numFilesFile
+	sed -Ei "s/\t/, /" $numFilesFile
 
 	cloneGroups=`cut $numFilesFile -d' ' -f2 | grep -v "^1$" | wc -l`
 	cloneCopies=`cut $numFilesFile -d' ' -f2 | grep -v "^1$" | paste -sd+ | bc`
@@ -75,7 +53,7 @@ countClones() {
 
 ################################################################################
 # Check how many files contain only clones and only unique snippets respectively.
-# Argument: Number of the column in the clone frequency file that contains the
+# Argument: Index of the column in the clone frequency file that contains the
 #			frequencies.
 ################################################################################
 cloneFrequency() {
@@ -83,11 +61,11 @@ cloneFrequency() {
 	frequencyCol=$1
 
 	## If fraction == 1, all snippets in the file are clones. (fraction<=1).
-	fractionClones=`sed -n "2,$ p" $frequencyFile | cut -d' ' -f$frequencyCol`
-	onlyClones=`echo "$fractionClones" | grep "1.0000" | wc -l`
+	fractionClones=`sed -n "2,$ p" $frequencyFile | cut -d',' -f$frequencyCol`
+	onlyClones=`echo "$fractionClones" | grep " 1.0000" | wc -l`
 	## If no number in fraction > 0, fraction==0, that is all snippets in the file are unique.
-	onlyUnique=`echo "$fractionClones" | grep "0.0000" | wc -l`		# 0 without decimals = no snippets in file
-	noSnippets=`echo "$fractionClones" | grep "^0$" | wc -l`		# 0 without decimals = no snippets in file
+	onlyUnique=`echo "$fractionClones" | grep " 0.0000" | wc -l`
+	noSnippets=`echo "$fractionClones" | grep " 0$" | wc -l` # 0 without decimals = no snippets in file
 
 	numLines=`wc -l $frequencyFile | cut -d' ' -f1`
 	numFiles=`echo "$numLines - 1" | bc`
@@ -101,4 +79,48 @@ cloneFrequency() {
 	echo "On average the following fraction of snippets in a file are clones:"
 	echo "(`echo "$fractionClones" | paste -sd+`) / $numFiles" | bc -l
 }
+
+################################################################################
+# Count the number of files containing intra clones
+# Argument: Index of the column in the clone frequency file that contains the
+#			number of intra clones.
+################################################################################
+intraClones() {
+	frequencyFile=`./get_latest_output.sh "cloneFrequency"`
+	intraCloneCol=$1
+
+	intraClones=`sed -n "2,$ p" $frequencyFile | cut -d',' -f$intraCloneCol | egrep -v "\ 0$" | wc -l`
+	noIntraClones=`sed -n "2,$ p" $frequencyFile | cut -d',' -f$intraCloneCol | egrep "\ 0$" | wc -l`	# Sanity check
+
+	echo "Number of files containing intra clones: $intraClones"
+	echo "Number of files not containing intra clones: $noIntraClones"
+}
+
+
+
+
+# Create hash2files file without empty snippets
+emptyHash="D41D8CD98F00B204E9800998ECF8427E"
+hash2filesA=`./get_latest_output.sh "hash2filesA"`
+hash2filesNE=`echo $hash2filesA | sed -E "s/hash2filesA/hash2filesNE/"`
+sed "/^$emptyHash/d" $hash2filesA > $hash2filesNE
+
+# Perform analyses
+echo ""
+echo "NUMBER OF CLONES, ALL SNIPPETS:"
+countClones $hash2filesA
+intraClones 7
+echo ""
+echo "CLONE FREQUENCY DATA, ALL SNIPPETS:"
+cloneFrequency 5
+echo ""
+echo ""
+echo "NUMBER OF CLONES, EMPTY SNIPPETS EXCLUDED:"
+countClones $hash2filesNE
+intraClones 8
+echo ""
+echo "CLONE FREQUENCY DATA, EMPTY SNIPPETS EXCLUDED:"
+cloneFrequency 6
+echo ""
+echo ""
 
