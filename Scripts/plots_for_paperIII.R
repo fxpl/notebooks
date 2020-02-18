@@ -1,16 +1,40 @@
-setwd("~/github/fxpl/notebooks")
 rm(list=ls())
-
-# TODO: Städa
-
+setwd("~/github/fxpl/notebooks")
+source("../mk/PaperII/Performance/plot_for_normality_check.R")
 library(dunn.test)  # TODO: Är det här biblioteket jag vill använda?
-
 outputDir <- "Output"
 
-printMeanAndPercentiles <- function(x) {
-  print(paste("Mean: ", mean(x), sep=""))
+# FUNCTIONS
+###############################################################################
+# Print the mean value and the following percentiles:
+# - 0:th (min value)
+# - 10:th
+# - 25:th
+# - 50:th (median)
+# - 75:th
+# - 90:th
+# - 100:th (max value)
+# for data
+# Parameters:
+# data: Data to print statistics for
+###############################################################################
+printMeanAndPercentiles <- function(data) {
+  print(paste("Mean: ", mean(data), sep=""))
   print("Percentiles:")
-  print(quantile(x, probs=c(0, 0.1, 0.25, 0.5, 0.75, 0.9, 1)))
+  print(quantile(data, probs=c(0, 0.1, 0.25, 0.5, 0.75, 0.9, 1)))
+}
+
+###############################################################################
+# Create a plot using plotFunction and save it as outputDir/plotName.eps
+# Parameters:
+# plotFunction: Function to be used for plotting
+# plotFunction: Name of output file (excl. directory and ".eps")
+###############################################################################
+exportAsEPS <- function(plotFunction, plotName) {
+  setEPS()
+  postscript(paste(outputDir, "/", plotName, ".eps", sep=""))
+  plotFunction
+  dev.off()
 }
 
 ###############################################################################
@@ -18,7 +42,7 @@ printMeanAndPercentiles <- function(x) {
 # Output/log_hist_<specifier>.eps.
 # Parameters:
 # data: data to be plotted
-# specifier: a specifier for the data, to be included in the plot file namn
+# specifier: a specifier for the data, to be included in the plot file name
 # objects: the type of object that the data concerns; the label on the y axis
 ###############################################################################
 logHist <- function(data, specifier="", objects="Notebooks") {
@@ -26,21 +50,47 @@ logHist <- function(data, specifier="", objects="Notebooks") {
   lineWidth <- 2
   lineEnd <- 2
   
-  setEPS()
-  postscript(paste(outputDir, "/log_hist_", specifier, ".eps", sep=""))
-  plot(histData$mids, histData$count, log='y',
+  exportAsEPS(plot(histData$mids, histData$count, log='y',
        type='h', lwd=lineWidth, lend=lineEnd,
-       xlab="", ylab=objects
-  )
-  dev.off()
+       xlab="", ylab=objects),
+       paste("log_hist_", specifier, sep=""))
 }
 
+###############################################################################
+# Plot a histogram over data. Save it as Output/hist_<specifier>.eps.
+# Parameters:
+# data: data to be plotted
+# specifier: a specifier for the data, to be included in the plot file name
+###############################################################################
 histogram <- function(data, specifier="") {
-  setEPS()
-  postscript(paste(outputDir, "/", specifier, ".eps", sep=""))
-  hist(data, main="", xlab="", ylab="Notebooks")
-  dev.off() 
+  exportAsEPS(hist(data, main="", xlab="", ylab="Notebooks"),
+              paste("hist_", specifier, sep=""))
 }
+
+###############################################################################
+# Check the assumptions of a linear model (e.g. ANOVA)
+# Parameters:
+# y: dependent variable
+# x: independent variable
+###############################################################################
+checkLM <- function(y, x) {
+  mdl <- lm(y~x)
+  plot_for_normality_check(mdl$resid)
+  #plot(mdl$residuals~mdl$fitted.values)
+}
+
+###############################################################################
+# Perform a Kruskal Wallis test with post hoc analysis
+# Parameters:
+# y: dependent variable
+# x: independent variable
+###############################################################################
+kruskalWallisWithPost <- function(y, x) {
+  kruskal.test(y, x)
+  # Post hoc analysis, relevant if Kruskal Wallis test indicates a significant difference
+  dunn.test(y, g=x, alpha=0.001, method="bonferroni")
+}
+
 
 # NOTEBOOK DATA
 codeCells <- read.csv("Output/code_cells.csv", header=TRUE, stringsAsFactors=FALSE)
@@ -86,10 +136,10 @@ logHist(locNonBlankReduced, specifier="loc_non-blank")
 lang_percentages <- c(95.3487, 0.8214, 0.7881, 0.1896, 0.6656, 2.1867)
 labels <- c("Python", "Julia", "R", "Scala", "other", "unknown")
 colors <- c("blue", "green", "yellow", "purple", "brown", "gray")
-postscript(paste(outputDir, "/languages.eps", sep=""))
-pie(lang_percentages, labels=NA,  col=colors)
-legend(x="topright", legend=labels, fill=colors)
-dev.off()
+exportAsEPS({
+  pie(lang_percentages, labels=NA,  col=colors)
+  legend(x="topright", legend=labels, fill=colors)
+}, "languages")
 
 
 # CLONE FREQUENCY
@@ -97,7 +147,7 @@ dev.off()
 logHist(snippetOccurrencesA[,2], specifier="snippetOccurencesA", objects="Snippets")
 logHist(snippetOccurrencesNE[,2], specifier="snippetOccurencesNE", objects="Snippets")
 
-# Clone frequencies
+# Plots and descriptive statistics
 frequencies <- nbData[,"clone.frequency"]
 print("Clone frequency")
 printMeanAndPercentiles(frequencies)
@@ -108,56 +158,38 @@ printMeanAndPercentiles(frequencies)
 histogram(frequencies, "clone_frequencyNE")
 
 # Correlation with size (=number of code cells)
-postscript(paste(outputDir, "/cells_frequencyA.eps", sep=""))
-plot(clone.frequency~code.cells, data=nbData, xlab="Number of code cells", ylab="Clone frequency")
-dev.off()
+exportAsEPS(plot(clone.frequency~code.cells, data=nbData, xlab="Number of code cells", ylab="Clone frequency"),
+            "cells_frequencyA")
 print("Correlation with size (all clones):")
 cor.test(nbData$code.cells, nbData$clone.frequency, alternative="two.sided", method="spearman")
-postscript(paste(outputDir, "/cells_frequencyNE.eps", sep=""))
-plot(non.empty.clone.frequency~code.cells, data=nbData, xlab="Number of code cells", ylab="Clone frequency")
-dev.off()
+
+exportAsEPS(plot(non.empty.clone.frequency~code.cells, data=nbData, xlab="Number of code cells", ylab="Clone frequency"),
+            "cells_frequencyNE")
 print("Correlation with size (non-empty clones):")
 cor.test(nbData$code.cells, nbData$non.empty.clone.frequency, alternative="two.sided", method="spearman")
 
 # Association with language
+exportAsEPS(boxplot(clone.frequency~language, data=nbData), "lang_frequencyA")
 nbDataKnownLang <- nbData[nbData$language!=" UNKNOWN",]
-postscript(paste(outputDir, "/lang_frequencyA.eps", sep=""))
-boxplot(clone.frequency~language, data=nbData)
-dev.off()
-langMdl <- lm(clone.frequency~language, data=nbDataKnownLang)
-hist(resid(langMdl))  # Non-parametric test needed (Kruskal-Wallis 1-way ANOVA!? --rapportera median)
-plot(langMdl$residuals~langMdl$fitted.values)
-kruskal.test(clone.frequency~as.factor(language), data=nbDataKnownLang)
-# Post hoc, since kruskal test indicated significant difference
-dunn.test(nbDataKnownLang$clone.frequency, g=as.factor(nbDataKnownLang$language), alpha=0.001, method="bonferroni")
+checkLM(nbDataKnownLang$clone.frequency, as.factor(nbDataKnownLang$language))
+print("Correlation with language (all clones):")
+kruskalWallisWithPost(nbDataKnownLang$clone.frequency, as.factor(nbDataKnownLang$language))
 
-postscript(paste(outputDir, "/lang_frequencyNE.eps", sep=""))
-boxplot(non.empty.clone.frequency~language, data=nbData)
-dev.off()
-langMdl <- lm(non.empty.clone.frequency~language, data=nbDataKnownLang)
-hist(resid(langMdl))  # Non-parametric test needed (Kruskal-Wallis 1-way ANOVA!? --rapportera median)
-plot(langMdl$residuals~langMdl$fitted.values)
-kruskal.test(non.empty.clone.frequency~as.factor(language), data=nbDataKnownLang)
-# Post hoc, since kruskal test indicated significant difference
-dunn.test(nbDataKnownLang$non.empty.clone.frequency, g=as.factor(nbDataKnownLang$language), alpha=0.001, method="bonferroni")
+exportAsEPS(boxplot(non.empty.clone.frequency~language, data=nbData), "lang_frequencyNE")
+checkLM(nbDataKnownLang$non.empty.clone.frequency, as.factor(nbDataKnownLang$language))
+print("Correlation with language (non-empty clones):")
+kruskalWallisWithPost(nbDataKnownLang$non.empty.clone.frequency, as.factor(nbDataKnownLang$language))
 
 
 # CONNECTIONS
-#intra <- connections[,"intra.repro.connections"] ## Overflowar!
-#meanInter <- connections[,"mean.inter.repro.connections"]
+# Connections for the empty snippet is skipped, since the number of intra
+# connections overflowed
 intraNE <- connections[,"non.empty.intra.repro.connections"]
 meanInterNE <- connections[,"mean.non.empty.inter.repro.connections"]
-#wilcox.test(intra, meanInter, alternative="two.sided", paired=TRUE)
 wilcox.test(intraNE, meanInterNE, alternative="two.sided", paired=TRUE)
 
-postscript(paste(outputDir, "/inter_intra_ne.eps", sep=""))
-plot(meanInterNE, intraNE, xlab="Inter repro connections", ylab="Intra repro connections")
 maxVal <- max(max(intraNE), max(meanInterNE))
-lines(c(0,maxVal), c(0,maxVal), col="gray")
-dev.off()
-
-#postscript(paste(outputDir, "/inter_intra.eps", sep=""))
-#plot(meanInter, intra, xlab="Inter repro connections", ylab="Intra repro connections")
-#maxVal <- max(max(intra), max(meanInter))
-#lines(c(0,maxVal), c(0,maxVal), col="gray")
-#dev.off()
+exportAsEPS({
+  plot(meanInterNE, intraNE, xlab="Inter repro connections", ylab="Intra repro connections")
+  lines(c(0,maxVal), c(0,maxVal), col="gray")
+}, "inter_intraNE")
