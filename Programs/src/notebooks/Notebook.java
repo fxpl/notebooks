@@ -499,20 +499,24 @@ public class Notebook {
 	 */
 	private JSONObject getNotebook() {
 		contentsLock.lock();
+		JSONObject contentsReferent = null;
 		try {
-			if (null == contents || null == contents.get()) {
+			if (null != contents && null != contents.get()) {
+				contentsReferent = contents.get();
+			} else {
 				InputStream input = new DataInputStream(new FileInputStream(new File(this.path)));
 				JSONTokener tokener = new JSONTokener(input);
-				JSONObject contentsReferent = new JSONObject(tokener);
+				contentsReferent = new JSONObject(tokener);
 				contents = new WeakReference<JSONObject>(contentsReferent);
 			}
 		} catch (FileNotFoundException e) {
 			System.err.println("Could not read " + this.path + ": " + e + ". Skipping notebook!");
-			contents = new WeakReference<JSONObject>(new JSONObject());
+			contentsReferent = new JSONObject();
+			contents = new WeakReference<JSONObject>(contentsReferent);
 		} finally {
 			contentsLock.unlock();
 		}
-		return contents.get();
+		return contentsReferent;
 	}
 	
 	/**
