@@ -16,5 +16,6 @@ public class PythonDumper extends Dumper {
 			System.exit(1);
 		}
 		new PythonDumper().dumpAll(args[0], args[1]);
+		ThreadExecutor.tearDown();
 	}
 }

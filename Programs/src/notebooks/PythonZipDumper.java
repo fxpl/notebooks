@@ -16,5 +16,6 @@ public class PythonZipDumper extends Dumper {
 			System.exit(1);
 		}
 		new PythonZipDumper().dumpAll(args[0], args[1]);
+		ThreadExecutor.tearDown();
 	}
 }
