@@ -72,6 +72,8 @@ public class Notebook {
 	 * <name>_<id>.<suffix> where <name> is the name of this notebook (except
 	 * its suffix, if any), id is the index of the snippet in the notebook file
 	 * and suffix is given as an argument.
+	 * @param location Directory where the output file will be put
+	 * @param suffix Suffix of output files
 	 */
 	public void dumpCode(String location, String suffix) throws IOException {
 		List<JSONObject> cells = this.getCodeCells();
@@ -85,6 +87,34 @@ public class Notebook {
 			}
 			writer.close();
 		}
+	}
+	
+	/**
+	 * Dump each notebook to a separate file wrapped in a zip file in the
+	 * directory whose name is given as an argument of the method. The name of
+	 * a wrapped file will be the notebook name followed by the suffix given as
+	 * an argument. The name of the zip file will be the notebook name followed
+	 * by ".zip".
+	 * @param location Directory where the output file will be put
+	 * @param suffix Suffix of output files (inside zip)
+	 */
+	public void dumpCodeAsZipWithSingleFile(String location, String suffix) throws IOException {
+		List<JSONObject> cells = this.getCodeCells();
+		String noteBookName = getNameWithoutSuffix();
+		String outputFile = location + "/" + noteBookName + ".zip";
+		FileOutputStream zipFileStream = new FileOutputStream(outputFile);
+		ZipOutputStream targetStream = new ZipOutputStream(zipFileStream);
+		ZipEntry codeFile = new ZipEntry(noteBookName + "." + suffix);
+		targetStream.putNextEntry(codeFile);
+		System.out.println("Notebook: " + noteBookName);
+		for (int i=0; i<cells.size(); i++) {
+			JSONArray lines = getSource(cells.get(i));
+			for (int j=0; j<lines.length(); j++) {
+				targetStream.write(lines.getString(j).getBytes());
+			}
+		}
+		targetStream.close();
+		zipFileStream.close();
 	}
 	
 	@Override

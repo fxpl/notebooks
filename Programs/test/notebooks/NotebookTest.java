@@ -79,6 +79,48 @@ public class NotebookTest {
 	}
 	
 	@Test
+	public void testDumpCodeAsZip_singleFile() throws IOException {
+		String dataDir = "test/data/dump";
+		String[] notebooks = {"nb1", "nb1_str", "nb2", "nb3"};
+		String outputDir = ".";
+		String suffix = "py";
+		String[][] expectedLines = {
+				{"import numpy", "\t", "def my_function", "\ta = 2", "\tb = 2"},
+				{"import numpy", "\t", "def my_function", "\ta = 2", "\tb = 2"},
+				{"import pandas"},
+				{"import something"}
+		};
+		
+		// Run
+		for (String nbFile: notebooks) {
+			Notebook nb = new Notebook(dataDir + "/" + nbFile + ".ipynb");
+			nb.dumpCodeAsZipWithSingleFile(outputDir, suffix);
+		}
+		
+		// Check output
+		for (int i=0; i<notebooks.length; i++) {
+			String fileName = notebooks[i] + ".zip";
+			ZipInputStream zipFileStream = new ZipInputStream(new FileInputStream(fileName));
+			ZipEntry codeFile = zipFileStream.getNextEntry(); 	// There is only one per zip file
+			assertEquals("Wrong fileName for codeFile in " + fileName,
+					notebooks[i] + "." + suffix, codeFile.getName());
+			BufferedReader codeLineReader = new BufferedReader(new InputStreamReader(zipFileStream));
+			for (int j=0; j<expectedLines[i].length; j++) {
+				System.out.println("Expected line: " + expectedLines[i][j]);
+				assertEquals("Wrong code dumped to " + fileName, expectedLines[i][j], codeLineReader.readLine());
+			}
+			assertNull("Too many lines in " + fileName, codeLineReader.readLine());
+			codeLineReader.close();
+			zipFileStream.close();
+		}
+		
+		// Clean up
+		for (String notebook: notebooks) {
+			new File(notebook + ".zip").delete();
+		}
+	}
+	
+	@Test
 	public void testDumpCodeAsZip() throws IOException {
 		String dataDir = "test/data/dump";
 		String[] inFiles = {"nb1.ipynb", "nb1_str.ipynb", "nb2.ipynb", "nb3.ipynb"};
