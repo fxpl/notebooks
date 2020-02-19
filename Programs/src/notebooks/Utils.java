@@ -1,6 +1,6 @@
 package notebooks;
 
-public class NotebookUtils {
+public class Utils {
 	/**
 	 * Convert a byte array to hexadecimal string
 	 * @param bytes Byte array to convert to hex string

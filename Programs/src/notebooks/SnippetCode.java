@@ -53,7 +53,7 @@ public class SnippetCode {
 			String emptyHash = "";
 			try {
 				MessageDigest hasher = MessageDigest.getInstance("MD5");
-				emptyHash = NotebookUtils.toHexString(hasher.digest("".getBytes()));
+				emptyHash = Utils.toHexString(hasher.digest("".getBytes()));
 			} catch (NoSuchAlgorithmException e) {
 				System.err.println("MessageDigest cannot hash using MD5!");
 			}
