@@ -106,7 +106,6 @@ public class Notebook {
 		ZipOutputStream targetStream = new ZipOutputStream(zipFileStream);
 		ZipEntry codeFile = new ZipEntry(noteBookName + "." + suffix);
 		targetStream.putNextEntry(codeFile);
-		System.out.println("Notebook: " + noteBookName);
 		for (int i=0; i<cells.size(); i++) {
 			JSONArray lines = getSource(cells.get(i));
 			for (int j=0; j<lines.length(); j++) {

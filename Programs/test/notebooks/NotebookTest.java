@@ -106,7 +106,6 @@ public class NotebookTest {
 					notebooks[i] + "." + suffix, codeFile.getName());
 			BufferedReader codeLineReader = new BufferedReader(new InputStreamReader(zipFileStream));
 			for (int j=0; j<expectedLines[i].length; j++) {
-				System.out.println("Expected line: " + expectedLines[i][j]);
 				assertEquals("Wrong code dumped to " + fileName, expectedLines[i][j], codeLineReader.readLine());
 			}
 			assertNull("Too many lines in " + fileName, codeLineReader.readLine());
