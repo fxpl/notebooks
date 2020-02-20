@@ -7,7 +7,9 @@
 
 diskPath=/home/maka4186/notebook_disk
 nbPath=$diskPath/notebooks
-targetDir=$diskPath/snippets
+targetDir=$diskPath/snippets_concatenated
+
+mkdir -p $targetDir
 
 java -XX:+UnlockDiagnosticVMOptions -XX:NativeMemoryTracking=summary -XX:+PrintNMTStatistics -XX:+UseParallelGC \
 	-cp Programs/bin:Programs/external/json-20190722.jar -Xms12G -Xmx12G \
