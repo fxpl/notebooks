@@ -73,7 +73,7 @@ class AllAnalyzer extends Worker<AllResults> {
 		try {
 			hashes = notebook.snippetCodes();
 		} catch (Exception e) {
-			System.err.println("Could not get language values for " + notebook.getName() + ": " + e);
+			System.err.println("Could not get snippets for " + notebook.getName() + ": " + e);
 			e.printStackTrace();
 			hashes = new SnippetCode[0];
 		}
