@@ -77,6 +77,48 @@ public class NotebookAnalyzerTest {
 		TestUtils.deleteCloneCsvs();
 	}
 	
+	@Test
+	public void testAllAnalyzes_error() throws IOException {
+		String testDir = "test/data/all";
+		String notebookFile = "empty.ipynb";
+		String[] expectedCodeCellsLines = {codeCellsHeader(),
+				notebookFile + ", 0"};
+		String[] expectedLOCLines = {LOCHeader(),
+				notebookFile + ", 0, 0, 0"};
+		String[] expectedLangLines = {languagesHeader(),
+					notebookFile + ", " + LangName.UNKNOWN + ", " + LangSpec.NONE
+				};
+		String[] expectedAllLangLines = {allLanguagesHeader(),
+					notebookFile + ", " + LangName.UNKNOWN + ", " + LangName.UNKNOWN + ", "
+					+ LangName.UNKNOWN + ", " + LangName.UNKNOWN + ", " + LangName.UNKNOWN
+				};
+		String[] expectedFile2hashesLines = {file2hashesHeader(),
+				notebookFile};
+		String[] expectedHash2filesLines = {hash2filesHeader()};
+		String[] expectedCloneFreqLines = {cloneFrequencyHeader(),
+				notebookFile + ", 0, 0, 0, 0, 0, 0, 0"};
+		String[] expectedConnectionsLines = {connectionsHeader(),
+				notebookFile + ", 0, 0.0000, 0, 0.0000, 0, 0, 0.0000, 0.0000"};
+		
+		analyzer.initializeNotebooksFrom(testDir + "/" + notebookFile);
+		analyzer.allAnalyzes();
+		
+		TestUtils.checkCsv("code_cells", expectedCodeCellsLines);
+		TestUtils.checkCsv("loc", expectedLOCLines);
+		TestUtils.checkCsv("languages", expectedLangLines);
+		TestUtils.checkCsv("all_languages", expectedAllLangLines);
+		TestUtils.checkCsv("file2hashesA", expectedFile2hashesLines);
+		TestUtils.checkCsv("hash2filesA", expectedHash2filesLines);
+		TestUtils.checkCsv("cloneFrequency", expectedCloneFreqLines);
+		TestUtils.checkCsv("connections", expectedConnectionsLines);
+		
+		TestUtils.lastOutputFile("code_cells").delete();
+		TestUtils.lastOutputFile("loc").delete();
+		TestUtils.lastOutputFile("languages").delete();
+		TestUtils.lastOutputFile("all_languages").delete();
+		TestUtils.deleteCloneCsvs();
+	}
+	
 	/**
 	 * Verify that the output file allLanguageValues<current-date-time>.csv has
 	 * the right content after analysis of all language value fields.
