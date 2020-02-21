@@ -80,17 +80,18 @@ checkLM <- function(y, x) {
 }
 
 ###############################################################################
-# Perform a Kruskal Wallis test with post hoc analysis
+# Perform a Kruskal Wallis test with post hoc analysis (pairwise Wilcoxon rank
+# sum test)
 # Parameters:
 # y: dependent variable
-# x: independent variable
+# x: independent variable, should be a factor
 ###############################################################################
 kruskalWallisWithPost <- function(y, x) {
   kruskal.test(y, x)
   # Post hoc analysis, relevant if Kruskal Wallis test indicates a significant difference
-  dunn.test(y, g=x, alpha=0.001, method="bonferroni")
+  pAdjustMethod="hochberg"
+  pairwise.wilcox.test(y, x, p.adjust.method=pAdjustMethod, paired=FALSE, alternative="two.sided")
 }
-
 
 # NOTEBOOK DATA
 codeCells <- read.csv("Output/code_cells.csv", header=TRUE, stringsAsFactors=FALSE)
