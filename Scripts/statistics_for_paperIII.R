@@ -188,9 +188,16 @@ kruskalWallisWithPost(nbDataKnownLang$non.empty.clone.frequency, as.factor(nbDat
 intraNE <- connections[,"non.empty.intra.repro.connections"]
 meanInterNE <- connections[,"mean.non.empty.inter.repro.connections"]
 wilcox.test(intraNE, meanInterNE, alternative="two.sided", paired=TRUE)
-
 maxVal <- max(max(intraNE), max(meanInterNE))
 exportAsEPS({
-  plot(meanInterNE, intraNE, xlab="Inter repro connections", ylab="Intra repro connections")
+  plot(meanInterNE, intraNE, xlab="Mean inter repro connections", ylab="Intra repro connections")
   lines(c(0,maxVal), c(0,maxVal), col="gray")
-}, "inter_intraNE")
+}, "meanInter_intraNE")
+
+totalInterNE <- connections[,"non.empty.connections"] - intraNE
+wilcox.test(intraNE, totalInterNE, alternative="two.sided", paired=TRUE)
+maxVal <- max(max(intraNE), max(totalInterNE))
+exportAsEPS({
+  plot(totalInterNE, intraNE, xlab="Total inter repro connections", ylab="Intra repro connections")
+  lines(c(0,maxVal), c(0,maxVal), col="gray")
+}, "totalInter_intraNE")
