@@ -4,10 +4,12 @@
 # Create soft links needed by statistics R script.
 ################################################################################
 
-files=( "code_cells" "loc" "languages" "cloneFrequency" "connections" )
+prefixes=( "code_cells" "loc" "languages" "cloneFrequency" "connections" )
 
-for file in ${files[@]};
+for prefix in ${prefixes[@]};
 do
-	csvFile=`./get_latest_output.sh $file`
-	ln -s $csvFile ../Output/$file.csv
+	rm -f ../Output$prefix.csv
+	csvFile=`./get_latest_output.sh $prefix`
+	ln -s $csvFile ../Output/$prefix.csv
 done
+
