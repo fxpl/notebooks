@@ -3,7 +3,9 @@ package notebooks;
 import static org.junit.Assert.*;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.zip.ZipEntry;
@@ -547,5 +549,38 @@ public class NotebookTest {
 	public void testParsingMissingFile()  {
 		Notebook notebook = new Notebook("nonexistent_file.txt");
 		notebook.numCodeCells();
+	}
+	
+	@Test
+	public void testSingleImport() {
+		String dataDir = "test/data/modules";
+		String file = "nb_1.ipynb";
+		List<PythonModule> expectedModules = new ArrayList<PythonModule>(1);
+		expectedModules.add(new PythonModule("kossa"));
+		Notebook notebook = new Notebook(dataDir + "/" + file);
+		assertEquals("Incorrect list of modules returned!",
+				expectedModules, notebook.modules());
+	}
+	
+	@Test
+	public void testSingleImportWithAlias() {
+		String dataDir = "test/data/modules";
+		String file = "nb_2.ipynb";
+		List<PythonModule> expectedModules = new ArrayList<PythonModule>(1);
+		expectedModules.add(new PythonModule("kalv"));
+		Notebook notebook = new Notebook(dataDir + "/" + file);
+		assertEquals("Incorrect list of modules returned!",
+				expectedModules, notebook.modules());
+	}
+	
+	@Test
+	public void testSingleImportFrom() {
+		String dataDir = "test/data/modules";
+		String file = "nb_3.ipynb";
+		List<PythonModule> expectedModules = new ArrayList<PythonModule>(1);
+		expectedModules.add(new PythonModule("ko"));
+		Notebook notebook = new Notebook(dataDir + "/" + file);
+		assertEquals("Incorrect list of modules returned!",
+				expectedModules, notebook.modules());
 	}
 }

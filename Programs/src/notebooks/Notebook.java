@@ -9,6 +9,8 @@ import java.util.zip.ZipOutputStream;
 import java.util.zip.ZipEntry;
 import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.json.*;
 
@@ -48,6 +50,36 @@ public class Notebook {
 		}
 		Notebook otherNotebook = (Notebook)other;
 		return this.getName().equals(otherNotebook.getName());
+	}
+	
+	/**
+	 * @return A list of all modules imported in the notebook
+	 */
+	public List<PythonModule> modules() {
+		List<PythonModule> modules = new ArrayList<PythonModule>();
+		Pattern importPattern = Pattern.compile("\\s*import\\s+(\\S+)\\s*");
+		Pattern importAliasPattern = Pattern.compile("\\s*import\\s+(\\S+)\\s*+as+\\s*(\\S+)\\s*");
+		Pattern fromPattern = Pattern.compile("\\s*from\\s+(\\S+)\\s+import\\s+.+\\s*");
+		List<JSONObject> codeCells = getCodeCells();
+		for (JSONObject cell: codeCells) {
+			JSONArray lines = getSource(cell);
+			for (int i=0; i<lines.length(); i++) {
+				String line = lines.getString(i);
+				Matcher lineMatcher = importPattern.matcher(line);
+				if (lineMatcher.matches()) {
+					modules.add(new PythonModule(lineMatcher.group(1)));
+				}
+				lineMatcher = importAliasPattern.matcher(line);
+				if (lineMatcher.matches()) {
+					modules.add(new PythonModule(lineMatcher.group(1)));
+				}
+				lineMatcher = fromPattern.matcher(line);
+				if (lineMatcher.matches()) {
+					modules.add(new PythonModule(lineMatcher.group(1)));
+				}
+			}
+		}
+		return modules;
 	}
 	
 	/**
@@ -331,7 +363,7 @@ public class Notebook {
 	 * @param notebook Notebook/worksheet to extract cells from
 	 * @return Array containing all cells of the notebook
 	 */
-	private /*static*/ JSONArray getCellArray(JSONObject notebook) {
+	private static JSONArray getCellArray(JSONObject notebook) {
 		JSONArray cells;
 		if (notebook.has("cells")) {
 			cells = notebook.getJSONArray("cells");
