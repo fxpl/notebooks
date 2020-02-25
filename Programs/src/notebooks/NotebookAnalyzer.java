@@ -391,7 +391,7 @@ public class NotebookAnalyzer extends Analyzer {
 	 * Create a file modules<current-date-time>.csv with the header line
 	 * followed by the modules imported in each notebook as a comma separated
 	 * list. The data for each notebooks is printed on a separate line .
-	 * @return A list where each element is a list of the modules found in the correspondning notebook
+	 * @return A list where each element is a list of the modules found in the corresponding notebook
 	 * @throws IOException On problems with handling the output file
 	 */
 	public List<List<PythonModule>> modules() throws IOException {
@@ -510,7 +510,8 @@ public class NotebookAnalyzer extends Analyzer {
 				lang = false,
 				loc = false,
 				clones = false,
-				langAll = false;
+				langAll = false,
+				modules = false;
 		String reproFile = null;
 		String nbPath = null;
 		
@@ -542,6 +543,9 @@ public class NotebookAnalyzer extends Analyzer {
 					break;
 				case "--lang_all":
 					langAll = true;
+					break;
+				case "--modules":
+					modules = true;
 					break;
 				default:
 					System.err.println("Unknown argument: " + arg);
@@ -590,6 +594,10 @@ public class NotebookAnalyzer extends Analyzer {
 			if (langAll) {
 				this.allLanguageValues();
 				System.out.println("File with all language values created!");
+			}
+			if (modules) {
+				this.modules();
+				System.out.println("Modules file created!");
 			}
 		} catch (IOException e) {
 			System.err.println("I/O error: " + e.getMessage() + ". Operation interrupted.");

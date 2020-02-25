@@ -253,6 +253,19 @@ public class NotebookAnalyzerTest {
 	}
 	
 	/**
+	 * Verify that the modules output file is created when the argument
+	 * "--modules" is given.
+	 * @throws IOException
+	 */
+	@Test
+	public void testArgumentParsing_modules() throws IOException {
+		String[] arg = {"--modules"};
+		String[] expectedFilePrefix = {"modules"};
+		analyzer.analyze(arg);
+		TestUtils.verifyExistenceAndRemove(expectedFilePrefix);
+	}
+	
+	/**
 	 * Verify that all relevant files are created when several arguments are
 	 * given.
 	 * @throws IOException 
