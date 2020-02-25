@@ -551,6 +551,9 @@ public class NotebookTest {
 		notebook.numCodeCells();
 	}
 	
+	/**
+	 * Verify that a single import can be identified.
+	 */
 	@Test
 	public void testSingleImport() {
 		String dataDir = "test/data/modules";
@@ -562,6 +565,9 @@ public class NotebookTest {
 				expectedModules, notebook.modules());
 	}
 	
+	/**
+	 * Verify that a single Python module import with alias can be identified.
+	 */
 	@Test
 	public void testSingleImportWithAlias() {
 		String dataDir = "test/data/modules";
@@ -573,6 +579,10 @@ public class NotebookTest {
 				expectedModules, notebook.modules());
 	}
 	
+	/**
+	 * Verify that a single Python module import with sub modules can be
+	 * identified.
+	 */
 	@Test
 	public void testSingleImportFrom() {
 		String dataDir = "test/data/modules";
@@ -584,6 +594,9 @@ public class NotebookTest {
 				expectedModules, notebook.modules());
 	}
 	
+	/**
+	 * Verify that several Python module imports in one cell can be identified.
+	 */
 	@Test
 	public void testSeveralImports() {
 		String dataDir = "test/data/modules";
@@ -597,6 +610,9 @@ public class NotebookTest {
 				expectedModules, notebook.modules());
 	}
 	
+	/**
+	 * Verify that Python module imports in different cells can be identified.
+	 */
 	@Test
 	public void testSeveralImportCells() {
 		String dataDir = "test/data/modules";
