@@ -327,7 +327,7 @@ public class NotebookAnalyzer extends Analyzer {
 	 * Create a file loc<current-date-time>.csv with the header line
 	 * followed by the number of lines of code for each notebook on the format
 	 * <total loc>, <non-blank loc>, <blank loc>
-	 * The data for each notebook is print on a separate line.
+	 * The data for each notebook is printed on a separate line.
 	 * @return Total number of LOC in notebooks stored in analyzer
 	 * @throws IOException On problems with handling the output file
 	 */
@@ -388,6 +388,61 @@ public class NotebookAnalyzer extends Analyzer {
 	}
 	
 	/**
+	 * Create a file modules<current-date-time>.csv with the header line
+	 * followed by the modules imported in each notebook as a comma separated
+	 * list. The data for each notebooks is printed on a separate line .
+	 * @return A list where each element is a list of the modules found in the correspondning notebook
+	 * @throws IOException On problems with handling the output file
+	 */
+	public List<List<PythonModule>> modules() throws IOException {
+		List<Callable<List<PythonModule>>> tasks
+			= new ArrayList<Callable<List<PythonModule>>>(notebooks.size());
+		List<List<PythonModule>> result = new ArrayList<List<PythonModule>>(notebooks.size());
+		for (int i=0; i<notebooks.size(); i++) {
+			tasks.add(new ModulesIdentifier(notebooks.get(i)));
+		}
+		List<Future<List<PythonModule>>> modules = ThreadExecutor.getInstance().invokeAll(tasks);
+		Writer writer = new FileWriter(outputDir + "/modules" + LocalDateTime.now() + ".csv");
+		writer.write(modulesHeader());
+		for (int i=0; i<notebooks.size(); i++) {
+			result.add(i, writeModuleLine(modules.get(i), notebooks.get(i), writer));
+		}
+		writer.close();
+		return result;
+	}
+
+	/**
+	 * Write the data for one notebook to the modules file.
+	 * @param modules Wrapper around the modules of the notebook
+	 * @param notebook Notebook to write information for
+	 * @param writer Writer that appends text to the modules file
+	 */
+	private List<PythonModule> writeModuleLine(Future<List<PythonModule>> modules, Notebook notebook, Writer writer) throws IOException {
+		List<PythonModule> result;
+		try {
+			result = modules.get();
+		} catch(InterruptedException | ExecutionException e) {
+			System.err.println("Could not get modules for " + notebook.getName() + ":" + e);
+			e.printStackTrace();
+			result = new ArrayList<PythonModule>(0);
+		}
+		writeModuleLine(result, notebook, writer);
+		return result;
+	}
+
+	private void writeModuleLine(List<PythonModule> modules, Notebook notebook, Writer writer) throws IOException {
+		writer.write(notebook.getName());
+		for (PythonModule module: modules) {
+			writer.write(", " + module.getName());
+		}
+		writer.write("\n");
+	}
+	
+	private String modulesHeader() {
+		return "notebook, modules ...\n";
+	}
+
+	/**
 	 * Count the number of code cells in each notebook. Print each value on a
 	 * separate line in the file code_cells<current-date-time>.csv. Start the
 	 * csv file with the header "file, code cells".
@@ -399,10 +454,10 @@ public class NotebookAnalyzer extends Analyzer {
 		for (Notebook notebook: notebooks) {
 			tasks.add(new CodeCellCounter(notebook));
 		}
+		List<Future<Integer>> result = ThreadExecutor.getInstance().invokeAll(tasks);
 		Writer writer = new FileWriter(outputDir + "/code_cells" + LocalDateTime.now() + ".csv");
 		writer.write(numCodeCellsHeader());
 		int totalNumCodeCells = 0;
-		List<Future<Integer>> result = ThreadExecutor.getInstance().invokeAll(tasks);
 		for (int i=0; i<notebooks.size(); i++) {
 			totalNumCodeCells += writeCodeCellsLine(result.get(i), notebooks.get(i), writer);
 		}

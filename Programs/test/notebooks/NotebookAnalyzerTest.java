@@ -762,6 +762,71 @@ public class NotebookAnalyzerTest {
 	}
 	
 	/**
+	 * Verify that the correct modules are found in notebooks.
+	 */
+	@Test
+	public void testModules() throws IOException {
+		String dataDir = "test/data/modules";
+		String[] files = {"nb_1.ipynb", "nb_2.ipynb", "nb_3.ipynb",
+				"nb_4.ipynb", "nb_5.ipynb"};
+		List<List<PythonModule>> expectedModules = new ArrayList<List<PythonModule>>(files.length);
+		for (int i=0; i<files.length; i++) {
+			expectedModules.add(i, new ArrayList<PythonModule>());
+		}
+		expectedModules.get(0).add(0, new PythonModule("kossa"));
+		expectedModules.get(1).add(0, new PythonModule("kalv"));
+		expectedModules.get(2).add(0, new PythonModule("ko"));
+		expectedModules.get(3).add(0, new PythonModule("module1"));
+		expectedModules.get(3).add(1, new PythonModule("module2"));
+		expectedModules.get(3).add(2, new PythonModule("module3"));
+		expectedModules.get(4).add(0, new PythonModule("module10"));
+		expectedModules.get(4).add(1, new PythonModule("module11"));
+		expectedModules.get(4).add(2, new PythonModule("module12"));
+		expectedModules.get(4).add(3, new PythonModule("module13"));
+		
+		for (String file: files) {
+			analyzer.initializeNotebooksFrom(dataDir + "/" + file);
+		}
+		List<List<PythonModule>> modules = analyzer.modules();
+		for (int i=0; i<files.length; i++) {
+			assertEquals("Wrong modules returned for " + files[i] + "!",
+					expectedModules.get(i), modules.get(i));
+		}
+		TestUtils.lastOutputFile("modules").delete();
+	}
+	
+	/**
+	 * Verify that the output file modules<current-date-time>.csv is created
+	 * and filled correctly when the modules are identified.
+	 * @throws IOException on errors when handling output file 
+	 */
+	@Test
+	public void testModules_csv() throws IOException {
+		String dataDir = "test/data/modules";
+		String[] files = {"nb_1.ipynb", "nb_2.ipynb", "nb_3.ipynb",
+				"nb_4.ipynb", "nb_5.ipynb"};
+		String[] expectedLines = {
+			modulesHeader(),
+			"nb_1.ipynb, kossa",
+			"nb_2.ipynb, kalv",
+			"nb_3.ipynb, ko",
+			"nb_4.ipynb, module1, module2, module3",
+			"nb_5.ipynb, module10, module11, module12, module13"
+		};
+		for (String file: files) {
+			analyzer.initializeNotebooksFrom(dataDir + "/" + file);
+		}
+		analyzer.modules();
+		
+		TestUtils.checkCsv("modules", expectedLines);
+		TestUtils.lastOutputFile("modules").delete();
+	}
+	
+	private String modulesHeader() {
+		return "notebook, modules ...";
+	}
+
+	/**
 	 * Verify that the right number of cells are found in the notebooks under a
 	 * directory.
 	 * @throws IOException on errors when handling output file
