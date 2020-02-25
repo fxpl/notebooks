@@ -583,4 +583,31 @@ public class NotebookTest {
 		assertEquals("Incorrect list of modules returned!",
 				expectedModules, notebook.modules());
 	}
+	
+	@Test
+	public void testSeveralImports() {
+		String dataDir = "test/data/modules";
+		String file = "nb_4.ipynb";
+		List<PythonModule> expectedModules = new ArrayList<PythonModule>(3);
+		expectedModules.add(new PythonModule("module1"));
+		expectedModules.add(new PythonModule("module2"));
+		expectedModules.add(new PythonModule("module3"));
+		Notebook notebook = new Notebook(dataDir + "/" + file);
+		assertEquals("Incorrect list of module returned!",
+				expectedModules, notebook.modules());
+	}
+	
+	@Test
+	public void testSeveralImportCells() {
+		String dataDir = "test/data/modules";
+		String file = "nb_5.ipynb";
+		List<PythonModule> expectedModules = new ArrayList<PythonModule>(4);
+		expectedModules.add(new PythonModule("module10"));
+		expectedModules.add(new PythonModule("module11"));
+		expectedModules.add(new PythonModule("module12"));
+		expectedModules.add(new PythonModule("module13"));
+		Notebook notebook = new Notebook(dataDir + "/" + file);
+		assertEquals("Incorrect list of modules returned!",
+				expectedModules, notebook.modules());
+	}
 }
