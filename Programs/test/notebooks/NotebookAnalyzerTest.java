@@ -835,8 +835,55 @@ public class NotebookAnalyzerTest {
 		TestUtils.lastOutputFile("modules").delete();
 	}
 	
-	private String modulesHeader() {
-		return "notebook, modules ...";
+	/**
+	 * Verify the behavior of modules for an invalid JSON file.
+	 * @throws IOException 
+	 */
+	@Test
+	public void testModules_invalidFile() throws IOException {
+		String dataDir = "test/data/modules";
+		String file = "empty.ipynb";
+		List<List<PythonModule>> expectedModules = new ArrayList<>(1);
+		expectedModules.add(new ArrayList<PythonModule>());
+		String[] expectedLines = {
+			modulesHeader(),
+			"empty.ipynb"
+		};
+		analyzer.initializeNotebooksFrom(dataDir + "/" + file);
+		List<List<PythonModule>> modules = analyzer.modules();
+		
+		assertEquals("Wrong modules returned for invalid file!",
+				expectedModules, modules);
+		TestUtils.checkCsv("modules", expectedLines);
+		TestUtils.lastOutputFile("modules").delete();
+	}
+	
+	/**
+	 * Verify that the correct string representation of the most commonly
+	 * imported modules is created correctly.
+	 * @throws IOException
+	 */
+	@Test
+	public void testMostCommonModulesAsString() throws IOException {
+		String dataDir = "test/data/modules";
+		String[] files = {"nb_10.ipynb", "nb_11.ipynb",
+				"nb_12.ipynb", "nb_13.ipynb"};
+		for (String file: files) {
+			analyzer.initializeNotebooksFrom(dataDir + "/" + file);
+		}
+		List<List<PythonModule>> modules = analyzer.modules();
+		// All modules
+		String expectedModulesString = "moduleZ: 4\n"
+				+ "moduleY: 3\n"
+				+ "moduleW: 2\n"
+				+ "moduleX: 1\n";
+		String modulesString = NotebookAnalyzer.mostCommonModulesAsString(modules, files.length);
+		assertEquals("Wrong top modules reported!", expectedModulesString, modulesString);
+		// Limited number of modules
+		expectedModulesString = "moduleZ: 4\n";
+		modulesString = NotebookAnalyzer.mostCommonModulesAsString(modules, 1);
+		assertEquals("Wrong top modules reported!", expectedModulesString, modulesString);
+		TestUtils.lastOutputFile("modules").delete();
 	}
 
 	/**
@@ -876,13 +923,6 @@ public class NotebookAnalyzerTest {
 		
 		TestUtils.lastOutputFile("code_cells").delete();
 	}
-	
-	/**
-	 * @return Expected header of snippet files
-	 */
-	private static String codeCellsHeader() {
-		return "file, code cells";
-	}
 
 	/**
 	 * Verify that the right number of notebooks are found under a directory.
@@ -908,6 +948,13 @@ public class NotebookAnalyzerTest {
 	private static String cloneFrequencyHeader() {
 		return "file, unique, clones, non-empty clones, clone frequency, non-empty clone frequency, "
 				+ "intra clones, non-empty intra clones";
+	}
+	
+	/**
+	 * @return Expected header of code cells files
+	 */
+	private static String codeCellsHeader() {
+		return "file, code cells";
 	}
 	
 	/**
@@ -944,5 +991,12 @@ public class NotebookAnalyzerTest {
 	 */
 	private static String LOCHeader() {
 		return "file, total LOC, non-blank LOC, blank LOC";
+	}
+	
+	/**
+	 * @return Expected header of modules file
+	 */
+	private String modulesHeader() {
+		return "notebook, modules ...";
 	}
 }

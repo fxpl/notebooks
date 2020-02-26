@@ -3,6 +3,7 @@ package notebooks;
 import java.io.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -441,6 +442,33 @@ public class NotebookAnalyzer extends Analyzer {
 	private String modulesHeader() {
 		return "notebook, modules ...\n";
 	}
+	
+	/**
+	 * Create a string containing the most common modules and their quantity
+	 * (i.e. how many times they are imported).
+	 * @param modules List of list of all imported modules
+	 * @param maxNum Maximum number of modules to include in the string
+	 * @return A list of the most common modules and their quantity
+	 */
+	static String mostCommonModulesAsString(List<List<PythonModule>> modules, int maxNum) {
+		Map<String, Integer> moduleQuantities = new HashMap<String, Integer>();
+		for (List<PythonModule> notebookModules: modules) {
+			for (PythonModule module: notebookModules) {
+				Utils.addOrIncrease(moduleQuantities, module.getName());
+			}
+		}
+		List<ModuleQuantity> moduleQuantitesSorted = new ArrayList<ModuleQuantity>(moduleQuantities.size());
+		for (String key: moduleQuantities.keySet()) {
+			moduleQuantitesSorted.add(new ModuleQuantity(key, moduleQuantities.get(key)));
+		}
+		Collections.sort(moduleQuantitesSorted, Collections.reverseOrder());
+		final int modulesToPrint = Math.min(maxNum, moduleQuantitesSorted.size());
+		String result ="";
+		for (int i=0; i<modulesToPrint; i++) {
+			result += moduleQuantitesSorted.get(i) + "\n";
+		}
+		return result;
+	}
 
 	/**
 	 * Count the number of code cells in each notebook. Print each value on a
@@ -596,8 +624,9 @@ public class NotebookAnalyzer extends Analyzer {
 				System.out.println("File with all language values created!");
 			}
 			if (modules) {
-				this.modules();
-				System.out.println("Modules file created!");
+				List<List<PythonModule>> allModules = this.modules();
+				System.out.println("Most common modules:");
+				System.out.print(mostCommonModulesAsString(allModules, 100));
 			}
 		} catch (IOException e) {
 			System.err.println("I/O error: " + e.getMessage() + ". Operation interrupted.");
