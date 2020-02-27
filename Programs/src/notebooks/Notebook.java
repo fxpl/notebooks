@@ -179,7 +179,6 @@ public class Notebook {
 			String hash = Utils.toHexString(hasher.digest(snippet.getBytes()));
 			code[i] = new SnippetCode(loc, hash);
 		}
-		System.out.println("Found " + code.length + " snippets in " + getName());
 		return code;
 	}
 	

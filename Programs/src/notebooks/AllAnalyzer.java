@@ -72,7 +72,6 @@ class AllAnalyzer extends Worker<AllResults> {
 	private void callSnippetCodes() {
 		try {
 			hashes = notebook.snippetCodes();
-			System.out.println("Got " + hashes.length + " hashes for " + notebook.getName());
 		} catch (Exception e) {
 			System.err.println("Could not get snippets for " + notebook.getName() + ": " + e);
 			e.printStackTrace();

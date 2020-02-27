@@ -96,7 +96,6 @@ public class NotebookAnalyzer extends Analyzer {
 			writeLocLine(results.getTotalLOC(), results.getNonBlankLOC(), results.getBlankLOC(), notebook, LOCWriter);
 			writeLanguagesLine(results.getLanguage(), notebook, langWriter);
 			writeAllLanguagesLine(results.getAllLanguages(), notebook, allLangWriter);
-			System.out.println("Notebook " + notebook.getName());
 			storeHashes(results.getHashes(), notebook, snippets);
 		}
 		

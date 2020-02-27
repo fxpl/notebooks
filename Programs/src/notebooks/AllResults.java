@@ -56,7 +56,6 @@ public class AllResults {
 	}
 	
 	public SnippetCode[] getHashes() {
-		System.out.println("Returning " + hashes.length + " hashes");
 		return hashes;
 	}
 	
