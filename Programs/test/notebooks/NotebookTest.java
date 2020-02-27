@@ -548,4 +548,18 @@ public class NotebookTest {
 		Notebook notebook = new Notebook("nonexistent_file.txt");
 		notebook.numCodeCells();
 	}
+	
+	/**
+	 * Verify that the number of code cells doesn't increase every time we
+	 * fetch them (and both keys "cells" and "worksheets" are present in the
+	 * notebook).
+	 */
+	@Test
+	public void testRefBugFix() {
+		Notebook notebook = new Notebook("test/data/refBug/nb_1390458.ipynb");
+		assertEquals("Wrong number of code cells reported!", 1, notebook.numCodeCells());
+		assertEquals("Wrong LOC reported!", 1, notebook.LOC());
+		SnippetCode[] hashes = notebook.snippetCodes();
+		assertEquals("Wrong number of hashes reported!", 1, hashes.length);
+	}
 }

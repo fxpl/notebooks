@@ -332,11 +332,12 @@ public class Notebook {
 	 * @return Array containing all cells of the notebook
 	 */
 	private /*static*/ JSONArray getCellArray(JSONObject notebook) {
-		JSONArray cells;
+		JSONArray cells = new JSONArray();
 		if (notebook.has("cells")) {
-			cells = notebook.getJSONArray("cells");
-		} else {
-			cells = new JSONArray();
+			JSONArray notebookCells = notebook.getJSONArray("cells");
+			for (int i=0; i< notebookCells.length(); i++) {
+				cells.put(notebookCells.getJSONObject(i));
+			}
 		}
 		if (notebook.has("worksheets")) {
 			// Not according to spec, but occurring
