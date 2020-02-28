@@ -1,7 +1,6 @@
 rm(list=ls())
 setwd("~/github/fxpl/notebooks")
 source("../mk/PaperII/Performance/plot_for_normality_check.R")
-library(dunn.test)  # TODO: Är det här biblioteket jag vill använda?
 outputDir <- "Output"
 
 # FUNCTIONS
