@@ -86,7 +86,7 @@ checkLM <- function(y, x) {
 # x: independent variable, should be a factor
 ###############################################################################
 kruskalWallisWithPost <- function(y, x) {
-  kruskal.test(y, x)
+  print(kruskal.test(y, x))
   # Post hoc analysis, relevant if Kruskal Wallis test indicates a significant difference
   pAdjustMethod="hochberg"
   pairwise.wilcox.test(y, x, p.adjust.method=pAdjustMethod, paired=FALSE, alternative="two.sided")
