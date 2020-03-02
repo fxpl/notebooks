@@ -94,6 +94,7 @@ kruskalWallisWithPost <- function(y, x) {
 
 # NOTEBOOK DATA
 codeCells <- read.csv("Output/code_cells.csv", header=TRUE, stringsAsFactors=FALSE)
+nonEmptySnippets <- read.csv("Output/snippetsPerFileNE.csv", header=TRUE, stringsAsFactors=FALSE)
 sizes <- read.csv("Output/notebook_sizes.csv", header=TRUE)
 loc <- read.csv("Output/loc.csv", header=TRUE, stringsAsFactors=FALSE)
 languages <- read.csv("Output/languages.csv", header=TRUE, stringsAsFactors=FALSE)
@@ -103,6 +104,7 @@ cloneFreq <- read.csv("Output/cloneFrequency.csv", header=TRUE, stringsAsFactors
 connections <-read.csv("Output/connections.csv", header=TRUE, stringsAsFactors=FALSE)
 nbData = merge(languages, cloneFreq, by="file")
 nbData = merge(codeCells, nbData, by="file")
+nbData = merge(nonEmptySnippets, nbData, by="file")
 
 # SIZES
 cells <- codeCells[,"code.cells"]
@@ -163,10 +165,10 @@ exportAsEPS(plot(clone.frequency~code.cells, data=nbData, xlab="Number of code c
 print("Correlation with size (all clones):")
 cor.test(nbData$code.cells, nbData$clone.frequency, alternative="two.sided", method="spearman")
 
-exportAsEPS(plot(non.empty.clone.frequency~code.cells, data=nbData, xlab="Number of code cells", ylab="Clone frequency"),
+exportAsEPS(plot(non.empty.clone.frequency~non.empty.snippets, data=nbData, xlab="Number of code cells", ylab="Clone frequency"),
             "cells_frequencyNE")
 print("Correlation with size (non-empty clones):")
-cor.test(nbData$code.cells, nbData$non.empty.clone.frequency, alternative="two.sided", method="spearman")
+cor.test(nbData$non.empty.snippets, nbData$non.empty.clone.frequency, alternative="two.sided", method="spearman")
 
 # Association with language
 exportAsEPS(boxplot(clone.frequency~language, data=nbData), "lang_frequencyA")
