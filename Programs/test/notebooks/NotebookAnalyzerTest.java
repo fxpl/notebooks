@@ -780,7 +780,9 @@ public class NotebookAnalyzerTest {
 	@Test
 	public void testModules() throws IOException {
 		String dataDir = "test/data/modules";
-		String[] files = {"nb_1.ipynb", "nb_2.ipynb", "nb_3.ipynb",
+		String[] files = {"nb_1.ipynb", "nb_2.ipynb", "nb_R.ipynb",
+				"nb_3.ipynb", "nb_4.ipynb", "nb_5.ipynb"};
+		String[] pythonFiles = {"nb_1.ipynb", "nb_2.ipynb", "nb_3.ipynb",
 				"nb_4.ipynb", "nb_5.ipynb"};
 		List<List<PythonModule>> expectedModules = new ArrayList<List<PythonModule>>(files.length);
 		for (int i=0; i<files.length; i++) {
@@ -801,8 +803,8 @@ public class NotebookAnalyzerTest {
 			analyzer.initializeNotebooksFrom(dataDir + "/" + file);
 		}
 		List<List<PythonModule>> modules = analyzer.modules();
-		for (int i=0; i<files.length; i++) {
-			assertEquals("Wrong modules returned for " + files[i] + "!",
+		for (int i=0; i<pythonFiles.length; i++) {
+			assertEquals("Wrong modules returned for " + pythonFiles[i] + "!",
 					expectedModules.get(i), modules.get(i));
 		}
 		TestUtils.lastOutputFile("modules").delete();
@@ -816,8 +818,8 @@ public class NotebookAnalyzerTest {
 	@Test
 	public void testModules_csv() throws IOException {
 		String dataDir = "test/data/modules";
-		String[] files = {"nb_1.ipynb", "nb_2.ipynb", "nb_3.ipynb",
-				"nb_4.ipynb", "nb_5.ipynb"};
+		String[] files = {"nb_1.ipynb", "nb_2.ipynb", "nb_R.ipynb",
+				"nb_3.ipynb", "nb_4.ipynb", "nb_5.ipynb"};
 		String[] expectedLines = {
 			modulesHeader(),
 			"nb_1.ipynb, kossa",
@@ -843,11 +845,9 @@ public class NotebookAnalyzerTest {
 	public void testModules_invalidFile() throws IOException {
 		String dataDir = "test/data/modules";
 		String file = "empty.ipynb";
-		List<List<PythonModule>> expectedModules = new ArrayList<>(1);
-		expectedModules.add(new ArrayList<PythonModule>());
+		List<List<PythonModule>> expectedModules = new ArrayList<>(0);
 		String[] expectedLines = {
-			modulesHeader(),
-			"empty.ipynb"
+			modulesHeader()
 		};
 		analyzer.initializeNotebooksFrom(dataDir + "/" + file);
 		List<List<PythonModule>> modules = analyzer.modules();
@@ -866,7 +866,7 @@ public class NotebookAnalyzerTest {
 	@Test
 	public void testMostCommonModulesAsString() throws IOException {
 		String dataDir = "test/data/modules";
-		String[] files = {"nb_10.ipynb", "nb_11.ipynb",
+		String[] files = {"nb_10.ipynb", "nb_R.ipynb", "nb_11.ipynb",
 				"nb_12.ipynb", "nb_13.ipynb"};
 		for (String file: files) {
 			analyzer.initializeNotebooksFrom(dataDir + "/" + file);

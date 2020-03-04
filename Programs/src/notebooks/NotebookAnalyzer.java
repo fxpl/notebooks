@@ -301,16 +301,19 @@ public class NotebookAnalyzer extends Analyzer {
 	 * @param writer Writer that appends text to the languages file
 	 */
 	private LangName writeLanguagesLine(Future<Language> language, Notebook notebook, Writer writer) throws IOException {
-		Language languageValue;
+		Language languageValue = getLanguage(language, notebook);
+		writeLanguagesLine(languageValue, notebook, writer);
+		return languageValue.getName();
+	}
+	
+	private Language getLanguage(Future<Language> language, Notebook notebook) {
 		try {
-			languageValue = language.get();
+			return language.get();
 		} catch (InterruptedException | ExecutionException e) {
 			System.err.println("Could not get language information for " + notebook.getName() + ": " + e);
 			e.printStackTrace();
-			languageValue = new Language();
+			return new Language();
 		}
-		writeLanguagesLine(languageValue, notebook, writer);
-		return languageValue.getName();
 	}
 	
 	private void writeLanguagesLine(Language language, Notebook notebook, Writer writer) throws IOException {
@@ -396,17 +399,31 @@ public class NotebookAnalyzer extends Analyzer {
 	 * @throws IOException On problems with handling the output file
 	 */
 	public List<List<PythonModule>> modules() throws IOException {
-		List<Callable<List<PythonModule>>> tasks
-			= new ArrayList<Callable<List<PythonModule>>>(notebooks.size());
-		List<List<PythonModule>> result = new ArrayList<List<PythonModule>>(notebooks.size());
-		for (int i=0; i<notebooks.size(); i++) {
-			tasks.add(new ModulesIdentifier(notebooks.get(i)));
+		List<Callable<Language>> languageTasks
+			= new ArrayList<Callable<Language>>(notebooks.size());
+		for (Notebook notebook: notebooks) {
+			languageTasks.add(new LanguageExtractor(notebook));
 		}
-		List<Future<List<PythonModule>>> modules = ThreadExecutor.getInstance().invokeAll(tasks);
+		List<Future<Language>> languages = ThreadExecutor.getInstance().invokeAll(languageTasks);
+
+		List<Notebook> pythonNotebooks = new ArrayList<Notebook>();
+		List<Callable<List<PythonModule>>> moduleTasks
+			= new ArrayList<Callable<List<PythonModule>>>();
+		for (int i=0; i<notebooks.size(); i++) {
+			Notebook notebook = notebooks.get(i);
+			LangName langName = getLanguage(languages.get(i), notebook).getName();
+			if (LangName.PYTHON == langName) {
+				pythonNotebooks.add(notebook);
+				moduleTasks.add(new ModulesIdentifier(notebook));
+			}
+		}
+		List<Future<List<PythonModule>>> modules = ThreadExecutor.getInstance().invokeAll(moduleTasks);
+		
+		List<List<PythonModule>> result = new ArrayList<List<PythonModule>>(pythonNotebooks.size());
 		Writer writer = new FileWriter(outputDir + "/modules" + LocalDateTime.now() + ".csv");
 		writer.write(modulesHeader());
-		for (int i=0; i<notebooks.size(); i++) {
-			result.add(i, writeModuleLine(modules.get(i), notebooks.get(i), writer));
+		for (int i=0; i<modules.size(); i++) {
+			result.add(i, writeModuleLine(modules.get(i), pythonNotebooks.get(i), writer));
 		}
 		writer.close();
 		return result;
