@@ -46,4 +46,10 @@ public class PythonModuleTest {
 		int expectedHash = Objects.hashCode(name);
 		assertEquals("Wrong hash code returned!", expectedHash, module.hashCode());
 	}
+	
+	@Test
+	public void testToString() {
+		String expected = name;
+		assertEquals("Wrong String representation returned!", expected, module.toString());
+	}
 }
