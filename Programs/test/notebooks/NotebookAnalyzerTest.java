@@ -873,14 +873,14 @@ public class NotebookAnalyzerTest {
 		}
 		List<List<PythonModule>> modules = analyzer.modules();
 		// All modules
-		String expectedModulesString = "moduleZ: 4\n"
-				+ "moduleY: 3\n"
-				+ "moduleW: 2\n"
-				+ "moduleX: 1\n";
+		String expectedModulesString = "1. moduleZ: 4\n"
+				+ "2. moduleY: 3\n"
+				+ "3. moduleW: 2\n"
+				+ "4. moduleX: 1\n";
 		String modulesString = NotebookAnalyzer.mostCommonModulesAsString(modules, files.length);
 		assertEquals("Wrong top modules reported!", expectedModulesString, modulesString);
 		// Limited number of modules
-		expectedModulesString = "moduleZ: 4\n";
+		expectedModulesString = "1. moduleZ: 4\n";
 		modulesString = NotebookAnalyzer.mostCommonModulesAsString(modules, 1);
 		assertEquals("Wrong top modules reported!", expectedModulesString, modulesString);
 		TestUtils.lastOutputFile("modules").delete();

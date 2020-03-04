@@ -482,7 +482,7 @@ public class NotebookAnalyzer extends Analyzer {
 		final int modulesToPrint = Math.min(maxNum, moduleQuantitesSorted.size());
 		String result ="";
 		for (int i=0; i<modulesToPrint; i++) {
-			result += moduleQuantitesSorted.get(i) + "\n";
+			result += (i+1) + ". " + moduleQuantitesSorted.get(i) + "\n";
 		}
 		return result;
 	}
