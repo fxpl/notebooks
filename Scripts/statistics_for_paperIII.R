@@ -100,6 +100,8 @@ loc <- read.csv("Output/loc.csv", header=TRUE, stringsAsFactors=FALSE)
 languages <- read.csv("Output/languages.csv", header=TRUE, stringsAsFactors=FALSE)
 snippetOccurrencesA <- read.csv("Output/filesPerSnippetA.csv", header=FALSE, stringsAsFactors=FALSE)
 snippetOccurrencesNE <- read.csv("Output/filesPerSnippetNE.csv", header=FALSE, stringsAsFactors=FALSE)
+notebookOccurencesA <- read.csv("Output/nb_clone_distrA.csv", header=FALSE)
+notebookOccurencesNE <- read.csv("Output/nb_clone_distrNE.csv", header=FALSE)
 cloneFreq <- read.csv("Output/cloneFrequency.csv", header=TRUE, stringsAsFactors=FALSE)
 connections <-read.csv("Output/connections.csv", header=TRUE, stringsAsFactors=FALSE)
 nbData = merge(languages, cloneFreq, by="file")
@@ -148,6 +150,9 @@ exportAsEPS({
 # Snippet occurences distribution
 logHist(snippetOccurrencesA[,2], specifier="snippetOccurencesA", objects="Snippets")
 logHist(snippetOccurrencesNE[,2], specifier="snippetOccurencesNE", objects="Snippets")
+# Notebook clone occurrences distribution
+logHist(notebookOccurencesA[,1], specifier="notebookOccurencesA")
+logHist(notebookOccurencesNE[,1], specifier="notebookOccurencesNE")
 
 # Plots and descriptive statistics
 frequencies <- nbData[,"clone.frequency"]
