@@ -788,16 +788,16 @@ public class NotebookAnalyzerTest {
 		for (int i=0; i<files.length; i++) {
 			expectedModules.add(i, new ArrayList<PythonModule>());
 		}
-		expectedModules.get(0).add(0, new PythonModule("kossa"));
-		expectedModules.get(1).add(0, new PythonModule("kalv"));
-		expectedModules.get(2).add(0, new PythonModule("ko"));
-		expectedModules.get(3).add(0, new PythonModule("module1"));
-		expectedModules.get(3).add(1, new PythonModule("module2"));
-		expectedModules.get(3).add(2, new PythonModule("module3"));
-		expectedModules.get(4).add(0, new PythonModule("module10"));
-		expectedModules.get(4).add(1, new PythonModule("module11"));
-		expectedModules.get(4).add(2, new PythonModule("module12"));
-		expectedModules.get(4).add(3, new PythonModule("module13"));
+		expectedModules.get(0).add(0, new PythonModule("kossa", ImportType.IMPORT));
+		expectedModules.get(1).add(0, new PythonModule("kalv", ImportType.ALIAS));
+		expectedModules.get(2).add(0, new PythonModule("ko", ImportType.FROM));
+		expectedModules.get(3).add(0, new PythonModule("module1", ImportType.IMPORT));
+		expectedModules.get(3).add(1, new PythonModule("module2", ImportType.ALIAS));
+		expectedModules.get(3).add(2, new PythonModule("module3", ImportType.ALIAS));
+		expectedModules.get(4).add(0, new PythonModule("module10", ImportType.IMPORT));
+		expectedModules.get(4).add(1, new PythonModule("module11", ImportType.ALIAS));
+		expectedModules.get(4).add(2, new PythonModule("module12", ImportType.IMPORT));
+		expectedModules.get(4).add(3, new PythonModule("module13", ImportType.ALIAS));
 		
 		for (String file: files) {
 			analyzer.initializeNotebooksFrom(dataDir + "/" + file);
@@ -806,6 +806,11 @@ public class NotebookAnalyzerTest {
 		for (int i=0; i<pythonFiles.length; i++) {
 			assertEquals("Wrong modules returned for " + pythonFiles[i] + "!",
 					expectedModules.get(i), modules.get(i));
+			for (int j=0; j<expectedModules.get(i).size(); j++) {
+				assertEquals("Incorrect import type stored for notebook " + i + ", " + j + "!",
+						expectedModules.get(i).get(j).importedWith(),
+						modules.get(i).get(j).importedWith());
+			}
 		}
 		TestUtils.lastOutputFile("modules").delete();
 	}

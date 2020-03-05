@@ -10,11 +10,12 @@ import org.junit.Test;
 public class PythonModuleTest {
 	private PythonModule module;
 	private final String name = "someModule";
+	private final ImportType importedWith = ImportType.IMPORT;
 
 	
 	@Before
 	public void setUp() {
-		module = new PythonModule(name);
+		module = new PythonModule(name, importedWith);
 	}
 	
 	@Test
@@ -24,7 +25,7 @@ public class PythonModuleTest {
 	
 	@Test
 	public void testEquals_equal() {
-		PythonModule other = new PythonModule(name);
+		PythonModule other = new PythonModule(name, ImportType.ALIAS);
 		assertTrue("Equal pyton modules considered different!", module.equals(other));
 	}
 
@@ -37,7 +38,7 @@ public class PythonModuleTest {
 	
 	@Test
 	public void testEquals_diffName() {
-		PythonModule other = new PythonModule("differentName");
+		PythonModule other = new PythonModule("differentName", ImportType.ALIAS);
 		assertFalse("Objects with different names considered equal!", module.equals(other));
 	}
 	
@@ -45,6 +46,11 @@ public class PythonModuleTest {
 	public void testHashCode() {
 		int expectedHash = Objects.hashCode(name);
 		assertEquals("Wrong hash code returned!", expectedHash, module.hashCode());
+	}
+	
+	@Test
+	public void testImportedWith() {
+		assertEquals("Wrong import type retured!", importedWith, module.importedWith());
 	}
 	
 	@Test

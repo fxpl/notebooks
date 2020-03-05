@@ -4,11 +4,13 @@ import java.util.Objects;
 
 public class PythonModule {
 	private String name;
+	private ImportType importedWith;
 	/*private String alias = null;
 	private List<String> methods;*/
 	
-	public PythonModule(String name) {
+	public PythonModule(String name, ImportType importedWith) {
 		this.name = name;
+		this.importedWith = importedWith;
 	}
 	
 	public String getName() {
@@ -27,6 +29,10 @@ public class PythonModule {
 	@Override
 	public int hashCode() {
 		return Objects.hashCode(name);
+	}
+	
+	public ImportType importedWith() {
+		return importedWith;
 	}
 	
 	@Override

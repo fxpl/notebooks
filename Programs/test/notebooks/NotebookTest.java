@@ -559,10 +559,8 @@ public class NotebookTest {
 		String dataDir = "test/data/modules";
 		String file = "nb_1.ipynb";
 		List<PythonModule> expectedModules = new ArrayList<PythonModule>(1);
-		expectedModules.add(new PythonModule("kossa"));
-		Notebook notebook = new Notebook(dataDir + "/" + file);
-		assertEquals("Incorrect list of modules returned!",
-				expectedModules, notebook.modules());
+		expectedModules.add(new PythonModule("kossa", ImportType.IMPORT));
+		verifyImports(dataDir + "/" + file, expectedModules);
 	}
 	
 	/**
@@ -573,10 +571,8 @@ public class NotebookTest {
 		String dataDir = "test/data/modules";
 		String file = "nb_2.ipynb";
 		List<PythonModule> expectedModules = new ArrayList<PythonModule>(1);
-		expectedModules.add(new PythonModule("kalv"));
-		Notebook notebook = new Notebook(dataDir + "/" + file);
-		assertEquals("Incorrect list of modules returned!",
-				expectedModules, notebook.modules());
+		expectedModules.add(new PythonModule("kalv", ImportType.ALIAS));
+		verifyImports(dataDir + "/" + file, expectedModules);
 	}
 	
 	/**
@@ -588,10 +584,8 @@ public class NotebookTest {
 		String dataDir = "test/data/modules";
 		String file = "nb_3.ipynb";
 		List<PythonModule> expectedModules = new ArrayList<PythonModule>(1);
-		expectedModules.add(new PythonModule("ko"));
-		Notebook notebook = new Notebook(dataDir + "/" + file);
-		assertEquals("Incorrect list of modules returned!",
-				expectedModules, notebook.modules());
+		expectedModules.add(new PythonModule("ko", ImportType.FROM));
+		verifyImports(dataDir + "/" + file, expectedModules);
 	}
 	
 	/**
@@ -602,12 +596,10 @@ public class NotebookTest {
 		String dataDir = "test/data/modules";
 		String file = "nb_4.ipynb";
 		List<PythonModule> expectedModules = new ArrayList<PythonModule>(3);
-		expectedModules.add(new PythonModule("module1"));
-		expectedModules.add(new PythonModule("module2"));
-		expectedModules.add(new PythonModule("module3"));
-		Notebook notebook = new Notebook(dataDir + "/" + file);
-		assertEquals("Incorrect list of module returned!",
-				expectedModules, notebook.modules());
+		expectedModules.add(new PythonModule("module1", ImportType.IMPORT));
+		expectedModules.add(new PythonModule("module2", ImportType.ALIAS));
+		expectedModules.add(new PythonModule("module3", ImportType.ALIAS));
+		verifyImports(dataDir + "/" + file, expectedModules);
 	}
 	
 	/**
@@ -618,12 +610,26 @@ public class NotebookTest {
 		String dataDir = "test/data/modules";
 		String file = "nb_5.ipynb";
 		List<PythonModule> expectedModules = new ArrayList<PythonModule>(4);
-		expectedModules.add(new PythonModule("module10"));
-		expectedModules.add(new PythonModule("module11"));
-		expectedModules.add(new PythonModule("module12"));
-		expectedModules.add(new PythonModule("module13"));
-		Notebook notebook = new Notebook(dataDir + "/" + file);
-		assertEquals("Incorrect list of modules returned!",
+		expectedModules.add(new PythonModule("module10", ImportType.IMPORT));
+		expectedModules.add(new PythonModule("module11", ImportType.ALIAS));
+		expectedModules.add(new PythonModule("module12", ImportType.IMPORT));
+		expectedModules.add(new PythonModule("module13", ImportType.ALIAS));
+		verifyImports(dataDir + "/" + file, expectedModules);
+	}
+	
+	/**
+	 * Verify that modules are imported correctly from notebook
+	 * @param file Path to notebook
+	 * @param expectedModules List of modules that are expected to be imported, in the specified order
+	 */
+	private void verifyImports(String file, List<PythonModule> expectedModules) {
+		Notebook notebook = new Notebook(file);
+		List<PythonModule> modules = notebook.modules();
+		assertEquals("Incorrect list of module returned!",
 				expectedModules, notebook.modules());
+		for (int i=0; i<expectedModules.size(); i++) {
+			assertEquals("Incorrect import type stored for notebook " + i + "!",
+					expectedModules.get(i).importedWith(), modules.get(i).importedWith());
+		}
 	}
 }
