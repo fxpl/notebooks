@@ -10,7 +10,7 @@ import org.junit.Test;
 public class PythonModuleTest {
 	private PythonModule module;
 	private final String name = "someModule";
-	private final ImportType importedWith = ImportType.IMPORT;
+	private final ImportType importedWith = ImportType.ORDINARY;
 
 	
 	@Before

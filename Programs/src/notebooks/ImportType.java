@@ -1,7 +1,7 @@
 package notebooks;
 
 public enum ImportType {
-	IMPORT,
+	ORDINARY,
 	ALIAS,
 	FROM;
 }

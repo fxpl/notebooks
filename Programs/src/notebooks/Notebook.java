@@ -67,7 +67,7 @@ public class Notebook {
 				String line = lines.getString(i);
 				Matcher lineMatcher = importPattern.matcher(line);
 				if (lineMatcher.matches()) {
-					modules.add(new PythonModule(lineMatcher.group(1), ImportType.IMPORT));
+					modules.add(new PythonModule(lineMatcher.group(1), ImportType.ORDINARY));
 				}
 				lineMatcher = importAliasPattern.matcher(line);
 				if (lineMatcher.matches()) {

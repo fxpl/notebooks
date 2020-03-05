@@ -788,15 +788,15 @@ public class NotebookAnalyzerTest {
 		for (int i=0; i<files.length; i++) {
 			expectedModules.add(i, new ArrayList<PythonModule>());
 		}
-		expectedModules.get(0).add(0, new PythonModule("kossa", ImportType.IMPORT));
+		expectedModules.get(0).add(0, new PythonModule("kossa", ImportType.ORDINARY));
 		expectedModules.get(1).add(0, new PythonModule("kalv", ImportType.ALIAS));
 		expectedModules.get(2).add(0, new PythonModule("ko", ImportType.FROM));
-		expectedModules.get(3).add(0, new PythonModule("module1", ImportType.IMPORT));
+		expectedModules.get(3).add(0, new PythonModule("module1", ImportType.ORDINARY));
 		expectedModules.get(3).add(1, new PythonModule("module2", ImportType.ALIAS));
 		expectedModules.get(3).add(2, new PythonModule("module3", ImportType.ALIAS));
-		expectedModules.get(4).add(0, new PythonModule("module10", ImportType.IMPORT));
+		expectedModules.get(4).add(0, new PythonModule("module10", ImportType.ORDINARY));
 		expectedModules.get(4).add(1, new PythonModule("module11", ImportType.ALIAS));
-		expectedModules.get(4).add(2, new PythonModule("module12", ImportType.IMPORT));
+		expectedModules.get(4).add(2, new PythonModule("module12", ImportType.ORDINARY));
 		expectedModules.get(4).add(3, new PythonModule("module13", ImportType.ALIAS));
 		
 		for (String file: files) {
@@ -818,7 +818,7 @@ public class NotebookAnalyzerTest {
 	/**
 	 * Verify that the output file modules<current-date-time>.csv is created
 	 * and filled correctly when the modules are identified.
-	 * @throws IOException on errors when handling output file 
+	 * @throws IOException on errors when handling input/output file(s) 
 	 */
 	@Test
 	public void testModules_csv() throws IOException {
@@ -844,7 +844,7 @@ public class NotebookAnalyzerTest {
 	
 	/**
 	 * Verify the behavior of modules for an invalid JSON file.
-	 * @throws IOException 
+	 * @throws IOException on errors handling the input file
 	 */
 	@Test
 	public void testModules_invalidFile() throws IOException {
@@ -866,7 +866,7 @@ public class NotebookAnalyzerTest {
 	/**
 	 * Verify that the correct string representation of the most commonly
 	 * imported modules is created correctly.
-	 * @throws IOException
+	 * @throws IOException on errors handling the input files
 	 */
 	@Test
 	public void testMostCommonModulesAsString() throws IOException {
@@ -888,6 +888,29 @@ public class NotebookAnalyzerTest {
 		expectedModulesString = "1. moduleZ: 4\n";
 		modulesString = NotebookAnalyzer.mostCommonModulesAsString(modules, 1);
 		assertEquals("Wrong top modules reported!", expectedModulesString, modulesString);
+		TestUtils.lastOutputFile("modules").delete();
+	}
+	
+	/**
+	 * Verify that a correct summary of the import type frequencies is created
+	 * by importTypeSummary.
+	 * @throws IOException on errors handling the input files
+	 */
+	@Test
+	public void testImportTypeSummary() throws IOException {
+		String dataDir = "test/data/modules";
+		String[] files = {"nb_1.ipynb", "nb_2.ipynb", "nb_R.ipynb",
+				"nb_3.ipynb", "nb_4.ipynb", "nb_5.ipynb"};
+		String expectedImportTypeString = "ORDINARY: 4 (40.00%)\n"
+				+ "ALIAS: 5 (50.00%)\n"
+				+ "FROM: 1 (10.00%)\n";
+		for (String file: files) {
+			analyzer.initializeNotebooksFrom(dataDir + "/" + file);
+		}
+		List<List<PythonModule>> modules = analyzer.modules();
+		String importTypeString = NotebookAnalyzer.importTypeSummary(modules);
+		assertEquals("Wrong import types reported!",
+				expectedImportTypeString, importTypeString);
 		TestUtils.lastOutputFile("modules").delete();
 	}
 

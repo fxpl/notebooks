@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.*;
 
@@ -486,6 +487,48 @@ public class NotebookAnalyzer extends Analyzer {
 		}
 		return result;
 	}
+	
+	/**
+	 * Create a string containing a list of import types and their quantity and
+	 * percentage (i.e. how many times they have been imported and the
+	 * percentage of imports that they constitute).
+	 * @param modules List of all imported modules
+	 * @return A list of the import type quantities + percentages
+	 */
+	static String importTypeSummary(List<List<PythonModule>> modules) {
+		int ordinary = 0;
+		int alias = 0;
+		int from = 0;
+		int total = 0;
+		for (List<PythonModule> notebookModules: modules) {
+			for (PythonModule module: notebookModules) {
+				switch (module.importedWith()) {
+				case ORDINARY:
+					ordinary++;
+					break;
+				case ALIAS:
+					alias++;
+					break;
+				case FROM:
+					from++;
+					break;
+				default:
+					System.err.println("Unknown import type: " + module.importedWith());
+					break;
+				}
+				total++;
+			}
+		}
+		double ordinaryPercent = 100.0 * ordinary/total;
+		double aliasPercent = 100.0 * alias/total;
+		double fromPercent = 100.0 * from/total;
+		return ImportType.ORDINARY.toString() + ": " + ordinary
+				+ " (" + String.format(Locale.US, "%.2f", ordinaryPercent) + "%)\n"
+				+ ImportType.ALIAS.toString() + ": " + alias
+				+ " (" + String.format(Locale.US,  "%.2f", aliasPercent) + "%)\n"
+				+ ImportType.FROM.toString() + ": " + from
+				+ " (" + String.format(Locale.US, "%.2f", fromPercent) + "%)\n";
+	}
 
 	/**
 	 * Count the number of code cells in each notebook. Print each value on a
@@ -642,8 +685,10 @@ public class NotebookAnalyzer extends Analyzer {
 			}
 			if (modules) {
 				List<List<PythonModule>> allModules = this.modules();
-				System.out.println("Most common modules:");
+				System.out.println("\nMost common modules:");
 				System.out.print(mostCommonModulesAsString(allModules, 100));
+				System.out.println("\nImport types:");
+				System.out.println(importTypeSummary(allModules));
 			}
 		} catch (IOException e) {
 			System.err.println("I/O error: " + e.getMessage() + ". Operation interrupted.");
