@@ -789,15 +789,15 @@ public class NotebookAnalyzerTest {
 			expectedModules.add(i, new ArrayList<PythonModule>());
 		}
 		expectedModules.get(0).add(0, new PythonModule("kossa", ImportType.ORDINARY));
-		expectedModules.get(1).add(0, new PythonModule("kalv", ImportType.ALIAS));
+		expectedModules.get(1).add(0, new PythonModule("kalv", "naut", ImportType.ALIAS));
 		expectedModules.get(2).add(0, new PythonModule("ko", ImportType.FROM));
 		expectedModules.get(3).add(0, new PythonModule("module1", ImportType.ORDINARY));
-		expectedModules.get(3).add(1, new PythonModule("module2", ImportType.ALIAS));
-		expectedModules.get(3).add(2, new PythonModule("module3", ImportType.ALIAS));
+		expectedModules.get(3).add(1, new PythonModule("module2", "mod2", ImportType.ALIAS));
+		expectedModules.get(3).add(2, new PythonModule("module3", "mod3", ImportType.ALIAS));
 		expectedModules.get(4).add(0, new PythonModule("module10", ImportType.ORDINARY));
-		expectedModules.get(4).add(1, new PythonModule("module11", ImportType.ALIAS));
+		expectedModules.get(4).add(1, new PythonModule("module11", "mod", ImportType.ALIAS));
 		expectedModules.get(4).add(2, new PythonModule("module12", ImportType.ORDINARY));
-		expectedModules.get(4).add(3, new PythonModule("module13", ImportType.ALIAS));
+		expectedModules.get(4).add(3, new PythonModule("module13", "mod13", ImportType.ALIAS));
 		
 		for (String file: files) {
 			analyzer.initializeNotebooksFrom(dataDir + "/" + file);

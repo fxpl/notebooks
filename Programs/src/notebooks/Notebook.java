@@ -71,7 +71,7 @@ public class Notebook {
 				}
 				lineMatcher = importAliasPattern.matcher(line);
 				if (lineMatcher.matches()) {
-					modules.add(new PythonModule(lineMatcher.group(1), ImportType.ALIAS));
+					modules.add(new PythonModule(lineMatcher.group(1), lineMatcher.group(2), ImportType.ALIAS));
 				}
 				lineMatcher = fromPattern.matcher(line);
 				if (lineMatcher.matches()) {
@@ -202,7 +202,7 @@ public class Notebook {
 			int loc = 0;
 			for (int j=0; j<lines.length(); j++) {
 				String line = lines.getString(j);
-				line = line .replaceAll("\\s", "");
+				line = line.replaceAll("\\s", "");
 				if(!"".equals(line)) {
 					loc++;	// Count non-empty lines
 				}

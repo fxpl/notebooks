@@ -571,7 +571,7 @@ public class NotebookTest {
 		String dataDir = "test/data/modules";
 		String file = "nb_2.ipynb";
 		List<PythonModule> expectedModules = new ArrayList<PythonModule>(1);
-		expectedModules.add(new PythonModule("kalv", ImportType.ALIAS));
+		expectedModules.add(new PythonModule("kalv", "naut", ImportType.ALIAS));
 		verifyImports(dataDir + "/" + file, expectedModules);
 	}
 	
@@ -597,8 +597,8 @@ public class NotebookTest {
 		String file = "nb_4.ipynb";
 		List<PythonModule> expectedModules = new ArrayList<PythonModule>(3);
 		expectedModules.add(new PythonModule("module1", ImportType.ORDINARY));
-		expectedModules.add(new PythonModule("module2", ImportType.ALIAS));
-		expectedModules.add(new PythonModule("module3", ImportType.ALIAS));
+		expectedModules.add(new PythonModule("module2", "mod2", ImportType.ALIAS));
+		expectedModules.add(new PythonModule("module3", "mod3", ImportType.ALIAS));
 		verifyImports(dataDir + "/" + file, expectedModules);
 	}
 	
@@ -611,9 +611,9 @@ public class NotebookTest {
 		String file = "nb_5.ipynb";
 		List<PythonModule> expectedModules = new ArrayList<PythonModule>(4);
 		expectedModules.add(new PythonModule("module10", ImportType.ORDINARY));
-		expectedModules.add(new PythonModule("module11", ImportType.ALIAS));
+		expectedModules.add(new PythonModule("module11", "mod", ImportType.ALIAS));
 		expectedModules.add(new PythonModule("module12", ImportType.ORDINARY));
-		expectedModules.add(new PythonModule("module13", ImportType.ALIAS));
+		expectedModules.add(new PythonModule("module13", "mod13", ImportType.ALIAS));
 		verifyImports(dataDir + "/" + file, expectedModules);
 	}
 	
