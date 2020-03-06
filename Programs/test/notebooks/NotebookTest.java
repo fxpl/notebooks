@@ -555,7 +555,7 @@ public class NotebookTest {
 	 * Verify that a single import can be identified.
 	 */
 	@Test
-	public void testSingleImport() {
+	public void testSingleImport() throws NotebookException {
 		String dataDir = "test/data/modules";
 		String file = "nb_1.ipynb";
 		List<PythonModule> expectedModules = new ArrayList<PythonModule>(1);
@@ -567,7 +567,7 @@ public class NotebookTest {
 	 * Verify that a single Python module import with alias can be identified.
 	 */
 	@Test
-	public void testSingleImportWithAlias() {
+	public void testSingleImportWithAlias() throws NotebookException {
 		String dataDir = "test/data/modules";
 		String file = "nb_2.ipynb";
 		List<PythonModule> expectedModules = new ArrayList<PythonModule>(1);
@@ -580,7 +580,7 @@ public class NotebookTest {
 	 * identified.
 	 */
 	@Test
-	public void testSingleImportFrom() {
+	public void testSingleImportFrom() throws NotebookException {
 		String dataDir = "test/data/modules";
 		String file = "nb_3.ipynb";
 		List<PythonModule> expectedModules = new ArrayList<PythonModule>(1);
@@ -592,7 +592,7 @@ public class NotebookTest {
 	 * Verify that several Python module imports in one cell can be identified.
 	 */
 	@Test
-	public void testSeveralImports() {
+	public void testSeveralImports() throws NotebookException {
 		String dataDir = "test/data/modules";
 		String file = "nb_4.ipynb";
 		List<PythonModule> expectedModules = new ArrayList<PythonModule>(3);
@@ -606,7 +606,7 @@ public class NotebookTest {
 	 * Verify that Python module imports in different cells can be identified.
 	 */
 	@Test
-	public void testSeveralImportCells() {
+	public void testSeveralImportCells() throws NotebookException {
 		String dataDir = "test/data/modules";
 		String file = "nb_5.ipynb";
 		List<PythonModule> expectedModules = new ArrayList<PythonModule>(4);
@@ -618,11 +618,22 @@ public class NotebookTest {
 	}
 	
 	/**
+	 * Verify that a NotebookException is thrown if we try to extract module
+	 * name(s) from an invalid import statement
+	 */
+	@Test (expected=NotebookException.class)
+	public void testInvalidImport() throws NotebookException {
+		String dataDir = "test/data/modules";
+		String file = "nb_100.ipynb";
+		verifyImports(dataDir + "/" + file, null);
+	}
+	
+	/**
 	 * Verify that modules are imported correctly from notebook
 	 * @param file Path to notebook
 	 * @param expectedModules List of modules that are expected to be imported, in the specified order
 	 */
-	private void verifyImports(String file, List<PythonModule> expectedModules) {
+	private void verifyImports(String file, List<PythonModule> expectedModules) throws NotebookException {
 		Notebook notebook = new Notebook(file);
 		List<PythonModule> modules = notebook.modules();
 		assertEquals("Incorrect list of module returned!",

@@ -54,32 +54,47 @@ public class Notebook {
 	
 	/**
 	 * @return A list of all modules imported in the notebook
+	 * @throws NotebookException for invalid import statements in the code
 	 */
-	public List<PythonModule> modules() {
+	public List<PythonModule> modules() throws NotebookException {
 		List<PythonModule> modules = new ArrayList<PythonModule>();
-		Pattern importPattern = Pattern.compile("\\s*import\\s+(\\S+)\\s*");
-		Pattern importAliasPattern = Pattern.compile("\\s*import\\s+(\\S+)\\s*+as+\\s*(\\S+)\\s*");
 		Pattern fromPattern = Pattern.compile("\\s*from\\s+(\\S+)\\s+import\\s+.+\\s*");
 		List<JSONObject> codeCells = getCodeCells();
 		for (JSONObject cell: codeCells) {
 			JSONArray lines = getSource(cell);
 			for (int i=0; i<lines.length(); i++) {
 				String line = lines.getString(i);
-				Matcher lineMatcher = importPattern.matcher(line);
-				if (lineMatcher.matches()) {
-					modules.add(new PythonModule(lineMatcher.group(1), ImportType.ORDINARY));
-				}
-				lineMatcher = importAliasPattern.matcher(line);
-				if (lineMatcher.matches()) {
-					modules.add(new PythonModule(lineMatcher.group(1), lineMatcher.group(2), ImportType.ALIAS));
-				}
-				lineMatcher = fromPattern.matcher(line);
-				if (lineMatcher.matches()) {
-					modules.add(new PythonModule(lineMatcher.group(1), ImportType.FROM));
+				if (line.trim().startsWith("import")) {
+					modules.add(module(line));
+				} else {
+					Matcher fromMatcher = fromPattern.matcher(line);
+					if (fromMatcher.matches()) {
+						// TODO: Specialhantera *!
+						modules.add(new PythonModule(fromMatcher.group(1), ImportType.FROM));
+						// TODO: Föräldrar för submoduler!
+					}
 				}
 			}
 		}
 		return modules;
+	}
+	
+	private PythonModule module(String importStatement) throws NotebookException {
+		// TODO: Hantera lista av imports!
+		// TODO: Föräldrar för submoduler!
+		Pattern importPattern = Pattern.compile("\\s*import\\s+(\\S+)\\s*");
+		Pattern importAliasPattern = Pattern.compile("\\s*import\\s+(\\S+)\\s*+as+\\s*(\\S+)\\s*");
+		Matcher matcher = importPattern.matcher(importStatement);
+		if (matcher.matches()) {
+			return new PythonModule(matcher.group(1), ImportType.ORDINARY);
+		}
+		matcher = importAliasPattern.matcher(importStatement);
+		if (matcher.matches()) {
+			return new PythonModule(matcher.group(1), matcher.group(2), ImportType.ALIAS);
+		}
+		// TODO: Annan typ av undantag!
+		// TODO: test för detta!
+		throw new NotebookException("Invalid import statement: " + importStatement);
 	}
 	
 	/**
