@@ -33,6 +33,15 @@ public class PythonModuleTest {
 	}
 	
 	@Test
+	public void testConstructor_oneParam() {
+		PythonModule oneParamModule = new PythonModule(name);
+		assertEquals("Wrong name returned!", name, oneParamModule.getName());
+		assertNull("Import type returned for module without import type!", oneParamModule.importedWith());
+		assertNull("Alias returned for module without alias!", oneParamModule.alias());
+		assertNull("Non-null parent returned from module without parent!", oneParamModule.getParent());
+	}
+	
+	@Test
 	public void testConstructor_twoParam() {
 		PythonModule twoParamModule = new PythonModule(name, importedWith);
 		assertEquals("Wrong name returned!", name, twoParamModule.getName());
@@ -73,7 +82,7 @@ public class PythonModuleTest {
 	
 	@Test
 	public void testGetParent_null() {
-		PythonModule moduleWithoutParent = new PythonModule(name, null);
+		PythonModule moduleWithoutParent = new PythonModule(name);
 		assertNull("Non-null parent returned from module without parent!", moduleWithoutParent.getParent());
 	}
 	
@@ -125,17 +134,17 @@ public class PythonModuleTest {
 	
 	@Test
 	public void testEquals_diffParent() {
-		PythonModule otherParent = new PythonModule("otherParentMOdule", null);
+		PythonModule otherParent = new PythonModule("otherParentMOdule");
 		PythonModule other = new PythonModule(name, alias, importedWith, otherParent);
 		assertFalse("Python modules with different parents considered equal!", module.equals(other));
 	}
 	
 	@Test
 	public void testEquals_diffGrandParent() {
-		PythonModule grandParent1 = new PythonModule("farfar", null);
+		PythonModule grandParent1 = new PythonModule("farfar");
 		PythonModule parent1 = new PythonModule("pappa", null, grandParent1);
 		PythonModule module1 = new PythonModule(name, importedWith, parent1);
-		PythonModule grandParent2 = new PythonModule("farmor", null);
+		PythonModule grandParent2 = new PythonModule("farmor");
 		PythonModule parent2 = new PythonModule("pappa", null, grandParent2);
 		PythonModule module2 = new PythonModule(name, importedWith, parent2);
 		assertFalse("Modules with different grand parents considered equal!", module1.equals(module2));
@@ -149,14 +158,14 @@ public class PythonModuleTest {
 	
 	@Test
 	public void testHashCode_nullParent() {
-		PythonModule moduleWithoutParent = new PythonModule(name, importedWith);
+		PythonModule moduleWithoutParent = new PythonModule(name);
 		int expectedHash = Objects.hash(name, null);
 		assertEquals("Wrong hash code returned!", expectedHash, moduleWithoutParent.hashCode());
 	}
 	
 	@Test
 	public void testIs_same() {
-		PythonModule parent = new PythonModule(parentModuleName, null);
+		PythonModule parent = new PythonModule(parentModuleName);
 		PythonModule same = new PythonModule(name, ImportType.FROM, parent);
 		assertTrue("Same module considered different!", module.is(same));
 	}
@@ -169,7 +178,7 @@ public class PythonModuleTest {
 	
 	@Test
 	public void testIs_diffParent() {
-		PythonModule otherParent = new PythonModule("mammi", null);
+		PythonModule otherParent = new PythonModule("mammi");
 		PythonModule other = new PythonModule(name, importedWith, otherParent);
 		assertFalse("Modules with different parents considered same!", module.is(other));
 	}
@@ -185,7 +194,7 @@ public class PythonModuleTest {
 	public void testIs_same_diffGrandParent() {
 		String parentName = "mamma";
 		String diffParentName = "mormor";
-		PythonModule diffGrandParent = new PythonModule(diffParentName, null);
+		PythonModule diffGrandParent = new PythonModule(diffParentName);
 		PythonModule diffParent = new PythonModule(parentName, null, diffGrandParent);
 		PythonModule other = new PythonModule(name, null, diffParent);
 		assertFalse("Modules with different grand parents considered same!", module.is(other));
@@ -195,10 +204,10 @@ public class PythonModuleTest {
 	public void testIs_sameGrandParent() {
 		final String parentName = "pappa";
 		final String grandParentName = "farmor";
-		PythonModule grandParent1 = new PythonModule(grandParentName, null);
+		PythonModule grandParent1 = new PythonModule(grandParentName);
 		PythonModule parent1 = new PythonModule(parentName, null, grandParent1);
 		PythonModule module1 = new PythonModule(name, importedWith, parent1);
-		PythonModule grandParent2 = new PythonModule(grandParentName, null);
+		PythonModule grandParent2 = new PythonModule(grandParentName);
 		PythonModule parent2 = new PythonModule(parentName, null, grandParent2);
 		PythonModule module2 = new PythonModule(name, importedWith, parent2);
 		assertTrue("Modules with same grand parents considered different!",
@@ -236,7 +245,7 @@ public class PythonModuleTest {
 	public void testToString_grandParent() {
 		final String parentName = "pappa";
 		final String grandParentName = "farmor";
-		PythonModule grandParent = new PythonModule(grandParentName, null);
+		PythonModule grandParent = new PythonModule(grandParentName);
 		PythonModule parent = new PythonModule(parentName, null, grandParent);
 		PythonModule module = new PythonModule(name, importedWith, parent);
 		String expected = grandParentName + "." + parentName + "." + name;

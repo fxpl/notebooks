@@ -8,6 +8,11 @@ public class PythonModule {
 	private String alias;
 	private PythonModule parent;
 	
+	
+	public PythonModule(String name) {
+		this.name = name;
+	}
+	
 	public PythonModule(String name, ImportType importedWith) {
 		this(name, null, importedWith, null);
 	}
