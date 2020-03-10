@@ -27,6 +27,8 @@ public class Notebook {
 	private WeakReference<JSONObject> contents;
 	private ReentrantLock contentsLock = new ReentrantLock();
 	
+	final static private String MODULEIDENTIFIER = "[A-Za-z0-9_]+";
+	
 	public Notebook(String path) {
 		this(path, "");
 	}
@@ -65,13 +67,14 @@ public class Notebook {
 			for (int i=0; i<lines.length(); i++) {
 				String line = lines.getString(i);
 				if (line.trim().startsWith("import")) {
-					modules.add(module(line));
+					modules.addAll(modules(line));
 				} else {
 					Matcher fromMatcher = fromPattern.matcher(line);
 					if (fromMatcher.matches()) {
 						// TODO: Specialhantera *!
 						modules.add(new PythonModule(fromMatcher.group(1), ImportType.FROM));
 						// TODO: Föräldrar för submoduler!
+						// TODO: Använd modulesInIdentifierList!
 					}
 				}
 			}
@@ -79,22 +82,44 @@ public class Notebook {
 		return modules;
 	}
 	
-	private PythonModule module(String importStatement) throws NotebookException {
-		// TODO: Hantera lista av imports!
-		// TODO: Föräldrar för submoduler!
-		Pattern importPattern = Pattern.compile("\\s*import\\s+(\\S+)\\s*");
-		Pattern importAliasPattern = Pattern.compile("\\s*import\\s+(\\S+)\\s*+as+\\s*(\\S+)\\s*");
+	private List<PythonModule> modules(String importStatement) throws NotebookException {
+		// TODO: Testa olika former av variabelnamn!
+		final String moduleDescr = "" + MODULEIDENTIFIER + "(\\s*as\\s+" + MODULEIDENTIFIER + "\\s*)?";
+		final String moduleList = "(" + moduleDescr + "\\s*,\\s*)*" + moduleDescr;
+		Pattern importPattern = Pattern.compile("\\s*import\\s+(" + moduleList + ")\\s+");
 		Matcher matcher = importPattern.matcher(importStatement);
 		if (matcher.matches()) {
-			return new PythonModule(matcher.group(1), ImportType.ORDINARY);
+			return modulesInIdentifierList(matcher.group(1));
+		} else {
+			throw new NotebookException("Invalid import statement: " + importStatement);
 		}
-		matcher = importAliasPattern.matcher(importStatement);
-		if (matcher.matches()) {
-			return new PythonModule(matcher.group(1), matcher.group(2), ImportType.ALIAS);
+	}
+	
+	private List<PythonModule> modulesInIdentifierList(String identifierList) {
+		return modulesInIdentifierList(identifierList, false);
+	}
+	
+	/**
+	 * Convert a list of modules from an import statement in Python to a list of
+	 * the corresponding modules.
+	 */
+	private List<PythonModule> modulesInIdentifierList(String moduleList, boolean from) {
+		final Pattern asPattern = Pattern.compile("(" + MODULEIDENTIFIER + ")\\s+as\\s+(" + MODULEIDENTIFIER + ")");
+		List<PythonModule> result = new ArrayList<PythonModule>();
+		String[] identifiers = moduleList.split(",");
+		// TODO: Föräldrar
+		for (int i=0; i<identifiers.length; i++) {
+			String identifier = identifiers[i].trim();
+			Matcher asMatcher = asPattern.matcher(identifier);
+			if (asMatcher.matches()) {
+				ImportType importType = from ? ImportType.FROM : ImportType.ALIAS;
+				result.add(new PythonModule(asMatcher.group(1), asMatcher.group(2), importType));
+			} else { // TODO: Matcha även denna!?
+				ImportType importType = from ? ImportType.FROM : ImportType.ORDINARY;
+				result.add(new PythonModule(identifier, importType));
+			}
 		}
-		// TODO: Annan typ av undantag!
-		// TODO: test för detta!
-		throw new NotebookException("Invalid import statement: " + importStatement);
+		return result;
 	}
 	
 	/**
@@ -613,6 +638,7 @@ public class Notebook {
 		if (source instanceof JSONArray) {
 			JSONArray result = (JSONArray)source;
 			if (!result.isEmpty()) {
+				// A newline is already stored in the end of each line, except the last one!
 				String lastLine = result.getString(result.length()-1);
 				result.put(result.length()-1, lastLine + "\n");
 			}

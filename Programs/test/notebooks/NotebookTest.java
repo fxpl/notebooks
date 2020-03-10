@@ -618,6 +618,61 @@ public class NotebookTest {
 	}
 	
 	/**
+	 * Verify that modules in an import list can be identified.
+	 */
+	@Test
+	public void testImportList() throws NotebookException {
+		String dataDir = "test/data/modules";
+		String file = "nb_20.ipynb";
+		List<PythonModule> expectedModules = new ArrayList<PythonModule>(3);
+		expectedModules.add(new PythonModule("moduleA", ImportType.ORDINARY));
+		expectedModules.add(new PythonModule("moduleB", ImportType.ORDINARY));
+		expectedModules.add(new PythonModule("moduleC", ImportType.ORDINARY));
+		verifyImports(dataDir + "/" + file, expectedModules);
+	}
+	
+	/**
+	 * Verify that modules in an import list with aliases can be identified.
+	 */
+	@Test
+	public void testImportListWithAliases() throws NotebookException {
+		String dataDir = "test/data/modules";
+		String file = "nb_21.ipynb";
+		List<PythonModule> expectedModules = new ArrayList<PythonModule>(3);
+		expectedModules.add(new PythonModule("moduleA", "a", ImportType.ALIAS));
+		expectedModules.add(new PythonModule("moduleB", "b", ImportType.ALIAS));
+		expectedModules.add(new PythonModule("moduleC", "c", ImportType.ALIAS));
+		verifyImports(dataDir + "/" + file, expectedModules);
+	}
+	
+	/**
+	 * Verify that modules in an import list both with and without aliases can
+	 * be identified.
+	 */
+	@Test
+	public void testImportListWithOneAlias() throws NotebookException {
+		// import A, B as b, C
+		String dataDir = "test/data/modules";
+		String file = "nb_22.ipynb";
+		List<PythonModule> expectedModules = new ArrayList<PythonModule>(3);
+		expectedModules.add(new PythonModule("moduleA", ImportType.ORDINARY));
+		expectedModules.add(new PythonModule("moduleB", "b", ImportType.ALIAS));
+		expectedModules.add(new PythonModule("moduleC", ImportType.ORDINARY));
+		verifyImports(dataDir + "/" + file, expectedModules);
+	}
+
+	@Test
+	public void testImportWithSubmodules() {
+		// import A.B.C
+		// TODO
+	}
+	
+	// TODO
+	// import A.B.C as
+	// from module import *
+	// from module import A, B as b, C
+	
+	/**
 	 * Verify that a NotebookException is thrown if we try to extract module
 	 * name(s) from an invalid import statement
 	 */
@@ -637,7 +692,7 @@ public class NotebookTest {
 		Notebook notebook = new Notebook(file);
 		List<PythonModule> modules = notebook.modules();
 		assertEquals("Incorrect list of module returned!",
-				expectedModules, notebook.modules());
+				expectedModules, modules);
 		for (int i=0; i<expectedModules.size(); i++) {
 			assertEquals("Incorrect import type stored for notebook " + i + "!",
 					expectedModules.get(i).importedWith(), modules.get(i).importedWith());
