@@ -26,6 +26,12 @@ public class PythonModule {
 	}
 	
 	public PythonModule(String name, String alias, ImportType importedWith, PythonModule parent) {
+		if (ImportType.ALIAS == importedWith && null == alias) {
+			System.err.println("Warning! You are creating a Python module imported with alias, but you are not providing an alias!");
+		}
+		if (ImportType.ALIAS != importedWith && null != alias) {
+			System.err.println("Warning! You are providing an alias for a module that is not imported with alias!");
+		}
 		this.name = name;
 		this.alias = alias;
 		this.importedWith = importedWith;

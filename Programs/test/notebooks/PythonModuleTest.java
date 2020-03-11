@@ -11,7 +11,7 @@ public class PythonModuleTest {
 	private PythonModule module;
 	private final String name = "someModule";
 	private final String alias = "m";
-	private final ImportType importedWith = ImportType.ORDINARY;
+	private final ImportType importedWith = ImportType.ALIAS;
 	private String parentModuleName = "parentModule";
 	private final PythonModule parent = new PythonModule(parentModuleName, ImportType.ORDINARY);
 
@@ -48,6 +48,20 @@ public class PythonModuleTest {
 		assertEquals("Wrong import type returned for module!", importedWith, twoParamModule.importedWith());
 		assertNull("Alias returned for module without alias!", twoParamModule.alias());
 		assertNull("Non-null parent returned from module without parent!", twoParamModule.getParent());
+	}
+	
+	@Test
+	public void testConstructor_suspicious() {
+		PythonModule withoutAlias = new PythonModule(name, ImportType.ALIAS);
+		assertEquals("Wrong name set!", name, withoutAlias.getName());
+		assertEquals("Wrong import type set!", ImportType.ALIAS, withoutAlias.importedWith());
+		assertNull("Alias set!", withoutAlias.alias());
+		assertNull("Parent set!", withoutAlias.getParent());
+		PythonModule withAlias = new PythonModule(name, alias, ImportType.FROM);
+		assertEquals("Wrong name set!", name, withAlias.getName());
+		assertEquals("Wrong import type set!", ImportType.FROM, withAlias.importedWith());
+		assertEquals("Wrong alias set!", alias, withAlias.alias());
+		assertNull("Parent set!", withAlias.getParent());
 	}
 	
 	@Test
