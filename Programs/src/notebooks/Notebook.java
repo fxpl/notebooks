@@ -27,7 +27,8 @@ public class Notebook {
 	private WeakReference<JSONObject> contents;
 	private ReentrantLock contentsLock = new ReentrantLock();
 	
-	final static private String MODULEIDENTIFIER = "[A-Za-z0-9_]+";
+	// TODO: Får inte börja med punkt eller siffra!
+	final static private String MODULEIDENTIFIER = "[A-Za-z0-9_\\.]+";
 	
 	public Notebook(String path) {
 		this(path, "");
@@ -87,7 +88,7 @@ public class Notebook {
 		String importStatementTemplate = "\\s*import\\s+(" + moduleList + ")\\s+";
 		Pattern importPattern = Pattern.compile(importStatementTemplate);
 		Matcher importMatcher = importPattern.matcher(importStatement);
-		Pattern fromPattern = Pattern.compile("\\s*from\\s+(" + MODULEIDENTIFIER + ")\\s+" + importStatementTemplate);
+		Pattern fromPattern = Pattern.compile("\\s*from\\s+(" + MODULEIDENTIFIER + ")\\s+(" + importStatementTemplate + ")");
 		Matcher fromMatcher = fromPattern.matcher(importStatement);
 		Pattern allFromPattern = Pattern.compile("\\s*from\\s+(" + MODULEIDENTIFIER + ")\\s+import\\s+\\*\\s+");
 		Matcher allFromMatcher = allFromPattern.matcher(importStatement);
@@ -100,10 +101,10 @@ public class Notebook {
 			// TODO: Representera barn på något vis!
 			return result;
 		} else if (fromMatcher.matches()) {
-			List<PythonModule> result = modulesInIdentifierList(fromMatcher.group(2));
+			List<PythonModule> result = modulesInImport(fromMatcher.group(2));
 			PythonModule parent = new PythonModule(fromMatcher.group(1), ImportType.FROM);
 			for (PythonModule child: result) {
-				child.setOldestAncestor(parent); 	// TODO: Detta kommer inte att fungera med submoduler! Måste sätta äldsta släkting istället!
+				child.setOldestAncestor(parent);
 			}
 			return result;
 		} else {
@@ -122,20 +123,46 @@ public class Notebook {
 		final Pattern asPattern = Pattern.compile("(" + MODULEIDENTIFIER + ")\\s+as\\s+(" + MODULEIDENTIFIER + ")");
 		List<PythonModule> result = new ArrayList<PythonModule>();
 		String[] identifiers = identifierList.split(",");
-		// TODO: Föräldrar
 		for (int i=0; i<identifiers.length; i++) {
 			String identifier = identifiers[i].trim();
 			Matcher ordinaryMatcher = ordinaryPattern.matcher(identifier);
 			Matcher asMatcher = asPattern.matcher(identifier);
 			if (ordinaryMatcher.matches()) {
-				result.add(new PythonModule(identifier, ImportType.ORDINARY));
+				String[] moduleNames = identifier.split("\\.");
+				String name = lastElementOf(moduleNames);
+				PythonModule parent = getParentModule(moduleNames);
+				result.add(new PythonModule(name, ImportType.ORDINARY, parent));
 			} else if (asMatcher.matches()) {
-				result.add(new PythonModule(asMatcher.group(1), asMatcher.group(2), ImportType.ALIAS));
+				String[] moduleNames = asMatcher.group(1).split("\\.");
+				String name = lastElementOf(moduleNames);
+				String alias = asMatcher.group(2);
+				PythonModule parent = getParentModule(moduleNames);
+				result.add(new PythonModule(name, alias, ImportType.ALIAS, parent));
 			} else {
 				System.out.println("Ignoring invalid identifier: " + identifier + "!");
 			}
 		}
 		return result;
+	}
+	
+	/**
+	 * @return The last element of the array given as parameter
+	 */
+	private String lastElementOf(String[] array) {
+		return array[array.length-1];
+	}
+	
+	/**
+	 * Build the parent of a Python module.
+	 * @param names Array of names of all ancestors, and the module itself. Sorted with oldest first
+	 * @return The parent of the module with name = last element in names
+	 */
+	private PythonModule getParentModule(String[] names) {
+		PythonModule parent = null;
+		for (int j=0; j<names.length-1; j++) {
+			parent = new PythonModule(names[j], null, parent);
+		}
+		return parent;
 	}
 	
 	/**

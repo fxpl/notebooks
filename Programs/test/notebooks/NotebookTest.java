@@ -705,15 +705,73 @@ public class NotebookTest {
 		verifyImports(dataDir + "/" + file, expectedModules);
 	}
 
-	//@Test
+	/**
+	 * Verify that a module in an import statement is identified correctly when
+	 * it has parent module(s).
+	 */
+	@Test
 	public void testImportWithSubmodules() {
+		String dataDir = "test/data/modules";
+		String file = "nb_30.ipynb";
+		PythonModule expectedGrandParent = new PythonModule("A", null);
+		PythonModule expectedParent = new PythonModule("B", null, expectedGrandParent);
+		PythonModule expectedModule = new PythonModule("C", ImportType.ORDINARY, expectedParent);
+		List<PythonModule> expectedModules = new ArrayList<PythonModule>(1);
+		expectedModules.add(expectedModule);
+		verifyImports(dataDir + "/" + file, expectedModules);
 	}
 	
-	// TODO
-	// import A.B.C
-	// import A.B.C as
-	// from X import Y.Z.W
-	// from X import Y.Z, X.Z, W.Q as
+	/**
+	 * Verify that a module in an import statement is identified correctly when
+	 * it has parent module(s) and an alias.
+	 */
+	@Test
+	public void testImportWithSubmodulesAndAlias() {
+		String dataDir = "test/data/modules";
+		String file = "nb_31.ipynb";
+		PythonModule expectedGrandParent = new PythonModule("A", null);
+		PythonModule expectedParent = new PythonModule("B", null, expectedGrandParent);
+		PythonModule expectedModule = new PythonModule("C", "child", ImportType.ALIAS, expectedParent);
+		List<PythonModule> expectedModules = new ArrayList<PythonModule>(1);
+		expectedModules.add(expectedModule);
+		verifyImports(dataDir + "/" + file, expectedModules);
+	}
+	
+	/**
+	 * Verify that a module in a "from" import statement can be identified
+	 * correctly when it is a sub module of other module(s).
+	 */
+	@Test
+	public void testFromImportWithSubmodule() {
+		String dataDir = "test/data/modules";
+		String file = "nb_32.ipynb";
+		PythonModule expectedGrandParent = new PythonModule("Base", ImportType.FROM);
+		PythonModule expectedParent = new PythonModule("A", null, expectedGrandParent);
+		PythonModule expectedModule = new PythonModule("B", ImportType.ORDINARY, expectedParent);
+		// TODO: Bryt ut listskaparmetod för ETT element!
+		List<PythonModule> expectedModules = new ArrayList<PythonModule>(1);
+		expectedModules.add(expectedModule);
+		verifyImports(dataDir + "/" + file, expectedModules);
+	}
+	
+	/**
+	 * Verify that a list of modules in a "from" import statement can be
+	 * identified correctly when they have aliases and/or additional parent
+	 * modules.
+	 */
+	@Test
+	public void testFromImportWithSubmodulesAndAlias() {
+		String dataDir = "test/data/modules";
+		String file = "nb_33.ipynb";
+		PythonModule expectedGrandParent = new PythonModule("Base", ImportType.FROM);
+		PythonModule expectedParent1 = new PythonModule("A", null, expectedGrandParent);
+		PythonModule expectedParent2 = new PythonModule("C", null, expectedGrandParent);
+		List<PythonModule> expectedModules = new ArrayList<PythonModule>(1);
+		expectedModules.add(new PythonModule("B", "sub", ImportType.ALIAS, expectedParent1));
+		expectedModules.add(new PythonModule("D", ImportType.ORDINARY, expectedParent2));
+		expectedModules.add(new PythonModule("E", "sub2", ImportType.ALIAS, expectedGrandParent));
+		verifyImports(dataDir + "/" + file, expectedModules);
+	}
 	
 	/**
 	 * Verify that no module is imported when in an invalid import statement.
