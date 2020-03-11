@@ -96,6 +96,10 @@ public class PythonModule {
 		}
 	}
 	
+	public void setParent(PythonModule newParent) {
+		this.parent = newParent;
+	}
+	
 	@Override
 	public String toString() {
 		String result = "";

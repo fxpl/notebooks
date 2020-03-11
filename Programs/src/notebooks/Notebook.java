@@ -56,67 +56,75 @@ public class Notebook {
 	
 	/**
 	 * @return A list of all modules imported in the notebook
-	 * @throws NotebookException for invalid import statements in the code
+	 * @throws NotebookException for invalid import statements in the code // TODO: Hantera här!
 	 */
 	public List<PythonModule> modules() throws NotebookException {
 		List<PythonModule> modules = new ArrayList<PythonModule>();
-		Pattern fromPattern = Pattern.compile("\\s*from\\s+(\\S+)\\s+import\\s+.+\\s*");
 		List<JSONObject> codeCells = getCodeCells();
 		for (JSONObject cell: codeCells) {
 			JSONArray lines = getSource(cell);
 			for (int i=0; i<lines.length(); i++) {
 				String line = lines.getString(i);
-				if (line.trim().startsWith("import")) {
-					modules.addAll(modules(line));
-				} else {
-					Matcher fromMatcher = fromPattern.matcher(line);
-					if (fromMatcher.matches()) {
-						// TODO: Specialhantera *!
-						modules.add(new PythonModule(fromMatcher.group(1), ImportType.FROM));
-						// TODO: Föräldrar för submoduler!
-						// TODO: Använd modulesInIdentifierList!
-					}
+				if (line.trim().startsWith("import") || line.trim().startsWith("from")) {
+					modules.addAll(modulesInImport(line));
 				}
 			}
 		}
 		return modules;
 	}
 	
-	private List<PythonModule> modules(String importStatement) throws NotebookException {
+	private List<PythonModule> modulesInImport(String line) throws NotebookException {
 		// TODO: Testa olika former av variabelnamn!
 		final String moduleDescr = "" + MODULEIDENTIFIER + "(\\s*as\\s+" + MODULEIDENTIFIER + "\\s*)?";
 		final String moduleList = "(" + moduleDescr + "\\s*,\\s*)*" + moduleDescr;
-		Pattern importPattern = Pattern.compile("\\s*import\\s+(" + moduleList + ")\\s+");
-		Matcher matcher = importPattern.matcher(importStatement);
-		if (matcher.matches()) {
-			return modulesInIdentifierList(matcher.group(1));
+		String importStatement = "\\s*import\\s+(" + moduleList + ")\\s+";
+		Pattern importPattern = Pattern.compile(importStatement);
+		Matcher importMatcher = importPattern.matcher(line);
+		Pattern fromPattern = Pattern.compile("\\s*from\\s+(" + MODULEIDENTIFIER + ")\\s+" + importStatement);
+		Matcher fromMatcher = fromPattern.matcher(line);
+		Pattern allFromPattern = Pattern.compile("\\s*from\\s+(" + MODULEIDENTIFIER + ")\\s+import\\s+\\*\\s+");
+		Matcher allFromMatcher = allFromPattern.matcher(line);
+		if (importMatcher.matches()) {
+			return modulesInIdentifierList(importMatcher.group(1));
+		} else if(allFromMatcher.matches()) {
+			PythonModule parent = new PythonModule(allFromMatcher.group(1), ImportType.FROM);
+			List <PythonModule> result = new ArrayList<PythonModule>(1);
+			result.add(parent);
+			// TODO: Representera barn på något vis!
+			return result;
+		} else if (fromMatcher.matches()) {
+			List<PythonModule> result = modulesInIdentifierList(fromMatcher.group(2));
+			PythonModule parent = new PythonModule(fromMatcher.group(1), ImportType.FROM);
+			for (PythonModule child: result) {
+				child.setParent(parent); 	// TODO: Detta kommer inte att fungera med submoduler! Måste sätta äldsta släkting istället!
+			}
+			return result;
 		} else {
-			throw new NotebookException("Invalid import statement: " + importStatement);
+			throw new NotebookException("Invalid import statement: " + line);
 		}
-	}
-	
-	private List<PythonModule> modulesInIdentifierList(String identifierList) {
-		return modulesInIdentifierList(identifierList, false);
 	}
 	
 	/**
 	 * Convert a list of modules from an import statement in Python to a list of
 	 * the corresponding modules.
 	 */
-	private List<PythonModule> modulesInIdentifierList(String moduleList, boolean from) {
+	private List<PythonModule> modulesInIdentifierList(String moduleList) {
+		final Pattern ordinaryPattern = Pattern.compile("(" + MODULEIDENTIFIER + ")");
 		final Pattern asPattern = Pattern.compile("(" + MODULEIDENTIFIER + ")\\s+as\\s+(" + MODULEIDENTIFIER + ")");
 		List<PythonModule> result = new ArrayList<PythonModule>();
 		String[] identifiers = moduleList.split(",");
 		// TODO: Föräldrar
 		for (int i=0; i<identifiers.length; i++) {
 			String identifier = identifiers[i].trim();
+			Matcher ordinaryMatcher = ordinaryPattern.matcher(identifier);
 			Matcher asMatcher = asPattern.matcher(identifier);
-			if (asMatcher.matches()) {
-				ImportType importType = from ? ImportType.FROM : ImportType.ALIAS;
-				result.add(new PythonModule(asMatcher.group(1), asMatcher.group(2), importType));
-			} else { // TODO: Matcha även denna!?
-				ImportType importType = from ? ImportType.FROM : ImportType.ORDINARY;
-				result.add(new PythonModule(identifier, importType));
+			// TODO: Skippa matchers!
+			if (ordinaryMatcher.matches()) {
+				result.add(new PythonModule(identifier, ImportType.ORDINARY));
+			} else if (asMatcher.matches()) {
+				result.add(new PythonModule(asMatcher.group(1), asMatcher.group(2), ImportType.ALIAS));
+			} else {
+				System.out.println("Ignoring invalid identifier: " + identifier + "!");
 			}
 		}
 		return result;

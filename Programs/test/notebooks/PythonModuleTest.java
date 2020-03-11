@@ -220,6 +220,13 @@ public class PythonModuleTest {
 	}
 	
 	@Test
+	public void testSetParent() {
+		PythonModule newParent = new PythonModule("styvmor");
+		module.setParent(newParent);
+		assertEquals("Parent not set correctly by setParent!", newParent, module.getParent());
+	}
+	
+	@Test
 	public void testToString() {
 		String expected = parentModuleName + "." + name + "(" + alias + ")";
 		assertEquals("Wrong string representation returned!", expected, module.toString());

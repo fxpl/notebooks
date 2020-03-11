@@ -576,15 +576,43 @@ public class NotebookTest {
 	}
 	
 	/**
-	 * Verify that a single Python module import with sub modules can be
-	 * identified.
+	 * Verify that the module is identified in a "from module import *"
+	 * statement.
 	 */
 	@Test
-	public void testSingleImportFrom() throws NotebookException {
+	public void testSingleImportAllFrom() throws NotebookException {
 		String dataDir = "test/data/modules";
 		String file = "nb_3.ipynb";
 		List<PythonModule> expectedModules = new ArrayList<PythonModule>(1);
 		expectedModules.add(new PythonModule("ko", ImportType.FROM));
+		verifyImports(dataDir + "/" + file, expectedModules);
+	}
+	
+	/**
+	 * Verify that a module in a "from" import statement can be identified
+	 * correctly.
+	 */
+	@Test
+	public void testImportOrdinaryFrom() throws NotebookException {
+		String dataDir = "test/data/modules";
+		String file = "nb_6.ipynb";
+		List<PythonModule> expectedModules = new ArrayList<PythonModule>(1);
+		PythonModule expectedParent = new PythonModule("ko", ImportType.FROM);
+		expectedModules.add(new PythonModule("mage", ImportType.ORDINARY, expectedParent));
+		verifyImports(dataDir + "/" + file, expectedModules);
+	}
+	
+	/**
+	 * Verify that a module with alias in a "from" import statement can be
+	 * identified correctly.
+	 */
+	@Test
+	public void testImportWithAliasFrom() throws NotebookException {
+		String dataDir = "test/data/modules";
+		String file = "nb_7.ipynb";
+		List<PythonModule> expectedModules = new ArrayList<PythonModule>(1);
+		PythonModule expectedParent = new PythonModule("ko", ImportType.FROM);
+		expectedModules.add(new PythonModule("vom", "mage", ImportType.ALIAS, expectedParent));
 		verifyImports(dataDir + "/" + file, expectedModules);
 	}
 	
