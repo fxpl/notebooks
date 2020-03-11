@@ -716,9 +716,7 @@ public class NotebookTest {
 		PythonModule expectedGrandParent = new PythonModule("A", null);
 		PythonModule expectedParent = new PythonModule("B", null, expectedGrandParent);
 		PythonModule expectedModule = new PythonModule("C", ImportType.ORDINARY, expectedParent);
-		List<PythonModule> expectedModules = new ArrayList<PythonModule>(1);
-		expectedModules.add(expectedModule);
-		verifyImports(dataDir + "/" + file, expectedModules);
+		verifyImport(dataDir + "/" + file, expectedModule);
 	}
 	
 	/**
@@ -732,9 +730,7 @@ public class NotebookTest {
 		PythonModule expectedGrandParent = new PythonModule("A", null);
 		PythonModule expectedParent = new PythonModule("B", null, expectedGrandParent);
 		PythonModule expectedModule = new PythonModule("C", "child", ImportType.ALIAS, expectedParent);
-		List<PythonModule> expectedModules = new ArrayList<PythonModule>(1);
-		expectedModules.add(expectedModule);
-		verifyImports(dataDir + "/" + file, expectedModules);
+		verifyImport(dataDir + "/" + file, expectedModule);
 	}
 	
 	/**
@@ -748,10 +744,7 @@ public class NotebookTest {
 		PythonModule expectedGrandParent = new PythonModule("Base", ImportType.FROM);
 		PythonModule expectedParent = new PythonModule("A", null, expectedGrandParent);
 		PythonModule expectedModule = new PythonModule("B", ImportType.ORDINARY, expectedParent);
-		// TODO: Bryt ut listskaparmetod för ETT element!
-		List<PythonModule> expectedModules = new ArrayList<PythonModule>(1);
-		expectedModules.add(expectedModule);
-		verifyImports(dataDir + "/" + file, expectedModules);
+		verifyImport(dataDir + "/" + file, expectedModule);
 	}
 	
 	/**
@@ -793,6 +786,17 @@ public class NotebookTest {
 		String file = "nb_101.ipynb";
 		List<PythonModule> expectedModules = new ArrayList<PythonModule>(0);
 		verifyImports(dataDir + "/" + file, expectedModules);
+	}
+	
+	/**
+	 * Verify that one module is imported correctly from notebook
+	 * @param file Path to notebook
+	 * @param expectedModules Module that is expected to be imported
+	 */
+	private void verifyImport(String file, PythonModule expectedModule) {
+		List<PythonModule> expectedModules = new ArrayList<PythonModule>(1);
+		expectedModules.add(expectedModule);
+		verifyImports(file, expectedModules);
 	}
 	
 	/**
