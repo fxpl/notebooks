@@ -559,7 +559,7 @@ public class NotebookTest {
 		String dataDir = "test/data/modules";
 		String file = "nb_1.ipynb";
 		List<PythonModule> expectedModules = new ArrayList<PythonModule>(1);
-		expectedModules.add(new PythonModule("kossa", ImportType.ORDINARY));
+		expectedModules.add(new PythonModule("kossan_mu", ImportType.ORDINARY));
 		verifyImports(dataDir + "/" + file, expectedModules);
 	}
 	
@@ -688,17 +688,32 @@ public class NotebookTest {
 		expectedModules.add(new PythonModule("moduleC", ImportType.ORDINARY));
 		verifyImports(dataDir + "/" + file, expectedModules);
 	}
-
+	
+	/**
+	 * Verify that modules in an import list in a "from" import statement are
+	 * identified correctly.
+	 */
 	@Test
+	public void testFromImportListWithAlias() {
+		String dataDir = "test/data/modules";
+		String file = "nb_23.ipynb";
+		PythonModule expectedParent = new PythonModule("Base", ImportType.FROM);
+		List<PythonModule> expectedModules = new ArrayList<PythonModule>(3);
+		expectedModules.add(new PythonModule("moduleA", ImportType.ORDINARY, expectedParent));
+		expectedModules.add(new PythonModule("moduleB", "b", ImportType.ALIAS, expectedParent));
+		expectedModules.add(new PythonModule("moduleC", ImportType.ORDINARY, expectedParent));
+		verifyImports(dataDir + "/" + file, expectedModules);
+	}
+
+	//@Test
 	public void testImportWithSubmodules() {
-		// import A.B.C
-		// TODO
 	}
 	
 	// TODO
+	// import A.B.C
 	// import A.B.C as
-	// from module import *
-	// from module import A, B as b, C
+	// from X import Y.Z.W
+	// from X import Y.Z, X.Z, W.Q as
 	
 	/**
 	 * Verify that no module is imported when in an invalid import statement.

@@ -76,8 +76,10 @@ public class Notebook {
 		return modules;
 	}
 	
+	/**
+	 * TODO
+	 */
 	private List<PythonModule> modulesInImport(String line) throws NotebookException {
-		// TODO: Testa olika former av variabelnamn!
 		final String moduleDescr = "" + MODULEIDENTIFIER + "(\\s*as\\s+" + MODULEIDENTIFIER + "\\s*)?";
 		final String moduleList = "(" + moduleDescr + "\\s*,\\s*)*" + moduleDescr;
 		String importStatement = "\\s*import\\s+(" + moduleList + ")\\s+";
@@ -107,7 +109,7 @@ public class Notebook {
 		}
 	}
 	
-	/**
+	/** TODO
 	 * Convert a list of modules from an import statement in Python to a list of
 	 * the corresponding modules.
 	 */
@@ -121,7 +123,6 @@ public class Notebook {
 			String identifier = identifiers[i].trim();
 			Matcher ordinaryMatcher = ordinaryPattern.matcher(identifier);
 			Matcher asMatcher = asPattern.matcher(identifier);
-			// TODO: Skippa matchers!
 			if (ordinaryMatcher.matches()) {
 				result.add(new PythonModule(identifier, ImportType.ORDINARY));
 			} else if (asMatcher.matches()) {

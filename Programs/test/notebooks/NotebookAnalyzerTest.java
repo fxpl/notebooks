@@ -788,7 +788,7 @@ public class NotebookAnalyzerTest {
 		for (int i=0; i<files.length; i++) {
 			expectedModules.add(i, new ArrayList<PythonModule>());
 		}
-		expectedModules.get(0).add(0, new PythonModule("kossa", ImportType.ORDINARY));
+		expectedModules.get(0).add(0, new PythonModule("kossan_mu", ImportType.ORDINARY));
 		expectedModules.get(1).add(0, new PythonModule("kalv", "naut", ImportType.ALIAS));
 		expectedModules.get(2).add(0, new PythonModule("ko", ImportType.FROM));
 		expectedModules.get(3).add(0, new PythonModule("module1", ImportType.ORDINARY));
@@ -827,7 +827,7 @@ public class NotebookAnalyzerTest {
 				"nb_3.ipynb", "nb_4.ipynb", "nb_5.ipynb"};
 		String[] expectedLines = {
 			modulesHeader(),
-			"nb_1.ipynb, kossa",
+			"nb_1.ipynb, kossan_mu",
 			"nb_2.ipynb, kalv",
 			"nb_3.ipynb, ko",
 			"nb_4.ipynb, module1, module2, module3",
