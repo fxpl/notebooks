@@ -96,8 +96,12 @@ public class PythonModule {
 		}
 	}
 	
-	public void setParent(PythonModule newParent) {
-		this.parent = newParent;
+	public void setOldestAncestor(PythonModule ancestor) {
+		if (null == parent) {
+			this.parent = ancestor;
+		} else {
+			parent.setOldestAncestor(ancestor);
+		}
 	}
 	
 	@Override

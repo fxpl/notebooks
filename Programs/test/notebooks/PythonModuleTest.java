@@ -220,10 +220,27 @@ public class PythonModuleTest {
 	}
 	
 	@Test
-	public void testSetParent() {
-		PythonModule newParent = new PythonModule("styvmor");
-		module.setParent(newParent);
-		assertEquals("Parent not set correctly by setParent!", newParent, module.getParent());
+	public void testSetOldestAncestor_noParents() {
+		PythonModule newAncestor = new PythonModule("Lucy", ImportType.FROM);
+		PythonModule descendant = new PythonModule(name, ImportType.ORDINARY);
+		descendant.setOldestAncestor(newAncestor);
+		assertEquals("Parent not set correctly by setParent!", newAncestor, descendant.getParent());
+	}
+	
+	@Test
+	public void testSetOldestAncestor_existingAncestors() {
+		String grandParentName = "morfar";
+		String parentName = "mamma";
+		String childName = "me";
+		PythonModule newAncestor = new PythonModule("Lucy", ImportType.FROM);
+		PythonModule expectedGrandParent = new PythonModule(grandParentName, ImportType.ORDINARY, newAncestor);
+		PythonModule expectedParent =new PythonModule(parentName, ImportType.ORDINARY, expectedGrandParent);
+		PythonModule expectedChild = new PythonModule(childName, ImportType.ORDINARY, expectedParent);
+		PythonModule grandParent = new PythonModule(grandParentName, ImportType.ORDINARY);
+		PythonModule parent = new PythonModule(parentName, ImportType.ORDINARY, grandParent);
+		PythonModule child = new PythonModule(childName, ImportType.ORDINARY, parent);
+		child.setOldestAncestor(newAncestor);
+		assertEquals("Oldest ancestor not set correctly when ancestors are already present!", expectedChild, child);
 	}
 	
 	@Test

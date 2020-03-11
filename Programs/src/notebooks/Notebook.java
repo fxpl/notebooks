@@ -103,7 +103,7 @@ public class Notebook {
 			List<PythonModule> result = modulesInIdentifierList(fromMatcher.group(2));
 			PythonModule parent = new PythonModule(fromMatcher.group(1), ImportType.FROM);
 			for (PythonModule child: result) {
-				child.setParent(parent); 	// TODO: Detta kommer inte att fungera med submoduler! Måste sätta äldsta släkting istället!
+				child.setOldestAncestor(parent); 	// TODO: Detta kommer inte att fungera med submoduler! Måste sätta äldsta släkting istället!
 			}
 			return result;
 		} else {
