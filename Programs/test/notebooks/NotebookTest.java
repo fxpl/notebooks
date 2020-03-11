@@ -767,7 +767,7 @@ public class NotebookTest {
 	}
 	
 	/**
-	 * Verify that no module is imported when in an invalid import statement.
+	 * Verify that modules are is imported when in an invalid import statement.
 	 */
 	@Test
 	public void testInvalidImport() {
@@ -781,7 +781,7 @@ public class NotebookTest {
 	 * Verify that no module is imported when its name is invalid.
 	 */
 	@Test
-	public void testImportInvalidModuleName() {
+	public void testImportInvalidModuleNames() {
 		String dataDir = "test/data/modules";
 		String file = "nb_101.ipynb";
 		List<PythonModule> expectedModules = new ArrayList<PythonModule>(0);

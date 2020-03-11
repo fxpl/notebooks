@@ -27,8 +27,7 @@ public class Notebook {
 	private WeakReference<JSONObject> contents;
 	private ReentrantLock contentsLock = new ReentrantLock();
 	
-	// TODO: Får inte börja med punkt eller siffra!
-	final static private String MODULEIDENTIFIER = "[A-Za-z0-9_\\.]+";
+	final static private String MODULEIDENTIFIER = "[A-Za-z_][A-Za-z0-9_\\.]*";
 	
 	public Notebook(String path) {
 		this(path, "");
