@@ -56,9 +56,8 @@ public class Notebook {
 	
 	/**
 	 * @return A list of all modules imported in the notebook
-	 * @throws NotebookException for invalid import statements in the code // TODO: Hantera här!
 	 */
-	public List<PythonModule> modules() throws NotebookException {
+	public List<PythonModule> modules() {
 		List<PythonModule> modules = new ArrayList<PythonModule>();
 		List<JSONObject> codeCells = getCodeCells();
 		for (JSONObject cell: codeCells) {
@@ -66,7 +65,11 @@ public class Notebook {
 			for (int i=0; i<lines.length(); i++) {
 				String line = lines.getString(i);
 				if (line.trim().startsWith("import") || line.trim().startsWith("from")) {
-					modules.addAll(modulesInImport(line));
+					try {
+						modules.addAll(modulesInImport(line));
+					} catch (NotebookException e) {
+						System.err.println("Could not add imported modules: " + e.getMessage());
+					}
 				}
 			}
 		}
