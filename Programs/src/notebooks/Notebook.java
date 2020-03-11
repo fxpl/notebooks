@@ -77,18 +77,20 @@ public class Notebook {
 	}
 	
 	/**
-	 * TODO
+	 * Identify all module(s) in a Python importStatement.
+	 * @param importStatement Python import statement in which modules will be identified.
+	 * @return A list of all modules found in importStatment
 	 */
-	private List<PythonModule> modulesInImport(String line) throws NotebookException {
+	private List<PythonModule> modulesInImport(String importStatement) throws NotebookException {
 		final String moduleDescr = "" + MODULEIDENTIFIER + "(\\s*as\\s+" + MODULEIDENTIFIER + "\\s*)?";
 		final String moduleList = "(" + moduleDescr + "\\s*,\\s*)*" + moduleDescr;
-		String importStatement = "\\s*import\\s+(" + moduleList + ")\\s+";
-		Pattern importPattern = Pattern.compile(importStatement);
-		Matcher importMatcher = importPattern.matcher(line);
-		Pattern fromPattern = Pattern.compile("\\s*from\\s+(" + MODULEIDENTIFIER + ")\\s+" + importStatement);
-		Matcher fromMatcher = fromPattern.matcher(line);
+		String importStatementTemplate = "\\s*import\\s+(" + moduleList + ")\\s+";
+		Pattern importPattern = Pattern.compile(importStatementTemplate);
+		Matcher importMatcher = importPattern.matcher(importStatement);
+		Pattern fromPattern = Pattern.compile("\\s*from\\s+(" + MODULEIDENTIFIER + ")\\s+" + importStatementTemplate);
+		Matcher fromMatcher = fromPattern.matcher(importStatement);
 		Pattern allFromPattern = Pattern.compile("\\s*from\\s+(" + MODULEIDENTIFIER + ")\\s+import\\s+\\*\\s+");
-		Matcher allFromMatcher = allFromPattern.matcher(line);
+		Matcher allFromMatcher = allFromPattern.matcher(importStatement);
 		if (importMatcher.matches()) {
 			return modulesInIdentifierList(importMatcher.group(1));
 		} else if(allFromMatcher.matches()) {
@@ -105,19 +107,21 @@ public class Notebook {
 			}
 			return result;
 		} else {
-			throw new NotebookException("Invalid import statement: " + line);
+			throw new NotebookException("Invalid import statement: " + importStatement);
 		}
 	}
 	
-	/** TODO
-	 * Convert a list of modules from an import statement in Python to a list of
-	 * the corresponding modules.
+	/**
+	 * Identify all modules in the identifier list from a Python import (that
+	 * is, everything stated after "import").
+	 * @param identifierList the module list described above 
+	 * @return A List of all modules in identifierList 
 	 */
-	private List<PythonModule> modulesInIdentifierList(String moduleList) {
+	private List<PythonModule> modulesInIdentifierList(String identifierList) {
 		final Pattern ordinaryPattern = Pattern.compile("(" + MODULEIDENTIFIER + ")");
 		final Pattern asPattern = Pattern.compile("(" + MODULEIDENTIFIER + ")\\s+as\\s+(" + MODULEIDENTIFIER + ")");
 		List<PythonModule> result = new ArrayList<PythonModule>();
-		String[] identifiers = moduleList.split(",");
+		String[] identifiers = identifierList.split(",");
 		// TODO: Föräldrar
 		for (int i=0; i<identifiers.length; i++) {
 			String identifier = identifiers[i].trim();
