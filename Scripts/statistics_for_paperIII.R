@@ -92,14 +92,23 @@ kruskalWallisWithPost <- function(y, x) {
   pairwise.wilcox.test(y, x, p.adjust.method=pAdjustMethod, paired=FALSE, alternative="two.sided")
 }
 
+###############################################################################
+# Return a vector consisting of the values in the second column of the
+# argument, each repeated the number of times specified in the third column of
+# the same row.
+###############################################################################
+repeatSecondColumn <- function(data) {
+  return(rep(data[2], data[3]))
+}
+
 # NOTEBOOK DATA
 codeCells <- read.csv("Output/code_cells.csv", header=TRUE, stringsAsFactors=FALSE)
 nonEmptySnippets <- read.csv("Output/snippetsPerFileNE.csv", header=TRUE, stringsAsFactors=FALSE)
 sizes <- read.csv("Output/notebook_sizes.csv", header=TRUE)
 loc <- read.csv("Output/loc.csv", header=TRUE, stringsAsFactors=FALSE)
 languages <- read.csv("Output/languages.csv", header=TRUE, stringsAsFactors=FALSE)
-snippetOccurrencesA <- read.csv("Output/filesPerSnippetA.csv", header=FALSE, stringsAsFactors=FALSE)
-snippetOccurrencesNE <- read.csv("Output/filesPerSnippetNE.csv", header=FALSE, stringsAsFactors=FALSE)
+snippetOccurrencesA <- read.csv("Output/filesPerSnippetA.csv", header=TRUE, stringsAsFactors=FALSE)
+snippetOccurrencesNE <- read.csv("Output/filesPerSnippetNE.csv", header=TRUE, stringsAsFactors=FALSE)
 notebookOccurencesA <- read.csv("Output/nb_clone_distrA.csv", header=FALSE)
 notebookOccurencesNE <- read.csv("Output/nb_clone_distrNE.csv", header=FALSE)
 cloneFreq <- read.csv("Output/cloneFrequency.csv", header=TRUE, stringsAsFactors=FALSE)
@@ -146,7 +155,7 @@ exportAsEPS({
 }, "languages")
 
 
-# CLONE FREQUENCY
+# CLONES
 # Snippet occurences distribution
 logHist(snippetOccurrencesA[,2], specifier="snippetOccurencesA", objects="Snippets")
 logHist(snippetOccurrencesNE[,2], specifier="snippetOccurencesNE", objects="Snippets")
@@ -154,7 +163,25 @@ logHist(snippetOccurrencesNE[,2], specifier="snippetOccurencesNE", objects="Snip
 logHist(notebookOccurencesA[,1], specifier="notebookOccurencesA")
 logHist(notebookOccurencesNE[,1], specifier="notebookOccurencesNE")
 
-# Plots and descriptive statistics
+# Clone sizes (LOC) distribution
+cloneGroupsA <- snippetOccurrencesA[snippetOccurrencesA$count>1,]
+print("LOC in clone groups, with empty snippet")
+printMeanAndPercentiles(cloneGroupsA[,2])
+cloneSizesA <- do.call(c, apply(cloneGroupsA, 1, repeatSecondColumn))
+print("LOC in clones, with empty snippet")
+printMeanAndPercentiles(as.integer(cloneSizesA))
+logHist(cloneGroupsA[,2], specifier="cloneGroupSizesA", objects="Clone groups")
+logHist(as.integer(cloneSizesA), specifier="cloneSizesA", objects="Clones")
+cloneGroupsNE <- snippetOccurrencesNE[snippetOccurrencesNE$count>1,]
+print("LOC in clone groups, without empty snippet")
+printMeanAndPercentiles(cloneGroupsNE[,2])
+cloneSizesNE <- do.call(c, apply(cloneGroupsNE, 1, repeatSecondColumn))
+print("LOC in clone instances, without empty snippet")
+printMeanAndPercentiles(as.integer(cloneSizesNE))
+logHist(cloneGroupsNE[,2], specifier="cloneGroupSizesNE", objects="Clone groups")
+logHist(as.integer(cloneSizesNE), specifier="cloneSizesNE", objects="Clones")
+
+# Clone frequency
 frequencies <- nbData[,"clone.frequency"]
 print("Clone frequency")
 printMeanAndPercentiles(frequencies)
