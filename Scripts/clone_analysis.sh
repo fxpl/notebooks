@@ -35,13 +35,14 @@ countClones() {
 	# Number of clones and unique snippets respectively
 	numFilesFile="../Output/filesPerSnippet`date -Ins`.csv"
 	numFiles=`sed -n "2,$ p" $hash2files | grep -o ',' -n | uniq -c | sed -E "s/^\s*//" | cut -d' ' -f1 | sed -E "s/^([0-9]+)$/(\1-1)\/2/" | bc`
-	hashes=`sed -n "2,$ p" $hash2files | cut -d',' -f1`
-	paste <(echo "$hashes") <(echo "$numFiles") > $numFilesFile
-	sed -Ei "s/\t/, /" $numFilesFile
+	hashesAndLOC=`sed -n "2,$ p" $hash2files | cut -d',' -f1-2`
+	echo "hash, LOC, count" > $numFilesFile
+	paste <(echo "$hashesAndLOC") <(echo "$numFiles") >> $numFilesFile
+	sed -Ei "s/\t/, /g" $numFilesFile
 
-	cloneGroups=`cut $numFilesFile -d' ' -f2 | grep -v "^1$" | wc -l`
-	cloneCopies=`cut $numFilesFile -d' ' -f2 | grep -v "^1$" | paste -sd+ | bc`
-	unique=`cut $numFilesFile -d' ' -f2 | grep "^1$" | wc -l`
+	cloneGroups=`sed -n "2,$ p" $numFilesFile | cut -d' ' -f2 | grep -v "^1$" | wc -l`
+	cloneCopies=`sed -n "2,$ p" $numFilesFile | cut -d' ' -f2 | grep -v "^1$" | paste -sd+ | bc`
+	unique=`sed -n "2,$ p" $numFilesFile | cut -d' ' -f2 | grep "^1$" | wc -l`
 	fractionCloneGroups=`echo "$cloneGroups / ($cloneGroups+$unique)" | bc -l`
 	fractionCloneCopies=`echo "$cloneCopies / ($cloneCopies+$unique)" | bc -l`
 	echo "Total number of clone pairs/groups: $cloneGroups"
