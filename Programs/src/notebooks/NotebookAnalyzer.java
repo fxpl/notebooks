@@ -3,6 +3,7 @@ package notebooks;
 import java.io.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -182,23 +183,52 @@ public class NotebookAnalyzer extends Analyzer {
 	private Map<SnippetCode, List<Snippet>> getClones(Map<Notebook, SnippetCode[]> fileMap) throws IOException {
 		int numAnalyzed = 0;
 		Map<SnippetCode, List<Snippet>> clones = new HashMap<SnippetCode, List<Snippet>>();
+		Map<SnippetCode, List<Integer>> loc = new HashMap<SnippetCode, List<Integer>>();
+		// Add all snippets to clone map
 		for (Notebook notebook: fileMap.keySet()) {
 			if (0 == numAnalyzed%10000) {
 				System.out.println("Finding clones in " + notebook.getName());
 			}
 			SnippetCode[] snippetCodes = fileMap.get(notebook);
 			for (int j=0; j<snippetCodes.length; j++) {
-				if (clones.containsKey(snippetCodes[j])) {
-					clones.get(snippetCodes[j]).add(new Snippet(notebook, j));
-				} else {
-					List<Snippet> snippets = new ArrayList<Snippet>();
-					snippets.add(new Snippet(notebook, j));
-					clones.put(snippetCodes[j], snippets);
-				}
+				addToMap(snippetCodes[j], new Snippet(notebook, j), clones);
+				addToMap(snippetCodes[j], snippetCodes[j].getLOC(), loc);
 			}
 			numAnalyzed++;
 		}
+		// Update line count for snippets
+		for (SnippetCode snippet: clones.keySet()) {
+			List<Integer> locValues = loc.get(snippet);
+			Collections.sort(locValues);
+			int numCopies = locValues.size();
+			int medianLoc = (locValues.get(numCopies/2) + locValues.get((numCopies-1)/2))/2;
+			snippet.setLOC(medianLoc);
+			int minLoc = locValues.get(0);
+			int maxLoc = locValues.get(locValues.size()-1);
+			if (minLoc != maxLoc) {
+				System.out.println("Different line count for snippet " + snippet
+						+ ". Min: " + minLoc + ". Max: " + maxLoc + ".");
+			}
+		}
 		return clones;
+	}
+	
+	/**
+	 * If the specified key exists in map, add the value to the list stored for
+	 * this key. Otherwise, create a new lost containing (only) the value and
+	 * add to map with the actual key.
+	 * @param key Key value
+	 * @param value Value to store
+	 * @param map Map to store the value in
+	 */
+	private<K, V> void addToMap(K key, V value, Map<K, List<V>> map) {
+		if (map.containsKey(key)) {
+			map.get(key).add(value);
+		} else {
+			List<V> values = new ArrayList<V>();
+			values.add(value);
+			map.put(key, values);
+		}
 	}
 	
 	/**

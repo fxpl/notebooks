@@ -642,6 +642,56 @@ public class NotebookAnalyzerTest {
 	}
 	
 	/**
+	 * When there is an odd number of clones with different LOC, verify that
+	 * only one line is stored for this clone in hash2files, and that the line
+	 * count is the median of the line counts of the clones.
+	 */
+	@Test
+	public void testHash2files_csv_clonesWithDifferentLOC_odd() throws IOException {
+		String dataDir = "test/data/hash";
+		String[] files = {"nb_12.ipynb", "nb_13.ipynb", "nb_14.ipynb"};
+		String reproFile = "repros.csv";
+		String[] expectedLines = {
+			hash2filesHeader(),
+			"159651F111F7381E9043CA7D2671E3E2\\, 2\\, nb_[0-9]+\\.ipynb\\, [0-9]+.*"
+		};
+		
+		for (String file: files) {
+			analyzer.initializeNotebooksFrom(dataDir + "/" + file);
+		}
+		analyzer.initializeReproInfo(dataDir + "/" + reproFile);
+		analyzer.clones();
+
+		TestUtils.checkCsv_matches("hash2filesA", expectedLines);
+		TestUtils.deleteCloneCsvs();
+	}
+	
+	/**
+	 * When there is an even number of clones with different LOC, verify that
+	 * only one line is stored for this clone in hash2files, and that the line
+	 * count is the median of the line counts of the clones.
+	 */
+	@Test
+	public void testHash2files_csv_clonesWithDifferentLOC_even() throws IOException {
+		String dataDir = "test/data/hash";
+		String[] files = {"nb_12.ipynb", "nb_13.ipynb"};
+		String reproFile = "repros.csv";
+		String[] expectedLines = {
+			hash2filesHeader(),
+			"159651F111F7381E9043CA7D2671E3E2\\, 1\\, nb_[0-9]+\\.ipynb\\, [0-9]+.*"
+		};
+		
+		for (String file: files) {
+			analyzer.initializeNotebooksFrom(dataDir + "/" + file);
+		}
+		analyzer.initializeReproInfo(dataDir + "/" + reproFile);
+		analyzer.clones();
+		
+		TestUtils.checkCsv_matches("hash2filesA", expectedLines);
+		TestUtils.deleteCloneCsvs();
+	}
+	
+	/**
 	 * Verify that connections are identified correctly at analysis of the whole
 	 * clone test files directory.
 	 * @throws IOException 
@@ -663,7 +713,10 @@ public class NotebookAnalyzerTest {
 				"nb_10.ipynb, 3, 3.0000, 0, 0.0000, 0, 0, 3.0000, 0.0000",
 				"nb_8.ipynb, 1, 1.0000, 1, 1.0000, 0, 0, 1.0000, 1.0000",
 				"nb_9.ipynb, 4, 2.0000, 4, 2.0000, 2, 2, 2.0000, 2.0000",
-				"nb_11.ipynb, 1, 1.0000, 1, 1.0000, 0, 0, 1.0000, 1.0000"
+				"nb_11.ipynb, 1, 1.0000, 1, 1.0000, 0, 0, 1.0000, 1.0000",
+				"nb_12.ipynb, 2, 2.0000, 2, 2.0000, 0, 0, 1.0000, 1.0000",
+				"nb_13.ipynb, 2, 2.0000, 2, 2.0000, 0, 0, 1.0000, 1.0000",
+				"nb_14.ipynb, 2, 2.0000, 2, 2.0000, 0, 0, 1.0000, 1.0000"
 		};
 		
 		analyzer.initializeNotebooksFrom(dataDir);

@@ -2,6 +2,7 @@ package notebooks;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.BufferedReader;
@@ -43,6 +44,7 @@ public class TestUtils {
 			boolean match = outputReader.readLine().matches(expectedPattern);
 			assertTrue("Wrong pattern of line number " + (i+1) + " for " + prefix + " csv!", match);
 		}
+		assertNull("Too many lines in csv!", outputReader.readLine());
 		outputReader.close();
 	}
 	

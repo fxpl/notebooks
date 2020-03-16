@@ -8,7 +8,7 @@ import java.util.Objects;
  * Represents the code inside a snippet.
  */
 public class SnippetCode {
-	private final int LOC;
+	private int LOC;
 	private final String hash;
 	
 	public SnippetCode(int LOC, String hash) {
@@ -34,8 +34,7 @@ public class SnippetCode {
 			return false;
 		}
 		SnippetCode otherCode = (SnippetCode)other;
-		return this.hash.equals(otherCode.getHash())
-				&& this.LOC == otherCode.LOC;
+		return this.hash.equals(otherCode.getHash());
 	}
 	
 	@Override
@@ -76,6 +75,10 @@ public class SnippetCode {
 			}
 		}
 		return false;
+	}
+	
+	public void setLOC(int LOC) {
+		this.LOC = LOC;
 	}
 	
 	@Override
