@@ -3,7 +3,6 @@ package notebooks;
 import java.io.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -199,16 +198,8 @@ public class NotebookAnalyzer extends Analyzer {
 		// Update line count for snippets
 		for (SnippetCode snippet: clones.keySet()) {
 			List<Integer> locValues = loc.get(snippet);
-			Collections.sort(locValues);
-			int numCopies = locValues.size();
-			int medianLoc = (locValues.get(numCopies/2) + locValues.get((numCopies-1)/2))/2;
+			int medianLoc = Utils.median(locValues, "Different line count for snippet " + snippet.getHash());
 			snippet.setLOC(medianLoc);
-			int minLoc = locValues.get(0);
-			int maxLoc = locValues.get(locValues.size()-1);
-			if (minLoc != maxLoc) {
-				System.out.println("Different line count for snippet " + snippet
-						+ ". Min: " + minLoc + ". Max: " + maxLoc + ".");
-			}
 		}
 		return clones;
 	}

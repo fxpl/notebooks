@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -183,21 +182,16 @@ public class SccOutputAnalyzer extends Analyzer {
 		for (List<SccSnippetId> cloned: clones) {
 			List<Snippet> snippets = new ArrayList<Snippet>();
 			int numClones = cloned.size();
-			int[] loc = new int[numClones];
+			List<Integer> loc = new ArrayList<Integer>(numClones);
 			for (int i=0; i<numClones; i++) {
 				SccSnippetId id = cloned.get(i);
 				addSnippet(id, snippets);
 				snippetIdsToAdd.remove(id);
-				loc[i] = linesOfCode.get(cloned.get(i));
+				loc.add(linesOfCode.get(cloned.get(i)));
 			}
-			Arrays.sort(loc);
-			int medianLoc = (loc[numClones/2] + loc[(numClones-1)/2]) / 2;
+			int medianLoc = Utils.median(loc, "Different line count for snippet " + Integer.toString(hashIndex));
 			SnippetCode hash = new SnippetCode(medianLoc, Integer.toString(hashIndex++));
 			result.put(hash, snippets);
-			if (loc[0] != loc[loc.length-1]) {
-				System.out.println("Different line count for snippet " + hash
-						+ ". Min: " + loc[0] + ". Max: " + loc[loc.length-1] + ".");
-			}
 		}
 		
 		// Remaining snippets are unique. Add them!
