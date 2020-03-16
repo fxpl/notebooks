@@ -3,11 +3,10 @@ package notebooks;
 import java.util.Objects;
 
 public class PythonModule {
-	private String name;
-	private ImportType importedWith;
-	private String alias;
-	private PythonModule parent;
-	
+	protected String name;
+	protected ImportType importedWith;
+	protected String alias;
+	protected PythonModule parent;
 	
 	public PythonModule(String name) {
 		this.name = name;
