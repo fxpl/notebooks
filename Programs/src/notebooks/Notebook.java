@@ -96,8 +96,7 @@ public class Notebook {
 		} else if(allFromMatcher.matches()) {
 			PythonModule parent = new PythonModule(allFromMatcher.group(1), ImportType.FROM);
 			List <PythonModule> result = new ArrayList<PythonModule>(1);
-			result.add(parent);
-			// TODO: Representera barn på något vis!
+			result.add(new AllModules(parent));
 			return result;
 		} else if (fromMatcher.matches()) {
 			List<PythonModule> result = modulesInImport(fromMatcher.group(2));

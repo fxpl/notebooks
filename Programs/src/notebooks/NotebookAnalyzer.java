@@ -452,7 +452,7 @@ public class NotebookAnalyzer extends Analyzer {
 	private void writeModuleLine(List<PythonModule> modules, Notebook notebook, Writer writer) throws IOException {
 		writer.write(notebook.getName());
 		for (PythonModule module: modules) {
-			writer.write(", " + module.getName());
+			writer.write(", " + module);
 		}
 		writer.write("\n");
 	}
@@ -469,7 +469,7 @@ public class NotebookAnalyzer extends Analyzer {
 	 * @return A list of the most common modules and their quantity
 	 */
 	static String mostCommonModulesAsString(List<List<PythonModule>> modules, int maxNum) {
-		// TODO: Extrahera ursprungsimporttype istället(!?)
+		// TODO: Inte bara namn behöver vara samma!
 		Map<String, Integer> moduleQuantities = new HashMap<String, Integer>();
 		for (List<PythonModule> notebookModules: modules) {
 			for (PythonModule module: notebookModules) {
@@ -497,6 +497,7 @@ public class NotebookAnalyzer extends Analyzer {
 	 * @return A list of the import type quantities + percentages
 	 */
 	static String importTypeSummary(List<List<PythonModule>> modules) {
+		// TODO: Extrahera ursprungsimporttypen istället(!?)
 		int ordinary = 0;
 		int alias = 0;
 		int from = 0;

@@ -584,7 +584,8 @@ public class NotebookTest {
 		String dataDir = "test/data/modules";
 		String file = "nb_3.ipynb";
 		List<PythonModule> expectedModules = new ArrayList<PythonModule>(1);
-		expectedModules.add(new PythonModule("ko", ImportType.FROM));
+		PythonModule parent = new PythonModule("ko", ImportType.FROM);
+		expectedModules.add(new AllModules(parent));
 		verifyImports(dataDir + "/" + file, expectedModules);
 	}
 	

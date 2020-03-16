@@ -790,7 +790,7 @@ public class NotebookAnalyzerTest {
 		}
 		expectedModules.get(0).add(0, new PythonModule("kossan_mu", ImportType.ORDINARY));
 		expectedModules.get(1).add(0, new PythonModule("kalv", "naut", ImportType.ALIAS));
-		expectedModules.get(2).add(0, new PythonModule("ko", ImportType.FROM));
+		expectedModules.get(2).add(0, new AllModules(new PythonModule("ko", ImportType.FROM)));
 		expectedModules.get(3).add(0, new PythonModule("module1", ImportType.ORDINARY));
 		expectedModules.get(3).add(1, new PythonModule("module2", "mod2", ImportType.ALIAS));
 		expectedModules.get(3).add(2, new PythonModule("module3", "mod3", ImportType.ALIAS));
@@ -828,10 +828,10 @@ public class NotebookAnalyzerTest {
 		String[] expectedLines = {
 			modulesHeader(),
 			"nb_1.ipynb, kossan_mu",
-			"nb_2.ipynb, kalv",
-			"nb_3.ipynb, ko",
-			"nb_4.ipynb, module1, module2, module3",
-			"nb_5.ipynb, module10, module11, module12, module13"
+			"nb_2.ipynb, kalv(naut)",
+			"nb_3.ipynb, ko.*",
+			"nb_4.ipynb, module1, module2(mod2), module3(mod3)",
+			"nb_5.ipynb, module10, module11(mod), module12, module13(mod13)"
 		};
 		for (String file: files) {
 			analyzer.initializeNotebooksFrom(dataDir + "/" + file);
