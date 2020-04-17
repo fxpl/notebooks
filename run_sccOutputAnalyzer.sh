@@ -5,7 +5,7 @@
 #SBATCH -p core -n 5
 #SBATCH -J scc_output_analyzer
 
-outputDirectory="Output"
+outputDirectory="OutputSCC"
 mkdir -p $outputDirectory
 
 java -XX:+UnlockDiagnosticVMOptions -XX:NativeMemoryTracking=summary -XX:+PrintNMTStatistics -XX:+UseParallelGC \
