@@ -40,9 +40,9 @@ countClones() {
 	paste <(echo "$hashesAndLOC") <(echo "$numFiles") >> $numFilesFile
 	sed -Ei "s/\t/, /g" $numFilesFile
 
-	cloneGroups=`sed -n "2,$ p" $numFilesFile | cut -d' ' -f2 | grep -v "^1$" | wc -l`
-	cloneCopies=`sed -n "2,$ p" $numFilesFile | cut -d' ' -f2 | grep -v "^1$" | paste -sd+ | bc`
-	unique=`sed -n "2,$ p" $numFilesFile | cut -d' ' -f2 | grep "^1$" | wc -l`
+	cloneGroups=`sed -n "2,$ p" $numFilesFile | cut -d' ' -f3 | grep -v "^1$" | wc -l`
+	cloneCopies=`sed -n "2,$ p" $numFilesFile | cut -d' ' -f3 | grep -v "^1$" | paste -sd+ | bc`
+	unique=`sed -n "2,$ p" $numFilesFile | cut -d' ' -f3 | grep "^1$" | wc -l`
 	fractionCloneGroups=`echo "$cloneGroups / ($cloneGroups+$unique)" | bc -l`
 	fractionCloneCopies=`echo "$cloneCopies / ($cloneCopies+$unique)" | bc -l`
 	echo "Total number of clone pairs/groups: $cloneGroups"
