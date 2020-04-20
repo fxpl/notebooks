@@ -6,7 +6,7 @@ public class PythonZipDumper extends Dumper {
 	
 	protected void dump(Notebook src, String target) throws IOException {
 		if (LangName.PYTHON.equals(src.language().getName())) {
-			src.dumpCodeAsZipWithSingleFile(target, "py");
+			src.dumpCodeAsZip(target, "py");
 		}
 	}
 
