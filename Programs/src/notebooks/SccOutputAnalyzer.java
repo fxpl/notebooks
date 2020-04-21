@@ -141,9 +141,6 @@ public class SccOutputAnalyzer extends Analyzer {
 		Scanner scanner = new Scanner(new File(pairFile));
 		int numRead = 0;
 		while (scanner.hasNextLine()) {
-			if (0 == numRead%1000000) {
-				System.out.println(numRead + " clone pairs read.");
-			}
 			String line = scanner.nextLine();
 			assert(line.matches("[0-9]+,[0-9]+,[0-9]+,[0-9]+"));
 			String[] numbers = line.split(",");
@@ -172,6 +169,9 @@ public class SccOutputAnalyzer extends Analyzer {
 				clones.add(newCloneList);
 			}
 			numRead++;
+			if (0 == numRead%1000000) {
+				System.out.println(numRead + " clone pairs read.");
+			}
 		}
 		scanner.close();
 		return clones;
@@ -185,6 +185,9 @@ public class SccOutputAnalyzer extends Analyzer {
 		
 		// Cloned snippets
 		for (List<SccSnippetId> cloned: clones) {
+			if (0 == hashIndex%10000) {
+				System.out.println("Creating entry  for " + hashIndex + " in snippet-to-files-map.");
+			}
 			List<Snippet> snippets = new ArrayList<Snippet>();
 			int numClones = cloned.size();
 			List<Integer> loc = new ArrayList<Integer>(numClones);
@@ -201,6 +204,9 @@ public class SccOutputAnalyzer extends Analyzer {
 		
 		// Remaining snippets are unique. Add them!
 		for (SccSnippetId id: snippetIdsToAdd) {
+			if (0 == hashIndex%10000) {
+				System.out.println("Creating entry  for " + hashIndex + " in snippet-to-files-map.");
+			}
 			List<Snippet> snippets = new ArrayList<>(1);
 			addSnippet(id, snippets);
 			snippetIdsToAdd.remove(id);
@@ -232,11 +238,16 @@ public class SccOutputAnalyzer extends Analyzer {
 			
 		}
 		// Put snippet in notebook-to-snippet-map
+		int numAdded = 0;
 		for (SnippetCode hash: snippet2file.keySet()) {
+			if (0 == numAdded%10000) {
+				System.out.println("Adding snippet " + hash + " to notebook-to-snippet-map.");
+			}
 			for (Snippet snippet: snippet2file.get(hash)) {
 				SnippetCode[] snippetsInFile = result.get(new Notebook(snippet.getFileName()));
 				snippetsInFile[snippet.getSnippetIndex()] = new SnippetCode(hash);
 			}
+			numAdded++;
 		}
 		return result;
 	}
