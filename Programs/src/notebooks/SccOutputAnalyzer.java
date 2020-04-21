@@ -139,7 +139,11 @@ public class SccOutputAnalyzer extends Analyzer {
 	private List<List<SccSnippetId>> getCloneLists(String pairFile) throws FileNotFoundException {
 		List<List<SccSnippetId>> clones = new ArrayList<List<SccSnippetId>>();
 		Scanner scanner = new Scanner(new File(pairFile));
+		int numRead = 0;
 		while (scanner.hasNextLine()) {
+			if (0 == numRead%1000000) {
+				System.out.println(numRead + " clone pairs read.");
+			}
 			String line = scanner.nextLine();
 			assert(line.matches("[0-9]+,[0-9]+,[0-9]+,[0-9]+"));
 			String[] numbers = line.split(",");
@@ -167,6 +171,7 @@ public class SccOutputAnalyzer extends Analyzer {
 				newCloneList.add(id2);
 				clones.add(newCloneList);
 			}
+			numRead++;
 		}
 		scanner.close();
 		return clones;
