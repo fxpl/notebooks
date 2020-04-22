@@ -24,4 +24,8 @@ public class SccSnippetId {
 	public int hashCode() {
 		return Objects.hash(nbID, snippetID);
 	}
+
+    public String toString() {
+        return this.nbID + "@" + this.snippetID;
+    }
 }
