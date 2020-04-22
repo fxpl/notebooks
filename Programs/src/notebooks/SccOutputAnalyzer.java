@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -132,7 +133,22 @@ public class SccOutputAnalyzer extends Analyzer {
 	 * files from SourcererCC.
 	 */
 	private Map<SnippetCode, List<Snippet>> getClones(String pairFile) throws IOException {
-		List<List<SccSnippetId>> clones = getCloneLists(pairFile);
+		// List<List<SccSnippetId>> clones = getCloneLists(pairFile);
+		// List<List<SccSnippetId>> clones2 = getCloneListsAlt(pairFile);
+
+    // HashSet<HashSet<SccSnippetId>> a = new HashSet<HashSet<SccSnippetId>>();
+    // HashSet<HashSet<SccSnippetId>> b = new HashSet<HashSet<SccSnippetId>>();
+    
+    // for (List<SccSnippetId> il : clones) {
+    //     a.add(new HashSet<SccSnippetId>(il));
+    // }
+    // for (List<SccSnippetId> il : clones2) {
+    //     b.add(new HashSet<SccSnippetId>(il));
+    // }
+
+    // System.err.println("ALTERNATIVE " + a.equals(b));
+    
+		List<List<SccSnippetId>> clones = getCloneListsAlt(pairFile);
 		return getCloneMap(clones);
 	}
 	
@@ -140,6 +156,7 @@ public class SccOutputAnalyzer extends Analyzer {
 		List<List<SccSnippetId>> clones = new ArrayList<List<SccSnippetId>>();
 		Scanner scanner = new Scanner(new File(pairFile));
 		int numRead = 0;
+    long t1 = System.currentTimeMillis();
 		while (scanner.hasNextLine()) {
 			String line = scanner.nextLine();
 			assert(line.matches("[0-9]+,[0-9]+,[0-9]+,[0-9]+"));
@@ -169,15 +186,83 @@ public class SccOutputAnalyzer extends Analyzer {
 				clones.add(newCloneList);
 			}
 			numRead++;
-			if (0 == numRead%1000000) {
-				System.out.println(numRead + " clone pairs read.");
+			if (0 == numRead%10000) {
+          long t2 = System.currentTimeMillis();
+          System.out.println(numRead + " clone pairs read in " + (t2 - t1) + " ms");
+          t1 = t2;
 			}
 		}
 		scanner.close();
 		return clones;
 	}
+
+    private List<List<SccSnippetId>> getCloneListsAlt(String pairFile) throws FileNotFoundException {
+        Scanner scanner = new Scanner(new File(pairFile));
+        int numRead = 0;
+
+        HashMap<SccSnippetId, HashSet<SccSnippetId>> clones = new HashMap<SccSnippetId, HashSet<SccSnippetId>>();
+
+        long t1 = System.currentTimeMillis();
+
+        while (scanner.hasNextLine()) {
+            String line = scanner.nextLine();
+            assert(line.matches("[0-9]+,[0-9]+,[0-9]+,[0-9]+"));
+            String[] numbers = line.split(",");
+            SccSnippetId id1 = new SccSnippetId(Integer.parseInt(numbers[0]), Integer.parseInt(numbers[1]));
+            SccSnippetId id2 = new SccSnippetId(Integer.parseInt(numbers[2]), Integer.parseInt(numbers[3]));
+
+            HashSet<SccSnippetId> id1Clones = clones.get(id1);
+            HashSet<SccSnippetId> id2Clones = clones.get(id2);
+
+            if (id1Clones == id2Clones) {
+                if (id1Clones != null) {
+                    /// We already had them marked as clones
+                } else {
+                    /// Create a new clone set with this data
+                    HashSet<SccSnippetId> newSet = new HashSet<SccSnippetId>();
+                    newSet.add(id1);
+                    newSet.add(id2);
+                    clones.put(id1, newSet);
+                    clones.put(id2, newSet);
+                }
+            } else {
+                /// Merge the sets as they are both clones, and point both to same set
+                if (id1Clones == null) {
+                    id2Clones.add(id1);
+                    clones.put(id1, id2Clones);
+                } else if (id2Clones == null) {
+                    id1Clones.add(id2);
+                    clones.put(id2, id1Clones);
+                } else {
+                    id1Clones.addAll(id2Clones);
+                    clones.put(id2, id1Clones);
+                }
+            }
+
+            numRead++;
+            if (0 == numRead%10000) {
+                long t2 = System.currentTimeMillis();
+                System.out.println(numRead + " clone pairs read in " + (t2 - t1) + " ms");
+                t1 = t2;
+            }
+        }
+
+        List<List<SccSnippetId>> result = new ArrayList<List<SccSnippetId>>();
+
+        HashSet<HashSet<SccSnippetId>> alreadyIncluded = new HashSet<HashSet<SccSnippetId>>();
+        for(HashSet<SccSnippetId> list : clones.values()) {
+            if (alreadyIncluded.contains(list) == false) {
+                result.add(new ArrayList<SccSnippetId>(list));
+                alreadyIncluded.add(list);
+            }
+        }
+
+        scanner.close();
+        return result;
+    }
 	
-	private Map<SnippetCode, List<Snippet>> getCloneMap(List<List<SccSnippetId>> clones)
+
+    private Map<SnippetCode, List<Snippet>> getCloneMap(List<List<SccSnippetId>> clones)
 			throws FileNotFoundException {
 		Map<SnippetCode, List<Snippet>> result = new HashMap<SnippetCode, List<Snippet>>(clones.size());
 		Set<SccSnippetId> snippetIdsToAdd = notebookNumbers.keySet();
