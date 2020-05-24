@@ -14,6 +14,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 public class CloneFileWriter {
+    private LocalDateTime startTime = LocalDateTime.now();
 	private String outputDir;
 	
 	public CloneFileWriter(String outputDir) {
@@ -50,7 +51,7 @@ public class CloneFileWriter {
 	}
 	
 	private void printFile2hashes(Map<Notebook, SnippetCode[]> file2hashes) throws IOException {
-		Writer writer = new FileWriter(outputDir + "/file2hashesA" + LocalDateTime.now() + ".csv");
+		Writer writer = new FileWriter(outputDir + "/file2hashesA" + startTime + ".csv");
 		writer.write(file2hashesHeader());
 		for (Notebook notebook: file2hashes.keySet()) {
 			writer.write(notebook.getName());
@@ -64,7 +65,7 @@ public class CloneFileWriter {
 	}
 	
 	private void printHash2files(Map<SnippetCode, List<Snippet>> hash2files) throws IOException {
-		Writer writer = new FileWriter(outputDir + "/hash2filesA" + LocalDateTime.now() + ".csv");
+		Writer writer = new FileWriter(outputDir + "/hash2filesA" + startTime + ".csv");
 		writer.write(hash2filesHeader());
 		for (SnippetCode code: hash2files.keySet()) {
 			writer.write(code.getHash() + ", " + code.getLOC());
@@ -78,7 +79,7 @@ public class CloneFileWriter {
 	
 	private void printCloneFrequencies(Map<Notebook, SnippetCode[]> file2hashes,
 			Map<SnippetCode, List<Snippet>> hash2files) throws IOException {
-		Writer writer = new FileWriter(outputDir + "/cloneFrequency" + LocalDateTime.now() + ".csv");
+		Writer writer = new FileWriter(outputDir + "/cloneFrequency" + startTime + ".csv");
 		writer.write(cloneFrequencyHeader());
 		for (Notebook notebook: file2hashes.keySet()) {
 			int numClones = 0, numUnique = 0, numClonesNE = 0;
@@ -146,32 +147,47 @@ public class CloneFileWriter {
 	 * @param hash2files Mapping from snippets to position in notebooks
 	 * @param NUM_NOTEBOOKS Maximum number of notebooks to print connection information for
 	 */
-	private void printConnectionsFile(Map<Notebook, SnippetCode[]> file2hashes,
-			Map<SnippetCode, List<Snippet>> hash2files, final int NUM_CONNECTIONS) throws IOException {
-		Writer writer = new FileWriter(outputDir + "/connections" + LocalDateTime.now() + ".csv");
-		writer.write(connectionsHeader());
-		List<Notebook> notebooks = new ArrayList<Notebook>(file2hashes.keySet());
-		Collections.shuffle(notebooks);
-		int connectionsToPrint = Math.min(NUM_CONNECTIONS, file2hashes.size());
-		List<Callable<String>> tasks = new ArrayList<Callable<String>>(connectionsToPrint);
-		for (int i=0; i<connectionsToPrint; i++) {
-			boolean heartBeat = 0 == i%10000;
-			tasks.add(new ConnectionsLineBuilder(notebooks.get(i), file2hashes, hash2files, heartBeat));
-		}
-		List<Future<String>> result = ThreadExecutor.getInstance().invokeAll(tasks);
-		for (int i=0; i<connectionsToPrint; i++) {
-			try {
-				writer.write(result.get(i).get());
-			} catch (InterruptedException e) {
-				System.err.println("Printing of connections for notebook " + notebooks.get(i).getName()
-						+ " was interrupted! " + e.getMessage());
-			} catch (ExecutionException e) {
-				System.err.println("Printing connections for notebook "
-						+ notebooks.get(i).getName() + " failed!" + e.toString());
-			}
-		}
-		writer.close();
-	}
+    private void printConnectionsFile(final Map<Notebook, SnippetCode[]> file2hashes,
+                                      final Map<SnippetCode, List<Snippet>> hash2files,
+                                      final int NUM_CONNECTIONS) throws IOException {
+
+        Writer writer = new FileWriter(outputDir + "/connections" + startTime + ".csv");
+        writer.write(connectionsHeader());
+        final List<Notebook> notebooks = new ArrayList<Notebook>(file2hashes.keySet());
+        ///Collections.shuffle(notebooks);
+        final int connectionsToPrint = Math.min(NUM_CONNECTIONS, file2hashes.size());
+
+        // List<Callable<String>> tasks = new ArrayList<Callable<String>>(connectionsToPrint);
+        // for (int i=0; i<connectionsToPrint; i++) {
+        //     boolean heartBeat = true; //0 == i%100000000;
+        //     tasks.add(new ConnectionsLineBuilder(notebooks.get(i), file2hashes, hash2files, heartBeat));
+        // }
+
+        List<Callable<Void>> tasks = new ArrayList<Callable<Void>>(connectionsToPrint);
+        for (int i=0; i < 8; i++) {
+            boolean heartBeat = true; //0 == i%100000000;
+            final int start = i;
+            tasks.add(() -> {
+                          for(int j = start; j < connectionsToPrint; j += 8) {
+                              new ConnectionsLineBuilder(notebooks.get(j), file2hashes, hash2files, heartBeat).call();
+                          }
+                          return null;
+                });
+        }
+        List<Future<Void>> result = ThreadExecutor.getInstance().invokeAll(tasks);
+        // for (int i=0; i<connectionsToPrint; i++) {
+        //     try {
+        //         writer.write(result.get(i).get());
+        //     } catch (InterruptedException e) {
+        //         System.err.println("Printing of connections for notebook " + notebooks.get(i).getName()
+        //                            + " was interrupted! " + e.getMessage());
+        //     } catch (ExecutionException e) {
+        //         System.err.println("Printing connections for notebook "
+        //                            + notebooks.get(i).getName() + " failed!" + e.toString());
+        //     }
+        // }
+        // writer.close();
+    }
 	
 	/**
 	 * Look in clones to decide whether snippet is a clone or a unique snippet

@@ -1,0 +1,1 @@
+java -ea -XX:+UseParallelGC -cp bin:external/json-simple-1.1.1.jar -Xms6G -Xmx20G notebooks.SccOutputAnalyzer --repro_file=/home/maka4186/notebook_disk/notebook-number_repo.csv --stats_file=/home/maka4186/notebook_disk/SourcererCC_output/files.stats --pair_file=/home/maka4186/notebook_disk/SourcererCC_output/clone.pairs.only.numbers --output_dir=OutputSCC2

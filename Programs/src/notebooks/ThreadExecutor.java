@@ -13,12 +13,12 @@ import java.util.concurrent.Future;
  */
 public class ThreadExecutor {
 	private static ThreadExecutor instance;
-	private ExecutorService threadPool;
+	public final  ExecutorService threadPool;
 	
 	private ThreadExecutor() {
 		int cores = Runtime.getRuntime().availableProcessors();
-		System.out.println("Setting up a thread pool with " + (2*cores) + " threads.");
-		threadPool = Executors.newFixedThreadPool(2*cores);
+		System.out.println("Setting up a thread pool with " + (cores/2) + " threads.");
+		threadPool = Executors.newFixedThreadPool(cores/2);
 	}
 	
 	/**

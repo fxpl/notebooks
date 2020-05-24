@@ -27,7 +27,7 @@
 
 	<target name="test" depends="buildTest">
 		<mkdir dir="reports"/>
-		<junit fork="true" printsummary="yes" haltonfailure="yes">
+		<junit fork="true" printsummary="on" showoutput="yes" haltonfailure="no">
 			<classpath>
 				<pathelement location="${bin}"/>
 				<pathelement location="${junit.path}"/>

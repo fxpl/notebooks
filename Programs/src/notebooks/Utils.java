@@ -12,6 +12,7 @@ public class Utils {
 	 * @return median of values
 	 */
 	public static int median(List<Integer> values, String msg) {
+      if (values.size() == 0) return 0; // FIXME: defensive but should it be offensive?
 		Collections.sort(values);
 		int min = values.get(0);
 		int max = values.get(values.size()-1);
