@@ -7,6 +7,7 @@ import org.junit.Test;
 
 public class SccOutputAnalyzerTest {
 	private SccOutputAnalyzer analyzer;
+	private final static String hashPattern = "[0-9,a-f]+";
 	private final static String notebookNamePattern = "nb_[0-9]+\\.ipynb";
 	
 	@Before
@@ -241,7 +242,7 @@ public class SccOutputAnalyzerTest {
 		
 		String[] expectedLines = {
 				hash2filesHeader(),
-				"[0-9,a-f]+, 13, " + notebookNamePattern + ", [0-9]+, " + notebookNamePattern + ", [0-9]+, " + notebookNamePattern + ", [0-9]+"
+				hashPattern + ", 13, " + notebookNamePattern + ", [0-9]+, " + notebookNamePattern + ", [0-9]+, " + notebookNamePattern + ", [0-9]+"
 		};
 
 		analyzer.clones(statsFile, reproMap, pairFile);
@@ -263,10 +264,32 @@ public class SccOutputAnalyzerTest {
 		
 		String[] expectedLines = {
 				hash2filesHeader(),
-				"[0-9,a-f]+, 16, " + notebookNamePattern + ", [0-9]+, " + notebookNamePattern + ", [0-9]+, " + notebookNamePattern + ", [0-9]+, nb_[0-9]\\.ipynb, [0-9]"
+				hashPattern + ", 16, " + notebookNamePattern + ", [0-9]+, " + notebookNamePattern + ", [0-9]+, " + notebookNamePattern + ", [0-9]+, " + notebookNamePattern + ", [0-9]+"
 		};
 
 		analyzer.clones(statsFile, reproMap, pairFile);
+		TestUtils.checkCsv_matches("hash2filesA", expectedLines);
+		TestUtils.deleteCloneCsvs();
+	}
+	
+	/**
+	 * Verify that a clone group is only considered once after the optimization
+	 * of getCloneLists.
+	 * @throws IOException
+	 */
+	@Test
+	public void testCloneListsOptimization() throws IOException {
+		String dataDir = "test/data/scc";
+		String statsFile = dataDir + "/file_stats_clopt";
+		String pairFile = dataDir + "/clone_pairs_clopt";
+		String reproFile = "test/data/hash/repros.csv";
+		
+		String[] expectedLines = {
+			hash2filesHeader(),
+			hashPattern + ", 10, " + notebookNamePattern + ", [0-9]+, " + notebookNamePattern + ", [0-9]+, " + notebookNamePattern + ", [0-9]+, " + notebookNamePattern + ", [0-9]+"
+		};
+		
+		analyzer.clones(statsFile, reproFile, pairFile);
 		TestUtils.checkCsv_matches("hash2filesA", expectedLines);
 		TestUtils.deleteCloneCsvs();
 	}
