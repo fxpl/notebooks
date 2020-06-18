@@ -43,11 +43,12 @@ public class Notebook {
 	 */
 	@Override
 	public boolean equals(Object other) {
-		if (other.getClass() != this.getClass()) {
+		if (other instanceof Notebook) {
+			Notebook otherNotebook = (Notebook)other;
+			return this.getName().equals(otherNotebook.getName());
+		} else {
 			return false;
 		}
-		Notebook otherNotebook = (Notebook)other;
-		return this.getName().equals(otherNotebook.getName());
 	}
 	
 	/**

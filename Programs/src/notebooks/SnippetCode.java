@@ -30,11 +30,12 @@ public class SnippetCode {
 	
 	@Override
 	public boolean equals(Object other) {
-		if (other.getClass() != this.getClass()) {
+		if (other instanceof SnippetCode) {
+			SnippetCode otherCode = (SnippetCode)other;
+			return this.hash.equals(otherCode.getHash());
+		} else {
 			return false;
 		}
-		SnippetCode otherCode = (SnippetCode)other;
-		return this.hash.equals(otherCode.getHash());
 	}
 	
 	@Override

@@ -13,11 +13,12 @@ public class SccSnippetId {
 
 	@Override
 	public boolean equals(Object other) {
-		if (other.getClass() != this.getClass()) {
+		if (other instanceof SccSnippetId) {
+			SccSnippetId otherId = (SccSnippetId)other;
+			return this.nbID == otherId.nbID && this.snippetID == otherId.snippetID;
+		} else {
 			return false;
 		}
-		SccSnippetId otherId = (SccSnippetId)other;
-		return this.nbID == otherId.nbID && this.snippetID == otherId.snippetID;
 	}
 	
 	@Override

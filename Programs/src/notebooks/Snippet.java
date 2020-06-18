@@ -26,12 +26,13 @@ public class Snippet {
 	
 	@Override
 	public boolean equals(Object other) {
-		if (other.getClass() != this.getClass()) {
+		if (other instanceof Snippet) {
+			Snippet otherSnippet = (Snippet)other;
+			return otherSnippet.fileName.equals(this.fileName)
+					&& otherSnippet.snippetIndex == this.snippetIndex;
+		} else {
 			return false;
 		}
-		Snippet otherSnippet = (Snippet)other;
-		return otherSnippet.fileName.equals(this.fileName)
-				&& otherSnippet.snippetIndex == this.snippetIndex;
 	}
 	
 	/**
