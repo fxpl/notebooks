@@ -558,7 +558,8 @@ public class NotebookAnalyzer extends Analyzer {
 				System.out.println("File with all language values created!");
 			}
 		} catch (IOException e) {
-			System.err.println("I/O error: " + e.getMessage() + ". Operation interrupted.");
+			e.printStackTrace();
+			System.err.println("Operation interrupted!");
 		}
 	}
 

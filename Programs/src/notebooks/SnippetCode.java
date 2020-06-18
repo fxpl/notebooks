@@ -51,11 +51,12 @@ public class SnippetCode {
 			return true;
 		} else {
 			String emptyHash = "";
+			final String algorithm = "MD5";
 			try {
-				MessageDigest hasher = MessageDigest.getInstance("MD5");
+				MessageDigest hasher = MessageDigest.getInstance(algorithm);
 				emptyHash = Utils.toHexString(hasher.digest("".getBytes()));
 			} catch (NoSuchAlgorithmException e) {
-				System.err.println("MessageDigest cannot hash using MD5!");
+				System.err.println("MessageDigest cannot hash using " + algorithm + "!");
 			}
 			return emptyHash.equals(this.hash);
 		}

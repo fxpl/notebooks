@@ -293,7 +293,8 @@ public class SccOutputAnalyzer extends Analyzer {
 				this.clones(pairFile);
 				System.out.println("Clone files created!");
 			} catch (IOException e) {
-				System.err.println("I/O error: " + e.getMessage() + ". Operation interrupted.");
+				e.printStackTrace();
+				System.err.println("Operation interrupted!");
 			}
 		} else {
 			if (null == pairFile || "" == pairFile) {

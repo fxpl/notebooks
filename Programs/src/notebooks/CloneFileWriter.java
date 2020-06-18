@@ -164,10 +164,12 @@ public class CloneFileWriter {
 				writer.write(result.get(i).get());
 			} catch (InterruptedException e) {
 				System.err.println("Printing of connections for notebook " + notebooks.get(i).getName()
-						+ " was interrupted! " + e.getMessage());
+						+ " was interrupted!");
+				e.printStackTrace();
 			} catch (ExecutionException e) {
 				System.err.println("Printing connections for notebook "
-						+ notebooks.get(i).getName() + " failed!" + e.toString());
+						+ notebooks.get(i).getName() + " failed!");
+				e.printStackTrace();
 			}
 		}
 		writer.close();
