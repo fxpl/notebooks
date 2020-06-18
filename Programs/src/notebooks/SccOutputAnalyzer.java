@@ -311,5 +311,6 @@ public class SccOutputAnalyzer extends Analyzer {
 	public static void main(String[] args) {
 		SccOutputAnalyzer analyzer = new SccOutputAnalyzer();
 		analyzer.analyze(args);
+		ThreadExecutor.tearDown();
 	}
 }
