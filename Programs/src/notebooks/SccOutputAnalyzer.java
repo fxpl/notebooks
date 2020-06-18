@@ -6,6 +6,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -134,52 +135,64 @@ public class SccOutputAnalyzer extends Analyzer {
 		return getCloneMap(clones);
 	}
 	
+	// TODO: Returnera mappen istället?!
 	private List<List<SccSnippetId>> getCloneLists(String pairFile) throws IOException {
-		List<List<SccSnippetId>> clones = new ArrayList<List<SccSnippetId>>();
-		BufferedReader reader = new BufferedReader(new FileReader(pairFile));
-		int numRead = 0;
+		HashMap<SccSnippetId, CloneGroup> clones = new HashMap<SccSnippetId, CloneGroup>();
+		final BufferedReader reader = new BufferedReader(new FileReader(pairFile));
+		long numRead = 0;
 		String line = reader.readLine();
 		while (null != line) {
 			assert(line.matches("[0-9]+,[0-9]+,[0-9]+,[0-9]+"));
 			String[] numbers = line.split(",");
 			SccSnippetId id1 = new SccSnippetId(numbers[0], numbers[1]);
 			SccSnippetId id2 = new SccSnippetId(numbers[2], numbers[3]);
-			boolean bothStored = false;
-			Iterator<List<SccSnippetId>> it = clones.iterator();
-			while (!bothStored && it.hasNext()) {
-				List<SccSnippetId> existing = it.next();
-				boolean id1stored = existing.contains(id1);
-				boolean id2stored = existing.contains(id2); 
-				if(id1stored && id2stored) {
-					bothStored = true;
-				} else if (id1stored && !id2stored) {
-					existing.add(id2);
-					bothStored = true;
-				} else if(id2stored && !id1stored) {
-					existing.add(id1);
-					bothStored = true;
+			// TODO: Extrahera metod!
+			CloneGroup id1Clones = clones.get(id1);
+			CloneGroup id2Clones = clones.get(id2);
+			if (id1Clones == id2Clones) {
+				if (id1Clones != null) {
+					/// We already had them marked as clones
+				} else {
+					/// Create a new clone set with this data
+					CloneGroup top = new CloneGroup();
+					clones.put(id1, top);
+					clones.put(id2, top);
+				}
+			} else {
+				/// Merge the sets as they are both clones, and point both to same set
+				if (id1Clones == null) {
+					clones.put(id1, id2Clones.top());
+				} else if (id2Clones == null) {
+					clones.put(id2, id1Clones.top());
+				} else {
+					CloneGroup top = id1Clones.merge(id2Clones);
+					if (id1Clones != top) {
+						clones.put(id1, top);
+					}
+					if (id2Clones != top) {
+						clones.put(id2, top);
+					}
 				}
 			}
-			if (!bothStored) {
-				List<SccSnippetId> newCloneList = new ArrayList<SccSnippetId>();
-				newCloneList.add(id1);
-				newCloneList.add(id2);
-				clones.add(newCloneList);
-			}
+			
 			numRead++;
+			if (0 == numRead%5000000) {
+				CloneGroup.compact(clones);
+			}
+			
 			if (0 == numRead%1000000) {
 				System.out.println(numRead + " clone pairs read.");
 			}
 			line = reader.readLine();
 		}
 		reader.close();
-		return clones;
+		return CloneGroup.convertResult(clones);
 	}
 	
 	private Map<SnippetCode, List<Snippet>> getCloneMap(List<List<SccSnippetId>> clones)
 			throws FileNotFoundException {
 		Map<SnippetCode, List<Snippet>> result = new HashMap<SnippetCode, List<Snippet>>(clones.size());
-		Set<SccSnippetId> snippetIdsToAdd = notebookNumbers.keySet();
+		Set<SccSnippetId> snippetIdsToAdd = new HashSet<SccSnippetId>(notebookNumbers.keySet());
 		int hashIndex = 0;
 		
 		// Cloned snippets
@@ -222,7 +235,7 @@ public class SccOutputAnalyzer extends Analyzer {
 	 * @param snippets List of snippets, to which the snippet will be added
 	 */
 	private void addSnippet(SccSnippetId id, List<Snippet> snippets) {
-		String notebookName = getNotebookNameFromNumber(notebookNumbers.get(id)); 
+		String notebookName = getNotebookNameFromNumber(notebookNumbers.get(id));
 		int snippetIndex = snippetIndices.get(id);
 		snippets.add(new Snippet(notebookName, repros.get(notebookName), snippetIndex));
 	}
