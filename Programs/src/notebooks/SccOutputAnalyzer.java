@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -131,12 +130,11 @@ public class SccOutputAnalyzer extends Analyzer {
 	 * files from SourcererCC.
 	 */
 	private Map<SnippetCode, List<Snippet>> getClones(String pairFile) throws IOException {
-		List<List<SccSnippetId>> clones = getCloneLists(pairFile);
+		HashMap<CloneGroup, List<SccSnippetId>> clones = getCloneLists(pairFile);
 		return getCloneMap(clones);
 	}
-	
-	// TODO: Returnera mappen istället?!
-	private List<List<SccSnippetId>> getCloneLists(String pairFile) throws IOException {
+
+	private HashMap<CloneGroup, List<SccSnippetId>> getCloneLists(String pairFile) throws IOException {
 		HashMap<SccSnippetId, CloneGroup> clones = new HashMap<SccSnippetId, CloneGroup>();
 		final BufferedReader reader = new BufferedReader(new FileReader(pairFile));
 		long numRead = 0;
@@ -146,57 +144,103 @@ public class SccOutputAnalyzer extends Analyzer {
 			String[] numbers = line.split(",");
 			SccSnippetId id1 = new SccSnippetId(numbers[0], numbers[1]);
 			SccSnippetId id2 = new SccSnippetId(numbers[2], numbers[3]);
-			// TODO: Extrahera metod!
-			CloneGroup id1Clones = clones.get(id1);
-			CloneGroup id2Clones = clones.get(id2);
-			if (id1Clones == id2Clones) {
-				if (id1Clones != null) {
-					/// We already had them marked as clones
-				} else {
-					/// Create a new clone set with this data
-					CloneGroup top = new CloneGroup();
-					clones.put(id1, top);
-					clones.put(id2, top);
-				}
-			} else {
-				/// Merge the sets as they are both clones, and point both to same set
-				if (id1Clones == null) {
-					clones.put(id1, id2Clones.top());
-				} else if (id2Clones == null) {
-					clones.put(id2, id1Clones.top());
-				} else {
-					CloneGroup top = id1Clones.merge(id2Clones);
-					if (id1Clones != top) {
-						clones.put(id1, top);
-					}
-					if (id2Clones != top) {
-						clones.put(id2, top);
-					}
-				}
-			}
-			
+			ensureClonePairStored(id1, id2, clones);
 			numRead++;
-			if (0 == numRead%5000000) {
-				CloneGroup.compact(clones);
-			}
-			
 			if (0 == numRead%1000000) {
 				System.out.println(numRead + " clone pairs read.");
+			}
+			if (0 == numRead%5000000) {
+				compact(clones);
 			}
 			line = reader.readLine();
 		}
 		reader.close();
-		return CloneGroup.convertResult(clones);
+		return invertMap(clones);
+	}
+
+	/**
+	 * Ensure that two snippets are stored as a clone pair in the proviced map
+	 * @param id1 ID of first snippet
+	 * @param id2 ID of second snippet
+	 * @param clones Map containing clone groups
+	 */
+	private void ensureClonePairStored(SccSnippetId id1, SccSnippetId id2,
+			HashMap<SccSnippetId, CloneGroup> clones) {
+		CloneGroup id1Clones = clones.get(id1);
+		CloneGroup id2Clones = clones.get(id2);
+		if (id1Clones == id2Clones) {
+			if (id1Clones != null) {
+				/// We already had them marked as clones
+			} else {
+				/// Create a new clone set with this data
+				CloneGroup top = new CloneGroup();
+				clones.put(id1, top);
+				clones.put(id2, top);
+			}
+		} else {
+			/// Merge the sets as they are both clones, and point both to same set
+			if (id1Clones == null) {
+				clones.put(id1, id2Clones.top());
+			} else if (id2Clones == null) {
+				clones.put(id2, id1Clones.top());
+			} else {
+				CloneGroup top = id1Clones.merge(id2Clones);
+				if (id1Clones != top) {
+					clones.put(id1, top);
+				}
+				if (id2Clones != top) {
+					clones.put(id2, top);
+				}
+			}
+		}
 	}
 	
-	private Map<SnippetCode, List<Snippet>> getCloneMap(List<List<SccSnippetId>> clones)
+	// TODO
+	public static void compact(HashMap<SccSnippetId, CloneGroup> clones) {
+		for(Map.Entry<SccSnippetId, CloneGroup> entry : clones.entrySet()){
+			CloneGroup group = entry.getValue();
+			if (null != group) {
+				entry.setValue(group.top());
+			}
+		}
+	}
+	
+	// TODO
+	public static HashMap<CloneGroup, List<SccSnippetId>> invertMap(HashMap<SccSnippetId, CloneGroup> clones) {
+		// Required for correctness
+		compact(clones);
+
+		final HashMap<CloneGroup, List<SccSnippetId>> outerResult = new HashMap<CloneGroup, List<SccSnippetId>>();
+
+		final Set<SccSnippetId> keySet = clones.keySet();
+
+		int progress = 0;
+		for (SccSnippetId key : keySet) {
+			// TODO: Heart beat if (progress++ % 10000 == 0) SccOutputAnalyzer.printTimeStampedMsg("Processed " + progress + " keys");
+
+			CloneGroup cg = clones.get(key);
+			List<SccSnippetId> list = outerResult.get(cg);
+			
+			if (list == null) {
+				list = new ArrayList<SccSnippetId>();
+				list.add(key);
+				outerResult.put(cg, list);
+			} else {
+				list.add(key);
+			}
+		}
+		
+		return outerResult;
+	}
+	
+	private Map<SnippetCode, List<Snippet>> getCloneMap(HashMap<CloneGroup, List<SccSnippetId>> clones)
 			throws FileNotFoundException {
 		Map<SnippetCode, List<Snippet>> result = new HashMap<SnippetCode, List<Snippet>>(clones.size());
 		Set<SccSnippetId> snippetIdsToAdd = new HashSet<SccSnippetId>(notebookNumbers.keySet());
 		int hashIndex = 0;
 		
 		// Cloned snippets
-		for (List<SccSnippetId> cloned: clones) {
+		for (List<SccSnippetId> cloned: clones.values()) {
 			if (0 == hashIndex%10000) {
 				System.out.println("Creating entry  for " + hashIndex + " in snippet-to-files-map.");
 			}
