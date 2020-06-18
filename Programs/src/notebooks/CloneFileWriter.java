@@ -163,8 +163,8 @@ public class CloneFileWriter {
 			try {
 				writer.write(result.get(i).get());
 			} catch (InterruptedException e) {
-				System.err.println("Printing of connections for notebook " + notebooks.get(i).getName()
-						+ " was interrupted!");
+				System.err.println("Printing of connections for notebook "
+						+ notebooks.get(i).getName() + " was interrupted!");
 				e.printStackTrace();
 			} catch (ExecutionException e) {
 				System.err.println("Printing connections for notebook "

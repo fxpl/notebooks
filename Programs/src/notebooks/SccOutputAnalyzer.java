@@ -88,9 +88,7 @@ public class SccOutputAnalyzer extends Analyzer {
 		String line = statsReader.readLine();
 		while(null != line) {
 			String[] columns = line.split(",");
-			int id1 = Integer.parseInt(columns[0]);
-			int id2 = Integer.parseInt(columns[1]);
-			SccSnippetId id = new SccSnippetId(id1, id2);
+			SccSnippetId id = new SccSnippetId(columns[0], columns[1]);
 			String path = columns[2];
 			// Remove directories from filename
 			String snippetFileName = path.substring(path.lastIndexOf('/') + 1);
@@ -144,8 +142,8 @@ public class SccOutputAnalyzer extends Analyzer {
 		while (null != line) {
 			assert(line.matches("[0-9]+,[0-9]+,[0-9]+,[0-9]+"));
 			String[] numbers = line.split(",");
-			SccSnippetId id1 = new SccSnippetId(Integer.parseInt(numbers[0]), Integer.parseInt(numbers[1]));
-			SccSnippetId id2 = new SccSnippetId(Integer.parseInt(numbers[2]), Integer.parseInt(numbers[3]));
+			SccSnippetId id1 = new SccSnippetId(numbers[0], numbers[1]);
+			SccSnippetId id2 = new SccSnippetId(numbers[2], numbers[3]);
 			boolean bothStored = false;
 			Iterator<List<SccSnippetId>> it = clones.iterator();
 			while (!bothStored && it.hasNext()) {

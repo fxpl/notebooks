@@ -10,6 +10,10 @@ public class SccSnippetId {
 		this.nbID = nbID;
 		this.snippetID = snippetID;
 	}
+	
+	public SccSnippetId(String nbID, String snippetID) {
+		this(Integer.parseInt(nbID), Integer.parseInt(snippetID));
+	}
 
 	@Override
 	public boolean equals(Object other) {
