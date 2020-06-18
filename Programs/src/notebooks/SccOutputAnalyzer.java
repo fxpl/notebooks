@@ -210,7 +210,6 @@ public class SccOutputAnalyzer extends Analyzer {
 			}
 			List<Snippet> snippets = new ArrayList<>(1);
 			addSnippet(id, snippets);
-			snippetIdsToAdd.remove(id);
 			int loc = linesOfCode.get(id);
 			SnippetCode hash = new SnippetCode(loc, Integer.toString(hashIndex++));
 			result.put(hash, snippets);
