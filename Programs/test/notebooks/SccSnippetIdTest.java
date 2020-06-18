@@ -48,4 +48,9 @@ public class SccSnippetIdTest {
 		int expectedHashCode = Objects.hash(file, snippet);
 		assertEquals("Wrong hash code returned!", expectedHashCode, id.hashCode());
 	}
+	
+	@Test
+	public void testToString() {
+		assertEquals(file + ":" + snippet, id.toString());
+	}
 }
