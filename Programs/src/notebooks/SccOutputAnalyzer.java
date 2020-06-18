@@ -1,14 +1,14 @@
 package notebooks;
 
-import java.io.File;
+import java.io.BufferedReader;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Scanner;
 import java.util.Set;
 
 public class SccOutputAnalyzer extends Analyzer {
@@ -71,23 +71,22 @@ public class SccOutputAnalyzer extends Analyzer {
 	 * Initialize repro information for each notebook.
 	 * @param fileName Path to file with mapping from notebook number to repro
 	 */
-	public void initializeReproMap(String fileName) throws FileNotFoundException {
+	public void initializeReproMap(String fileName) throws IOException {
 		repros = createReproMap(fileName);
 	}
 	
 	/**
 	 * Initialize the maps containing information about each snippet
 	 * @param statsFile Path to file stats file produced by the SourcererCC tokenizer
-	 * @throws FileNotFoundException If the stats file doesn't exist
 	 */
-	public void initializeSnippetInfo(String statsFile) throws FileNotFoundException {
-		Scanner statsScanner = new Scanner(new File(statsFile));
+	public void initializeSnippetInfo(String statsFile) throws IOException {
+		BufferedReader statsReader = new BufferedReader(new FileReader(statsFile));
 		notebookNumbers = new HashMap<SccSnippetId, Integer>();
 		snippetIndices = new HashMap<SccSnippetId, Integer>();
 		linesOfCode = new HashMap<SccSnippetId, Integer>();
 		snippetsPerNotebook = new HashMap<String, Integer>();
-		while(statsScanner.hasNextLine()) {
-			String line = statsScanner.nextLine();
+		String line = statsReader.readLine();
+		while(null != line) {
 			String[] columns = line.split(",");
 			int id1 = Integer.parseInt(columns[0]);
 			int id2 = Integer.parseInt(columns[1]);
@@ -109,8 +108,9 @@ public class SccOutputAnalyzer extends Analyzer {
 			   doesn't consider comments in clone analysis. */
 			int loc = Integer.parseInt(columns[8]);
 			linesOfCode.put(id, loc);
+			line = statsReader.readLine();
 		}
-		statsScanner.close();
+		statsReader.close();
 	}
 	
 	/**
@@ -136,12 +136,12 @@ public class SccOutputAnalyzer extends Analyzer {
 		return getCloneMap(clones);
 	}
 	
-	private List<List<SccSnippetId>> getCloneLists(String pairFile) throws FileNotFoundException {
+	private List<List<SccSnippetId>> getCloneLists(String pairFile) throws IOException {
 		List<List<SccSnippetId>> clones = new ArrayList<List<SccSnippetId>>();
-		Scanner scanner = new Scanner(new File(pairFile));
+		BufferedReader reader = new BufferedReader(new FileReader(pairFile));
 		int numRead = 0;
-		while (scanner.hasNextLine()) {
-			String line = scanner.nextLine();
+		String line = reader.readLine();
+		while (null != line) {
 			assert(line.matches("[0-9]+,[0-9]+,[0-9]+,[0-9]+"));
 			String[] numbers = line.split(",");
 			SccSnippetId id1 = new SccSnippetId(Integer.parseInt(numbers[0]), Integer.parseInt(numbers[1]));
@@ -172,8 +172,9 @@ public class SccOutputAnalyzer extends Analyzer {
 			if (0 == numRead%1000000) {
 				System.out.println(numRead + " clone pairs read.");
 			}
+			line = reader.readLine();
 		}
-		scanner.close();
+		reader.close();
 		return clones;
 	}
 	
@@ -266,15 +267,16 @@ public class SccOutputAnalyzer extends Analyzer {
 				String statsFile = getValueFromArgument(arg);
 				try {
 					initializeSnippetInfo(statsFile);
-				} catch (FileNotFoundException e) {
-					System.err.println("Stats file not found: " + e.getMessage());
+				} catch (IOException e) {
+					System.err.println("I/O error when initializing snippet info: " + e.getMessage());
 				}
 			} else if (arg.startsWith("--repro_file")) {
 				String reproFile = getValueFromArgument(arg);
 				try {
 					this.initializeReproMap(reproFile);
-				} catch (FileNotFoundException e) {
-					System.err.println("Repro file not found: " + e.getMessage());
+				} catch (IOException e) {
+					System.err.println("I/O error when initializing repro info: " + e.getMessage());
+					System.err.println("Repro information not initialized!");
 				}
 			} else if (arg.startsWith("--pair_file")) {
 				pairFile = getValueFromArgument(arg);

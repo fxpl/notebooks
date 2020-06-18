@@ -1,10 +1,10 @@
 package notebooks;
 
-import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Scanner;
 
 public class Analyzer {
 	protected String outputDir = ".";
@@ -14,12 +14,11 @@ public class Analyzer {
 	 * @param fileName Name of file with mapping from notebook number to repro
 	 * @return The map from notebook name to repro
 	 */
-	protected static Map<String, String> createReproMap(String fileName)
-			throws FileNotFoundException {
+	protected static Map<String, String> createReproMap(String fileName) throws IOException {
 		Map<String, String> result = new HashMap<String, String>();
-		Scanner scanner = new Scanner(new File(fileName));
-		while (scanner.hasNextLine()) {
-			String line = scanner.nextLine();
+		BufferedReader reader = new BufferedReader(new FileReader(fileName));
+		String line = reader.readLine();
+		while (null != line) {
 			String[] subStrings = line.split(",");
 			try {
 				int notebookNumber = Integer.parseInt(subStrings[0]);
@@ -30,8 +29,9 @@ public class Analyzer {
 				System.err.println("Notebook numbers in repro file must be integers! Notebook with \"number\" '"
 						+ subStrings[0] + "' is excluded from mapping!");
 			}
+			line = reader.readLine();
 		}
-		scanner.close();
+		reader.close();
 		return result;
 	}
 	

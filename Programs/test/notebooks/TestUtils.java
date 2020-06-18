@@ -9,7 +9,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Scanner;
 
 public class TestUtils {
 	
@@ -65,13 +64,14 @@ public class TestUtils {
 		for (int i=0; i<expectedLines.length; i++) {
 			String expectedLine = expectedLines[i];
 			boolean exists = false;
-			Scanner outputReader = new Scanner(outputFile);
-			while (outputReader.hasNextLine() && false == exists) {
-				String nextLine = outputReader.nextLine();
-				if (nextLine.equals(expectedLine)) {
+			BufferedReader outputReader = new BufferedReader(new FileReader(outputFile));
+			String nextLine = null;
+			do {
+				nextLine = outputReader.readLine();
+				if (expectedLine.equals(nextLine)) {
 					exists = true;
 				}
-			}
+			} while (null != nextLine && false == exists);
 			outputReader.close();
 			assertTrue("The line " + expectedLine + " cannot be found in " + prefix + " csv!", exists);
 		}

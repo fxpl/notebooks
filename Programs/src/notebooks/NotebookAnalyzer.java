@@ -51,7 +51,7 @@ public class NotebookAnalyzer extends Analyzer {
 	 * Initialize the map from notebook name to repro, and add information about repro to each notebook.
 	 * @param fileName Name of file with mapping from notebook number to repro
 	 */
-	void initializeReproInfo(String fileName) throws FileNotFoundException {
+	void initializeReproInfo(String fileName) throws IOException {
 		Map<String, String> reproMap = createReproMap(fileName);
 		for (Notebook nb: notebooks) {
 			nb.setRepro(reproMap.get(nb.getName()));
@@ -524,8 +524,8 @@ public class NotebookAnalyzer extends Analyzer {
 		if (null != reproFile && "" != reproFile) {
 			try {
 				this.initializeReproInfo(reproFile);
-			} catch (FileNotFoundException e) {
-				System.err.println("Repro file not found: " + e.getMessage());
+			} catch (IOException e) {
+				System.err.println("I/O error when initializing repro info: " + e.getMessage());
 				System.err.println("Repro information not initialized!");
 			}
 		} else if (all || clones) {
