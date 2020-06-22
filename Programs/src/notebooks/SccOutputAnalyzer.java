@@ -196,7 +196,7 @@ public class SccOutputAnalyzer extends Analyzer {
 					clones.put(id1, top);
 				}
 				if (id2Clones != top) {
-					// TODO: Täcks inte av test!
+					// TODO: Kan det här verkligen hända? Anropet till merge returnerar ju en referens till id2Clones!
 					clones.put(id2, top);
 				}
 			}

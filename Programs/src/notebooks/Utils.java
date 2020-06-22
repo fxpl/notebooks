@@ -14,7 +14,7 @@ public class Utils {
 		System.out.println(timeStamped(msg));
 	}
 	
-	/** TODO: Testa!
+	/**
 	 * Add the string ">>> (T s)", where T is the elapsed time since program
 	 * start, in seconds, at the beginning of the argument string
 	 * @param msg String to preced by time stamp

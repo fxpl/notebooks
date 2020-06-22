@@ -44,5 +44,18 @@ public class UtilsTest {
 		List<Integer> numbers = new ArrayList<Integer>();
 		assertEquals("Wrong median returned for empty list", 0, Utils.median(numbers, "Mediantest"));
 	}
-
+	
+	/**
+	 * Verify that timeStamp precedes the specified message with
+	 * ">>> (<seconds since program start> s) "
+	 */
+	@Test
+	public void testTimeStamp() {
+		final String msg = "Message";
+		final String expected = ">>> \\([0-9]+ s\\) " + msg;
+		final String actual = Utils.timeStamped(msg);
+		final String errorMessage = "Incorrectly time stamped string. Expected \""
+				+ expected + "\", but was \"" + actual + "\"";
+		assertTrue(errorMessage, actual.matches(expected));
+	}
 }
