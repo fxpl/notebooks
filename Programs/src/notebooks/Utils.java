@@ -14,7 +14,7 @@ public class Utils {
 		System.out.println(timeStamped(msg));
 	}
 	
-	/**
+	/** TODO: Testa!
 	 * Add the string ">>> (T s)", where T is the elapsed time since program
 	 * start, in seconds, at the beginning of the argument string
 	 * @param msg String to preced by time stamp
@@ -35,9 +35,14 @@ public class Utils {
 	 * Return the median.
 	 * @param values to check and compute median from
 	 * @param msg Specialized part of log message
-	 * @return median of values
+	 * @return median of values, 0 if values is empty
 	 */
 	public static int median(List<Integer> values, String msg) {
+		if (0 == values.size()) {
+			System.err.println("Trying to compute median of empty list. Returning 0."
+					+ "Line count message: " + msg);
+			return 0;
+		}
 		Collections.sort(values);
 		int min = values.get(0);
 		int max = values.get(values.size()-1);

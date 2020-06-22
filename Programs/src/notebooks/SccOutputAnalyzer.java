@@ -133,8 +133,7 @@ public class SccOutputAnalyzer extends Analyzer {
 		HashMap<CloneGroup, List<SccSnippetId>> clones = getCloneLists(pairFile);
 		return getCloneMap(clones);
 	}
-
-	// TODO: Av testskäl, lägg till en parameter compact frequency
+	
 	private HashMap<CloneGroup, List<SccSnippetId>> getCloneLists(String pairFile) throws IOException {
 		HashMap<SccSnippetId, CloneGroup> clones = new HashMap<SccSnippetId, CloneGroup>();
 		final BufferedReader reader = new BufferedReader(new FileReader(pairFile));
@@ -146,9 +145,16 @@ public class SccOutputAnalyzer extends Analyzer {
 			}
 			assert(line.matches("[0-9]+,[0-9]+,[0-9]+,[0-9]+"));
 			String[] numbers = line.split(",");
-			SccSnippetId id1 = new SccSnippetId(numbers[0], numbers[1]);
-			SccSnippetId id2 = new SccSnippetId(numbers[2], numbers[3]);
-			ensureClonePairStored(id1, id2, clones);
+			SccSnippetId id1, id2;
+			try {
+				id1 = new SccSnippetId(numbers[0], numbers[1]);
+				id2 = new SccSnippetId(numbers[2], numbers[3]);
+				ensureClonePairStored(id1, id2, clones);
+			} catch (NumberFormatException e) {
+				// We just skip this line
+				System.err.println("Number format exception when parsing line "
+						+ line + ": " + e.getMessage());
+			}
 			numRead++;
 			if (0 == numRead%5000000) {
 				compact(clones);
@@ -160,7 +166,7 @@ public class SccOutputAnalyzer extends Analyzer {
 	}
 
 	/**
-	 * Ensure that two snippets are stored as a clone pair in the proviced map
+	 * Ensure that two snippets are stored as a clone pair in the provided map
 	 * @param id1 ID of first snippet
 	 * @param id2 ID of second snippet
 	 * @param clones Map containing clone groups
@@ -217,7 +223,7 @@ public class SccOutputAnalyzer extends Analyzer {
 		final Set<SccSnippetId> keySet = clones.keySet();
 		int keyNum = 0;
 		for (SccSnippetId key : keySet) {
-			if (0 == keyNum % 10000) {
+			if (0 == keyNum % 100000) {
 				Utils.heartBeat("Inverting data for key " + keyNum + ".");
 			}
 			keyNum++;
@@ -250,9 +256,15 @@ public class SccOutputAnalyzer extends Analyzer {
 			List<Integer> loc = new ArrayList<Integer>(numClones);
 			for (int i=0; i<numClones; i++) {
 				SccSnippetId id = cloned.get(i);
-				addSnippet(id, snippets);
-				snippetIdsToAdd.remove(id);
-				loc.add(linesOfCode.get(cloned.get(i)));
+				if (null == id) {
+					// TODO: Kan det här verkligen hända?
+					System.err.println("Snippet number " + i
+							+ " in clone group " + hashIndex + " is null. Skipping clone!");
+				} else {
+					addSnippet(id, snippets);
+					snippetIdsToAdd.remove(id);
+					loc.add(linesOfCode.get(cloned.get(i)));
+				}
 			}
 			int medianLoc = Utils.median(loc, "Different line count for snippet " + Integer.toString(hashIndex));
 			SnippetCode hash = new SnippetCode(medianLoc, Integer.toString(hashIndex++));

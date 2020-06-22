@@ -295,6 +295,25 @@ public class SccOutputAnalyzerTest {
 	}
 	
 	/**
+	 * Verify that SccOutputAnalyzer smoothly skips a clone pair with numbers
+	 * that don't fit in an int.
+	 * @throws IOException 
+	 */
+	@Test
+	public void test_clones_numberFormat() throws IOException {
+		String dataDir = "test/data/scc";
+		String statsFile = dataDir + "/file_stats";
+		String pairFile = dataDir + "/clone_pairs_overflow";
+		String reproFile = dataDir + "/empty_repro_file";
+		analyzer.clones(statsFile, reproFile, pairFile);
+		String[] expectedLine = {
+				hash2filesHeader()
+		};
+		TestUtils.checkCsv("hash2filesA", expectedLine);
+		TestUtils.deleteCloneCsvs();
+	}
+	
+	/**
 	 * Verify that an AssertionError is thrown when the clone pairs file is on
 	 * the wrong format.
 	 * @throws IOException
