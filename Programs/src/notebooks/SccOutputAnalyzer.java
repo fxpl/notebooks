@@ -134,21 +134,22 @@ public class SccOutputAnalyzer extends Analyzer {
 		return getCloneMap(clones);
 	}
 
+	// TODO: Av testskäl, lägg till en parameter compact frequency
 	private HashMap<CloneGroup, List<SccSnippetId>> getCloneLists(String pairFile) throws IOException {
 		HashMap<SccSnippetId, CloneGroup> clones = new HashMap<SccSnippetId, CloneGroup>();
 		final BufferedReader reader = new BufferedReader(new FileReader(pairFile));
 		long numRead = 0;
 		String line = reader.readLine();
 		while (null != line) {
+			if (0 == numRead%1000000) {
+				Utils.heartBeat("Reading clone pair " + numRead + ".");
+			}
 			assert(line.matches("[0-9]+,[0-9]+,[0-9]+,[0-9]+"));
 			String[] numbers = line.split(",");
 			SccSnippetId id1 = new SccSnippetId(numbers[0], numbers[1]);
 			SccSnippetId id2 = new SccSnippetId(numbers[2], numbers[3]);
 			ensureClonePairStored(id1, id2, clones);
 			numRead++;
-			if (0 == numRead%1000000) {
-				System.out.println(numRead + " clone pairs read.");
-			}
 			if (0 == numRead%5000000) {
 				compact(clones);
 			}
@@ -189,13 +190,16 @@ public class SccOutputAnalyzer extends Analyzer {
 					clones.put(id1, top);
 				}
 				if (id2Clones != top) {
+					// TODO: Täcks inte av test!
 					clones.put(id2, top);
 				}
 			}
 		}
 	}
 	
-	// TODO
+	/**
+	 * Merge entries in clones so that each clone group is only stored once.
+	 */
 	public static void compact(HashMap<SccSnippetId, CloneGroup> clones) {
 		for(Map.Entry<SccSnippetId, CloneGroup> entry : clones.entrySet()){
 			CloneGroup group = entry.getValue();
@@ -205,22 +209,20 @@ public class SccOutputAnalyzer extends Analyzer {
 		}
 	}
 	
-	// TODO
 	public static HashMap<CloneGroup, List<SccSnippetId>> invertMap(HashMap<SccSnippetId, CloneGroup> clones) {
 		// Required for correctness
 		compact(clones);
 
 		final HashMap<CloneGroup, List<SccSnippetId>> outerResult = new HashMap<CloneGroup, List<SccSnippetId>>();
-
 		final Set<SccSnippetId> keySet = clones.keySet();
-
-		int progress = 0;
+		int keyNum = 0;
 		for (SccSnippetId key : keySet) {
-			// TODO: Heart beat if (progress++ % 10000 == 0) SccOutputAnalyzer.printTimeStampedMsg("Processed " + progress + " keys");
-
+			if (0 == keyNum % 10000) {
+				Utils.heartBeat("Inverting data for key " + keyNum + ".");
+			}
+			keyNum++;
 			CloneGroup cg = clones.get(key);
 			List<SccSnippetId> list = outerResult.get(cg);
-			
 			if (list == null) {
 				list = new ArrayList<SccSnippetId>();
 				list.add(key);
@@ -229,7 +231,6 @@ public class SccOutputAnalyzer extends Analyzer {
 				list.add(key);
 			}
 		}
-		
 		return outerResult;
 	}
 	
@@ -242,7 +243,7 @@ public class SccOutputAnalyzer extends Analyzer {
 		// Cloned snippets
 		for (List<SccSnippetId> cloned: clones.values()) {
 			if (0 == hashIndex%10000) {
-				System.out.println("Creating entry  for " + hashIndex + " in snippet-to-files-map.");
+				Utils.heartBeat("Creating entry  for " + hashIndex + " in snippet-to-files-map.");
 			}
 			List<Snippet> snippets = new ArrayList<Snippet>();
 			int numClones = cloned.size();
@@ -261,7 +262,7 @@ public class SccOutputAnalyzer extends Analyzer {
 		// Remaining snippets are unique. Add them!
 		for (SccSnippetId id: snippetIdsToAdd) {
 			if (0 == hashIndex%10000) {
-				System.out.println("Creating entry  for " + hashIndex + " in snippet-to-files-map.");
+				Utils.heartBeat("Creating entry for " + hashIndex + " in snippet-to-files-map.");
 			}
 			List<Snippet> snippets = new ArrayList<>(1);
 			addSnippet(id, snippets);
@@ -296,7 +297,7 @@ public class SccOutputAnalyzer extends Analyzer {
 		int numAdded = 0;
 		for (SnippetCode hash: snippet2file.keySet()) {
 			if (0 == numAdded%10000) {
-				System.out.println("Adding snippet " + hash + " to notebook-to-snippet-map.");
+				Utils.heartBeat("Adding snippet " + hash + " to notebook-to-snippet-map.");
 			}
 			for (Snippet snippet: snippet2file.get(hash)) {
 				SnippetCode[] snippetsInFile = result.get(new Notebook(snippet.getFileName()));

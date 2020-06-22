@@ -4,6 +4,32 @@ import java.util.Collections;
 import java.util.List;
 
 public class Utils {
+	private final static long startTime = System.currentTimeMillis();
+	
+	/**
+	 * Print the given message to stdout, preceed by a time stamp.
+	 * @param Heart beat message
+	 */
+	public static void heartBeat(String msg) {
+		System.out.println(timeStamped(msg));
+	}
+	
+	/**
+	 * Add the string ">>> (T s)", where T is the elapsed time since program
+	 * start, in seconds, at the beginning of the argument string
+	 * @param msg String to preced by time stamp
+	 * @return The resulting string
+	 */
+	public static String timeStamped(String msg) {
+		StringBuilder sb = new StringBuilder();
+		final long timeRun = (System.currentTimeMillis() - startTime) / 1000;
+		sb.append(">>> (")
+		.append(timeRun)
+		.append(" s) ")
+		.append(msg);
+		return sb.toString();
+	}
+	
 	/**
 	 * Log to stdout if the minimum and the maximum values are different.
 	 * Return the median.

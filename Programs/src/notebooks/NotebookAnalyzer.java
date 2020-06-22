@@ -38,7 +38,7 @@ public class NotebookAnalyzer extends Analyzer {
 				this.notebooks.add(new Notebook(fileName));
 			}
 		} else {
-			System.out.println("Traversing " + file.getPath());
+			Utils.heartBeat("Traversing " + file.getPath());
 			// The file is a directory. Traverse it.
 			String[] subFiles = file.list();
 			for (String subFileName: subFiles) {
@@ -147,7 +147,7 @@ public class NotebookAnalyzer extends Analyzer {
 		for (int i=0; i<notebooks.size(); i++) {
 			Notebook notebook = notebooks.get(i);
 			if (0 == i%10000) {
-				System.out.println("Retrieving hashes in " + notebook.getName());
+				Utils.heartBeat("Retrieving hashes in " + notebook.getName());
 			}
 			storeHashes(result.get(i), notebook, snippets);
 		}
@@ -186,7 +186,7 @@ public class NotebookAnalyzer extends Analyzer {
 		// Add all snippets to clone map
 		for (Notebook notebook: fileMap.keySet()) {
 			if (0 == numAnalyzed%10000) {
-				System.out.println("Finding clones in " + notebook.getName());
+				Utils.heartBeat("Finding clones in " + notebook.getName());
 			}
 			SnippetCode[] snippetCodes = fileMap.get(notebook);
 			for (int j=0; j<snippetCodes.length; j++) {
