@@ -228,7 +228,7 @@ public class SccOutputAnalyzerTest {
 		TestUtils.deleteCloneCsvs();
 	}
 	
-	/** TODO: Inte hash2files
+	/**
 	 * Verify that a clone group is only considered once after the optimization
 	 * of getCloneLists.
 	 * @throws IOException
@@ -250,8 +250,7 @@ public class SccOutputAnalyzerTest {
 		TestUtils.deleteCloneCsvs();
 	}
 	
-	/** TODO: Rad före och efter!?
-	 * TODO: Inte hash2files
+	/**
 	 * Verify that SccOutputAnalyzer smoothly skips a clone pair with numbers
 	 * that don't fit in an int.
 	 * @throws IOException 
@@ -259,16 +258,24 @@ public class SccOutputAnalyzerTest {
 	@Test
 	public void testClones_numberFormat() throws IOException {
 		String dataDir = "test/data/scc";
-		String statsFile = dataDir + "/file_stats";
+		String statsFile = dataDir + "/file_stats_brokenLines";
 		String pairFile = dataDir + "/clone_pairs_overflow";
-		String reproFile = dataDir + "/empty_repro_file";
+		String reproFile = "test/data/hash/repros.csv";
 		
-		String[] expectedLine = {
-				hash2filesHeader()
+		String[] expectedCloneFrequecyLines = {
+			cloneFrequencyHeader(),
+			"nb_6.ipynb, 0, 2, 2, 1.0000, 1.0000, 2, 2",
+			"nb_9.ipynb, 0, 2, 2, 1.0000, 1.0000, 2, 2"
+		};
+		String[] expectedConnectionsLines = {
+			connectionsHeader(),
+			"nb_6.ipynb, 2, 1.0000, 2, 1.0000, 2, 2, 0.0000, 0.0000",
+			"nb_9.ipynb, 2, 1.0000, 2, 1.0000, 2, 2, 0.0000, 0.0000"
 		};
 		
 		analyzer.clones(statsFile, reproFile, pairFile);
-		TestUtils.checkCsv("hash2filesA", expectedLine);
+		TestUtils.checkCsv_anyOrder("cloneFrequency", expectedCloneFrequecyLines);
+		TestUtils.checkCsv_anyOrder("connections", expectedConnectionsLines);
 		TestUtils.deleteCloneCsvs();
 	}
 	
