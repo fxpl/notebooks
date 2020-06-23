@@ -40,7 +40,7 @@ public class Utils {
 	public static int median(List<Integer> values, String msg) {
 		if (0 == values.size()) {
 			System.err.println("Trying to compute median of empty list. Returning 0."
-					+ "Line count message: " + msg);
+					+ " Line count message: " + msg);
 			return 0;
 		}
 		Collections.sort(values);

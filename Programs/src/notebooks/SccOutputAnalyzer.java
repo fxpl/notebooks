@@ -125,7 +125,7 @@ public class SccOutputAnalyzer extends Analyzer {
 		}
 	}
 
-	/**
+	/** TODO: Bättre namn
 	 * Create a mapping from snippets to notebooks (hash2files) using output
 	 * files from SourcererCC.
 	 */
@@ -143,17 +143,21 @@ public class SccOutputAnalyzer extends Analyzer {
 			if (0 == numRead%1000000) {
 				Utils.heartBeat("Reading clone pair " + numRead + ".");
 			}
-			assert(line.matches("[0-9]+,[0-9]+,[0-9]+,[0-9]+"));
 			String[] numbers = line.split(",");
-			SccSnippetId id1, id2;
-			try {
-				id1 = new SccSnippetId(numbers[0], numbers[1]);
-				id2 = new SccSnippetId(numbers[2], numbers[3]);
-				ensureClonePairStored(id1, id2, clones);
-			} catch (NumberFormatException e) {
-				// We just skip this line
-				System.err.println("Number format exception when parsing line "
-						+ line + ": " + e.getMessage());
+			if (4 != numbers.length) {
+				System.err.println("Invalid line number " + (numRead + 1) + ": " + line);
+				System.err.println(" Skipping line!");
+			} else {
+				SccSnippetId id1, id2;
+				try {
+					id1 = new SccSnippetId(numbers[0], numbers[1]);
+					id2 = new SccSnippetId(numbers[2], numbers[3]);
+					ensureClonePairStored(id1, id2, clones);
+				} catch (NumberFormatException e) {
+					// We just skip this line
+					System.err.println("Number format exception when parsing line "
+							+ line + ": " + e.getMessage());
+				}
 			}
 			numRead++;
 			if (0 == numRead%5000000) {
@@ -263,7 +267,12 @@ public class SccOutputAnalyzer extends Analyzer {
 				} else {
 					addSnippet(id, snippets);
 					snippetIdsToAdd.remove(id);
-					loc.add(linesOfCode.get(cloned.get(i)));
+					Integer currentLoc = linesOfCode.get(id);
+					if (null == currentLoc) {
+						System.err.println("Snippet without line count (" + id + ") skipped!");
+					} else {
+						loc.add(currentLoc);
+					}
 				}
 			}
 			int medianLoc = Utils.median(loc, "Different line count for snippet " + Integer.toString(hashIndex));
@@ -292,9 +301,14 @@ public class SccOutputAnalyzer extends Analyzer {
 	 * @param snippets List of snippets, to which the snippet will be added
 	 */
 	private void addSnippet(SccSnippetId id, List<Snippet> snippets) {
-		String notebookName = getNotebookNameFromNumber(notebookNumbers.get(id));
-		int snippetIndex = snippetIndices.get(id);
-		snippets.add(new Snippet(notebookName, repros.get(notebookName), snippetIndex));
+		Integer notebookNumber = notebookNumbers.get(id);
+		if (null == notebookNumber) {
+			System.err.println("Snippet without notebook (" + id + ") skipped!");
+		} else {
+			String notebookName = getNotebookNameFromNumber(notebookNumber);
+			int snippetIndex = snippetIndices.get(id);
+			snippets.add(new Snippet(notebookName, repros.get(notebookName), snippetIndex));
+		}
 	}
 	
 	private Map<Notebook, SnippetCode[]> getSnippets(Map<SnippetCode, List<Snippet>> snippet2file) {
