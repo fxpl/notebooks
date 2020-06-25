@@ -181,8 +181,8 @@ public class SccOutputAnalyzer extends Analyzer {
 	 * files from SourcererCC.
 	 */
 	private Map<SnippetCode, List<Snippet>> getClones(String pairFile) throws IOException {
-		HashMap<CloneGroup, List<SccSnippetId>> clones = getCloneLists(pairFile);
-		return getCloneMap(clones);
+		HashMap<CloneGroup, List<SccSnippetId>> intermediateCloneMap = getCloneMap(pairFile);
+		return getClones(intermediateCloneMap);
 	}
 	
 	private Map<SnippetCode, List<Snippet>> readClones(String snippet2filesFile) throws IOException {
@@ -222,8 +222,7 @@ public class SccOutputAnalyzer extends Analyzer {
 		return result;
 	}
 	
-	// TODO: Bättre namn!
-	private HashMap<CloneGroup, List<SccSnippetId>> getCloneLists(String pairFile) throws IOException {
+	private HashMap<CloneGroup, List<SccSnippetId>> getCloneMap(String pairFile) throws IOException {
 		HashMap<SccSnippetId, CloneGroup> clones = new HashMap<SccSnippetId, CloneGroup>();
 		final BufferedReader reader = new BufferedReader(new FileReader(pairFile));
 		long numRead = 0;
@@ -333,7 +332,7 @@ public class SccOutputAnalyzer extends Analyzer {
 		return outerResult;
 	}
 	
-	private Map<SnippetCode, List<Snippet>> getCloneMap(HashMap<CloneGroup, List<SccSnippetId>> clones)
+	private Map<SnippetCode, List<Snippet>> getClones(HashMap<CloneGroup, List<SccSnippetId>> clones)
 			throws FileNotFoundException {
 		Map<SnippetCode, List<Snippet>> result = new HashMap<SnippetCode, List<Snippet>>(clones.size());
 		Set<SccSnippetId> snippetIdsToAdd = new HashSet<SccSnippetId>(notebookNumbers.keySet());
