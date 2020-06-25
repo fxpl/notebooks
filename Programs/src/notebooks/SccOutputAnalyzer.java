@@ -348,19 +348,13 @@ public class SccOutputAnalyzer extends Analyzer {
 			List<Integer> loc = new ArrayList<Integer>(numClones);
 			for (int i=0; i<numClones; i++) {
 				SccSnippetId id = cloned.get(i);
-				if (null == id) {
-					// TODO: Kan det här verkligen hända? Nej.
-					System.err.println("Snippet number " + i
-							+ " in clone group " + hashIndex + " is null. Skipping clone!");
+				addSnippet(id, snippets);
+				snippetIdsToAdd.remove(id);
+				Integer currentLoc = linesOfCode.get(id);
+				if (null == currentLoc) {
+					System.err.println("Snippet without line count (" + id + ") skipped!");
 				} else {
-					addSnippet(id, snippets);
-					snippetIdsToAdd.remove(id);
-					Integer currentLoc = linesOfCode.get(id);
-					if (null == currentLoc) {
-						System.err.println("Snippet without line count (" + id + ") skipped!");
-					} else {
-						loc.add(currentLoc);
-					}
+					loc.add(currentLoc);
 				}
 			}
 			int medianLoc = Utils.median(loc, "Different line count for snippet " + Integer.toString(hashIndex));
