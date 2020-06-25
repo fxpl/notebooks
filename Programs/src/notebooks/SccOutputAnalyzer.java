@@ -332,14 +332,14 @@ public class SccOutputAnalyzer extends Analyzer {
 		return outerResult;
 	}
 	
-	private Map<SnippetCode, List<Snippet>> getClones(HashMap<CloneGroup, List<SccSnippetId>> clones)
+	private Map<SnippetCode, List<Snippet>> getClones(HashMap<CloneGroup, List<SccSnippetId>> intermediateCloneMap)
 			throws FileNotFoundException {
-		Map<SnippetCode, List<Snippet>> result = new HashMap<SnippetCode, List<Snippet>>(clones.size());
+		Map<SnippetCode, List<Snippet>> result = new HashMap<SnippetCode, List<Snippet>>(intermediateCloneMap.size());
 		Set<SccSnippetId> snippetIdsToAdd = new HashSet<SccSnippetId>(notebookNumbers.keySet());
 		int hashIndex = 0;
 		
 		// Cloned snippets
-		for (List<SccSnippetId> cloned: clones.values()) {
+		for (List<SccSnippetId> cloned: intermediateCloneMap.values()) {
 			if (0 == hashIndex%1000000) {
 				Utils.heartBeat("Creating entry for " + hashIndex + " in snippet-to-files-map.");
 			}
