@@ -228,7 +228,7 @@ public class SccOutputAnalyzer extends Analyzer {
 		long numRead = 0;
 		String line = reader.readLine();
 		while (null != line) {
-			if (0 == numRead%1000000) {
+			if (0 == numRead%100000000) {
 				Utils.heartBeat("Reading clone pair " + numRead + ".");
 			}
 			String[] numbers = line.split(",");
@@ -315,7 +315,7 @@ public class SccOutputAnalyzer extends Analyzer {
 		final Set<SccSnippetId> keySet = clones.keySet();
 		int keyNum = 0;
 		for (SccSnippetId key : keySet) {
-			if (0 == keyNum % 100000) {
+			if (0 == keyNum % 10000000) {
 				Utils.heartBeat("Inverting data for key " + keyNum + ".");
 			}
 			keyNum++;
@@ -340,7 +340,7 @@ public class SccOutputAnalyzer extends Analyzer {
 		
 		// Cloned snippets
 		for (List<SccSnippetId> cloned: clones.values()) {
-			if (0 == hashIndex%10000) {
+			if (0 == hashIndex%1000000) {
 				Utils.heartBeat("Creating entry for " + hashIndex + " in snippet-to-files-map.");
 			}
 			List<Snippet> snippets = new ArrayList<Snippet>();
@@ -364,7 +364,7 @@ public class SccOutputAnalyzer extends Analyzer {
 		
 		// Remaining snippets are unique. Add them!
 		for (SccSnippetId id: snippetIdsToAdd) {
-			if (0 == hashIndex%10000) {
+			if (0 == hashIndex%1000000) {
 				Utils.heartBeat("Creating entry for " + hashIndex + " in snippet-to-files-map.");
 			}
 			List<Snippet> snippets = new ArrayList<>(1);
@@ -404,7 +404,7 @@ public class SccOutputAnalyzer extends Analyzer {
 		// Put snippet in notebook-to-snippet-map
 		int numAdded = 0;
 		for (SnippetCode hash: snippet2file.keySet()) {
-			if (0 == numAdded%10000) {
+			if (0 == numAdded%1000000) {
 				Utils.heartBeat("Adding snippet " + hash + " to notebook-to-snippet-map.");
 			}
 			for (Snippet snippet: snippet2file.get(hash)) {
