@@ -2,20 +2,32 @@ package notebooks;
 
 import java.io.IOException;
 
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class SccOutputAnalyzerTest {
+public class SccOutputAnalyzerTest extends AnalyzerTest {
 	private SccOutputAnalyzer analyzer;
 	private final static String hashPattern = "[0-9,a-f]+";
 	private final static String notebookNamePattern = "nb_[0-9]+\\.ipynb";
 	
+	@BeforeClass
+	public static void setUpOutputDirectory() {
+		defaultOutputDirName = "scc_output_analyzer_unit_test_output";
+		AnalyzerTest.setUpOutputDirectory();
+	}
+	
 	@Before
 	public void setUp() {
 		analyzer = new SccOutputAnalyzer();
+		analyzer.outputDir = defaultOutputDirName;
 	}
 	
-	// TODO: tearDown!
+	@AfterClass
+	public static void tearDown() {
+		tearDownClass();
+	}
 	
 	/**
 	 * Verify that the clone output files are created when paths are specified
@@ -30,7 +42,7 @@ public class SccOutputAnalyzerTest {
 				"--repro_file=test/data/hash/repros.csv"
 		};
 		analyzer.analyze(args);
-		TestUtils.verifyExistenceOfAndRemoveCloneFiles();
+		verifyExistenceOfAndRemoveCloneFiles();
 	}
 	
 	/**
@@ -76,9 +88,9 @@ public class SccOutputAnalyzerTest {
 		};
 		
 		analyzer.analyze(args);
-		TestUtils.checkCsv_anyOrder("cloneFrequency", expectedCloneFrequecyLines);
-		TestUtils.checkCsv_anyOrder("connections", expectedConnectionsLines);
-		TestUtils.deleteCloneCsvs();
+		checkCsv_anyOrder("cloneFrequency", expectedCloneFrequecyLines);
+		checkCsv_anyOrder("connections", expectedConnectionsLines);
+		deleteCloneCsvs();
 	}
 	
 	/**
@@ -106,10 +118,10 @@ public class SccOutputAnalyzerTest {
 			};
 			
 			analyzer.analyze(args);
-			TestUtils.checkCsv_anyOrder("cloneFrequency", expectedCloneFrequecyLines);
-			TestUtils.checkCsv_anyOrder("connections", expectedConnectionsLines);
-			TestUtils.deleteCloneCsvs();
-			TestUtils.verifyAbsenceOfCloneFiles(); // To check that clone analysis is run only once
+			checkCsv_anyOrder("cloneFrequency", expectedCloneFrequecyLines);
+			checkCsv_anyOrder("connections", expectedConnectionsLines);
+			deleteCloneCsvs();
+			verifyAbsenceOfCloneFiles(); // To check that clone analysis is run only once
 	}
 	
 	/**
@@ -123,7 +135,7 @@ public class SccOutputAnalyzerTest {
 				"--repro_file=test/data/hash/repros.csv"
 		};
 		analyzer.analyze(args);
-		TestUtils.verifyAbsenceOfCloneFiles();
+		verifyAbsenceOfCloneFiles();
 	}
 	
 	/**
@@ -138,7 +150,7 @@ public class SccOutputAnalyzerTest {
 				"--stats_file"
 		};
 		analyzer.analyze(args);
-		TestUtils.verifyAbsenceOfCloneFiles();
+		verifyAbsenceOfCloneFiles();
 	}
 	
 	/**
@@ -152,7 +164,7 @@ public class SccOutputAnalyzerTest {
 				"--repro_file=test/data/hash/repros.csv"
 		};
 		analyzer.analyze(args);
-		TestUtils.verifyAbsenceOfCloneFiles();
+		verifyAbsenceOfCloneFiles();
 	}
 	
 	/**
@@ -167,7 +179,7 @@ public class SccOutputAnalyzerTest {
 				"--pair_file",
 		};
 		analyzer.analyze(args);
-		TestUtils.verifyAbsenceOfCloneFiles();
+		verifyAbsenceOfCloneFiles();
 	}
 	
 	/**
@@ -181,7 +193,7 @@ public class SccOutputAnalyzerTest {
 				"--repro_file=test/data/hash/repros.csv"
 		};
 		analyzer.analyze(args);
-		TestUtils.verifyAbsenceOfCloneFiles();
+		verifyAbsenceOfCloneFiles();
 	}
 	
 	/**
@@ -194,7 +206,7 @@ public class SccOutputAnalyzerTest {
 				"--stats_file=test/data/scc/file_stats",
 		};
 		analyzer.analyze(args);
-		TestUtils.verifyAbsenceOfCloneFiles();
+		verifyAbsenceOfCloneFiles();
 	}
 	
 	/**
@@ -209,7 +221,7 @@ public class SccOutputAnalyzerTest {
 				"--pair_file=test/data/scc/clone_pairs"
 		};
 		analyzer.analyze(args);
-		TestUtils.verifyAbsenceOfCloneFiles();
+		verifyAbsenceOfCloneFiles();
 	}
 	
 	/**
@@ -224,7 +236,7 @@ public class SccOutputAnalyzerTest {
 				"--repro_file=test/data/hash/repros.csv",
 				"--unknown"};
 		analyzer.analyze(args);
-		TestUtils.verifyExistenceOfAndRemoveCloneFiles();
+		verifyExistenceOfAndRemoveCloneFiles();
 	}
 	
 	/**
@@ -255,8 +267,8 @@ public class SccOutputAnalyzerTest {
 		};
 
 		analyzer.clones(statsFile, reproFile, pairFile);
-		TestUtils.checkCsv_anyOrder("connections", expectedLines);
-		TestUtils.deleteCloneCsvs();
+		checkCsv_anyOrder("connections", expectedLines);
+		deleteCloneCsvs();
 	}
 	
 	/**
@@ -286,8 +298,8 @@ public class SccOutputAnalyzerTest {
 		};
 
 		analyzer.clonesFromH2fFile(statsFile, reproFile, h2fFile);
-		TestUtils.checkCsv_anyOrder("connections", expectedLines);
-		TestUtils.deleteCloneCsvs();
+		checkCsv_anyOrder("connections", expectedLines);
+		deleteCloneCsvs();
 	}
 	
 	/**
@@ -318,8 +330,8 @@ public class SccOutputAnalyzerTest {
 		};
 		
 		analyzer.clones(statsFile, reproFile, pairFile);
-		TestUtils.checkCsv_anyOrder("cloneFrequency", expectedLines);
-		TestUtils.deleteCloneCsvs();
+		checkCsv_anyOrder("cloneFrequency", expectedLines);
+		deleteCloneCsvs();
 	}
 	
 	/**
@@ -350,8 +362,8 @@ public class SccOutputAnalyzerTest {
 		};
 		
 		analyzer.clonesFromH2fFile(statsFile, reproFile, h2fFile);
-		TestUtils.checkCsv_anyOrder("cloneFrequency", expectedLines);
-		TestUtils.deleteCloneCsvs();
+		checkCsv_anyOrder("cloneFrequency", expectedLines);
+		deleteCloneCsvs();
 	}
 	
 	/**
@@ -378,9 +390,9 @@ public class SccOutputAnalyzerTest {
 		};
 		
 		analyzer.clones(statsFile, reproFile, pairFile);
-		TestUtils.checkCsv_anyOrder("cloneFrequency", expectedCloneFrequecyLines);
-		TestUtils.checkCsv_anyOrder("connections", expectedConnectionsLines);
-		TestUtils.deleteCloneCsvs();
+		checkCsv_anyOrder("cloneFrequency", expectedCloneFrequecyLines);
+		checkCsv_anyOrder("connections", expectedConnectionsLines);
+		deleteCloneCsvs();
 	}
 	
 	/**
@@ -407,9 +419,9 @@ public class SccOutputAnalyzerTest {
 		};
 		
 		analyzer.clones(statsFile, reproFile, pairFile);
-		TestUtils.checkCsv_anyOrder("cloneFrequency", expectedCloneFrequecyLines);
-		TestUtils.checkCsv_anyOrder("connections", expectedConnectionsLines);
-		TestUtils.deleteCloneCsvs();
+		checkCsv_anyOrder("cloneFrequency", expectedCloneFrequecyLines);
+		checkCsv_anyOrder("connections", expectedConnectionsLines);
+		deleteCloneCsvs();
 	}
 	
 	/**
@@ -436,9 +448,9 @@ public class SccOutputAnalyzerTest {
 		};
 		
 		analyzer.clones(statsFile, reproFile, pairFile);
-		TestUtils.checkCsv_anyOrder("cloneFrequency", expectedCloneFrequecyLines);
-		TestUtils.checkCsv_anyOrder("connections", expectedConnectionsLines);
-		TestUtils.deleteCloneCsvs();
+		checkCsv_anyOrder("cloneFrequency", expectedCloneFrequecyLines);
+		checkCsv_anyOrder("connections", expectedConnectionsLines);
+		deleteCloneCsvs();
 	}
 	
 	/**
@@ -465,9 +477,9 @@ public class SccOutputAnalyzerTest {
 		};
 		
 		analyzer.clonesFromH2fFile(statsFile, reproFile, pairFile);
-		TestUtils.checkCsv_anyOrder("cloneFrequency", expectedCloneFrequecyLines);
-		TestUtils.checkCsv_anyOrder("connections", expectedConnectionsLines);
-		TestUtils.deleteCloneCsvs();
+		checkCsv_anyOrder("cloneFrequency", expectedCloneFrequecyLines);
+		checkCsv_anyOrder("connections", expectedConnectionsLines);
+		deleteCloneCsvs();
 	}
 	
 	/* file2hashes and hash2files are not checked above, since we don't know
@@ -493,8 +505,8 @@ public class SccOutputAnalyzerTest {
 		};
 
 		analyzer.clones(statsFile, reproMap, pairFile);
-		TestUtils.checkCsv_matches("hash2filesA", expectedLines);
-		TestUtils.deleteCloneCsvs();
+		checkCsv_matches("hash2filesA", expectedLines);
+		deleteCloneCsvs();
 	}
 	
 	/**
@@ -515,8 +527,8 @@ public class SccOutputAnalyzerTest {
 		};
 
 		analyzer.clones(statsFile, reproMap, pairFile);
-		TestUtils.checkCsv_matches("hash2filesA", expectedLines);
-		TestUtils.deleteCloneCsvs();
+		checkCsv_matches("hash2filesA", expectedLines);
+		deleteCloneCsvs();
 	}
 	
 	/**
@@ -537,8 +549,8 @@ public class SccOutputAnalyzerTest {
 		};
 		
 		analyzer.clones(statsFile, reproFile, pairFile);
-		TestUtils.checkCsv_matches("hash2filesA", expectedLines);
-		TestUtils.deleteCloneCsvs();
+		checkCsv_matches("hash2filesA", expectedLines);
+		deleteCloneCsvs();
 	}
 		
 	/**

@@ -13,13 +13,14 @@ import java.io.IOException;
 public class TestUtils {
 	
 	/**
-	 * Check that the most recent file <prefix><timestamp>.csv has the right
-	 * content.
+	 * Check that the most recent file <dir>/<prefix><timestamp>.csv has the
+	 * right content.
+	 * @param dir Directory to look for the file in
 	 * @param prefix First part of name of file to be analyzed (see above)
 	 * @param expectedLines Array of the lines expected to be found in the file, in order
 	 */
-	static void checkCsv(String prefix, String[] expectedLines) throws IOException {
-		File outputFile = lastOutputFile(prefix);
+	static void checkCsv(String dir, String prefix, String[] expectedLines) throws IOException {
+		File outputFile = lastOutputFile(dir, prefix);
 		BufferedReader outputReader = new BufferedReader(new FileReader(outputFile));
 		for (int i=0; i<expectedLines.length; i++) {
 			String expectedLine = expectedLines[i];
@@ -29,14 +30,15 @@ public class TestUtils {
 	}
 	
 	/**
-	 * Check that each line the most recent file <prefix><timestamp>.csv
+	 * Check that each line the most recent file <dir>/<prefix><timestamp>.csv
 	 * matches (in a regular expression sense) the corresponding expected
 	 * lines.
+	 * @param dir Directory to look for the file in
 	 * @param prefix First part of name of file to be analyzed (see above)
 	 * @param expectedPatterns Array of the patterns expected to be found in the file, in order
 	 */
-	static void checkCsv_matches(String prefix, String[] expectedPatterns) throws IOException {
-		File outputFile = lastOutputFile(prefix);
+	static void checkCsv_matches(String dir, String prefix, String[] expectedPatterns) throws IOException {
+		File outputFile = lastOutputFile(dir, prefix);
 		BufferedReader outputReader = new BufferedReader(new FileReader(outputFile));
 		for (int i=0; i<expectedPatterns.length; i++) {
 			String expectedPattern = expectedPatterns[i];
@@ -48,14 +50,15 @@ public class TestUtils {
 	}
 	
 	/**
-	 * Check that the most recent file <prefix><timestamp>.csv contains all
-	 * lines in expectedLines, and nothing more.
+	 * Check that the most recent file <dir>/<prefix><timestamp>.csv contains
+	 * all lines in expectedLines, and nothing more.
+	 * @param dir Directory to look for the file in
 	 * @param prefix First part of name of file to be analyzed (see above)
 	 * @param expectedLines Array of the lines expected to be found in the file, not necessarily in order
 	 * @throws IOException 
 	 */
-	static void checkCsv_anyOrder(String prefix, String[] expectedLines) throws IOException {
-		File outputFile = lastOutputFile(prefix);
+	static void checkCsv_anyOrder(String dir, String prefix, String[] expectedLines) throws IOException {
+		File outputFile = lastOutputFile(dir, prefix);
 		BufferedReader reader = new BufferedReader(new FileReader(outputFile));
 		long linesInFile = reader.lines().count();
 		reader.close();
@@ -78,9 +81,26 @@ public class TestUtils {
 	}
 	
 	/**
-	 * Verify that no output file from the clone analysis exist.
+	 * Remove all files from the specified directory
+	 * @param directory Directory to remove files from
 	 */
-	static void verifyAbsenceOfCloneFiles() {
+	static void cleanDirectory(File directory) {
+		String[] filesToRemove = directory.list();
+		if (0 < filesToRemove.length) {
+			System.err.print("The directory '" + directory.getName() + "' contains files. ");
+			System.err.println("These will be removed!");
+			for (String fileName: filesToRemove) {
+				new File(directory, fileName).delete();
+			}
+		}
+	}
+	
+	/**
+	 * Verify that no output file from the clone analysis exist in the
+	 * specified directory.
+	 * @param dir Directory to look for files in
+	 */
+	static void verifyAbsenceOfCloneFiles(String dir) {
 		String[] prefixes = {
 				"file2hashesA",
 				"hash2filesA",
@@ -89,19 +109,9 @@ public class TestUtils {
 		};
 		
 		for (String prefix: prefixes) {
-			File outputFile = lastOutputFile(prefix);
+			File outputFile = lastOutputFile(dir, prefix);
 			assertFalse("Unexpected output file: " + outputFile.getName(), outputFile.exists());
 		}
-	}
-	
-	/**
-	 * Verify that all files prefixed in expectedFiles exist in the current
-	 * directory, and remove them.
-	 * @param expectedFilePrefixes Prefixes for all expected files
-	 * throws IOException
-	 */
-	static void verifyExistenceAndRemove(String[] expectedFilePrefixes) throws IOException {
-		verifyExistenceAndRemove(".", expectedFilePrefixes);
 	}
 	
 	/**
@@ -109,24 +119,15 @@ public class TestUtils {
 	 * directory, and remove them.
 	 * @param dir Directory to look for files in
 	 * @param expectedFilePrefixes Prefixes for all expected files
-	 * throws IOException
+	 * @throws IOException
 	 */
-	static void verifyExistenceAndRemove(String dir, String[] expectedFilePrefixes) throws IOException {
+	static void verifyExistenceOfAndRemove(String dir, String[] expectedFilePrefixes) throws IOException {
 		for (String prefix: expectedFilePrefixes) {
 			File expectedFile = lastOutputFile(dir, prefix);
 			assertTrue("Expected output file " + expectedFile.getName() + " is missing in " + dir + "!",
 					expectedFile.exists());
 			expectedFile.delete();
 		}
-	}
-	
-	/**
-	 * Verify that all clone analysis output files exist in the current
-	 * directory, and remove them.
-	 * @throws IOException 
-	 */
-	static void verifyExistenceOfAndRemoveCloneFiles() throws IOException {
-		verifyExistenceOfAndRemoveCloneFiles(".");
 	}
 	
 	/**
@@ -142,29 +143,21 @@ public class TestUtils {
 				"cloneFrequency",
 				"connections"
 		};
-		verifyExistenceAndRemove(dir, prefixes);
+		verifyExistenceOfAndRemove(dir, prefixes);
 	}
 	
 	/**
-	 * Delete all CSV files created by the clone analysis. 
+	 * Delete all CSV files created by the clone analysis in the specified
+	 * directory.
+	 * @param dir Directory to remove files from
 	 */
-	static void deleteCloneCsvs() {
-		lastOutputFile("file2hashesA").delete();
-		lastOutputFile("hash2filesA").delete();
-		lastOutputFile("cloneFrequency").delete();
-		lastOutputFile("connections").delete();
+	static void deleteCloneCsvs(String dir) {
+		lastOutputFile(dir, "file2hashesA").delete();
+		lastOutputFile(dir, "hash2filesA").delete();
+		lastOutputFile(dir, "cloneFrequency").delete();
+		lastOutputFile(dir, "connections").delete();
 	}
 	
-	/**
-	 * Find the output file <prefix><timestamp>.csv with the greatest (latest)
-	 * time stamp in the current directory.
-	 * @param prefix First part of the output file
-	 * @return Output file described above
-	 */
-	static File lastOutputFile(String prefix) {
-		return lastOutputFile(".", prefix);
-	}
-
 	/**
 	 * Find the output file <prefix><timestamp>.csv with the greatest (latest)
 	 * time stamp in the directory given as argument.
@@ -181,6 +174,6 @@ public class TestUtils {
 				outputFileName = currentFileName;
 			}
 		}
-		return new File(dir + "/" + outputFileName);
+		return new File(dir, outputFileName);
 	}
 }
