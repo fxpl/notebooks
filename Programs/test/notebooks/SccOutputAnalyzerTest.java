@@ -15,13 +15,15 @@ public class SccOutputAnalyzerTest {
 		analyzer = new SccOutputAnalyzer();
 	}
 	
+	// TODO: tearDown!
+	
 	/**
 	 * Verify that the clone output files are created when paths are specified
 	 * correctly.
 	 * @throws IOException 
 	 */
 	@Test
-	public void testArgumentParsing_correct() throws IOException {
+	public void testArgumentParsing_pairFile() throws IOException {
 		String args[] = {
 				"--stats_file=test/data/scc/file_stats",
 				"--pair_file=test/data/scc/clone_pairs",
@@ -47,6 +49,67 @@ public class SccOutputAnalyzerTest {
 		};
 		analyzer.analyze(args);
 		TestUtils.verifyExistenceOfAndRemoveCloneFiles(outputDir);
+	}
+	
+	/**
+	 * Verify that data in hash2files is used when the file is specified in the
+	 * program arguments.
+	 * @throws IOException
+	 */
+	@Test
+	public void testArgumentParsing_h2f() throws IOException {
+		String args[] = {
+			"--stats_file=test/data/scc/file_stats_small",
+			"--repro_file=test/data/hash/repros.csv",
+			"--pair_file=test/data/scc/clone_pairs",
+			"--h2f_file=test/data/scc/hash2files_small.csv"
+		};
+		String[] expectedCloneFrequecyLines = {
+			cloneFrequencyHeader(),
+			"nb_6.ipynb, 0, 2, 2, 1.0000, 1.0000, 2, 2",
+			"nb_9.ipynb, 0, 2, 2, 1.0000, 1.0000, 2, 2"
+		};
+		String[] expectedConnectionsLines = {
+			connectionsHeader(),
+			"nb_6.ipynb, 2, 1.0000, 2, 1.0000, 2, 2, 0.0000, 0.0000",
+			"nb_9.ipynb, 2, 1.0000, 2, 1.0000, 2, 2, 0.0000, 0.0000"
+		};
+		
+		analyzer.analyze(args);
+		TestUtils.checkCsv_anyOrder("cloneFrequency", expectedCloneFrequecyLines);
+		TestUtils.checkCsv_anyOrder("connections", expectedConnectionsLines);
+		TestUtils.deleteCloneCsvs();
+	}
+	
+	/**
+	 * Verify that data in hash2files is used when both hash2files file and
+	 * clone pair file are specified in the program arguments.
+	 * @throws IOException
+	 */
+	@Test
+	public void testArgumentParsing_h2fAndPairFile() throws IOException {
+		String args[] = {
+				"--stats_file=test/data/scc/file_stats_small",
+				"--repro_file=test/data/hash/repros.csv",
+				"--pair_file=test/data/scc/clone_pairs",
+				"--h2f_file=test/data/scc/hash2files_small.csv"
+			};
+			String[] expectedCloneFrequecyLines = {
+				cloneFrequencyHeader(),
+				"nb_6.ipynb, 0, 2, 2, 1.0000, 1.0000, 2, 2",
+				"nb_9.ipynb, 0, 2, 2, 1.0000, 1.0000, 2, 2"
+			};
+			String[] expectedConnectionsLines = {
+				connectionsHeader(),
+				"nb_6.ipynb, 2, 1.0000, 2, 1.0000, 2, 2, 0.0000, 0.0000",
+				"nb_9.ipynb, 2, 1.0000, 2, 1.0000, 2, 2, 0.0000, 0.0000"
+			};
+			
+			analyzer.analyze(args);
+			TestUtils.checkCsv_anyOrder("cloneFrequency", expectedCloneFrequecyLines);
+			TestUtils.checkCsv_anyOrder("connections", expectedConnectionsLines);
+			TestUtils.deleteCloneCsvs();
+			TestUtils.verifyAbsenceOfCloneFiles(); // To check that clone analysis is run only once
 	}
 	
 	/**
@@ -197,6 +260,37 @@ public class SccOutputAnalyzerTest {
 	}
 	
 	/**
+	 * Verify that connections are identified correctly at clone analysis based
+	 * on an existing hash2files.
+	 * @throws IOException
+	 */
+	@Test
+	public void testConnectionsCsv_h2f() throws IOException {
+		String dataDir = "test/data/scc";
+		String statsFile = dataDir + "/file_stats";
+		String h2fFile = dataDir + "/hash2files.csv";
+		String reproFile = "test/data/hash/repros.csv";
+		String[] expectedLines = {
+				connectionsHeader(),
+				"nb_4.ipynb, 6, 3.0000, 0, 0.0000, 4, 0, 2.0000, 0.0000",
+				"nb_5.ipynb, 4, 2.0000, 1, 1.0000, 2, 0, 1.0000, 1.0000",
+				"nb_1.ipynb, 6, 3.0000, 6, 3.0000, 2, 2, 4.0000, 4.0000",
+				"nb_2.ipynb, 7, 2.3333, 7, 2.3333, 3, 3, 4.0000, 4.0000",
+				"nb_3.ipynb, 1, 0.5000, 1, 0.5000, 1, 1, 0.0000, 0.0000",
+				"nb_6.ipynb, 4, 2.0000, 4, 2.0000, 4, 4, 0.0000, 0.0000",
+				"nb_7.ipynb, 5, 1.6667, 5, 1.6667, 2, 2, 1.5000, 1.5000",
+				"nb_10.ipynb, 3, 3.0000, 0, 0.0000, 0, 0, 3.0000, 0.0000",
+				"nb_8.ipynb, 1, 1.0000, 1, 1.0000, 0, 0, 1.0000, 1.0000",
+				"nb_9.ipynb, 4, 2.0000, 4, 2.0000, 2, 2, 2.0000, 2.0000",
+				"nb_11.ipynb, 1, 1.0000, 1, 1.0000, 0, 0, 1.0000, 1.0000",
+		};
+
+		analyzer.clonesFromH2fFile(statsFile, reproFile, h2fFile);
+		TestUtils.checkCsv_anyOrder("connections", expectedLines);
+		TestUtils.deleteCloneCsvs();
+	}
+	
+	/**
 	 * Verify that cloneFrequencies are computed correctly at clone analysis
 	 * based on SourcererCC data.
 	 * @throws IOException 
@@ -229,6 +323,38 @@ public class SccOutputAnalyzerTest {
 	}
 	
 	/**
+	 * Verify that cloneFrequencies are computed correctly at clone analysis
+	 * based on an existing hash2files.
+	 * @throws IOException
+	 */
+	@Test
+	public void testCloneFreqCsv_h2f() throws IOException {
+		String dataDir = "test/data/scc";
+		String statsFile = dataDir + "/file_stats";
+		String h2fFile = dataDir + "/hash2files.csv";
+		String reproFile = "test/data/hash/repros.csv";
+		
+		String[] expectedLines = {
+				cloneFrequencyHeader(),
+				"nb_1.ipynb, 0, 2, 2, 1.0000, 1.0000, 2, 2",
+				"nb_2.ipynb, 0, 3, 3, 1.0000, 1.0000, 2, 2",
+				"nb_3.ipynb, 1, 1, 1, 0.5000, 0.5000, 0, 0",
+				"nb_4.ipynb, 0, 2, 0, 1.0000, 0, 2, 0",
+				"nb_5.ipynb, 0, 2, 1, 1.0000, 1.0000, 0, 0",
+				"nb_6.ipynb, 0, 2, 2, 1.0000, 1.0000, 2, 2",
+				"nb_7.ipynb, 0, 3, 3, 1.0000, 1.0000, 0, 0",
+				"nb_8.ipynb, 0, 1, 1, 1.0000, 1.0000, 0, 0",
+				"nb_9.ipynb, 0, 2, 2, 1.0000, 1.0000, 2, 2",
+				"nb_10.ipynb, 0, 1, 0, 1.0000, 0, 0, 0",
+				"nb_11.ipynb, 0, 1, 1, 1.0000, 1.0000, 0, 0"
+		};
+		
+		analyzer.clonesFromH2fFile(statsFile, reproFile, h2fFile);
+		TestUtils.checkCsv_anyOrder("cloneFrequency", expectedLines);
+		TestUtils.deleteCloneCsvs();
+	}
+	
+	/**
 	 * Verify that SccOutputAnalyzer smoothly skips a clone pair with numbers
 	 * that don't fit in an int.
 	 * @throws IOException 
@@ -236,7 +362,7 @@ public class SccOutputAnalyzerTest {
 	@Test
 	public void testClones_numberFormat() throws IOException {
 		String dataDir = "test/data/scc";
-		String statsFile = dataDir + "/file_stats_brokenLines";
+		String statsFile = dataDir + "/file_stats_small";
 		String pairFile = dataDir + "/clone_pairs_overflow";
 		String reproFile = "test/data/hash/repros.csv";
 		
@@ -265,7 +391,7 @@ public class SccOutputAnalyzerTest {
 	@Test
 	public void testClones_nonExistentID() throws IOException {
 		String dataDir = "test/data/scc";
-		String statsFile = dataDir + "/file_stats_brokenLines";
+		String statsFile = dataDir + "/file_stats_small";
 		String pairFile = dataDir + "/clone_pairs_nonExistentID";
 		String reproFile = "test/data/hash/repros.csv";
 		
@@ -294,7 +420,7 @@ public class SccOutputAnalyzerTest {
 	@Test
 	public void testClones_corruptPairData() throws IOException {
 		String dataDir = "test/data/scc";
-		String statsFile = dataDir + "/file_stats_brokenLines";
+		String statsFile = dataDir + "/file_stats_small";
 		String pairFile = dataDir + "/clone_pairs_corrupt";
 		String reproFile = "test/data/hash/repros.csv";
 		
@@ -310,6 +436,35 @@ public class SccOutputAnalyzerTest {
 		};
 		
 		analyzer.clones(statsFile, reproFile, pairFile);
+		TestUtils.checkCsv_anyOrder("cloneFrequency", expectedCloneFrequecyLines);
+		TestUtils.checkCsv_anyOrder("connections", expectedConnectionsLines);
+		TestUtils.deleteCloneCsvs();
+	}
+	
+	/**
+	 * Verify that input lines on wrong format are smoothly ignored when
+	 * clone analysis based on an existing hash2files file.
+	 * @throws IOException
+	 */
+	@Test
+	public void testClones_h2f_corruptLines() throws IOException {
+		String dataDir = "test/data/scc";
+		String statsFile = dataDir + "/file_stats_small";
+		String pairFile = dataDir + "/hash2files_corrupt.csv";
+		String reproFile = "test/data/hash/repros.csv";
+		
+		String[] expectedCloneFrequecyLines = {
+			cloneFrequencyHeader(),
+			"nb_6.ipynb, 0, 2, 2, 1.0000, 1.0000, 2, 2",
+			"nb_9.ipynb, 0, 2, 2, 1.0000, 1.0000, 2, 2"
+		};
+		String[] expectedConnectionsLines = {
+			connectionsHeader(),
+			"nb_6.ipynb, 2, 1.0000, 2, 1.0000, 2, 2, 0.0000, 0.0000",
+			"nb_9.ipynb, 2, 1.0000, 2, 1.0000, 2, 2, 0.0000, 0.0000"
+		};
+		
+		analyzer.clonesFromH2fFile(statsFile, reproFile, pairFile);
 		TestUtils.checkCsv_anyOrder("cloneFrequency", expectedCloneFrequecyLines);
 		TestUtils.checkCsv_anyOrder("connections", expectedConnectionsLines);
 		TestUtils.deleteCloneCsvs();

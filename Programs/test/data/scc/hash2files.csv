@@ -1,0 +1,9 @@
+hash, LOC, file, index, ...
+1, 1, nb_8.ipynb, 0, nb_7.ipynb, 1
+2, 1, nb_7.ipynb, 0, nb_6.ipynb, 1, nb_6.ipynb, 0
+3, 1, nb_9.ipynb, 1, nb_7.ipynb, 2, nb_9.ipynb, 0
+4, 0, nb_4.ipynb, 1, nb_10.ipynb, 0, nb_4.ipynb, 0, nb_5.ipynb, 0
+5, 1, nb_2.ipynb, 1, nb_3.ipynb, 0
+6, 1, nb_1.ipynb, 0, nb_2.ipynb, 0, nb_1.ipynb, 1, nb_2.ipynb, 2
+7, 1, nb_3.ipynb, 1
+0, 1, nb_5.ipynb, 1, nb_11.ipynb, 0
