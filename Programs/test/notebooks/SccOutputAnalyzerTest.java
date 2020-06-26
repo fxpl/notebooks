@@ -545,7 +545,7 @@ public class SccOutputAnalyzerTest extends AnalyzerTest {
 		
 		String[] expectedLines = {
 			hash2filesHeader(),
-			hashPattern + ", 10, " + notebookNamePattern + ", [0-9]+, " + notebookNamePattern + ", [0-9]+, " + notebookNamePattern + ", [0-9]+, " + notebookNamePattern + ", [0-9]+"
+			hashPattern + ", 10, " + notebookNamePattern + ", [0-3]+, " + notebookNamePattern + ", [0-3]+, " + notebookNamePattern + ", [0-3]+, " + notebookNamePattern + ", [0-3]+, " + notebookNamePattern + ", [0-3]+, " + notebookNamePattern + ", [0-3]+"
 		};
 		
 		analyzer.clones(statsFile, reproFile, pairFile);

@@ -288,7 +288,6 @@ public class SccOutputAnalyzer extends Analyzer {
 					clones.put(id1, top);
 				}
 				if (id2Clones != top) {
-					// TODO: Kan det här verkligen hända? Troligtvis!
 					clones.put(id2, top);
 				}
 			}
@@ -298,7 +297,7 @@ public class SccOutputAnalyzer extends Analyzer {
 	/**
 	 * Merge entries in clones so that each clone group is only stored once.
 	 */
-	public static void compact(HashMap<SccSnippetId, CloneGroup> clones) {
+	private static void compact(HashMap<SccSnippetId, CloneGroup> clones) {
 		for(Map.Entry<SccSnippetId, CloneGroup> entry : clones.entrySet()){
 			CloneGroup group = entry.getValue();
 			if (null != group) {
@@ -307,7 +306,7 @@ public class SccOutputAnalyzer extends Analyzer {
 		}
 	}
 	
-	public static HashMap<CloneGroup, List<SccSnippetId>> invertMap(HashMap<SccSnippetId, CloneGroup> clones) {
+	private static HashMap<CloneGroup, List<SccSnippetId>> invertMap(HashMap<SccSnippetId, CloneGroup> clones) {
 		// Required for correctness
 		compact(clones);
 
