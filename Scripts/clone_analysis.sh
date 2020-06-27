@@ -101,10 +101,10 @@ intraClones() {
 
 
 # Create hash2files file without empty snippets
-emptyHash="D41D8CD98F00B204E9800998ECF8427E"
 hash2filesA=`./get_latest_output.sh "hash2filesA"`
 hash2filesNE=`echo $hash2filesA | sed -E "s/hash2filesA/hash2filesNE/"`
-sed "/^$emptyHash/d" $hash2filesA > $hash2filesNE
+emptyPattern="^[A-F,a-f,0-9]+\, 0\, nb_"	# Pattern for line representing an empty snippet
+sed -E "/$emptyPattern/d" $hash2filesA > $hash2filesNE
 
 # Perform analyses
 echo ""

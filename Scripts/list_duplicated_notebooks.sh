@@ -44,11 +44,9 @@ listDuplicated() {
 
 }
 
-emptyHash="D41D8CD98F00B204E9800998ECF8427E"
+./create_file2hashesNE_if_nonexistent.sh
 file2hashesA=`./get_latest_output.sh "file2hashesA"`
-file2hashesNE=`echo $file2hashesA | sed -E "s/file2hashesA/file2hashesNE/"`
-sed -E "s/\, $emptyHash//g" $file2hashesA > $file2hashesNE
-
+file2hashesNE=`./get_latest_output.sh file2hashesNE`
 listDuplicated $file2hashesA "A"
 listDuplicated $file2hashesNE "NE"
 

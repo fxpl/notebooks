@@ -7,9 +7,8 @@
 
 # Create file with mapping from file to non-empty snippet hashes
 file2hashesA=`./get_latest_output.sh file2hashesA`
-file2hashesNE=`echo $file2hashesA | sed -E "s/file2hashesA/file2hashesNE/"`
-emptyHash="D41D8CD98F00B204E9800998ECF8427E"
-cat $file2hashesA | sed -E "s/\, $emptyHash//" > $file2hashesNE
+./create_file2hashesNE_if_nonexistent.sh
+file2hashesNE=`./get_latest_output.sh file2hashesNE`
 
 # Count hashes
 file2hashesTmp="../Output/file2hashes_with_comma.csv"
