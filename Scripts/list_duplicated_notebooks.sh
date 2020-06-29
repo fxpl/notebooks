@@ -32,13 +32,13 @@ listDuplicated() {
 	count="../Output/nb_clone_distr$suffix.csv"
 	list="../Output/nb_clone_list$suffix.csv"
 
-	sed -n "2,$ p" $f2h | cut -d' ' -f2- | egrep -v "\.ipynb" | sort | uniq -c | sort -rn > $specs
+	sed -n "2,$ p" $f2h | cut -d' ' -f2- | grep -E -v "\.ipynb" | sort | uniq -c | sort -rn > $specs
 
 	sed -E "s/([0-9]) ([A-F,0-9])/\1, \2/" $specs | cut -d',' -f1 > $count
 
-	sed -E "s/([0-9]) ([A-F,0-9])/\1, \2/" $specs | egrep -v "^\s*1\, " | cut -d',' -f2- | while read hashComb
+	sed -E "s/([0-9]) ([A-F,0-9])/\1, \2/" $specs | grep -E -v "^\s*1\, " | cut -d',' -f2- | while read hashComb
 	do
-		egrep "ipynb\, $hashComb$" $f2h | cut -d',' -f1 | paste -sd' ' >> $list
+		grep -E "ipynb\, $hashComb$" $f2h | cut -d',' -f1 | paste -sd' ' >> $list
 	done
 	echo "--------------------------------------------------------------------------------" >> $list
 

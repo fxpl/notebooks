@@ -17,7 +17,7 @@ unparseable="../logs/unparseable_mf.txt"
 targetDir="/proj/uppstore2019098/unparseable_notebooks"
 
 # Find unparseable notebooks
-egrep -a "Skipping\!" $logFile | grep -a "/proj/uppstore2019098/notebooks/" | cut -d'/' -f5- | cut -d':' -f1 > $unparseable
+grep -E -a "Skipping\!" $logFile | grep -a "/proj/uppstore2019098/notebooks/" | cut -d'/' -f5- | cut -d':' -f1 > $unparseable
 
 # Create parallel directory structure
 rev $unparseable | cut -d'/' -f2- | rev | uniq | while read subdir;

@@ -90,8 +90,8 @@ intraClones() {
 	frequencyFile=`./get_latest_output.sh "cloneFrequency"`
 	intraCloneCol=$1
 
-	intraClones=`sed -n "2,$ p" $frequencyFile | cut -d',' -f$intraCloneCol | egrep -v "\ 0$" | wc -l`
-	noIntraClones=`sed -n "2,$ p" $frequencyFile | cut -d',' -f$intraCloneCol | egrep "\ 0$" | wc -l`	# Sanity check
+	intraClones=`sed -n "2,$ p" $frequencyFile | cut -d',' -f$intraCloneCol | grep -E -v "\ 0$" | wc -l`
+	noIntraClones=`sed -n "2,$ p" $frequencyFile | cut -d',' -f$intraCloneCol | grep -E "\ 0$" | wc -l`	# Sanity check
 
 	echo "Number of files containing intra clones: $intraClones"
 	echo "Number of files not containing intra clones: $noIntraClones"
