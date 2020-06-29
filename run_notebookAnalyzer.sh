@@ -8,7 +8,7 @@
 diskPath=/home/maka4186/notebook_disk
 nbPath=$diskPath/notebooks
 reproFile=$diskPath/notebook-number_repo.csv
-outputDirectory="Output"
+outputDirectory="OutputNBA"
 mkdir -p $outputDirectory
 
 java -XX:+UnlockDiagnosticVMOptions -XX:NativeMemoryTracking=summary -XX:+PrintNMTStatistics -XX:+UseParallelGC \

@@ -16,7 +16,7 @@ notebookPathsFile="$projDir/notebook_paths.txt"
 duplicates="./duplicates.txt"
 targetDir="/proj/uppstore2019098/duplicated_notebooks"
 
-rev $notebookPathsFile | cut -d '/' -f1 | sort | uniq -c | sed -E "s/^\s*//" | egrep -v "^1" | cut -d' ' -f2 | rev | while read notebook
+rev $notebookPathsFile | cut -d '/' -f1 | sort | uniq -c | sed -E "s/^\s*//" | grep -E -v "^1" | cut -d' ' -f2 | rev | while read notebook
 do
 	num=0
 	grep $notebook $notebookPathsFile | while read path

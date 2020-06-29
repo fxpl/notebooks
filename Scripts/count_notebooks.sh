@@ -21,7 +21,7 @@ inDir=`find $projDir/notebooks -name "*ipynb" | wc -l`
 #duplicated=`find $projDir/duplicated_notebooks -name "*ipynb" | wc -l`
 forked=`find $projDir/forked_notebooks -name "*ipynb" | wc -l`
 unparseable=`find $projDir/unparseable_notebooks -name "*ipynb" | wc -l`
-errorneousUnmoved=`egrep "Could not get" $logFile | cut -d'_' -f2 | cut -d'.' -f1 | uniq | wc -l`
+errorneousUnmoved=`grep -E "Could not get" $logFile | cut -d'_' -f2 | cut -d'.' -f1 | uniq | wc -l`
 
 echo "Notebooks in input directory: $inDir"
 echo "Analyzed notebooks: $outputNotebooks"

@@ -23,7 +23,7 @@ numbers="("
 
 i=0
 for language in ${languages[@]}; do
-	num=`sed -n "2,$ p" $file | cut -d',' -f2 | egrep " $language$" | wc -l`
+	num=`sed -n "2,$ p" $file | cut -d',' -f2 | grep -E " $language$" | wc -l`
 	perc=`echo 100*$num/$total | bc -l`
 	perc=`printf "%.4f" $perc`
 	echo "$language: $num/$total ($perc%)"
@@ -45,7 +45,7 @@ echo ""
 # Language specification
 specFields=( METADATA_LANGUAGEINFO_NAME METADATA_LANGUAGE METADATA_KERNELSPEC_LANGUAGE CODE_CELLS)
 for specField in ${specFields[@]}; do
-	num=`sed -n "2,$ p" $file | cut -d',' -f3 | egrep " $specField$" | wc -l`
+	num=`sed -n "2,$ p" $file | cut -d',' -f3 | grep -E " $specField$" | wc -l`
 	perc=`echo 100*$num/$total | bc -l`
 	perc=`printf "%.4f" $perc`
 	echo "$specField: $num/$total ($perc%)"
