@@ -50,17 +50,26 @@ public class CloneFileWriter {
 	}
 	
 	private void printFile2hashes(Map<Notebook, SnippetCode[]> file2hashes) throws IOException {
-		Writer writer = new FileWriter(outputDir + "/file2hashesA" + LocalDateTime.now() + ".csv");
-		writer.write(file2hashesHeader());
+		String timeStamp = LocalDateTime.now().toString();
+		Writer writerA = new FileWriter(outputDir + "/file2hashesA" + timeStamp + ".csv");
+		Writer writerNE = new FileWriter(outputDir + "/file2hashesNE" + timeStamp + ".csv");
+		writerA.write(file2hashesHeader());
+		writerNE.write(file2hashesHeader());
 		for (Notebook notebook: file2hashes.keySet()) {
-			writer.write(notebook.getName());
+			writerA.write(notebook.getName());
+			writerNE.write(notebook.getName());
 			SnippetCode[] code = file2hashes.get(notebook);
 			for (SnippetCode snippet: code) {
-				writer.write(", " + snippet.getHash());
+				writerA.write(", " + snippet.getHash());
+				if (0 != snippet.getLOC()) {
+					writerNE.write(", " + snippet.getHash());
+				}
 			}
-			writer.write("\n");
+			writerA.write("\n");
+			writerNE.write("\n");
 		}
-		writer.close();
+		writerA.close();
+		writerNE.close();
 	}
 	
 	private void printHash2files(Map<SnippetCode, List<Snippet>> hash2files) throws IOException {

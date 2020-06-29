@@ -44,7 +44,6 @@ listDuplicated() {
 
 }
 
-./create_file2hashesNE_if_nonexistent.sh
 file2hashesA=`./get_latest_output.sh "file2hashesA"`
 file2hashesNE=`./get_latest_output.sh file2hashesNE`
 listDuplicated $file2hashesA "A"

@@ -5,12 +5,8 @@
 # the corpus. Save it in a csv file prefixed "snippetsPerFileNE".
 ################################################################################
 
-# Create file with mapping from file to non-empty snippet hashes
-file2hashesA=`./get_latest_output.sh file2hashesA`
-./create_file2hashesNE_if_nonexistent.sh
-file2hashesNE=`./get_latest_output.sh file2hashesNE`
-
 # Count hashes
+file2hashesNE=`./get_latest_output.sh file2hashesNE`
 file2hashesTmp="../Output/file2hashes_with_comma.csv"
 cp $file2hashesNE $file2hashesTmp
 sed -Ei "s/^nb_/,nb_/" $file2hashesTmp	# In order to catch files without hashes

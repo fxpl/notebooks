@@ -103,6 +103,7 @@ public class TestUtils {
 	static void verifyAbsenceOfCloneFiles(String dir) {
 		String[] prefixes = {
 				"file2hashesA",
+				"file2hashesNE",
 				"hash2filesA",
 				"cloneFrequency",
 				"connections"
@@ -139,6 +140,7 @@ public class TestUtils {
 	static void verifyExistenceOfAndRemoveCloneFiles(String dir) throws IOException {
 		String[] prefixes = {
 				"file2hashesA",
+				"file2hashesNE",
 				"hash2filesA",
 				"cloneFrequency",
 				"connections"
@@ -153,6 +155,7 @@ public class TestUtils {
 	 */
 	static void deleteCloneCsvs(String dir) {
 		lastOutputFile(dir, "file2hashesA").delete();
+		lastOutputFile(dir, "file2hashesNE").delete();
 		lastOutputFile(dir, "hash2filesA").delete();
 		lastOutputFile(dir, "cloneFrequency").delete();
 		lastOutputFile(dir, "connections").delete();
