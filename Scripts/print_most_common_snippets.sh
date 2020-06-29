@@ -75,7 +75,7 @@ sed -n "2,$ p" $hashFile | grep -o ',' -n | uniq -c | sort -rn \
 
 		# Print the specified number of random occurrences
 		echo "$i ($numOccurrences OCCURRENCES):"
-		snippetIndices=`./generate_random_numbers.sh $numOccurrences $snippetsPerCloneGroup`
+		snippetIndices=`generate_random_numbers $numOccurrences $snippetsPerCloneGroup`
 		for snippetIndex in ${snippetIndices[@]};
 		do
 			# Information about the snippet
