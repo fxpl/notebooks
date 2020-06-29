@@ -552,27 +552,4 @@ public class SccOutputAnalyzerTest extends AnalyzerTest {
 		checkCsv_matches("hash2filesA", expectedLines);
 		deleteCloneCsvs();
 	}
-		
-	/**
-	 * @return Expected header of cloneFrequency files
-	 */
-	private static String cloneFrequencyHeader() {
-		return "file, unique, clones, non-empty clones, clone frequency, non-empty clone frequency, "
-				+ "intra clones, non-empty intra clones";
-	}
-	
-	/**
-	 * @return Expected header of connections files
-	 */
-	private static String connectionsHeader() {
-		return "file, connections, connections normalized, non-empty connections, non-empty connections normalized, "
-				+ "intra repro connections, non-empty intra repro connections, mean inter repro connections, mean non-empty inter repro connections";
-	}
-	
-	/**
-	 * @return Expected header of hash2files files
-	 */
-	private static String hash2filesHeader() {
-		return "hash, LOC, file, index, ...";
-	}
 }

@@ -109,4 +109,27 @@ public abstract class AnalyzerTest {
 	protected static void verifyExistenceOfAndRemoveCloneFiles() throws IOException {
 		TestUtils.verifyExistenceOfAndRemoveCloneFiles(defaultOutputDirName);
 	}
+
+	/**
+	 * @return Expected header of cloneFrequency files
+	 */
+	protected static String cloneFrequencyHeader() {
+		return "file, unique, clones, non-empty clones, clone frequency, non-empty clone frequency, "
+				+ "intra clones, non-empty intra clones";
+	}
+
+	/**
+	 * @return Expected header of connections files
+	 */
+	protected static String connectionsHeader() {
+		return "file, connections, connections normalized, non-empty connections, non-empty connections normalized, "
+				+ "intra repro connections, non-empty intra repro connections, mean inter repro connections, mean non-empty inter repro connections";
+	}
+
+	/**
+	 * @return Expected header of hash2files files
+	 */
+	protected static String hash2filesHeader() {
+		return "hash, LOC, file, index, ...";
+	}
 }
