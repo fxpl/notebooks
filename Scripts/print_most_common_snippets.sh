@@ -86,7 +86,7 @@ sed -n "2,$ p" $hashFile | grep -o ',' -n | uniq -c | sort -rn \
 			notebookPath=$diskPath"/"`grep $notebook $pathFile`
 
 			# Print snippet
-			echo ""
+			echo "----------------------------------------"
 			echo "$notebookPath($snippetIndex) :"
 			java -XX:+UseParallelGC -cp ../Programs/bin:../Programs/external/json-20190722.jar \
 				notebooks.SnippetPrinter $notebookPath $snippetIndex
