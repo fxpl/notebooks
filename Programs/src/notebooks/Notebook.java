@@ -293,6 +293,10 @@ public class Notebook {
 		}
 	}
 	
+	@Override
+	public String toString() {
+		return this.getName();
+	}
 	
 	/**
 	 * Count lines of code and set all loc variables.

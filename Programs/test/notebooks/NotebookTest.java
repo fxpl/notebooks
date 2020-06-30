@@ -562,4 +562,20 @@ public class NotebookTest {
 		SnippetCode[] hashes = notebook.snippetCodes();
 		assertEquals("Wrong number of hashes reported!", 1, hashes.length);
 	}
+	
+	/**
+	 * Verify that the right string representation is returned for a notebook,
+	 * with and without directory names in the path.
+	 */
+	@Test
+	public void testToString_fullPath() {
+		String name = "nb_76.ipynb";
+		String path = "some/nonexistent/path/" + name;
+		// Only name
+		Notebook notebook = new Notebook(name);
+		assertEquals("Wrong string representation of notebook", name, notebook.toString());
+		// Full path
+		notebook = new Notebook(path);
+		assertEquals("Wrong string representation of notebook", name, notebook.toString());
+	}
 }
