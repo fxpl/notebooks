@@ -59,7 +59,7 @@ function generate_random_numbers() {
 
 i=1
 # Print $snippetsPerCloneGroup random occurrences of the $numCloneGroups most
-# common clones using SnippetPrinter (=> stdout at the time of writing"
+# common clones using SnippetPrinter (=> stdout at the time of writing)
 sed -n "2,$ p" $hashFile | grep -o ',' -n | uniq -c | sort -rn \
  | cut -d':' -f1 | rev | cut -d' ' -f1 | rev | while read lineNum; do
 
