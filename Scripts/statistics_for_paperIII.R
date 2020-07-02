@@ -202,13 +202,13 @@ print("Correlation with size (non-empty clones):")
 cor.test(nbData$non.empty.snippets, nbData$non.empty.clone.frequency, alternative="two.sided", method="spearman")
 
 # Association with language
-exportAsEPS(boxplot(clone.frequency~language, data=nbData), "lang_frequencyA")
 nbDataKnownLang <- nbData[nbData$language!=" UNKNOWN",]
+exportAsEPS(boxplot(clone.frequency~language, data=nbDataKnownLang), "lang_frequencyA")
 checkLM(nbDataKnownLang$clone.frequency, as.factor(nbDataKnownLang$language))
 print("Correlation with language (all clones):")
 kruskalWallisWithPost(nbDataKnownLang$clone.frequency, as.factor(nbDataKnownLang$language))
 
-exportAsEPS(boxplot(non.empty.clone.frequency~language, data=nbData), "lang_frequencyNE")
+exportAsEPS(boxplot(non.empty.clone.frequency~language, data=nbDataKnownLang), "lang_frequencyNE")
 checkLM(nbDataKnownLang$non.empty.clone.frequency, as.factor(nbDataKnownLang$language))
 print("Correlation with language (non-empty clones):")
 kruskalWallisWithPost(nbDataKnownLang$non.empty.clone.frequency, as.factor(nbDataKnownLang$language))
