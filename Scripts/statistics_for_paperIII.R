@@ -1,6 +1,5 @@
-rm(list=ls())
-setwd("~/github/fxpl/notebooks")
-source("../mk/PaperII/Performance/plot_for_normality_check.R")
+source("plot_for_normality_check.R")
+setwd("..")
 outputDir <- "Output"
 
 # FUNCTIONS
@@ -157,8 +156,8 @@ exportAsEPS({
 
 # CLONES
 # Snippet occurences distribution
-logHist(snippetOccurrencesA[,2], specifier="snippetOccurencesA", objects="Snippets")
-logHist(snippetOccurrencesNE[,2], specifier="snippetOccurencesNE", objects="Snippets")
+logHist(snippetOccurrencesA$count, specifier="snippetOccurencesA", objects="Snippets")
+logHist(snippetOccurrencesNE$count, specifier="snippetOccurencesNE", objects="Snippets")
 # Notebook clone occurrences distribution
 logHist(notebookOccurencesA[,1], specifier="notebookOccurencesA")
 logHist(notebookOccurencesNE[,1], specifier="notebookOccurencesNE")
@@ -166,11 +165,11 @@ logHist(notebookOccurencesNE[,1], specifier="notebookOccurencesNE")
 # Clone sizes (LOC) distribution
 cloneGroupsA <- snippetOccurrencesA[snippetOccurrencesA$count>1,]
 print("LOC in clone groups, with empty snippet")
-printMeanAndPercentiles(cloneGroupsA[,2])
+printMeanAndPercentiles(cloneGroupsA$LOC)
 cloneSizesA <- do.call(c, apply(cloneGroupsA, 1, repeatSecondColumn))
 print("LOC in clones, with empty snippet")
 printMeanAndPercentiles(as.integer(cloneSizesA))
-logHist(cloneGroupsA[,2], specifier="cloneGroupSizesA", objects="Clone groups")
+logHist(cloneGroupsA$LOC, specifier="cloneGroupSizesA", objects="Clone groups")
 logHist(as.integer(cloneSizesA), specifier="cloneSizesA", objects="Clones")
 cloneGroupsNE <- snippetOccurrencesNE[snippetOccurrencesNE$count>1,]
 print("LOC in clone groups, without empty snippet")
