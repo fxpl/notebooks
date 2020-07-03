@@ -269,13 +269,10 @@ public class SccOutputAnalyzer extends Analyzer {
 							String notebook2Name = getNotebookNameFromNumber(notebook2Number);
 							String repro1 = repros.get(notebook1Name);
 							String repro2 = repros.get(notebook2Name);
-							if (repro1.equals(repro2)) {
-								snippet1.addIntraConnection();
-								snippet2.addIntraConnection();
-							} else {
-								snippet1.addInterConnection(repro2);
-								snippet2.addInterConnection(repro1);
-							}
+							boolean intraNotebook = notebook1Name.equals(notebook2Name);
+							boolean intraRepro = repro1.equals(repro2);
+							snippet1.addConnection(intraNotebook, intraRepro, repro2);
+							snippet2.addConnection(intraNotebook, intraRepro, repro1);
 						} else {
 							if (null == notebook1Number) {
 								System.err.println("Notebook missing for snippet " + id1 + ").");

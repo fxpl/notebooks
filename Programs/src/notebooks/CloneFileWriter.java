@@ -27,7 +27,7 @@ public class CloneFileWriter {
 			Map<SccSnippetId, SccSnippet> snippets) throws IOException {
 		printFile2hashes(file2hashes);
 		printHash2files(hash2files);
-		printCloneFrequencies(file2hashes, hash2files);
+		printCloneFrequencies2(file2snippets, snippets);
 		printConnectionsFile(file2snippets, snippets);
 	}
 	
@@ -121,24 +121,69 @@ public class CloneFileWriter {
 					numUnique++;
 				}
 			}
-			writer.write(notebook.getName() + ", " + numUnique + ", " + numClones + ", " + numClonesNE + ", ");
-			int numSnippets = numClones + numUnique;
-			int numSnippetsNE = numClonesNE + numUnique;
-			if (0 != numSnippets) {
-				double cloneFrequency = (double)numClones / numSnippets;
-				writer.write(String.format(Locale.US, "%.4f", cloneFrequency) + ", ");
-			} else {
-				writer.write("0, ");
-			}
-			if (0 != numSnippetsNE) {
-				double cloneFrequency = (double)numClonesNE / numSnippetsNE;
-				writer.write(String.format(Locale.US, "%.4f", cloneFrequency) + ", ");
-			} else {
-				writer.write("0, ");
-			}
-			writer.write(numIntra + ", " + numIntraNE + "\n");
+			writeCloneFrequencyLine(writer, notebook.getName(), numClones, numUnique, numClonesNE, numIntra, numIntraNE);
 		}
 		writer.close();
+	}
+	
+	// TODO: Bättre namn! (Annan klass?)
+	private void printCloneFrequencies2(Map<String, Set<SccSnippetId>> file2snippets,
+			Map<SccSnippetId, SccSnippet> snippets) throws IOException {
+		Writer writer = new FileWriter(outputDir + "/cloneFrequency" + LocalDateTime.now() + ".csv");
+		writer.write(cloneFrequencyHeader());
+		for (String notebook: file2snippets.keySet()) {
+			int numClones = 0, numUnique = 0, numClonesNE = 0; //numEmpty = 0;
+			int numIntra = 0, numIntraNE = 0;
+			Set<SccSnippetId> snippetsInNotebook = file2snippets.get(notebook);
+			for (SccSnippetId id: snippetsInNotebook) {
+				SccSnippet snippet = snippets.get(id);
+				if (snippet.isClone()) {
+					numClones++;
+				} else {
+					numUnique++;
+				}
+				/*if (0 == snippet.getLoc()) {
+					numEmpty++;
+				}*/
+				numIntra += snippet.numIntraNotebookConnections();
+			}
+			numClonesNE = numClones;
+			numIntraNE = numIntra;	// No empty clones for Scc data!
+			writeCloneFrequencyLine(writer, notebook, numClones, numUnique, numClonesNE, numIntra, numIntraNE);
+		}
+		writer.close();
+	}
+	
+	/**
+	 * TODO
+	 * @param writer
+	 * @param notebook
+	 * @param numClones
+	 * @param numUnique
+	 * @param numClonesNE
+	 * @param numIntra
+	 * @param numIntraNE
+	 * @throws IOException
+	 */
+	private void writeCloneFrequencyLine(Writer writer, String notebook,
+			int numClones, int numUnique, int numClonesNE, int numIntra,
+			int numIntraNE) throws IOException {
+		writer.write(notebook + ", " + numUnique + ", " + numClones + ", " + numClonesNE + ", ");
+		int numSnippets = numClones + numUnique;
+		int numSnippetsNE = numClonesNE + numUnique;
+		if (0 != numSnippets) {
+			double cloneFrequency = (double)numClones / numSnippets;
+			writer.write(String.format(Locale.US, "%.4f", cloneFrequency) + ", ");
+		} else {
+			writer.write("0, ");
+		}
+		if (0 != numSnippetsNE) {
+			double cloneFrequency = (double)numClonesNE / numSnippetsNE;
+			writer.write(String.format(Locale.US, "%.4f", cloneFrequency) + ", ");
+		} else {
+			writer.write("0, ");
+		}
+		writer.write(numIntra + ", " + numIntraNE + "\n");
 	}
 	
 	/**
@@ -210,8 +255,8 @@ public class CloneFileWriter {
 			Set<SccSnippetId> snippetsForNotebook = file2snippets.get(notebook);
 			for (SccSnippetId id: snippetsForNotebook) {
 				SccSnippet snippet = snippets.get(id);
-				interConnections += snippet.numInterConnections();
-				intraConnections += snippet.numIntraConnections();
+				interConnections += snippet.numInterReproConnections();
+				intraConnections += snippet.numIntraReproConnections();
 				if (0 != snippet.getLoc()) {
 					nonEmptySnippets++;
 				}
@@ -256,6 +301,7 @@ public class CloneFileWriter {
 	 * @return Header for the cloneFrequency csv file
 	 */
 	private static String cloneFrequencyHeader() {
+		// TODO: Lagra tomma snippet istf icke-tomma kloner! (Kräver ändring i postprocessing!)
 		return "file, unique, clones, non-empty clones, clone frequency, non-empty clone frequency, "
 				+ "intra clones, non-empty intra clones\n";
 	}

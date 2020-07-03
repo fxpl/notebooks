@@ -6,8 +6,10 @@ import java.util.Set;
 // TODO(?!) Mergea olika snippetklasser
 public class SccSnippet {
 	private final int loc;
-	private int intraConnections;
-	private int interConnections;
+	private int intraNotebookConnections;
+	private int interNotebookConnections;
+	private int intraReproConnections;
+	private int interReproConnections;
 	// Repros that this snippet has an inter connection to
 	private Set<String> reprosInterConnected;
 	
@@ -20,24 +22,23 @@ public class SccSnippet {
 		this(Integer.parseInt(loc));
 	}
 	
-	/**
-	 * Add one inter repro connection
-	 * @param otherRepro Name of the repro to which this connection connects
-	 */
-	public void addInterConnection(String otherRepro) {
-		reprosInterConnected.add(otherRepro);
-		interConnections++;
-	}
-	
-	/**
-	 * Add one intra repro connection
-	 */
-	public void addIntraConnection() {
-		intraConnections++;
+	// TODO: Osnygg signatur
+	public void addConnection(boolean intraNotebook, boolean intraRepro, String otherRepro) {
+		if (intraNotebook) {
+			intraNotebookConnections++;
+		} else {
+			interNotebookConnections++;
+		}
+		if (intraRepro) {
+			intraReproConnections++;
+		} else {
+			interReproConnections++;
+			reprosInterConnected.add(otherRepro);
+		}
 	}
 	
 	public boolean isClone() {
-		return interConnections > 0 || intraConnections > 0;
+		return interNotebookConnections > 0 || intraNotebookConnections > 0;
 	}
 	
 	/**
@@ -54,11 +55,19 @@ public class SccSnippet {
 		return reprosInterConnected;
 	}
 	
-	public int numInterConnections() {
-		return interConnections;
+	public int numInterNotebookConnections() {
+		return interNotebookConnections;
 	}
 	
-	public int numIntraConnections() {
-		return intraConnections;
+	public int numInterReproConnections() {
+		return interReproConnections;
+	}
+	
+	public int numIntraNotebookConnections() {
+		return intraNotebookConnections;
+	}
+	
+	public int numIntraReproConnections() {
+		return intraReproConnections;
 	}
 }

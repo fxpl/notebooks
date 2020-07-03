@@ -26,50 +26,98 @@ public class SccSnippetTest {
 	}
 	
 	@Test
+	public void testAddConnections() {
+		String repro1 = "repro1";
+		String repro2 = "repro2";
+		assertEquals("Number of intra notebook connections != 0 on creation",
+				0, snippet.numIntraNotebookConnections());
+		assertEquals("Number of inter notebook connections != 0 on creation",
+				0, snippet.numInterNotebookConnections());
+		assertEquals("Number of intra repro connections != 0 on creation",
+				0, snippet.numIntraReproConnections());
+		assertEquals("Number of inter repro connections != 0 on creation",
+				0, snippet.numInterReproConnections());
+		assertTrue("Inter connected repros set not empty at creation",
+				snippet.getReprosInterConnected().isEmpty());
+		snippet.addConnection(true, true, null);
+		assertEquals("Number of intra notebook connections !=1 after addition of one",
+				1, snippet.numIntraNotebookConnections());
+		assertEquals("Number of inter notebook connections != 0 after addition of intra notebook connection",
+				0, snippet.numInterNotebookConnections());
+		assertEquals("Number of intra repro connections !=1 after addition of one",
+				1, snippet.numIntraReproConnections());
+		assertEquals("Number of inter repro connections != 0 after addition of intra repro connection",
+				0, snippet.numInterReproConnections());
+		assertTrue("Inter connected repros set not empty after addition of intra repro connection",
+				snippet.getReprosInterConnected().isEmpty());
+		snippet.addConnection(true, false, repro1);
+		Set<String> expectedRepros = new HashSet<String>();
+		expectedRepros.add(repro1);
+		assertEquals("Number of intra notebook connections !=2 after addition of two",
+				2, snippet.numIntraNotebookConnections());
+		assertEquals("Number of inter notebook connections != 0 after addition of intra notebook connections",
+				0, snippet.numInterNotebookConnections());
+		assertEquals("Number of intra repro connections changed by addition of inter repro connection",
+				1, snippet.numIntraReproConnections());
+		assertEquals("Number of inter repro connections != 1 after addition of one",
+				1, snippet.numInterReproConnections());
+		assertEquals("Wrong content of inter connected repro set after addition of one inter repro connection",
+				expectedRepros, snippet.getReprosInterConnected());
+		snippet.addConnection(false, false, repro1);
+		assertEquals("Number of intra notebook connections changed by addition of inter notebook connection",
+				2, snippet.numIntraNotebookConnections());
+		assertEquals("Number of inter notebook connections != 1 after addition of one",
+				1, snippet.numInterNotebookConnections());
+		assertEquals("Number of inter repro connections != 2 after addition of two",
+				2, snippet.numInterReproConnections());
+		assertEquals("Wrong content of inter connected repro set after addition of two connections to the same repro",
+				expectedRepros, snippet.getReprosInterConnected());
+		snippet.addConnection(false, false, repro2);
+		expectedRepros.add(repro2);
+		assertEquals("Number of inter notebook connections != 2 after addition of two",
+				2, snippet.numInterNotebookConnections());
+		assertEquals("Number of inter repro connections != 3 after addition of three", 3,
+				snippet.numInterReproConnections());
+		assertEquals("Wrong content of inter connected repro set after addition of connection to second repro",
+				expectedRepros, snippet.getReprosInterConnected());
+		snippet.addConnection(false, true, "apa");
+		assertEquals("Content of inter connected repro set changed by addition of intra repro connection",
+				expectedRepros, snippet.getReprosInterConnected());
+		// Final check of number of connections, to be on the safe side. (Everything should be checked above.)
+		assertEquals("Wrong final number of intra notebook connections",
+				2, snippet.numIntraNotebookConnections());
+		assertEquals("Wrong final number of inter notebook connections",
+				3, snippet.numInterNotebookConnections());
+		assertEquals("Wrong final number of intra repro connections",
+				2, snippet.numIntraReproConnections());
+		assertEquals("Wrong final number of inter repro connections",
+				3, snippet.numInterReproConnections());
+	}
+	
+	@Test
 	public void testGetLoc() {
 		assertEquals("Wrong loc for snippet", loc, snippet.getLoc());
 	}
 	
-	@Test
-	public void testInterConnections() {
-		String repro1 = "repro1";
-		String repro2 = "repro2";
-		assertEquals("Number of inter connections != 0 on creation", 0, snippet.numInterConnections());
-		assertTrue("Inter connected repros set not empty at creation", snippet.getReprosInterConnected().isEmpty());
-		snippet.addInterConnection(repro1);
-		assertEquals("Wrong number of inter connections after one addition", 1, snippet.numInterConnections());
-		Set<String> expectedRepros = new HashSet<String>();
-		expectedRepros.add(repro1);
-		assertEquals("Wrong inter connections set after one addition", expectedRepros, snippet.getReprosInterConnected());
-		snippet.addInterConnection(repro2);
-		expectedRepros.add(repro2);
-		assertEquals("Wrong inter connections set after two additions", expectedRepros, snippet.getReprosInterConnected());
-		snippet.addInterConnection(repro2);
-		assertEquals("Wrong number of inter connections after three additions", 3, snippet.numInterConnections());
-		assertEquals("Wrong inter connections set after addition of connection to the same repro", expectedRepros, snippet.getReprosInterConnected());
-	}
-	
-	@Test
-	public void testIntraConnections() {
-		assertEquals("Number of intra connections != 0 on creation", 0, snippet.numIntraConnections());
-		snippet.addIntraConnection();
-		assertEquals("Wrong number of intra connections after one addition", 1, snippet.numIntraConnections());
-		snippet.addIntraConnection();
-		snippet.addIntraConnection();
-		assertEquals("Wrong number of intra connections after three additions", 3, snippet.numIntraConnections());
-	}
-	
+	/**
+	 * Verify that a snippet is considered clone after addition of inter
+	 * notebook connection, but not before.
+	 */
 	@Test
 	public void testIsClone_inter() {
 		assertFalse("Snippet considered clone on creation", snippet.isClone());
-		snippet.addInterConnection("foo");
-		assertTrue("Snippet not considered clone after addition of addition of inter connection", snippet.isClone());
+		snippet.addConnection(false, true, null);
+		assertTrue("Snippet not considered clone after addition of addition of inter notebook connection", snippet.isClone());
 	}
 	
+	/**
+	 * Verify that a snippet is considered clone after addition of intra
+	 * notebook connection, but not before.
+	 */
 	@Test
 	public void testIsClone_intra() {
 		assertFalse("Snippet considered clone on creation", snippet.isClone());
-		snippet.addIntraConnection();
-		assertTrue("Snippet not considered clone after addition of addition of intra connection", snippet.isClone());
+		snippet.addConnection(true, true, null);
+		assertTrue("Snippet not considered clone after addition of addition of intra notebook connection", snippet.isClone());
 	}
 }
