@@ -103,7 +103,7 @@ repeatSecondColumn <- function(data) {
 
 # NOTEBOOK DATA
 codeCells <- read.csv("Output/code_cells.csv", header=TRUE, stringsAsFactors=FALSE)
-nonEmptySnippets <- read.csv("Output/snippetsPerFileNE.csv", header=TRUE, stringsAsFactors=FALSE)
+nonEmptySnippets <- read.csv("Output/snippetsPerFileNE.csv", header=TRUE, stringsAsFactors=FALSE)	# TODO: Kan ev. fås från klonfrek istället!
 sizes <- read.csv("Output/notebook_sizes.csv", header=TRUE)
 loc <- read.csv("Output/loc.csv", header=TRUE, stringsAsFactors=FALSE)
 languages <- read.csv("Output/languages.csv", header=TRUE, stringsAsFactors=FALSE)

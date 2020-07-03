@@ -114,11 +114,11 @@ public abstract class AnalyzerTest {
 	 * @return Expected header of cloneFrequency files
 	 */
 	protected static String cloneFrequencyHeader() {
-		return "file, unique, clones, non-empty clones, clone frequency, non-empty clone frequency, "
+		return "file, unique, clones, empty, clone frequency, non-empty clone frequency, "
 				+ "intra clones, non-empty intra clones";
 	}
 
-	/**
+	/** TODO: Flytta!
 	 * @return Expected header of connections files
 	 */
 	protected static String connectionsHeader() {

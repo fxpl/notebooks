@@ -78,8 +78,8 @@ public class SccOutputAnalyzerTest extends AnalyzerTest {
 		};
 		String[] expectedCloneFrequecyLines = {
 			cloneFrequencyHeader(),
-			"nb_6.ipynb, 0, 2, 2, 1.0000, 1.0000, 2, 2",
-			"nb_9.ipynb, 0, 2, 2, 1.0000, 1.0000, 2, 2"
+			"nb_6.ipynb, 0, 2, 0, 1.0000, 1.0000, 2, 2",
+			"nb_9.ipynb, 0, 2, 0, 1.0000, 1.0000, 2, 2"
 		};
 		String[] expectedConnectionsLines = {
 			connectionsHeader(),
@@ -108,8 +108,8 @@ public class SccOutputAnalyzerTest extends AnalyzerTest {
 			};
 			String[] expectedCloneFrequecyLines = {
 				cloneFrequencyHeader(),
-				"nb_6.ipynb, 0, 2, 2, 1.0000, 1.0000, 2, 2",
-				"nb_9.ipynb, 0, 2, 2, 1.0000, 1.0000, 2, 2"
+				"nb_6.ipynb, 0, 2, 0, 1.0000, 1.0000, 2, 2",
+				"nb_9.ipynb, 0, 2, 0, 1.0000, 1.0000, 2, 2"
 			};
 			String[] expectedConnectionsLines = {
 				connectionsHeader(),
@@ -247,7 +247,7 @@ public class SccOutputAnalyzerTest extends AnalyzerTest {
 	@Test
 	public void testConnectionsCsv() throws IOException {
 		String dataDir = "test/data/scc";
-		String statsFile = dataDir + "/file_stats_new";
+		String statsFile = dataDir + "/file_stats";
 		String pairFile = dataDir + "/clone_pairs";
 		String reproFile = "test/data/hash/repros.csv";
 		String[] expectedLines = {
@@ -302,7 +302,7 @@ public class SccOutputAnalyzerTest extends AnalyzerTest {
 		deleteCloneCsvs();
 	}*/
 	
-	/**
+	/** TODO: Test med tomma snippets!
 	 * Verify that cloneFrequencies are computed correctly at clone analysis
 	 * based on SourcererCC data.
 	 * @throws IOException 
@@ -316,17 +316,17 @@ public class SccOutputAnalyzerTest extends AnalyzerTest {
 		
 		String[] expectedLines = {
 				cloneFrequencyHeader(),
-				"nb_1.ipynb, 0, 2, 2, 1.0000, 1.0000, 2, 2",
-				"nb_2.ipynb, 0, 3, 3, 1.0000, 1.0000, 2, 2",
-				"nb_3.ipynb, 1, 1, 1, 0.5000, 0.5000, 0, 0",
-				"nb_4.ipynb, 0, 2, 2, 1.0000, 1.0000, 2, 2",
-				"nb_5.ipynb, 0, 2, 2, 1.0000, 1.0000, 0, 0",
-				"nb_6.ipynb, 0, 2, 2, 1.0000, 1.0000, 2, 2",
-				"nb_7.ipynb, 0, 3, 3, 1.0000, 1.0000, 0, 0",
-				"nb_8.ipynb, 0, 1, 1, 1.0000, 1.0000, 0, 0",
-				"nb_9.ipynb, 0, 2, 2, 1.0000, 1.0000, 2, 2",
-				"nb_10.ipynb, 0, 1, 1, 1.0000, 1.0000, 0, 0",
-				"nb_11.ipynb, 0, 1, 1, 1.0000, 1.0000, 0, 0"
+				"nb_1.ipynb, 0, 2, 0, 1.0000, 1.0000, 2, 2",
+				"nb_2.ipynb, 0, 3, 0, 1.0000, 1.0000, 2, 2",
+				"nb_3.ipynb, 1, 1, 0, 0.5000, 0.5000, 0, 0",
+				"nb_4.ipynb, 0, 2, 0, 1.0000, 1.0000, 2, 2",
+				"nb_5.ipynb, 0, 2, 0, 1.0000, 1.0000, 0, 0",
+				"nb_6.ipynb, 0, 2, 0, 1.0000, 1.0000, 2, 2",
+				"nb_7.ipynb, 0, 3, 0, 1.0000, 1.0000, 0, 0",
+				"nb_8.ipynb, 0, 1, 0, 1.0000, 1.0000, 0, 0",
+				"nb_9.ipynb, 0, 2, 0, 1.0000, 1.0000, 2, 2",
+				"nb_10.ipynb, 0, 1, 0, 1.0000, 1.0000, 0, 0",
+				"nb_11.ipynb, 0, 1, 0, 1.0000, 1.0000, 0, 0"
 		};
 		
 		analyzer.clones(statsFile, reproFile, pairFile);
@@ -380,8 +380,8 @@ public class SccOutputAnalyzerTest extends AnalyzerTest {
 		
 		String[] expectedCloneFrequecyLines = {
 			cloneFrequencyHeader(),
-			"nb_6.ipynb, 0, 2, 2, 1.0000, 1.0000, 2, 2",
-			"nb_9.ipynb, 0, 2, 2, 1.0000, 1.0000, 2, 2"
+			"nb_6.ipynb, 0, 2, 0, 1.0000, 1.0000, 2, 2",
+			"nb_9.ipynb, 0, 2, 0, 1.0000, 1.0000, 2, 2"
 		};
 		String[] expectedConnectionsLines = {
 			connectionsHeader(),
@@ -409,8 +409,8 @@ public class SccOutputAnalyzerTest extends AnalyzerTest {
 		
 		String[] expectedCloneFrequecyLines = {
 			cloneFrequencyHeader(),
-			"nb_6.ipynb, 0, 2, 2, 1.0000, 1.0000, 2, 2",
-			"nb_9.ipynb, 0, 2, 2, 1.0000, 1.0000, 2, 2"
+			"nb_6.ipynb, 0, 2, 0, 1.0000, 1.0000, 2, 2",
+			"nb_9.ipynb, 0, 2, 0, 1.0000, 1.0000, 2, 2"
 		};
 		String[] expectedConnectionsLines = {
 			connectionsHeader(),
@@ -438,8 +438,8 @@ public class SccOutputAnalyzerTest extends AnalyzerTest {
 		
 		String[] expectedCloneFrequecyLines = {
 			cloneFrequencyHeader(),
-			"nb_6.ipynb, 0, 2, 2, 1.0000, 1.0000, 2, 2",
-			"nb_9.ipynb, 0, 2, 2, 1.0000, 1.0000, 2, 2"
+			"nb_6.ipynb, 0, 2, 0, 1.0000, 1.0000, 2, 2",
+			"nb_9.ipynb, 0, 2, 0, 1.0000, 1.0000, 2, 2"
 		};
 		String[] expectedConnectionsLines = {
 			connectionsHeader(),
