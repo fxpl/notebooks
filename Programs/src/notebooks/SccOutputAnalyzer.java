@@ -12,10 +12,11 @@ import java.util.Map;
 import java.util.Set;
 
 public class SccOutputAnalyzer extends Analyzer {
+	Map<String, Set<SccSnippetId>> file2snippets;	// TODO: Int istf String?
+	Map <SccSnippetId, SccSnippet> snippets;
 	// Information about each snippet
 	Map<SccSnippetId, Integer> notebookNumbers;
 	Map<SccSnippetId, Integer> snippetIndices;
-	Map<SccSnippetId, Integer> linesOfCode;
 	// Information about each notebook
 	private Map<String, String> repros = null;
 	Map<String, Integer> snippetsPerNotebook = null;
@@ -112,8 +113,9 @@ public class SccOutputAnalyzer extends Analyzer {
 		BufferedReader statsReader = new BufferedReader(new FileReader(statsFile));
 		notebookNumbers = new HashMap<SccSnippetId, Integer>();
 		snippetIndices = new HashMap<SccSnippetId, Integer>();
-		linesOfCode = new HashMap<SccSnippetId, Integer>();
-		snippetsPerNotebook = new HashMap<String, Integer>();
+		snippets = new HashMap<SccSnippetId, SccSnippet>();
+		snippetsPerNotebook = new HashMap<String, Integer>();	// TODO: Int istf String?
+		file2snippets = new HashMap<String, Set<SccSnippetId>>();
 		String line = statsReader.readLine();
 		while(null != line) {
 			String[] columns = line.split(",");
@@ -134,7 +136,13 @@ public class SccOutputAnalyzer extends Analyzer {
 			   notebook files, but so is the clone detection -SourcererCC
 			   doesn't consider comments in clone analysis. */
 			int loc = Integer.parseInt(columns[8]);
-			linesOfCode.put(id, loc);
+			snippets.put(id, new SccSnippet(loc));
+			Set<SccSnippetId> snippetsForNotebook = file2snippets.get(notebookName);
+			if (null == snippetsForNotebook) {
+				snippetsForNotebook = new HashSet<SccSnippetId>();
+			}
+			snippetsForNotebook.add(id);
+			file2snippets.put(notebookName, snippetsForNotebook);
 			line = statsReader.readLine();
 		}
 		statsReader.close();
@@ -154,7 +162,7 @@ public class SccOutputAnalyzer extends Analyzer {
 		}
 	}
 	
-	/**
+	/** TODO
 	 * Perform clone analysis. If from Hash2Files is true, data is read from an
 	 * existing hash2files file. Else, a pair file from a SourcererCC run is
 	 * used.
@@ -171,8 +179,11 @@ public class SccOutputAnalyzer extends Analyzer {
 		} else {
 			snippet2file = getClones(fileName);
 		}
-		Map<Notebook, SnippetCode[]> file2snippet = getSnippets(snippet2file);
-		new CloneFileWriter(outputDir).write(file2snippet, snippet2file);
+		Map<Notebook, SnippetCode[]> file2snippet = getSnippets(snippet2file);	// TODO: Ska bort!
+		storeConnections(fileName);
+		CloneFileWriter writer = new CloneFileWriter(outputDir);
+		//writer.write(file2snippet, snippet2file);
+		writer.write(file2snippet, snippet2file, file2snippets, snippets);
 		return snippet2file;
 	}
 
@@ -220,6 +231,70 @@ public class SccOutputAnalyzer extends Analyzer {
 		reader.close();
 		Utils.heartBeat("Hash-to-files map read from file (" + numRead + " lines)!");
 		return result;
+	}
+	
+	private void storeConnections(String pairFile) throws IOException {
+		final BufferedReader reader = new BufferedReader(new FileReader(pairFile));
+		long numRead = 0;
+		String line = reader.readLine();
+		while (null != line) {
+			if (0 == numRead%100000000) {
+				Utils.heartBeat("Reading clone pair " + numRead + ".");
+			}
+			String[] numbers = line.split(",");
+			if (4 != numbers.length) {
+				System.err.println("Invalid line number " + (numRead + 1) + " in pair file: " + line);
+				System.err.println(" Skipping line!");
+			} else {
+				try {
+					// TODO: Tester!
+					SccSnippetId id1 = new SccSnippetId(numbers[0], numbers[1]);
+					SccSnippetId id2 = new SccSnippetId(numbers[2], numbers[3]);
+					SccSnippet snippet1 = snippets.get(id1);
+					SccSnippet snippet2 = snippets.get(id2);
+					if (null == snippet1) {
+						System.err.println("ID for nonexistent snippet (" + id1 + ") found on line \""
+								+ line + "\". Skipping clone pair!");
+					}
+					if (null == snippet2) {
+						System.err.println("ID for nonexistent snippet (" + id2 + ") found on line \""
+								+ line + "\". Skipping clone pair!");
+					}
+					if (null != snippet1 && null != snippet2) {
+						// TODO: Spara repro i snippet istället!?
+						Integer notebook1Number = notebookNumbers.get(id1);
+						Integer notebook2Number = notebookNumbers.get(id2);
+						if (null != notebook1Number && null != notebook2Number) {
+							String notebook1Name = getNotebookNameFromNumber(notebook1Number);
+							String notebook2Name = getNotebookNameFromNumber(notebook2Number);
+							String repro1 = repros.get(notebook1Name);
+							String repro2 = repros.get(notebook2Name);
+							if (repro1.equals(repro2)) {
+								snippet1.addIntraConnection();
+								snippet2.addIntraConnection();
+							} else {
+								snippet1.addInterConnection(repro2);
+								snippet2.addInterConnection(repro1);
+							}
+						} else {
+							if (null == notebook1Number) {
+								System.err.println("Notebook missing for snippet " + id1 + ").");
+							} if (null == notebook1Number) {
+								System.err.println("Notebook missing for snippet " + id2 + ").");
+							}
+							System.err.println("Clone pair " + line + " skipped!");
+						}
+					}
+				} catch (NumberFormatException e) {
+					// We just skip this line
+					System.err.println("Number format exception when parsing line \""
+							+ line + "\": " + e.getMessage());
+				}
+			}
+			numRead++;
+			line = reader.readLine();
+		}
+		reader.close();
 	}
 	
 	private HashMap<CloneGroup, List<SccSnippetId>> getCloneMap(String pairFile) throws IOException {
@@ -331,6 +406,7 @@ public class SccOutputAnalyzer extends Analyzer {
 		return outerResult;
 	}
 	
+	// TODO: Hela den här lär tas bort!
 	private Map<SnippetCode, List<Snippet>> getClones(HashMap<CloneGroup, List<SccSnippetId>> intermediateCloneMap)
 			throws FileNotFoundException {
 		Map<SnippetCode, List<Snippet>> result = new HashMap<SnippetCode, List<Snippet>>(intermediateCloneMap.size());
@@ -342,23 +418,24 @@ public class SccOutputAnalyzer extends Analyzer {
 			if (0 == hashIndex%1000000) {
 				Utils.heartBeat("Creating entry for " + hashIndex + " in snippet-to-files-map.");
 			}
-			List<Snippet> snippets = new ArrayList<Snippet>();
+			List<Snippet> snippetsTmp = new ArrayList<Snippet>();
 			int numClones = cloned.size();
 			List<Integer> loc = new ArrayList<Integer>(numClones);
 			for (int i=0; i<numClones; i++) {
 				SccSnippetId id = cloned.get(i);
-				addSnippet(id, snippets);
+				addSnippet(id, snippetsTmp);
 				snippetIdsToAdd.remove(id);
-				Integer currentLoc = linesOfCode.get(id);
-				if (null == currentLoc) {
-					System.err.println("Snippet without line count (" + id + ") skipped!");
+				SccSnippet snippet = snippets.get(id);
+				if (null == snippet) {	// TODO: Lär inte hända!?
+					System.err.println("Nonexistent snippet (" + id + ") skipped!");
 				} else {
+					int currentLoc = snippet.getLoc();
 					loc.add(currentLoc);
 				}
 			}
 			int medianLoc = Utils.median(loc, "Different line count for snippet " + Integer.toString(hashIndex));
 			SnippetCode hash = new SnippetCode(medianLoc, Integer.toString(hashIndex++));
-			result.put(hash, snippets);
+			result.put(hash, snippetsTmp);
 		}
 		
 		// Remaining snippets are unique. Add them!
@@ -366,11 +443,11 @@ public class SccOutputAnalyzer extends Analyzer {
 			if (0 == hashIndex%1000000) {
 				Utils.heartBeat("Creating entry for " + hashIndex + " in snippet-to-files-map.");
 			}
-			List<Snippet> snippets = new ArrayList<>(1);
-			addSnippet(id, snippets);
-			int loc = linesOfCode.get(id);
+			List<Snippet> snippetsTmp = new ArrayList<>(1);
+			addSnippet(id, snippetsTmp);
+			int loc = snippets.get(id).getLoc();
 			SnippetCode hash = new SnippetCode(loc, Integer.toString(hashIndex++));
-			result.put(hash, snippets);
+			result.put(hash, snippetsTmp);
 		}
 		return result;
 	}

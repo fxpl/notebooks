@@ -105,6 +105,7 @@ public class TestUtils {
 				"file2hashesA",
 				"file2hashesNE",
 				"hash2filesA",
+				"snippetsA",
 				"cloneFrequency",
 				"connections"
 		};
@@ -131,7 +132,7 @@ public class TestUtils {
 		}
 	}
 	
-	/**
+	/** TODO
 	 * Verify that all clone analysis output files exist in the specified
 	 * directory, and remove them.
 	 * @param dir Name of directory to look in and remove from
@@ -148,7 +149,7 @@ public class TestUtils {
 		verifyExistenceOfAndRemove(dir, prefixes);
 	}
 	
-	/**
+	/** TODO
 	 * Delete all CSV files created by the clone analysis in the specified
 	 * directory.
 	 * @param dir Directory to remove files from

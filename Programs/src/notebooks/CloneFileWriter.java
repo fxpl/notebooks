@@ -6,9 +6,11 @@ import java.io.Writer;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -18,6 +20,15 @@ public class CloneFileWriter {
 	
 	public CloneFileWriter(String outputDir) {
 		this.outputDir = outputDir;
+	}
+	
+	public void write(Map<Notebook, SnippetCode[]> file2hashes, Map<SnippetCode,
+			List<Snippet>> hash2files, Map<String, Set<SccSnippetId>> file2snippets,
+			Map<SccSnippetId, SccSnippet> snippets) throws IOException {
+		printFile2hashes(file2hashes);
+		printHash2files(hash2files);
+		printCloneFrequencies(file2hashes, hash2files);
+		printConnectionsFile(file2snippets, snippets);
 	}
 	
 	/**
@@ -180,6 +191,39 @@ public class CloneFileWriter {
 						+ notebooks.get(i).getName() + " failed!");
 				e.printStackTrace();
 			}
+		}
+		writer.close();
+	}
+	
+	// TODO: Annan file-avbildning
+	private void printConnectionsFile(Map<String, Set<SccSnippetId>> file2snippets, Map<SccSnippetId, SccSnippet> snippets) throws IOException {
+		Writer writer = new FileWriter(outputDir + "/connections" + LocalDateTime.now() + ".csv");
+		// TODO: Separat metod
+		writer.write("file, non-empty connections, non-empty connections normalized, non-empty intra repro connections, mean non-empty inter repro connections\n");
+		Set<String> notebooks = file2snippets.keySet();
+		// TODO: Behöver detta parallelliseras?
+		for (String notebook: notebooks) {
+			Set<String> interConnectedRepros = new HashSet<String>();
+			int interConnections = 0;
+			int intraConnections = 0;
+			int nonEmptySnippets = 0;
+			Set<SccSnippetId> snippetsForNotebook = file2snippets.get(notebook);
+			for (SccSnippetId id: snippetsForNotebook) {
+				SccSnippet snippet = snippets.get(id);
+				interConnections += snippet.numInterConnections();
+				intraConnections += snippet.numIntraConnections();
+				if (0 != snippet.getLoc()) {
+					nonEmptySnippets++;
+				}
+				interConnectedRepros.addAll(snippet.getReprosInterConnected());
+			}
+			int connections = interConnections + intraConnections;
+			// Empty snippets are considered unique by SourcererCC
+			double normalizedNonEmptyConnections = ConnectionsLineBuilder.normalized(connections, nonEmptySnippets);
+			double meanNonEmptyInterReproConnections = ConnectionsLineBuilder.normalized(interConnections, interConnectedRepros.size());
+			writer.write(notebook + ", "
+					+ connections + ", " + String.format(Locale.US, "%.4f", normalizedNonEmptyConnections) + ", "
+					+ intraConnections + ", " + String.format(Locale.US, "%.4f", meanNonEmptyInterReproConnections) + "\n");
 		}
 		writer.close();
 	}
