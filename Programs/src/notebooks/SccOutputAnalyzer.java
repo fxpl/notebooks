@@ -2,9 +2,13 @@ package notebooks;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Writer;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -51,19 +55,23 @@ public class SccOutputAnalyzer extends Analyzer {
 		System.out.println("NOTE THAT NOTEBOOKS WITHOUT SNIPPETS ARE NOT INCLUDED");
 		System.out.println("since they are not included in the SourcererCC data!");
 		storeConnections(pairFile);
-		CloneFileWriter writer = new CloneFileWriter(outputDir);
-		writer.write(null, null, file2snippets, snippets);
+		writeCloneFiles(file2snippets, snippets);
 	}
 	
 	/**
-	 * Initialize repro information for each notebook.
-	 * @param fileName Path to file with mapping from notebook number to repro
+	 * Create and fill cloneFrequencies and connections csv files with data for
+	 * all notebooks.
+	 * @param file2snippets A map from file names to snippets
+	 * @param snippets A map with all snippets (id -> object)
+	 * @throws IOException On problems handling the output files
 	 */
-	private Map<String, String> initializeReproMap(String fileName) throws IOException {
-		return createReproMap(fileName);
+	private void writeCloneFiles(Map<String, Set<SccSnippetId>> file2snippets,
+			Map<SccSnippetId, SccSnippet> snippets) throws IOException {
+		printCloneFrequencies(file2snippets, snippets);
+		printConnectionsFile(file2snippets, snippets);
 	}
 	
-	/**
+	/** TODO: Snygga till!
 	 * Initialize the maps containing information about each snippet
 	 * @param statsFile Path to file stats file produced by the SourcererCC tokenizer
 	 */
@@ -98,7 +106,7 @@ public class SccOutputAnalyzer extends Analyzer {
 			line = statsReader.readLine();
 		}
 		statsReader.close();
-		Map<String, String> repros = initializeReproMap(reproFile);
+		Map<String, String> repros = createReproMap(reproFile);
 		for (SccSnippetId snippet: snippets.keySet()) {
 			Notebook notebook = snippets.get(snippet).getNotebook();
 			notebook.setRepro(repros.get(notebook.getName()));
@@ -165,6 +173,85 @@ public class SccOutputAnalyzer extends Analyzer {
 	
 	private static String getNotebookNameFromNumber(int notebookNumber) {
 		return "nb_" + notebookNumber + ".ipynb";
+	}
+	
+	private void printCloneFrequencies(Map<String, Set<SccSnippetId>> file2snippets,
+			Map<SccSnippetId, SccSnippet> snippets) throws IOException {
+		Writer writer = new FileWriter(outputDir + "/cloneFrequency" + LocalDateTime.now() + ".csv");
+		writer.write(cloneFrequencyHeader());
+		for (String notebook: file2snippets.keySet()) {
+			int numClones = 0, numUnique = 0, numEmpty = 0;
+			int numIntra = 0, numIntraNE = 0;
+			Set<SccSnippetId> snippetsInNotebook = file2snippets.get(notebook);
+			for (SccSnippetId id: snippetsInNotebook) {
+				SccSnippet snippet = snippets.get(id);
+				if (snippet.isClone()) {
+					numClones++;
+				} else {
+					numUnique++;
+				}
+				if (0 == snippet.getLoc()) {
+					numEmpty++;
+				}
+				numIntra += snippet.numIntraNotebookConnections();
+			}
+			numIntraNE = numIntra;	// No empty clones for Scc data!
+			printCloneFrequencyLine(writer, notebook, numClones, numUnique, numEmpty, numIntra, numIntraNE);
+		}
+		writer.close();
+	}
+	
+	/**
+	 * Imagine a graph where the nodes are the notebooks and each snippet that
+	 * is shared between two notebooks constitutes an edge between these
+	 * notebooks. For each node, let 'edges' be the number of edges
+	 * starting/ending at this node and 'repro' be the repro where the current
+	 * notebook resides. For every node/notebook, count:
+	 * - edges
+	 * - normalized edges (that is, edges/number of snippets, or 0 if edges=0)
+	 * - edges inside current repro
+	 * - mean number edges to other repros
+	 * Ignore empty snippets in all computations. Print the values, in the
+	 * order mentioned, separated with commas to the file
+	 * connections<current-date-time>.csv. Note that when computing the mean,
+	 * only repros for which there is a connection are included.
+	 */
+	private void printConnectionsFile(Map<String, Set<SccSnippetId>> file2snippets, Map<SccSnippetId, SccSnippet> snippets) throws IOException {
+		Writer writer = new FileWriter(outputDir + "/connections" + LocalDateTime.now() + ".csv");
+		writer.write(connectionsHeader());
+		Set<String> notebooks = file2snippets.keySet();
+		for (String notebook: notebooks) {
+			Set<String> interConnectedRepros = new HashSet<String>();
+			int interConnections = 0;
+			int intraConnections = 0;
+			int nonEmptySnippets = 0;
+			Set<SccSnippetId> snippetsForNotebook = file2snippets.get(notebook);
+			for (SccSnippetId id: snippetsForNotebook) {
+				SccSnippet snippet = snippets.get(id);
+				interConnections += snippet.numInterReproConnections();
+				intraConnections += snippet.numIntraReproConnections();
+				if (0 != snippet.getLoc()) {
+					nonEmptySnippets++;
+				}
+				interConnectedRepros.addAll(snippet.getReprosInterConnected());
+			}
+			int connections = interConnections + intraConnections;
+			// Empty snippets are considered unique by SourcererCC
+			double normalizedNonEmptyConnections = ConnectionsLineBuilder.normalized(connections, nonEmptySnippets);
+			double meanNonEmptyInterReproConnections = ConnectionsLineBuilder.normalized(interConnections, interConnectedRepros.size());
+			writer.write(notebook + ", "
+					+ connections + ", " + String.format(Locale.US, "%.4f", normalizedNonEmptyConnections) + ", "
+					+ intraConnections + ", " + String.format(Locale.US, "%.4f", meanNonEmptyInterReproConnections) + "\n");
+		}
+		writer.close();
+	}
+	
+	/**
+	 * @return Header for the connections csv file
+	 */
+	private String connectionsHeader() {
+		return "file, non-empty connections, non-empty connections normalized, "
+				+ "non-empty intra repro connections, mean non-empty inter repro connections\n";
 	}
 	
 	void analyze(String[] args) {

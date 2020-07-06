@@ -624,7 +624,7 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 		// hash2Files is hard to test since we don't know in which order the hashes are stored
 		String[] expectedFrequencyLines = {
 			cloneFrequencyHeader(),
-			notebookFile + ", 1, 2, 2, 0.6667, 0.0000, 2, 2"
+			notebookFile + ", 1, 2, 2, 0.6667, 2.0000, 2, 2"
 		};
 		String[] expectedConnectionsLines = {
 			connectionsHeader(),
