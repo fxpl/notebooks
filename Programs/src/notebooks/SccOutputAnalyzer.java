@@ -44,25 +44,6 @@ public class SccOutputAnalyzer extends Analyzer {
 	}
 	
 	/**
-	 * Perform the clone analysis based on an existing hash2files file. Write
-	 * file2hashes[A|NE]<<current-date-time>.csv, hash2filesA<current-date-time>.csv,
-	 * cloneFrequencies<current-date-time>.csv and
-	 * connections<current-date-time>.csv accordingly.
-	 * This methods initializes snippet and repro information, so you shouldn't
-	 * do it explicitly before the call to this method.
-	 * @param statsFile Path to file stats file produced by the SourcererCC tokenizer
-	 * @param reproFile Path to file with mapping from notebook number to repro
-	 * @param h2fFile: Path to existing hash2files
-	 * @return A map from snippets to files
-	 * @throws IOException
-	 */
-	public Map<SnippetCode, List<Snippet>> clonesFromH2fFile(String statsFile, String reproFile, String h2fFile) throws IOException {
-		initializeSnippetInfo(statsFile);
-		initializeReproMap(reproFile);
-		return clonesFromH2fFile(h2fFile);
-	}
-	
-	/**
 	 * Perform the clone analysis based on SourcererCC output files. Write
 	 * file2hashes[A|NE]<<current-date-time>.csv, hash2filesA<current-date-time>.csv,
 	 * cloneFrequencies<current-date-time>.csv and
@@ -78,23 +59,17 @@ public class SccOutputAnalyzer extends Analyzer {
 	 * @throws IOException
 	 */
 	public Map<SnippetCode, List<Snippet>> clones(String pairFile) throws IOException {
-		return clones(pairFile, false);
-	}
-	
-	/**
-	 * Perform the clone analysis based on an existing hash2files file. Write
-	 * file2hashes[A|NE]<<current-date-time>.csv, hash2filesA<current-date-time>.csv,
-	 * cloneFrequencies<current-date-time>.csv and
-	 * connections<current-date-time>.csv accordingly.
-	 * Note that you have to initialize the snippet and repro information, by
-	 * calling initializeSnippetInfo and initializeReproMap respectively before
-	 * calling this method!
-	 * @param h2fFile: Path to output hash2files file
-	 * @return A map from snippets to files
-	 * @throws IOException
-	 */
-	public Map<SnippetCode, List<Snippet>> clonesFromH2fFile(String h2fFile) throws IOException {
-		return clones(h2fFile, true);
+		System.out.println("Analyzing clones based on SourcererCC output files!");
+		System.out.println("NOTE THAT NOTEBOOKS WITHOUT SNIPPETS ARE NOT INCLUDED");
+		System.out.println("since they are not included in the SourcererCC data!");
+		Map<SnippetCode, List<Snippet>> snippet2file;
+		snippet2file = getClones(pairFile);
+		Map<Notebook, SnippetCode[]> file2snippet = getSnippets(snippet2file);	// TODO: Ska bort!
+		storeConnections(pairFile);
+		CloneFileWriter writer = new CloneFileWriter(outputDir);
+		//writer.write(file2snippet, snippet2file);
+		writer.write(file2snippet, snippet2file, file2snippets, snippets);
+		return snippet2file;
 	}
 	
 	/**
@@ -161,31 +136,6 @@ public class SccOutputAnalyzer extends Analyzer {
 			map.put(key, 1);
 		}
 	}
-	
-	/** TODO
-	 * Perform clone analysis. If from Hash2Files is true, data is read from an
-	 * existing hash2files file. Else, a pair file from a SourcererCC run is
-	 * used.
-	 * @param fileName Name of file2hash or pair file
-	 * @param fromHash2files Indicate whether to use an existing hash2files
-	 */
-	private Map<SnippetCode, List<Snippet>> clones(String fileName, boolean fromHash2files) throws IOException {
-		System.out.println("Analyzing clones based on SourcererCC output files!");
-		System.out.println("NOTE THAT NOTEBOOKS WITHOUT SNIPPETS ARE NOT INCLUDED");
-		System.out.println("since they are not included in the SourcererCC data!");
-		Map<SnippetCode, List<Snippet>> snippet2file;
-		if (fromHash2files) {
-			snippet2file = readClones(fileName);
-		} else {
-			snippet2file = getClones(fileName);
-		}
-		Map<Notebook, SnippetCode[]> file2snippet = getSnippets(snippet2file);	// TODO: Ska bort!
-		storeConnections(fileName);
-		CloneFileWriter writer = new CloneFileWriter(outputDir);
-		//writer.write(file2snippet, snippet2file);
-		writer.write(file2snippet, snippet2file, file2snippets, snippets);
-		return snippet2file;
-	}
 
 	/**
 	 * Create a mapping from snippets to notebooks (hash2files) using output
@@ -194,43 +144,6 @@ public class SccOutputAnalyzer extends Analyzer {
 	private Map<SnippetCode, List<Snippet>> getClones(String pairFile) throws IOException {
 		HashMap<CloneGroup, List<SccSnippetId>> intermediateCloneMap = getCloneMap(pairFile);
 		return getClones(intermediateCloneMap);
-	}
-	
-	private Map<SnippetCode, List<Snippet>> readClones(String snippet2filesFile) throws IOException {
-		Map<SnippetCode, List<Snippet>> result = new HashMap<SnippetCode, List<Snippet>>();
-		BufferedReader reader = new BufferedReader(new FileReader(snippet2filesFile));
-		reader.readLine();	// Skip header
-		int numRead = 1;
-		String line = reader.readLine();
-		while (null != line) {
-			String[] subStrings = line.split(", ");
-			if (0 == subStrings.length || 0 != subStrings.length % 2) {
-				System.err.println("Invalid line number " + (numRead + 1) + " in hash2files: " + line);
-				System.err.println(" Skipping line!");
-			} else {
-				try {
-					SnippetCode key = new SnippetCode(Integer.parseInt(subStrings[1]), subStrings[0]);
-					int numSnippets = (subStrings.length - 2) / 2;
-					List<Snippet> snippets = new ArrayList<Snippet>(numSnippets);
-					for (int i=0; i<numSnippets; i++) {
-						String notebookName = subStrings[2+2*i];
-						int snippetIndex = Integer.parseInt(subStrings[3+2*i]);
-						String reproName = repros.get(notebookName);
-						snippets.add(new Snippet(notebookName, reproName, snippetIndex));
-					}
-					result.put(key, snippets);
-				} catch (NumberFormatException e) {
-					// We just skip this line
-					System.err.println("Number format exception when parsing line \""
-							+ line + "\": " + e.getMessage());
-				}
-			}
-			numRead++;
-			line = reader.readLine();
-		}
-		reader.close();
-		Utils.heartBeat("Hash-to-files map read from file (" + numRead + " lines)!");
-		return result;
 	}
 	
 	private void storeConnections(String pairFile) throws IOException {
@@ -494,7 +407,7 @@ public class SccOutputAnalyzer extends Analyzer {
 	}
 	
 	void analyze(String[] args) {
-		String pairFile = null, h2fFile = null;
+		String pairFile = null;
 		
 		// Set up
 		for (int i=0; i<args.length; i++) {
@@ -516,8 +429,6 @@ public class SccOutputAnalyzer extends Analyzer {
 				}
 			} else if (arg.startsWith("--pair_file")) {
 				pairFile = getValueFromArgument(arg);
-			} else if (arg.startsWith("--h2f_file")) {
-				h2fFile = getValueFromArgument(arg);
 			} else if (arg.startsWith("--output_dir")) {
 				outputDir = getValueFromArgument(arg);
 			} else {
@@ -526,17 +437,11 @@ public class SccOutputAnalyzer extends Analyzer {
 		}
 		
 		boolean pairFileSet = null != pairFile && !("".equals(pairFile));
-		boolean h2fFileSet = null != h2fFile && !("".equals(h2fFile));
-		
 		// Run
 		// (If notebookNumbers is null, none of the snippet info maps are initialized.)
-		if ((pairFileSet || h2fFileSet) && null != notebookNumbers &&  null !=this.repros) {
+		if (pairFileSet && null != notebookNumbers &&  null !=this.repros) {
 			try {
-				if (h2fFileSet) {
-					this.clonesFromH2fFile(h2fFile);
-				} else if (pairFileSet) {
-					this.clones(pairFile);
-				}
+				this.clones(pairFile);
 				System.out.println("Clone files created!");
 			} catch (IOException e) {
 				e.printStackTrace();
