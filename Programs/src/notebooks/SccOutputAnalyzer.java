@@ -32,8 +32,7 @@ public class SccOutputAnalyzer extends Analyzer {
 	 * @throws IOException
 	 */
 	public void clones(String statsFile, String reproFile, String pairFile) throws IOException {
-		initializeSnippetInfo(statsFile);
-		initializeReproMap(reproFile);
+		initializeSnippetInfo(statsFile, reproFile);
 		clones(pairFile);
 		//return clones(pairFile);
 	}
@@ -66,7 +65,7 @@ public class SccOutputAnalyzer extends Analyzer {
 	 * Initialize repro information for each notebook.
 	 * @param fileName Path to file with mapping from notebook number to repro
 	 */
-	public void initializeReproMap(String fileName) throws IOException {
+	private void initializeReproMap(String fileName) throws IOException {
 		repros = createReproMap(fileName);
 	}
 	
@@ -74,7 +73,7 @@ public class SccOutputAnalyzer extends Analyzer {
 	 * Initialize the maps containing information about each snippet
 	 * @param statsFile Path to file stats file produced by the SourcererCC tokenizer
 	 */
-	public void initializeSnippetInfo(String statsFile) throws IOException {
+	public void initializeSnippetInfo(String statsFile, String reproFile) throws IOException {
 		BufferedReader statsReader = new BufferedReader(new FileReader(statsFile));
 		notebookNumbers = new HashMap<SccSnippetId, Notebook>();
 		snippets = new HashMap<SccSnippetId, SccSnippet>();
@@ -107,6 +106,7 @@ public class SccOutputAnalyzer extends Analyzer {
 			line = statsReader.readLine();
 		}
 		statsReader.close();
+		initializeReproMap(reproFile);
 	}
 
 	private void storeConnections(String pairFile) throws IOException {
@@ -174,25 +174,16 @@ public class SccOutputAnalyzer extends Analyzer {
 	
 	void analyze(String[] args) {
 		String pairFile = null;
+		String statsFile = null;
+		String reproFile = null;
 		
 		// Set up
 		for (int i=0; i<args.length; i++) {
 			String arg = args[i];
 			if (arg.startsWith("--stats_file")) {
-				String statsFile = getValueFromArgument(arg);
-				try {
-					initializeSnippetInfo(statsFile);
-				} catch (IOException e) {
-					System.err.println("I/O error when initializing snippet info: " + e.getMessage());
-				}
+				statsFile = getValueFromArgument(arg);
 			} else if (arg.startsWith("--repro_file")) {
-				String reproFile = getValueFromArgument(arg);
-				try {
-					this.initializeReproMap(reproFile);
-				} catch (IOException e) {
-					System.err.println("I/O error when initializing repro info: " + e.getMessage());
-					System.err.println("Repro information not initialized!");
-				}
+				reproFile = getValueFromArgument(arg);
 			} else if (arg.startsWith("--pair_file")) {
 				pairFile = getValueFromArgument(arg);
 			} else if (arg.startsWith("--output_dir")) {
@@ -202,10 +193,18 @@ public class SccOutputAnalyzer extends Analyzer {
 			}
 		}
 		
+		boolean statsFileSet = null != statsFile && !("".equals(statsFile));
+		boolean reproFileSet = null != reproFile && !("".equals(reproFile));
 		boolean pairFileSet = null != pairFile && !("".equals(pairFile));
 		// Run
-		// (If notebookNumbers is null, none of the snippet info maps are initialized.)
-		if (pairFileSet && null != notebookNumbers &&  null !=this.repros) {
+		if (pairFileSet && statsFileSet &&  reproFileSet) {
+			try {
+				this.initializeSnippetInfo(statsFile, reproFile);
+			} catch (IOException e) {
+				System.err.println("I/O error when initializing snippet info: " + e.getMessage());
+				e.printStackTrace();
+				System.err.println("Analysis will not be run!");
+			}
 			try {
 				this.clones(pairFile);
 				System.out.println("Clone files created!");
@@ -214,13 +213,13 @@ public class SccOutputAnalyzer extends Analyzer {
 				System.err.println("Operation interrupted!");
 			}
 		} else {
-			if (null == pairFile || "" == pairFile) {
+			if (!pairFileSet) {
 				System.err.println("SourcererCC clones pair file path not set!");
 			}
-			if (null == notebookNumbers) {
+			if (!statsFileSet) {
 				System.err.println("Snippet information is not initialized!");
 			}
-			if (null == this.repros) {
+			if (!reproFileSet) {
 				System.err.println("Repro information is not initialized!");
 			}
 			System.err.println("Analysis will not be run!");
