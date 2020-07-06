@@ -71,11 +71,12 @@ public class SccOutputAnalyzer extends Analyzer {
 		printConnectionsFile(file2snippets, snippets);
 	}
 	
-	/** TODO: Snygga till!
+	/**
 	 * Initialize the maps containing information about each snippet
 	 * @param statsFile Path to file stats file produced by the SourcererCC tokenizer
 	 */
 	public void initializeSnippetInfo(String statsFile, String reproFile) throws IOException {
+		Map<String, String> repros = createReproMap(reproFile);
 		BufferedReader statsReader = new BufferedReader(new FileReader(statsFile));
 		snippets = new HashMap<SccSnippetId, SccSnippet>();
 		file2snippets = new HashMap<String, Set<SccSnippetId>>();
@@ -89,14 +90,16 @@ public class SccOutputAnalyzer extends Analyzer {
 			// Remove suffix
 			snippetFileName = snippetFileName.substring(0, snippetFileName.lastIndexOf('.'));
 			String[] snippetSubStrings = snippetFileName.split("_");
+			// Create parent notebook
 			int notebookNumber = Integer.parseInt(snippetSubStrings[1]);
 			String notebookName = getNotebookNameFromNumber(notebookNumber);
+			Notebook notebook = new Notebook(notebookName, repros.get(notebookName));
 			/* Here we use the number of lines of source code (comments
 			   excluded), which is inconsistent with the clone analysis of the 
 			   notebook files, but so is the clone detection -SourcererCC
 			   doesn't consider comments in clone analysis. */
 			int loc = Integer.parseInt(columns[8]);
-			snippets.put(id, new SccSnippet(loc, new Notebook(notebookName)));
+			snippets.put(id, new SccSnippet(loc, notebook));
 			Set<SccSnippetId> snippetsForNotebook = file2snippets.get(notebookName);
 			if (null == snippetsForNotebook) {
 				snippetsForNotebook = new HashSet<SccSnippetId>();
@@ -106,11 +109,6 @@ public class SccOutputAnalyzer extends Analyzer {
 			line = statsReader.readLine();
 		}
 		statsReader.close();
-		Map<String, String> repros = createReproMap(reproFile);
-		for (SccSnippetId snippet: snippets.keySet()) {
-			Notebook notebook = snippets.get(snippet).getNotebook();
-			notebook.setRepro(repros.get(notebook.getName()));
-		}
 	}
 
 	private void storeConnections(String pairFile) throws IOException {

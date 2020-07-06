@@ -30,7 +30,7 @@ public class SccOutputAnalyzerTest extends AnalyzerTest {
 		tearDownClass();
 	}
 	
-	/** TODO
+	/**
 	 * Verify that the clone output files are created when paths are specified
 	 * correctly.
 	 * @throws IOException 
@@ -46,7 +46,7 @@ public class SccOutputAnalyzerTest extends AnalyzerTest {
 		verifyExistenceOfAndRemoveCloneFiles();
 	}
 	
-	/** TODO
+	/**
 	 * Verify that the output directory is set correctly when give as an
 	 * argument.
 	 * @throws IOException 
@@ -329,54 +329,6 @@ public class SccOutputAnalyzerTest extends AnalyzerTest {
 		checkCsv_anyOrder("connections", expectedConnectionsLines);
 		deleteCloneCsvs();
 	}
-	/* (TODO) file2hashes and hash2files are not checked above, since we don't know
-	   which snippet will get which index. If cloneFrequency and connections
-	   files are correct, it is very unlikely that the file-hash and hash-file
-	   maps are incorrect! */
-	
-	/** TODO
-	 * Verify that the right line count is reported when the number of clones
-	 * is odd.
-	 * @throws IOException 
-	 * /
-	@Test
-	public void testLocComputation_odd() throws IOException {
-		String dataDir = "test/data/scc";
-		String statsFile = dataDir + "/file_stats_loc_odd";
-		String pairFile = dataDir + "/clone_pairs_loc_odd";
-		String reproMap = dataDir + "/repro_map_loc.csv";
-		
-		String[] expectedLines = {
-				hash2filesHeader(),
-				hashPattern + ", 13, " + notebookNamePattern + ", [0-9]+, " + notebookNamePattern + ", [0-9]+, " + notebookNamePattern + ", [0-9]+"
-		};
-
-		analyzer.clones(statsFile, reproMap, pairFile);
-		checkCsv_matches("hash2filesA", expectedLines);
-		deleteCloneCsvs();
-	}*/
-	
-	/** TODO
-	 * Verify that the right line count is reported when the number of clones
-	 * is even.
-	 * @throws IOException 
-	 * /
-	@Test
-	public void testLocComputation_even() throws IOException {
-		String dataDir = "test/data/scc";
-		String statsFile = dataDir + "/file_stats_loc_even";
-		String pairFile = dataDir + "/clone_pairs_loc_even";
-		String reproMap = dataDir + "/repro_map_loc.csv";
-		
-		String[] expectedLines = {
-				hash2filesHeader(),
-				hashPattern + ", 16, " + notebookNamePattern + ", [0-9]+, " + notebookNamePattern + ", [0-9]+, " + notebookNamePattern + ", [0-9]+, " + notebookNamePattern + ", [0-9]+"
-		};
-
-		analyzer.clones(statsFile, reproMap, pairFile);
-		checkCsv_matches("hash2filesA", expectedLines);
-		deleteCloneCsvs();
-	}*/
 	
 	/**
 	 * @return Expected header of connections files
