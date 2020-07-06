@@ -11,8 +11,6 @@ import java.util.Set;
 public class SccOutputAnalyzer extends Analyzer {
 	Map<String, Set<SccSnippetId>> file2snippets;	// TODO: Int istf String?
 	Map <SccSnippetId, SccSnippet> snippets;
-	// Information about each snippet
-	Map<SccSnippetId, Notebook> notebookNumbers;	// TODO: Behövs denna?
 	
 	/**
 	 * Perform the clone analysis based on SourcererCC output files. Write
@@ -73,7 +71,6 @@ public class SccOutputAnalyzer extends Analyzer {
 	 */
 	public void initializeSnippetInfo(String statsFile, String reproFile) throws IOException {
 		BufferedReader statsReader = new BufferedReader(new FileReader(statsFile));
-		notebookNumbers = new HashMap<SccSnippetId, Notebook>();
 		snippets = new HashMap<SccSnippetId, SccSnippet>();
 		file2snippets = new HashMap<String, Set<SccSnippetId>>();
 		String line = statsReader.readLine();
@@ -88,13 +85,12 @@ public class SccOutputAnalyzer extends Analyzer {
 			String[] snippetSubStrings = snippetFileName.split("_");
 			int notebookNumber = Integer.parseInt(snippetSubStrings[1]);
 			String notebookName = getNotebookNameFromNumber(notebookNumber);
-			notebookNumbers.put(id, new Notebook(notebookName));	// TODO: NotebookID istället?
 			/* Here we use the number of lines of source code (comments
 			   excluded), which is inconsistent with the clone analysis of the 
 			   notebook files, but so is the clone detection -SourcererCC
 			   doesn't consider comments in clone analysis. */
 			int loc = Integer.parseInt(columns[8]);
-			snippets.put(id, new SccSnippet(loc));
+			snippets.put(id, new SccSnippet(loc, new Notebook(notebookName)));
 			Set<SccSnippetId> snippetsForNotebook = file2snippets.get(notebookName);
 			if (null == snippetsForNotebook) {
 				snippetsForNotebook = new HashSet<SccSnippetId>();
@@ -106,7 +102,7 @@ public class SccOutputAnalyzer extends Analyzer {
 		statsReader.close();
 		Map<String, String> repros = initializeReproMap(reproFile);
 		for (SccSnippetId snippet: snippets.keySet()) {
-			Notebook notebook = notebookNumbers.get(snippet);
+			Notebook notebook = snippets.get(snippet).getNotebook();
 			notebook.setRepro(repros.get(notebook.getName()));
 		}
 	}
@@ -139,9 +135,8 @@ public class SccOutputAnalyzer extends Analyzer {
 								+ line + "\". Skipping clone pair!");
 					}
 					if (null != snippet1 && null != snippet2) {
-						// TODO: Spara notebook (& repro )i snippet istället!?
-						Notebook notebook1 = notebookNumbers.get(id1);
-						Notebook notebook2 = notebookNumbers.get(id2);
+						Notebook notebook1 = snippet1.getNotebook();
+						Notebook notebook2 = snippet2.getNotebook();
 						if (null != notebook1 && null != notebook2) {
 							String repro1 = notebook1.getRepro();
 							String repro2 = notebook2.getRepro();

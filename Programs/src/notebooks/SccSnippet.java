@@ -12,14 +12,16 @@ public class SccSnippet {
 	private int interReproConnections;
 	// Repros that this snippet has an inter connection to
 	private Set<String> reprosInterConnected;
+	Notebook notebook;
 	
-	public SccSnippet(int loc) {
+	public SccSnippet(int loc, Notebook notebook) {
 		this.loc = loc;
+		this.notebook = notebook;
 		reprosInterConnected = new HashSet<String>();
 	}
 	
-	public SccSnippet(String loc) {
-		this(Integer.parseInt(loc));
+	public SccSnippet(String loc, Notebook notebook) {
+		this(Integer.parseInt(loc), notebook);
 	}
 	
 	// TODO: Osnygg signatur
@@ -46,6 +48,10 @@ public class SccSnippet {
 	 */
 	public int getLoc() {
 		return loc;
+	}
+	
+	public Notebook getNotebook() {
+		return notebook;
 	}
 	
 	/**

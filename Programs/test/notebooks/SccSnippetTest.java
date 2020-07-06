@@ -11,18 +11,22 @@ import org.junit.Test;
 public class SccSnippetTest {
 	private SccSnippet snippet;
 	private final int loc = 21;
+	private final String notebookName = "nb_86.ipynb";
+	private Notebook notebook;
 	
 	@Before
 	public void setUp() {
-		snippet = new SccSnippet(loc);
+		notebook = new Notebook(notebookName);
+		snippet = new SccSnippet(loc, notebook);
 	}
 	
 	@Test
 	public void testStringConstructor() {
 		String locString = Integer.toString(loc);
-		SccSnippet stringSnippet = new SccSnippet(locString);
+		SccSnippet stringSnippet = new SccSnippet(locString, notebook);
 		assertEquals("Wrong loc for snippet ID created using string constructor", loc, stringSnippet.getLoc());
 		assertFalse("Snippet created using string constructor marked as clone", stringSnippet.isClone());
+		assertEquals("Wrong notebook retured for snippet ID created using string constructor", notebook, snippet.getNotebook());
 	}
 	
 	@Test
@@ -97,6 +101,11 @@ public class SccSnippetTest {
 	@Test
 	public void testGetLoc() {
 		assertEquals("Wrong loc for snippet", loc, snippet.getLoc());
+	}
+	
+	@Test
+	public void testGetNotebook() {
+		assertEquals("Wrong notebook for snippet", notebook, snippet.getNotebook());
 	}
 	
 	/**
