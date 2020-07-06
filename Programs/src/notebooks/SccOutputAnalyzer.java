@@ -125,7 +125,6 @@ public class SccOutputAnalyzer extends Analyzer {
 				System.err.println(" Skipping line!");
 			} else {
 				try {
-					// TODO: Tester!
 					SccSnippetId id1 = new SccSnippetId(numbers[0], numbers[1]);
 					SccSnippetId id2 = new SccSnippetId(numbers[2], numbers[3]);
 					SccSnippet snippet1 = snippets.get(id1);
@@ -141,18 +140,18 @@ public class SccOutputAnalyzer extends Analyzer {
 					if (null != snippet1 && null != snippet2) {
 						Notebook notebook1 = snippet1.getNotebook();
 						Notebook notebook2 = snippet2.getNotebook();
-						if (null != notebook1 && null != notebook2) {
-							String repro1 = notebook1.getRepro();
-							String repro2 = notebook2.getRepro();
+						String repro1 = notebook1.getRepro();
+						String repro2 = notebook2.getRepro();
+						if (null != repro1 && null != repro2) {
 							boolean intraNotebook = notebook1.equals(notebook2);
 							boolean intraRepro = repro1.equals(repro2);
 							snippet1.addConnection(intraNotebook, intraRepro, repro2);
 							snippet2.addConnection(intraNotebook, intraRepro, repro1);
 						} else {
-							if (null == notebook1) {
-								System.err.println("Notebook missing for snippet " + id1 + ").");
-							} if (null == notebook2) {
-								System.err.println("Notebook missing for snippet " + id2 + ").");
+							if (null == repro1) {
+								System.err.println("Repro missing for notebook " + notebook1 + " (snippet id" + id1 + ").");
+							} if (null == repro2) {
+								System.err.println("Repro missing for notebook " + notebook2 + " (snippet id" + id2 + ").");
 							}
 							System.err.println("Clone pair " + line + " skipped!");
 						}
