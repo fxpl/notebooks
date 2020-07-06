@@ -9,8 +9,8 @@ import java.util.Map;
 import java.util.Set;
 
 public class SccOutputAnalyzer extends Analyzer {
-	Map<String, Set<SccSnippetId>> file2snippets;	// TODO: Int istf String?
-	Map <SccSnippetId, SccSnippet> snippets;
+	private Map<String, Set<SccSnippetId>> file2snippets;
+	private Map <SccSnippetId, SccSnippet> snippets;
 	
 	/**
 	 * Perform the clone analysis based on SourcererCC output files. Write
@@ -30,10 +30,9 @@ public class SccOutputAnalyzer extends Analyzer {
 	public void clones(String statsFile, String reproFile, String pairFile) throws IOException {
 		initializeSnippetInfo(statsFile, reproFile);
 		clones(pairFile);
-		//return clones(pairFile);
 	}
 	
-	/** TODO: Borde den returnera något?
+	/**
 	 * Perform the clone analysis based on SourcererCC output files. Write
 	 * cloneFrequencies<current-date-time>.csv and
 	 * connections<current-date-time>.csv accordingly.
@@ -54,7 +53,6 @@ public class SccOutputAnalyzer extends Analyzer {
 		storeConnections(pairFile);
 		CloneFileWriter writer = new CloneFileWriter(outputDir);
 		writer.write(null, null, file2snippets, snippets);
-		//return snippet2file;
 	}
 	
 	/**

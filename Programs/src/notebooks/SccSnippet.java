@@ -12,7 +12,7 @@ public class SccSnippet {
 	private int interReproConnections;
 	// Repros that this snippet has an inter connection to
 	private Set<String> reprosInterConnected;
-	Notebook notebook;
+	private final Notebook notebook;
 	
 	public SccSnippet(int loc, Notebook notebook) {
 		this.loc = loc;
