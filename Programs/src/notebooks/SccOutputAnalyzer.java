@@ -55,7 +55,7 @@ public class SccOutputAnalyzer extends Analyzer {
 		System.out.println("NOTE THAT NOTEBOOKS WITHOUT SNIPPETS ARE NOT INCLUDED");
 		System.out.println("since they are not included in the SourcererCC data!");
 		storeConnections(pairFile);
-		writeCloneFiles(file2snippets, snippets);
+		writeCloneFiles();
 	}
 	
 	/**
@@ -65,10 +65,9 @@ public class SccOutputAnalyzer extends Analyzer {
 	 * @param snippets A map with all snippets (id -> object)
 	 * @throws IOException On problems handling the output files
 	 */
-	private void writeCloneFiles(Map<String, Set<SccSnippetId>> file2snippets,
-			Map<SccSnippetId, SccSnippet> snippets) throws IOException {
-		printCloneFrequencies(file2snippets, snippets);
-		printConnectionsFile(file2snippets, snippets);
+	private void writeCloneFiles() throws IOException {
+		printCloneFrequencies();
+		printConnectionsFile();
 	}
 	
 	/**
@@ -158,9 +157,7 @@ public class SccOutputAnalyzer extends Analyzer {
 		return "nb_" + notebookNumber + ".ipynb";
 	}
 	
-	// TODO: Onödiga argument!
-	private void printCloneFrequencies(Map<String, Set<SccSnippetId>> file2snippets,
-			Map<SccSnippetId, SccSnippet> snippets) throws IOException {
+	private void printCloneFrequencies() throws IOException {
 		Writer writer = new FileWriter(outputDir + "/cloneFrequency" + LocalDateTime.now() + ".csv");
 		writer.write(cloneFrequencyHeader());
 		for (String notebook: file2snippets.keySet()) {
@@ -200,7 +197,7 @@ public class SccOutputAnalyzer extends Analyzer {
 	 * connections<current-date-time>.csv. Note that when computing the mean,
 	 * only repros for which there is a connection are included.
 	 */
-	private void printConnectionsFile(Map<String, Set<SccSnippetId>> file2snippets, Map<SccSnippetId, SccSnippet> snippets) throws IOException {
+	private void printConnectionsFile() throws IOException {
 		Writer writer = new FileWriter(outputDir + "/connections" + LocalDateTime.now() + ".csv");
 		writer.write(connectionsHeader());
 		Set<String> notebooks = file2snippets.keySet();
