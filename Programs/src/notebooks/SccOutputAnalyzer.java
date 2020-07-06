@@ -12,7 +12,7 @@ public class SccOutputAnalyzer extends Analyzer {
 	Map<String, Set<SccSnippetId>> file2snippets;	// TODO: Int istf String?
 	Map <SccSnippetId, SccSnippet> snippets;
 	// Information about each snippet
-	Map<SccSnippetId, Integer> notebookNumbers;	// TODO: Behövs denna?
+	Map<SccSnippetId, Notebook> notebookNumbers;	// TODO: Behövs denna?
 	// Information about each notebook
 	private Map<String, String> repros = null;	// TODO: Behövs denna?
 	
@@ -76,7 +76,7 @@ public class SccOutputAnalyzer extends Analyzer {
 	 */
 	public void initializeSnippetInfo(String statsFile) throws IOException {
 		BufferedReader statsReader = new BufferedReader(new FileReader(statsFile));
-		notebookNumbers = new HashMap<SccSnippetId, Integer>();
+		notebookNumbers = new HashMap<SccSnippetId, Notebook>();
 		snippets = new HashMap<SccSnippetId, SccSnippet>();
 		file2snippets = new HashMap<String, Set<SccSnippetId>>();
 		String line = statsReader.readLine();
@@ -91,7 +91,7 @@ public class SccOutputAnalyzer extends Analyzer {
 			String[] snippetSubStrings = snippetFileName.split("_");
 			int notebookNumber = Integer.parseInt(snippetSubStrings[1]);
 			String notebookName = getNotebookNameFromNumber(notebookNumber);
-			notebookNumbers.put(id, notebookNumber);
+			notebookNumbers.put(id, new Notebook(notebookName));	// TODO: NotebookID istället?
 			/* Here we use the number of lines of source code (comments
 			   excluded), which is inconsistent with the clone analysis of the 
 			   notebook files, but so is the clone detection -SourcererCC
@@ -138,21 +138,19 @@ public class SccOutputAnalyzer extends Analyzer {
 					}
 					if (null != snippet1 && null != snippet2) {
 						// TODO: Spara repro i snippet istället!?
-						Integer notebook1Number = notebookNumbers.get(id1);
-						Integer notebook2Number = notebookNumbers.get(id2);
-						if (null != notebook1Number && null != notebook2Number) {
-							String notebook1Name = getNotebookNameFromNumber(notebook1Number);
-							String notebook2Name = getNotebookNameFromNumber(notebook2Number);
-							String repro1 = repros.get(notebook1Name);
-							String repro2 = repros.get(notebook2Name);
-							boolean intraNotebook = notebook1Name.equals(notebook2Name);
+						Notebook notebook1 = notebookNumbers.get(id1);
+						Notebook notebook2 = notebookNumbers.get(id2);
+						if (null != notebook1 && null != notebook2) {
+							String repro1 = repros.get(notebook1.getName());
+							String repro2 = repros.get(notebook2.getName());
+							boolean intraNotebook = notebook1.equals(notebook2);
 							boolean intraRepro = repro1.equals(repro2);
 							snippet1.addConnection(intraNotebook, intraRepro, repro2);
 							snippet2.addConnection(intraNotebook, intraRepro, repro1);
 						} else {
-							if (null == notebook1Number) {
+							if (null == notebook1) {
 								System.err.println("Notebook missing for snippet " + id1 + ").");
-							} if (null == notebook1Number) {
+							} if (null == notebook2) {
 								System.err.println("Notebook missing for snippet " + id2 + ").");
 							}
 							System.err.println("Clone pair " + line + " skipped!");
