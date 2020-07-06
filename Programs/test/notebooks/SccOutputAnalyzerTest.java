@@ -252,14 +252,14 @@ public class SccOutputAnalyzerTest extends AnalyzerTest {
 		String reproFile = "test/data/hash/repros.csv";
 		String[] expectedLines = {
 				connectionsHeader(),
-				"nb_4.ipynb, 6, 3.0000, 4, 2.0000",
-				"nb_5.ipynb, 4, 2.0000, 2, 1.0000",
+				"nb_4.ipynb, 0, 0.0000, 0, 0.0000",
+				"nb_5.ipynb, 1, 1.0000, 0, 1.0000",
 				"nb_1.ipynb, 6, 3.0000, 2, 4.0000",
 				"nb_2.ipynb, 7, 2.3333, 3, 4.0000",
 				"nb_3.ipynb, 1, 0.5000, 1, 0.0000",
 				"nb_6.ipynb, 4, 2.0000, 4, 0.0000",
 				"nb_7.ipynb, 5, 1.6667, 2, 1.5000",
-				"nb_10.ipynb, 3, 3.0000, 0, 3.0000",
+				"nb_10.ipynb, 0, 0.0000, 0, 0.0000",
 				"nb_8.ipynb, 1, 1.0000, 0, 1.0000",
 				"nb_9.ipynb, 4, 2.0000, 2, 2.0000",
 				"nb_11.ipynb, 1, 1.0000, 0, 1.0000",
@@ -319,13 +319,13 @@ public class SccOutputAnalyzerTest extends AnalyzerTest {
 				"nb_1.ipynb, 0, 2, 0, 1.0000, 1.0000, 2, 2",
 				"nb_2.ipynb, 0, 3, 0, 1.0000, 1.0000, 2, 2",
 				"nb_3.ipynb, 1, 1, 0, 0.5000, 0.5000, 0, 0",
-				"nb_4.ipynb, 0, 2, 0, 1.0000, 1.0000, 2, 2",
-				"nb_5.ipynb, 0, 2, 0, 1.0000, 1.0000, 0, 0",
+				"nb_4.ipynb, 2, 0, 2, 0.0000, 0, 0, 0",
+				"nb_5.ipynb, 1, 1, 1, 0.5000, 1.0000, 0, 0",
 				"nb_6.ipynb, 0, 2, 0, 1.0000, 1.0000, 2, 2",
 				"nb_7.ipynb, 0, 3, 0, 1.0000, 1.0000, 0, 0",
 				"nb_8.ipynb, 0, 1, 0, 1.0000, 1.0000, 0, 0",
 				"nb_9.ipynb, 0, 2, 0, 1.0000, 1.0000, 2, 2",
-				"nb_10.ipynb, 0, 1, 0, 1.0000, 1.0000, 0, 0",
+				"nb_10.ipynb, 1, 0, 1, 0.0000, 0, 0, 0",
 				"nb_11.ipynb, 0, 1, 0, 1.0000, 1.0000, 0, 0"
 		};
 		
