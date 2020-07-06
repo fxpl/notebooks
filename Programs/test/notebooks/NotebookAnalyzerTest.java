@@ -491,7 +491,8 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 		String notebookFile = "nb_100.ipynb";
 		String reproMapName = "repros.csv";
 		String[] expectedSnippetLines = {
-				file2hashesHeader()
+				file2hashesHeader(),
+				notebookFile
 		};
 		String[] expectedClonesLines = {
 				hash2filesHeader()

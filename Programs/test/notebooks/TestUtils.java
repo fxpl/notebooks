@@ -25,6 +25,7 @@ public class TestUtils {
 			String expectedLine = expectedLines[i];
 			assertEquals("Wrong line number " + (i+1) + " for " + prefix + " csv!", expectedLine, outputReader.readLine());
 		}
+		assertNull("Too many lines in csv!", outputReader.readLine());
 		outputReader.close();
 	}
 	
