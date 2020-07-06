@@ -14,7 +14,7 @@ import java.util.Set;
 
 public class SccOutputAnalyzer extends Analyzer {
 	private Map<String, Set<SccSnippetId>> file2snippets;
-	private Map <SccSnippetId, SccSnippet> snippets;
+	private Map <SccSnippetId, SccSnippet> snippets;	// TODO: Lagra SccSnippet i file2snippets!?
 	
 	/**
 	 * Perform the clone analysis based on SourcererCC output files. Write
@@ -138,23 +138,9 @@ public class SccOutputAnalyzer extends Analyzer {
 								+ line + "\". Skipping clone pair!");
 					}
 					if (null != snippet1 && null != snippet2) {
-						Notebook notebook1 = snippet1.getNotebook();
-						Notebook notebook2 = snippet2.getNotebook();
-						String repro1 = notebook1.getRepro();
-						String repro2 = notebook2.getRepro();
-						if (null != repro1 && null != repro2) {
-							boolean intraNotebook = notebook1.equals(notebook2);
-							boolean intraRepro = repro1.equals(repro2);
-							snippet1.addConnection(intraNotebook, intraRepro, repro2);
-							snippet2.addConnection(intraNotebook, intraRepro, repro1);
-						} else {
-							if (null == repro1) {
-								System.err.println("Repro missing for notebook " + notebook1 + " (snippet id" + id1 + ").");
-							} if (null == repro2) {
-								System.err.println("Repro missing for notebook " + notebook2 + " (snippet id" + id2 + ").");
-							}
-							System.err.println("Clone pair " + line + " skipped!");
-						}
+						// TODO: Ett anrop!
+						snippet1.addConnection(snippet2);
+						snippet2.addConnection(snippet1);
 					}
 				} catch (NumberFormatException e) {
 					// We just skip this line
@@ -172,6 +158,7 @@ public class SccOutputAnalyzer extends Analyzer {
 		return "nb_" + notebookNumber + ".ipynb";
 	}
 	
+	// TODO: Onödiga argument!
 	private void printCloneFrequencies(Map<String, Set<SccSnippetId>> file2snippets,
 			Map<SccSnippetId, SccSnippet> snippets) throws IOException {
 		Writer writer = new FileWriter(outputDir + "/cloneFrequency" + LocalDateTime.now() + ".csv");

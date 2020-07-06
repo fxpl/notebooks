@@ -302,31 +302,6 @@ public class SccOutputAnalyzerTest extends AnalyzerTest {
 	}
 	
 	/**
-	 * Verify that clone pairs belonging to notebooks without repro information
-	 * are smoothly ignored in the clone analysis.
-	 * @throws IOException
-	 */
-	@Test
-	public void testClones_reproInfoMissing() throws IOException {
-		String dataDir = "test/data/scc";
-		String statsFile = dataDir + "/file_stats_small";
-		String pairFile = dataDir + "/clone_pairs_small";
-		String reproFile = dataDir + "/empty_repro_file";
-		
-		String[] expectedCloneFrequecyLines = {
-				cloneFrequencyHeader()
-		};
-		String[] expectedConnectionsLines = {
-				connectionsHeader()
-		};
-		
-		analyzer.clones(statsFile, reproFile, pairFile);
-		checkCsv("cloneFrequency", expectedCloneFrequecyLines);
-		checkCsv("connections", expectedConnectionsLines);
-		deleteCloneCsvs();
-	}
-	
-	/**
 	 * Verify that lines not containing exact 4 comma-separated strings are
 	 * smoothly ignored in clone analysis.
 	 * @throws IOException 

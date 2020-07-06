@@ -24,18 +24,32 @@ public class SccSnippet {
 		this(Integer.parseInt(loc), notebook);
 	}
 	
-	// TODO: Osnygg signatur
-	public void addConnection(boolean intraNotebook, boolean intraRepro, String otherRepro) {
-		if (intraNotebook) {
-			intraNotebookConnections++;
+	public void addConnection(SccSnippet other) {
+		Notebook otherNotebook = other.getNotebook();
+		if (null != this.notebook && null != otherNotebook) {
+			if (this.notebook.equals(otherNotebook)) {
+				intraNotebookConnections++;
+				intraReproConnections++;
+			} else {
+				interNotebookConnections++;
+				String myRepro = notebook.getRepro();
+				if (null == myRepro) {
+					// TODO: Bättre utskrift
+					System.err.println("Null repro for notebook. Connection considered inter repro connection!");
+					interReproConnections++;
+				} else {
+					String otherRepo = otherNotebook.getRepro();
+					if (myRepro.equals(otherRepo)) {
+						intraReproConnections++;
+					} else {
+						interReproConnections++;
+						reprosInterConnected.add(otherRepo);
+					}
+				}
+			}
 		} else {
-			interNotebookConnections++;
-		}
-		if (intraRepro) {
-			intraReproConnections++;
-		} else {
-			interReproConnections++;
-			reprosInterConnected.add(otherRepro);
+			// TODO: Bättre utskrift
+			System.err.println("Notebook info missing. Connections not added!");
 		}
 	}
 	
