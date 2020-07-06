@@ -68,7 +68,7 @@ public class SccOutputAnalyzer extends Analyzer {
 		storeConnections(pairFile);
 		CloneFileWriter writer = new CloneFileWriter(outputDir);
 		//writer.write(file2snippet, snippet2file);
-		writer.write(file2snippet, snippet2file, file2snippets, snippets);
+		writer.write(null, null, file2snippets, snippets);
 		return snippet2file;
 	}
 	

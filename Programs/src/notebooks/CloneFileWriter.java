@@ -22,11 +22,13 @@ public class CloneFileWriter {
 		this.outputDir = outputDir;
 	}
 	
+	/**
+	 * TODO: Kommentar
+	 * TODO: Oanvända argument
+	 */
 	public void write(Map<Notebook, SnippetCode[]> file2hashes, Map<SnippetCode,
 			List<Snippet>> hash2files, Map<String, Set<SccSnippetId>> file2snippets,
 			Map<SccSnippetId, SccSnippet> snippets) throws IOException {
-		printFile2hashes(file2hashes);
-		printHash2files(hash2files);
 		printCloneFrequencies2(file2snippets, snippets);
 		printConnectionsFile(file2snippets, snippets);
 	}

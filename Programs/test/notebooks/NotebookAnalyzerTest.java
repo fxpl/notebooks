@@ -899,6 +899,51 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 		assertEquals("Wrong number of notebooks found:", 12, analyzer.numNotebooks());
 	}
 	
+	@Override
+	protected void deleteCloneCsvs(String dir) {
+		TestUtils.lastOutputFile(dir, "file2hashesA").delete();
+		TestUtils.lastOutputFile(dir, "file2hashesNE").delete();
+		TestUtils.lastOutputFile(dir, "hash2filesA").delete();
+		TestUtils.lastOutputFile(dir, "cloneFrequency").delete();
+		TestUtils.lastOutputFile(dir, "connections").delete();
+	}
+	
+	@Override
+	protected void verifyAbsenceOfCloneFiles(String dir) {
+		String[] prefixes = {
+				"file2hashesA",
+				"file2hashesNE",
+				"hash2filesA",
+				"cloneFrequency",
+				"connections"
+		};
+		
+		for (String prefix: prefixes) {
+			File outputFile = TestUtils.lastOutputFile(dir, prefix);
+			assertFalse("Unexpected output file: " + outputFile.getName(), outputFile.exists());
+		}
+	}
+	
+	@Override
+	protected void verifyExistenceOfAndRemoveCloneFiles(String dir) throws IOException {
+		String[] prefixes = {
+				"file2hashesA",
+				"file2hashesNE",
+				"hash2filesA",
+				"cloneFrequency",
+				"connections"
+		};
+		TestUtils.verifyExistenceOfAndRemove(dir, prefixes);
+	}
+	
+	/**
+	 * @return Expected header of connections files
+	 */
+	protected static String connectionsHeader() {
+		return "file, connections, connections normalized, non-empty connections, non-empty connections normalized, "
+				+ "intra repro connections, non-empty intra repro connections, mean inter repro connections, mean non-empty inter repro connections";
+	}
+	
 	/**
 	 * @return Expected header of all_languages files
 	 */
@@ -913,6 +958,13 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 	 */
 	private static String file2hashesHeader() {
 		return "file, snippets";
+	}
+
+	/**
+	 * @return Expected header of hash2files files
+	 */
+	protected static String hash2filesHeader() {
+		return "hash, LOC, file, index, ...";
 	}
 	
 	/**

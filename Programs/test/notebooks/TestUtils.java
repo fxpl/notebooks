@@ -1,7 +1,6 @@
 package notebooks;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -96,27 +95,6 @@ public class TestUtils {
 	}
 	
 	/**
-	 * Verify that no output file from the clone analysis exist in the
-	 * specified directory.
-	 * @param dir Directory to look for files in
-	 */
-	static void verifyAbsenceOfCloneFiles(String dir) {
-		String[] prefixes = {
-				"file2hashesA",
-				"file2hashesNE",
-				"hash2filesA",
-				"snippetsA",
-				"cloneFrequency",
-				"connections"
-		};
-		
-		for (String prefix: prefixes) {
-			File outputFile = lastOutputFile(dir, prefix);
-			assertFalse("Unexpected output file: " + outputFile.getName(), outputFile.exists());
-		}
-	}
-	
-	/**
 	 * Verify that all files prefixed in expectedFiles exist in the specified
 	 * directory, and remove them.
 	 * @param dir Directory to look for files in
@@ -130,36 +108,6 @@ public class TestUtils {
 					expectedFile.exists());
 			expectedFile.delete();
 		}
-	}
-	
-	/** TODO
-	 * Verify that all clone analysis output files exist in the specified
-	 * directory, and remove them.
-	 * @param dir Name of directory to look in and remove from
-	 * @throws IOException 
-	 */
-	static void verifyExistenceOfAndRemoveCloneFiles(String dir) throws IOException {
-		String[] prefixes = {
-				"file2hashesA",
-				"file2hashesNE",
-				"hash2filesA",
-				"cloneFrequency",
-				"connections"
-		};
-		verifyExistenceOfAndRemove(dir, prefixes);
-	}
-	
-	/** TODO
-	 * Delete all CSV files created by the clone analysis in the specified
-	 * directory.
-	 * @param dir Directory to remove files from
-	 */
-	static void deleteCloneCsvs(String dir) {
-		lastOutputFile(dir, "file2hashesA").delete();
-		lastOutputFile(dir, "file2hashesNE").delete();
-		lastOutputFile(dir, "hash2filesA").delete();
-		lastOutputFile(dir, "cloneFrequency").delete();
-		lastOutputFile(dir, "connections").delete();
 	}
 	
 	/**

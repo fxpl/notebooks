@@ -64,12 +64,19 @@ public abstract class AnalyzerTest {
 	}
 	
 	/**
+	 * Delete all CSV files created by the clone analysis in the specified
+	 * directory.
+	 * @param dir Directory to remove files from
+	 */
+	protected abstract void deleteCloneCsvs(String dir);
+	
+	/**
 	 * Delete all CSV files created by the clone analysis in the default output
 	 * directory.
 	 * @param dir Directory to remove files from
 	 */
-	protected static void deleteCloneCsvs() {
-		TestUtils.deleteCloneCsvs(defaultOutputDirName);
+	protected void deleteCloneCsvs() {
+		deleteCloneCsvs(defaultOutputDirName);
 	}
 	
 	/**
@@ -84,11 +91,18 @@ public abstract class AnalyzerTest {
 	
 	/**
 	 * Verify that no output file from the clone analysis exist in the
+	 * specified directory.
+	 * @param dir Directory to look for files in
+	 */
+	protected abstract void verifyAbsenceOfCloneFiles(String dir);
+	
+	/**
+	 * Verify that no output file from the clone analysis exist in the
 	 * default output directory.
 	 * @param dir Directory to look for files in
 	 */
-	protected static void verifyAbsenceOfCloneFiles() {
-		TestUtils.verifyAbsenceOfCloneFiles(defaultOutputDirName);
+	protected void verifyAbsenceOfCloneFiles() {
+		verifyAbsenceOfCloneFiles(defaultOutputDirName);
 	}
 	
 	/**
@@ -102,12 +116,20 @@ public abstract class AnalyzerTest {
 	}
 	
 	/**
+	 * Verify that all clone analysis output files exist in the specified
+	 * directory, and remove them.
+	 * @param dir Name of directory to look in and remove from
+	 * @throws IOException
+	 */
+	protected abstract void verifyExistenceOfAndRemoveCloneFiles(String dir) throws IOException;
+	
+	/**
 	 * Verify that all clone analysis output files exist in the default output
 	 * directory, and remove them.
 	 * @throws IOException 
 	 */
-	protected static void verifyExistenceOfAndRemoveCloneFiles() throws IOException {
-		TestUtils.verifyExistenceOfAndRemoveCloneFiles(defaultOutputDirName);
+	protected void verifyExistenceOfAndRemoveCloneFiles() throws IOException {
+		verifyExistenceOfAndRemoveCloneFiles(defaultOutputDirName);
 	}
 
 	/**
@@ -116,20 +138,5 @@ public abstract class AnalyzerTest {
 	protected static String cloneFrequencyHeader() {
 		return "file, unique, clones, empty, clone frequency, non-empty clone frequency, "
 				+ "intra clones, non-empty intra clones";
-	}
-
-	/** TODO: Flytta!
-	 * @return Expected header of connections files
-	 */
-	protected static String connectionsHeader() {
-		return "file, connections, connections normalized, non-empty connections, non-empty connections normalized, "
-				+ "intra repro connections, non-empty intra repro connections, mean inter repro connections, mean non-empty inter repro connections";
-	}
-
-	/**
-	 * @return Expected header of hash2files files
-	 */
-	protected static String hash2filesHeader() {
-		return "hash, LOC, file, index, ...";
 	}
 }

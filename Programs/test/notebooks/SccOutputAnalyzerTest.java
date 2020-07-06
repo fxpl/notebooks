@@ -1,5 +1,8 @@
 package notebooks;
 
+import static org.junit.Assert.assertFalse;
+
+import java.io.File;
 import java.io.IOException;
 
 import org.junit.AfterClass;
@@ -9,8 +12,6 @@ import org.junit.Test;
 
 public class SccOutputAnalyzerTest extends AnalyzerTest {
 	private SccOutputAnalyzer analyzer;
-	private final static String hashPattern = "[0-9,a-f]+";
-	private final static String notebookNamePattern = "nb_[0-9]+\\.ipynb";
 	
 	@BeforeClass
 	public static void setUpOutputDirectory() {
@@ -60,7 +61,7 @@ public class SccOutputAnalyzerTest extends AnalyzerTest {
 				"--output_dir=" + outputDir
 		};
 		analyzer.analyze(args);
-		TestUtils.verifyExistenceOfAndRemoveCloneFiles(outputDir);
+		verifyExistenceOfAndRemoveCloneFiles(outputDir);
 	}
 	
 	/**
@@ -337,7 +338,7 @@ public class SccOutputAnalyzerTest extends AnalyzerTest {
 	 * Verify that the right line count is reported when the number of clones
 	 * is odd.
 	 * @throws IOException 
-	 */
+	 * /
 	@Test
 	public void testLocComputation_odd() throws IOException {
 		String dataDir = "test/data/scc";
@@ -353,13 +354,13 @@ public class SccOutputAnalyzerTest extends AnalyzerTest {
 		analyzer.clones(statsFile, reproMap, pairFile);
 		checkCsv_matches("hash2filesA", expectedLines);
 		deleteCloneCsvs();
-	}
+	}*/
 	
 	/** TODO
 	 * Verify that the right line count is reported when the number of clones
 	 * is even.
 	 * @throws IOException 
-	 */
+	 * /
 	@Test
 	public void testLocComputation_even() throws IOException {
 		String dataDir = "test/data/scc";
@@ -375,29 +376,7 @@ public class SccOutputAnalyzerTest extends AnalyzerTest {
 		analyzer.clones(statsFile, reproMap, pairFile);
 		checkCsv_matches("hash2filesA", expectedLines);
 		deleteCloneCsvs();
-	}
-	
-	/** TODO
-	 * Verify that a clone group is only considered once after the optimization
-	 * of getCloneLists.
-	 * @throws IOException
-	 */
-	@Test
-	public void testCloneListsOptimization() throws IOException {
-		String dataDir = "test/data/scc";
-		String statsFile = dataDir + "/file_stats_clopt";
-		String pairFile = dataDir + "/clone_pairs_clopt";
-		String reproFile = "test/data/hash/repros.csv";
-		
-		String[] expectedLines = {
-			hash2filesHeader(),
-			hashPattern + ", 10, " + notebookNamePattern + ", [0-3]+, " + notebookNamePattern + ", [0-3]+, " + notebookNamePattern + ", [0-3]+, " + notebookNamePattern + ", [0-3]+, " + notebookNamePattern + ", [0-3]+, " + notebookNamePattern + ", [0-3]+"
-		};
-		
-		analyzer.clones(statsFile, reproFile, pairFile);
-		checkCsv_matches("hash2filesA", expectedLines);
-		deleteCloneCsvs();
-	}
+	}*/
 	
 	/**
 	 * @return Expected header of connections files
@@ -405,5 +384,34 @@ public class SccOutputAnalyzerTest extends AnalyzerTest {
 	protected static String connectionsHeader() {
 		return "file, non-empty connections, non-empty connections normalized, "
 				+ "non-empty intra repro connections, mean non-empty inter repro connections";
+	}
+	
+	@Override
+	protected void deleteCloneCsvs(String dir) {
+		TestUtils.lastOutputFile(dir, "cloneFrequency").delete();
+		TestUtils.lastOutputFile(dir, "connections").delete();
+	}
+	
+	@Override
+	protected void verifyAbsenceOfCloneFiles(String dir) {
+		String[] prefixes = {
+				//"snippetsA",
+				"cloneFrequency",
+				"connections"
+		};
+		
+		for (String prefix: prefixes) {
+			File outputFile = TestUtils.lastOutputFile(dir, prefix);
+			assertFalse("Unexpected output file: " + outputFile.getName(), outputFile.exists());
+		}
+	}
+	
+	@Override
+	protected void verifyExistenceOfAndRemoveCloneFiles(String dir) throws IOException {
+		String[] prefixes = {
+				"cloneFrequency",
+				"connections"
+		};
+		TestUtils.verifyExistenceOfAndRemove(dir, prefixes);
 	}
 }
