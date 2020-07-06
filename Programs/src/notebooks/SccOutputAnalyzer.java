@@ -13,8 +13,6 @@ public class SccOutputAnalyzer extends Analyzer {
 	Map <SccSnippetId, SccSnippet> snippets;
 	// Information about each snippet
 	Map<SccSnippetId, Notebook> notebookNumbers;	// TODO: Behövs denna?
-	// Information about each notebook
-	private Map<String, String> repros = null;	// TODO: Behövs denna?
 	
 	/**
 	 * Perform the clone analysis based on SourcererCC output files. Write
@@ -65,8 +63,8 @@ public class SccOutputAnalyzer extends Analyzer {
 	 * Initialize repro information for each notebook.
 	 * @param fileName Path to file with mapping from notebook number to repro
 	 */
-	private void initializeReproMap(String fileName) throws IOException {
-		repros = createReproMap(fileName);
+	private Map<String, String> initializeReproMap(String fileName) throws IOException {
+		return createReproMap(fileName);
 	}
 	
 	/**
@@ -106,7 +104,11 @@ public class SccOutputAnalyzer extends Analyzer {
 			line = statsReader.readLine();
 		}
 		statsReader.close();
-		initializeReproMap(reproFile);
+		Map<String, String> repros = initializeReproMap(reproFile);
+		for (SccSnippetId snippet: snippets.keySet()) {
+			Notebook notebook = notebookNumbers.get(snippet);
+			notebook.setRepro(repros.get(notebook.getName()));
+		}
 	}
 
 	private void storeConnections(String pairFile) throws IOException {
@@ -137,12 +139,12 @@ public class SccOutputAnalyzer extends Analyzer {
 								+ line + "\". Skipping clone pair!");
 					}
 					if (null != snippet1 && null != snippet2) {
-						// TODO: Spara repro i snippet istället!?
+						// TODO: Spara notebook (& repro )i snippet istället!?
 						Notebook notebook1 = notebookNumbers.get(id1);
 						Notebook notebook2 = notebookNumbers.get(id2);
 						if (null != notebook1 && null != notebook2) {
-							String repro1 = repros.get(notebook1.getName());
-							String repro2 = repros.get(notebook2.getName());
+							String repro1 = notebook1.getRepro();
+							String repro2 = notebook2.getRepro();
 							boolean intraNotebook = notebook1.equals(notebook2);
 							boolean intraRepro = repro1.equals(repro2);
 							snippet1.addConnection(intraNotebook, intraRepro, repro2);
