@@ -120,7 +120,7 @@ public class SccOutputAnalyzer extends Analyzer {
 			}
 			String[] numbers = line.split(",");
 			if (4 != numbers.length) {
-				System.err.println("Invalid line number " + (numRead + 1) + " in pair file: " + line);
+				System.err.println("Invalid line (number " + (numRead + 1) + ") in pair file: " + line);
 				System.err.println(" Skipping line!");
 			} else {
 				try {
