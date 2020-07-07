@@ -60,6 +60,32 @@ public class NotebookAnalyzer extends Analyzer {
 	}
 	
 	/**
+	 * Create a map from notebook name to repro name.
+	 * @param fileName Name of file with mapping from notebook number to repro
+	 * @return The map from notebook name to repro name
+	 */
+	protected static Map<String, String> createReproMap(String fileName) throws IOException {
+		Map<String, String> result = new HashMap<String, String>();
+		BufferedReader reader = new BufferedReader(new FileReader(fileName));
+		String line = reader.readLine();
+		while (null != line) {
+			String[] subStrings = line.split(",");
+			try {
+				int notebookNumber = Integer.parseInt(subStrings[0]);
+				String notebookName = "nb_" + notebookNumber + ".ipynb";
+				String reproName = subStrings[1];
+				result.put(notebookName, reproName);
+			} catch (NumberFormatException e) {
+				System.err.println("Notebook numbers in repro file must be integers! Notebook with \"number\" '"
+						+ subStrings[0] + "' is excluded from mapping!");
+			}
+			line = reader.readLine();
+		}
+		reader.close();
+		return result;
+	}
+	
+	/**
 	 * Create CSV files with information about LOC, languages (actual one and
 	 * all defined ones respectively) and clones.
 	 * @throws IOException On problems handling the output file
