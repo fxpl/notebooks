@@ -3,7 +3,6 @@ package notebooks;
 import java.util.HashSet;
 import java.util.Set;
 
-// TODO(?!) Mergea olika snippetklasser
 public class SccSnippet {
 	private final int loc;
 	private int intraNotebookConnections;
@@ -25,31 +24,28 @@ public class SccSnippet {
 	}
 	
 	public void addConnection(SccSnippet other) {
+		boolean intraNotebook = false;
+		boolean intraRepro = false;
 		Notebook otherNotebook = other.getNotebook();
-		if (null != this.notebook && null != otherNotebook) {
-			if (this.notebook.equals(otherNotebook)) {
-				intraNotebookConnections++;
-				intraReproConnections++;
-			} else {
-				interNotebookConnections++;
-				String myRepro = notebook.getRepro();
-				if (null == myRepro) {
-					// TODO: Bättre utskrift
-					System.err.println("Null repro for notebook. Connection considered inter repro connection!");
-					interReproConnections++;
-				} else {
-					String otherRepo = otherNotebook.getRepro();
-					if (myRepro.equals(otherRepo)) {
-						intraReproConnections++;
-					} else {
-						interReproConnections++;
-						reprosInterConnected.add(otherRepo);
-					}
-				}
-			}
+		if (this.notebook.equals(otherNotebook)) {
+			intraNotebook = true;
+			intraRepro = true;
 		} else {
-			// TODO: Bättre utskrift
-			System.err.println("Notebook info missing. Connections not added!");
+			String myRepro = this.notebook.getRepro();
+			// We call toString because we want a NPE to be thrown if repro is null.
+			String otherRepo = otherNotebook.getRepro().toString();
+			intraRepro = myRepro.equals(otherRepo);
+		}
+		if (intraNotebook) {
+			this.intraNotebookConnections++;
+		} else {
+			interNotebookConnections++;
+		}
+		if (intraRepro) {
+			intraReproConnections++;
+		} else {
+			interReproConnections++;
+			reprosInterConnected.add(otherNotebook.getRepro());
 		}
 	}
 	

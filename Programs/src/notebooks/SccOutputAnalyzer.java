@@ -14,7 +14,7 @@ import java.util.Set;
 
 public class SccOutputAnalyzer extends Analyzer {
 	private Map<String, Set<SccSnippetId>> file2snippets;
-	private Map <SccSnippetId, SccSnippet> snippets;	// TODO: Lagra SccSnippet i file2snippets!?
+	private Map <SccSnippetId, SccSnippet> snippets;
 	
 	/**
 	 * Perform the clone analysis based on SourcererCC output files. Write
@@ -137,9 +137,15 @@ public class SccOutputAnalyzer extends Analyzer {
 								+ line + "\". Skipping clone pair!");
 					}
 					if (null != snippet1 && null != snippet2) {
-						// TODO: Ett anrop!
-						snippet1.addConnection(snippet2);
-						snippet2.addConnection(snippet1);
+						try {
+							// TODO: Ett anrop!
+							snippet1.addConnection(snippet2);
+							snippet2.addConnection(snippet1);
+						} catch (NullPointerException e) {
+							// Notebook or repro was null for one of the snippets
+							System.err.println("Couldn't add connection. Notebook or repro info is missing.");
+							System.err.println("Skipping line " + line);
+						}
 					}
 				} catch (NumberFormatException e) {
 					// We just skip this line

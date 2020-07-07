@@ -302,6 +302,52 @@ public class SccOutputAnalyzerTest extends AnalyzerTest {
 	}
 	
 	/**
+	 * Verify that connections are smoothly ignored if repro (or notebook) info
+	 * is missing in first snippet in pair.
+	 * @throws IOException
+	 */
+	@Test
+	public void testClones_nullReproLeft() throws IOException {
+		String dataDir = "test/data/scc";
+		String statsFile = dataDir + "/file_stats_xsmall";
+		String pairFile = dataDir + "/clone_pairs_xsmall";
+		String reproFile = dataDir + "/repro_file_xsmall";
+		
+		String[] expectedConnectionLines = {
+			connectionsHeader(),
+			"nb_8.ipynb, 0, 0.0000, 0, 0.0000",
+			"nb_9.ipynb, 0, 0.0000, 0, 0.0000"
+		};
+		
+		analyzer.clones(statsFile, reproFile, pairFile);
+		checkCsv_anyOrder("connections", expectedConnectionLines);
+		deleteCloneCsvs();
+	}
+	
+	/**
+	 * Verify that connections are smoothly ignored if repro (or notebook) info
+	 * is missing in second snippet in pair.
+	 * @throws IOException
+	 */
+	@Test
+	public void testClones_nullReproRight() throws IOException {
+		String dataDir = "test/data/scc";
+		String statsFile = dataDir + "/file_stats_xsmall";
+		String pairFile = dataDir + "/clone_pairs_xsmall_rev";
+		String reproFile = dataDir + "/repro_file_xsmall";
+		
+		String[] expectedConnectionLines = {
+			connectionsHeader(),
+			"nb_8.ipynb, 0, 0.0000, 0, 0.0000",
+			"nb_9.ipynb, 0, 0.0000, 0, 0.0000"
+		};
+		
+		analyzer.clones(statsFile, reproFile, pairFile);
+		checkCsv_anyOrder("connections", expectedConnectionLines);
+		deleteCloneCsvs();
+	}
+	
+	/**
 	 * Verify that lines not containing exact 4 comma-separated strings are
 	 * smoothly ignored in clone analysis.
 	 * @throws IOException 

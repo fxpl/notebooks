@@ -8,8 +8,6 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 
-// TODO: Testa med nullnotebook och nullrepro!
-
 public class SccSnippetTest {
 	private SccSnippet snippet;
 	private final int loc = 21;
@@ -108,38 +106,132 @@ public class SccSnippetTest {
 	}
 	
 	/**
-	 * Verify that connections are not added when notebook info is missing in
-	 * any of the snippets.
+	 * Verify that a NullPointerException is throw and no connections are added
+	 * by addConnection when notebook info is missing.
 	 */
 	@Test
 	public void testAddConnections_nullNotebook() {
+		boolean thrown = false;
 		SccSnippet nullNbSnippet = new SccSnippet(loc, null);
-		snippet.addConnection(nullNbSnippet);
-		assertFalse("Snippet considered connected after addition of connection to snippet without notebook", snippet.isClone());
-		nullNbSnippet.addConnection(snippet);
-		assertFalse("Snippet considered connected despite missing notebook info", nullNbSnippet.isClone());
-		SccSnippet otherNullNbSnippet = new SccSnippet(loc, null);
-		nullNbSnippet.addConnection(otherNullNbSnippet);
-		assertFalse("Snippet considered connected despite missing notebook info in both snippets", nullNbSnippet.isClone());
+		try {
+			snippet.addConnection(nullNbSnippet);
+		} catch (NullPointerException e) {
+			thrown = true;
+		}
+		assertTrue("No NullPointerException thrown when notebook info is missing.", thrown);
+		assertEquals("Intra notebook connection stored despite missing notebook info",
+				0, snippet.numIntraNotebookConnections());
+		assertEquals("Intra notebook connection stored despite missing notebook info",
+				0, nullNbSnippet.numIntraNotebookConnections());
+		assertEquals("Inter notebook connection stored despite missing notebook info",
+				0, snippet.numInterNotebookConnections());
+		assertEquals("Inter notebook connection stored despite missing notebook info",
+				0, nullNbSnippet.numInterNotebookConnections());
+		assertEquals("Intra repro connection stored despite missing notebook info",
+				0, snippet.numIntraReproConnections());
+		assertEquals("Intra repro connection stored despite missing notebook info",
+				0, nullNbSnippet.numIntraReproConnections());
+		assertEquals("Inter repro connection stored despite missing notebook info",
+				0, snippet.numInterReproConnections());
+		assertEquals("Inter repro connection stored despite missing notebook info",
+				0, nullNbSnippet.numInterReproConnections());
 	}
 	
 	/**
-	 * Verify that snippets are considered inter repro clones if repro
-	 * information is missing for any of them.
+	 * Verify that a NullPointerException is throw and no connections are added
+	 * by addConnection when notebook info is missing in argument snippet.
+	 */
+	@Test
+	public void testAddConnections_nullNotebookArg() {
+		boolean thrown = false;
+		SccSnippet nullNbSnippet = new SccSnippet(loc, null);
+		try {
+			nullNbSnippet.addConnection(snippet);
+		} catch (NullPointerException e) {
+			thrown = true;
+		}
+		assertTrue("No NullPointerException thrown when notebook info is missing in argument snippet.", thrown);
+		assertEquals("Intra repro connection stored despite missing notebook info",
+				0, snippet.numIntraReproConnections());
+		assertEquals("Intra repro connection stored despite missing notebook info",
+				0, nullNbSnippet.numIntraReproConnections());
+		assertEquals("Inter repro connection stored despite missing notebook info",
+				0, snippet.numInterReproConnections());
+		assertEquals("Inter repro connection stored despite missing notebook info",
+				0, nullNbSnippet.numInterReproConnections());
+		assertEquals("Intra notebook connection stored despite missing notebook info",
+				0, snippet.numIntraNotebookConnections());
+		assertEquals("Intra notebook connection stored despite missing notebook info",
+				0, nullNbSnippet.numIntraNotebookConnections());
+		assertEquals("Inter notebook connection stored despite missing notebook info",
+				0, snippet.numInterNotebookConnections());
+		assertEquals("Inter notebook connection stored despite missing notebook info",
+				0, nullNbSnippet.numInterNotebookConnections());
+	}
+	
+	/**
+	 * Verify that a NullPointerException is throw and no connections are added
+	 * by addConnection when repro info is missing.
 	 */
 	@Test
 	public void testAddConnections_nullRepro() {
+		boolean thrown = false;
 		SccSnippet nullReproSnippet = new SccSnippet(loc, new Notebook("nullReproNb.ipynb", null));
-		snippet.addConnection(nullReproSnippet);
-		assertEquals("Inter notebook connection not added when repro info missing in argument",
-				1, snippet.numInterNotebookConnections());
-		nullReproSnippet.addConnection(snippet);
-		assertEquals("Inter notebook connection not added when repro info missing in caller",
-				1, nullReproSnippet.numInterNotebookConnections());
-		SccSnippet otherReproSnippet = new SccSnippet(loc, new Notebook("otherNullReproNb.ipynb", null));
-		nullReproSnippet.addConnection(otherReproSnippet);
-		assertEquals("Inter notebook connection not added when repro info missing in both",
-				2, nullReproSnippet.numInterNotebookConnections());
+		try {
+			snippet.addConnection(nullReproSnippet);
+		} catch (NullPointerException e) {
+			thrown = true;
+		}
+		assertTrue("No NullPointerException thrown when repro info is missing.", thrown);
+		assertEquals("Intra notebook connection stored despite missing repro info",
+				0, snippet.numIntraNotebookConnections());
+		assertEquals("Intra notebook connection stored despite missing repro info",
+				0, nullReproSnippet.numIntraNotebookConnections());
+		assertEquals("Inter notebook connection stored despite missing repro info",
+				0, snippet.numInterNotebookConnections());
+		assertEquals("Inter notebook connection stored despite missing repro info",
+				0, nullReproSnippet.numInterNotebookConnections());
+		assertEquals("Intra repro connection stored despite missing repro info",
+				0, snippet.numIntraReproConnections());
+		assertEquals("Intra repro connection stored despite missing repro info",
+				0, nullReproSnippet.numIntraReproConnections());
+		assertEquals("Inter repro connection stored despite missing repro info",
+				0, snippet.numInterReproConnections());
+		assertEquals("Inter repro connection stored despite missing repro info",
+				0, nullReproSnippet.numInterReproConnections());
+	}
+	
+	/**
+	 * Verify that a NullPointerException is throw and no connections are added
+	 * by addConnection when repro info is missing in argument snippet.
+	 */
+	@Test
+	public void testAddConnections_nullReproArg() {
+		boolean thrown = false;
+		SccSnippet nullReproSnippet = new SccSnippet(loc, new Notebook("nullReproNb.ipynb", null));
+		try {
+			nullReproSnippet.addConnection(snippet);
+		} catch (NullPointerException e) {
+			thrown = true;
+		}
+		assertTrue("No NullPointerException thrown when repro info is missing in argument snippet.", thrown);
+		assertEquals("Intra notebook connection stored despite missing repro info",
+				0, snippet.numIntraNotebookConnections());
+		assertEquals("Intra notebook connection stored despite missing repro info",
+				0, nullReproSnippet.numIntraNotebookConnections());
+		assertEquals("Inter notebook connection stored despite missing repro info",
+				0, snippet.numInterNotebookConnections());
+		assertEquals("Inter notebook connection stored despite missing repro info",
+				0, nullReproSnippet.numInterNotebookConnections());
+		assertEquals("Intra repro connection stored despite missing repro info",
+				0, snippet.numIntraReproConnections());
+		assertEquals("Intra repro connection stored despite missing repro info",
+				0, nullReproSnippet.numIntraReproConnections());
+		assertEquals("Inter repro connection stored despite missing repro info",
+				0, snippet.numInterReproConnections());
+		assertEquals("Inter repro connection stored despite missing repro info",
+				0, nullReproSnippet.numInterReproConnections());
+		
 	}
 	
 	@Test
