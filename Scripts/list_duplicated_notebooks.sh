@@ -45,8 +45,8 @@ listDuplicated() {
 
 }
 
-file2hashesA=`./get_latest_output.sh "file2hashesA"`
-file2hashesNE=`./get_latest_output.sh file2hashesNE`
+file2hashesA=`./get_last_output.sh "file2hashesA"`
+file2hashesNE=`./get_last_output.sh file2hashesNE`
 listDuplicated $file2hashesA "A"
 listDuplicated $file2hashesNE "NE"
 

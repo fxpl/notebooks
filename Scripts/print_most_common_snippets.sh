@@ -19,7 +19,7 @@ numCloneGroups=$1
 minLOC=$2
 snippetsPerCloneGroup=$3
 
-hashFile=`./get_latest_output.sh "hash2filesA"`
+hashFile=`./get_last_output.sh "hash2filesA"`
 diskPath=/home/maka4186/notebook_disk
 pathFile=$diskPath/notebook_paths.txt
 

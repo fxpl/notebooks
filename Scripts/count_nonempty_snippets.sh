@@ -6,7 +6,7 @@
 ################################################################################
 
 # Count hashes
-file2hashesNE=`./get_latest_output.sh file2hashesNE`
+file2hashesNE=`./get_last_output.sh file2hashesNE`
 file2hashesTmp="../Output/file2hashes_with_comma.csv"
 cp $file2hashesNE $file2hashesTmp
 sed -Ei "s/^nb_/,nb_/" $file2hashesTmp	# In order to catch files without hashes
