@@ -303,8 +303,9 @@ public class NotebookAnalyzer extends Analyzer {
 					if (intra) {
 						numIntra++;
 					}
-					if (!snippet.isEmpty()) {
+					if (snippet.isEmpty()) {
 						numEmpty++;
+					} else {
 						if (intra) {
 							numIntraNE++;
 						}
