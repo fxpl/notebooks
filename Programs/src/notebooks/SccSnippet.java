@@ -23,10 +23,15 @@ public class SccSnippet {
 		this(Integer.parseInt(loc), notebook);
 	}
 	
-	public void addConnection(SccSnippet other) {
+	/**
+	 * Add information about connections to the current snippet and the snippet
+	 * given as argument.
+	 * @param connected Snippet that has a connection to this snippet
+	 */
+	public void connect(SccSnippet connected) {
 		boolean intraNotebook = false;
 		boolean intraRepro = false;
-		Notebook otherNotebook = other.getNotebook();
+		Notebook otherNotebook = connected.getNotebook();
 		if (this.notebook.equals(otherNotebook)) {
 			intraNotebook = true;
 			intraRepro = true;
@@ -38,14 +43,19 @@ public class SccSnippet {
 		}
 		if (intraNotebook) {
 			this.intraNotebookConnections++;
+			connected.intraNotebookConnections++;
 		} else {
-			interNotebookConnections++;
+			this.interNotebookConnections++;
+			connected.interNotebookConnections++;
 		}
 		if (intraRepro) {
-			intraReproConnections++;
+			this.intraReproConnections++;
+			connected.intraReproConnections++;
 		} else {
-			interReproConnections++;
-			reprosInterConnected.add(otherNotebook.getRepro());
+			this.interReproConnections++;
+			connected.interReproConnections++;
+			this.reprosInterConnected.add(otherNotebook.getRepro());
+			connected.reprosInterConnected.add(this.notebook.getRepro());
 		}
 	}
 	

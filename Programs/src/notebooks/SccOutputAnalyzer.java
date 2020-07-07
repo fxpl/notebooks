@@ -138,9 +138,7 @@ public class SccOutputAnalyzer extends Analyzer {
 					}
 					if (null != snippet1 && null != snippet2) {
 						try {
-							// TODO: Ett anrop!
-							snippet1.addConnection(snippet2);
-							snippet2.addConnection(snippet1);
+							snippet1.connect(snippet2);
 						} catch (NullPointerException e) {
 							// Notebook or repro was null for one of the snippets
 							System.err.println("Couldn't add connection. Notebook or repro info is missing.");
