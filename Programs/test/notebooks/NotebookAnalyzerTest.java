@@ -68,7 +68,6 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 		checkCsv("languages", expectedLangLines);
 		checkCsv("all_languages", expectedAllLangLines);
 		checkCsv("file2hashesA", expectedFile2hashesLines);
-		checkCsv("file2hashesNE", expectedFile2hashesLines);
 		checkCsv("hash2filesA", expectedHash2filesLines);
 		checkCsv("cloneFrequency", expectedCloneFreqLines);
 		checkCsv("connections", expectedConnectionsLines);
@@ -111,7 +110,6 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 		checkCsv("languages", expectedLangLines);
 		checkCsv("all_languages", expectedAllLangLines);
 		checkCsv("file2hashesA", expectedFile2hashesLines);
-		checkCsv("file2hashesNE", expectedFile2hashesLines);
 		checkCsv("hash2filesA", expectedHash2filesLines);
 		checkCsv("cloneFrequency", expectedCloneFreqLines);
 		checkCsv("connections", expectedConnectionsLines);
@@ -184,7 +182,6 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 				"languages",
 				"all_languages",
 				"file2hashesA",
-				"file2hashesNE",
 				"hash2filesA",
 				"cloneFrequency",
 				"connections"
@@ -512,7 +509,6 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 		analyzer.clones();
 		
 		checkCsv("file2hashesA", expectedSnippetLines);
-		checkCsv("file2hashesNE", expectedSnippetLines);
 		checkCsv("hash2filesA", expectedClonesLines);
 		checkCsv("cloneFrequency", expectedFrequencyLines);
 		checkCsv("connections", expectedConnectionsLines);
@@ -554,7 +550,6 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 		analyzer.clones();
 		
 		checkCsv("file2hashesA", expectedSnippetLines);
-		checkCsv("file2hashesNE", expectedSnippetLines);
 		checkCsv("hash2filesA", expectedClonesLines);
 		checkCsv("cloneFrequency", expectedFrequencyLiens);
 		checkCsv("connections", expectedConnectionsLines);
@@ -596,7 +591,6 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 		analyzer.clones();
 		
 		checkCsv("file2hashesA", expectedFile2HashesLines);
-		checkCsv("file2hashesNE", expectedFile2HashesLines);
 		checkCsv("hash2filesA", expectedHash2FileLines);
 		checkCsv("cloneFrequency", expectedFrequencyLines);
 		checkCsv("connections", expectedConnectionsLines);
@@ -605,7 +599,7 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 	}
 	
 	/**
-	 * Verify that the output files file2hashes[A|NE]<current-date-time>.csv,
+	 * Verify that the output files file2hashesA<current-date-time>.csv,
 	 * cloneFrequency<current-date-time>.csv and
 	 * connections<current-date-time>.csv have the right content after clone
 	 * analysis of a notebooks with both clones and a unique snippet.
@@ -637,39 +631,9 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 		analyzer.clones();
 		
 		checkCsv("file2hashesA", expectedFile2HashesLines);
-		checkCsv("file2hashesNE", expectedFile2HashesLines);
 		checkCsv("cloneFrequency", expectedFrequencyLines);
 		checkCsv("connections", expectedConnectionsLines);
 		
-		deleteCloneCsvs();
-	}
-	
-	/**
-	 * Verify that empty snippets are omitted in
-	 * file2hashesNE<current-date-time>.csv but not in
-	 * file2hashesA<current-date-time>.csv.
-	 * @throws IOException
-	 */
-	@Test
-	public void testFile2Hashes_emptySnippet() throws IOException {
-		String dataDir = "test/data/hash";
-		String notebookFile = "nb_5.ipynb";
-		String emptyHash = "D41D8CD98F00B204E9800998ECF8427E";
-		String fHash = "ECE926D8C0356205276A45266D361161";
-		String[] expectedFile2HashesALines = {
-			file2hashesHeader(),
-			notebookFile + ", " + emptyHash + ", " + fHash
-		};
-		String[] expectedFile2HashesNELines = {
-				file2hashesHeader(),
-				notebookFile + ", " + fHash
-		};
-		
-		analyzer.initializeNotebooksFrom(dataDir + "/" + notebookFile);
-		analyzer.clones();
-		
-		checkCsv("file2hashesA", expectedFile2HashesALines);
-		checkCsv("file2hashesNE", expectedFile2HashesNELines);
 		deleteCloneCsvs();
 	}
 	
@@ -903,7 +867,6 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 	@Override
 	protected void deleteCloneCsvs(String dir) {
 		TestUtils.lastOutputFile(dir, "file2hashesA").delete();
-		TestUtils.lastOutputFile(dir, "file2hashesNE").delete();
 		TestUtils.lastOutputFile(dir, "hash2filesA").delete();
 		TestUtils.lastOutputFile(dir, "cloneFrequency").delete();
 		TestUtils.lastOutputFile(dir, "connections").delete();
@@ -913,7 +876,6 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 	protected void verifyAbsenceOfCloneFiles(String dir) {
 		String[] prefixes = {
 				"file2hashesA",
-				"file2hashesNE",
 				"hash2filesA",
 				"cloneFrequency",
 				"connections"
@@ -929,7 +891,6 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 	protected void verifyExistenceOfAndRemoveCloneFiles(String dir) throws IOException {
 		String[] prefixes = {
 				"file2hashesA",
-				"file2hashesNE",
 				"hash2filesA",
 				"cloneFrequency",
 				"connections"

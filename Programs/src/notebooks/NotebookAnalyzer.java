@@ -281,24 +281,16 @@ public class NotebookAnalyzer extends Analyzer {
 	private void printFile2hashes(Map<Notebook, SnippetCode[]> file2hashes) throws IOException {
 		String timeStamp = LocalDateTime.now().toString();
 		Writer writerA = new FileWriter(outputDir + "/file2hashesA" + timeStamp + ".csv");
-		Writer writerNE = new FileWriter(outputDir + "/file2hashesNE" + timeStamp + ".csv");
 		writerA.write(file2hashesHeader());
-		writerNE.write(file2hashesHeader());
 		for (Notebook notebook: file2hashes.keySet()) {
 			writerA.write(notebook.getName());
-			writerNE.write(notebook.getName());
 			SnippetCode[] code = file2hashes.get(notebook);
 			for (SnippetCode snippet: code) {
 				writerA.write(", " + snippet.getHash());
-				if (0 != snippet.getLOC()) {
-					writerNE.write(", " + snippet.getHash());
-				}
 			}
 			writerA.write("\n");
-			writerNE.write("\n");
 		}
 		writerA.close();
-		writerNE.close();
 	}
 	
 	private void printHash2files(Map<SnippetCode, List<Snippet>> hash2files) throws IOException {
