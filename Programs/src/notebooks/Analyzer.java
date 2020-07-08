@@ -40,7 +40,7 @@ public class Analyzer {
 	 * @param numIntraNE Number of intra notebook connections, empty snippet excluded
 	 */
 	protected void printCloneFrequencyLine(Writer writer, String notebook, int numClones,
-			int numUnique, int numEmpty, int numIntra, int numIntraNE) throws IOException {
+			int numUnique, int numEmpty, int numClonesNE, int numIntra, int numIntraNE) throws IOException {
 		writer.write(notebook + ", " + numUnique + ", " + numClones + ", " + numEmpty + ", ");
 		int numSnippets = numClones + numUnique;
 		int numSnippetsNE = numSnippets - numEmpty;
@@ -51,7 +51,7 @@ public class Analyzer {
 			writer.write("0, ");
 		}
 		if (0 != numSnippetsNE) {
-			double cloneFrequency = (double)numClones / numSnippetsNE;
+			double cloneFrequency = (double)numClonesNE / numSnippetsNE;
 			writer.write(String.format(Locale.US, "%.4f", cloneFrequency) + ", ");
 		} else {
 			writer.write("0, ");

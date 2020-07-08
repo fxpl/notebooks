@@ -602,7 +602,7 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 	 * Verify that the output files file2hashesA<current-date-time>.csv,
 	 * cloneFrequency<current-date-time>.csv and
 	 * connections<current-date-time>.csv have the right content after clone
-	 * analysis of a notebooks with both clones and a unique snippet.
+	 * analysis of a notebook with both clones and a unique snippet.
 	 * @throws IOException
 	 */
 	@Test
@@ -633,6 +633,51 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 		checkCsv("file2hashesA", expectedFile2HashesLines);
 		checkCsv("cloneFrequency", expectedFrequencyLines);
 		checkCsv("connections", expectedConnectionsLines);
+		
+		deleteCloneCsvs();
+	}
+	
+	/**
+	 * Verify that the output files file2hashesA<current-date-time>.csv,
+	 * cloneFrequency<current-date-time>.csv and
+	 * connections<current-date-time>.csv have the right content after clone
+	 * analysis of a notebook with an empty clone.
+	 * @throws IOException
+	 */
+	@Test
+	public void testClones_csv_emptyClone() throws IOException {
+		String dataDir = "test/data/hash_maintenance";
+		String[] notebookFiles = {"nb_1.ipynb", "nb_2.ipynb"};
+		String reproFile = "test/data/hash/repros.csv";
+		String emptyHash = "D41D8CD98F00B204E9800998ECF8427E";
+		String codeHash = "82B3B93D07679915D2486E460668A907";
+		String otherCodeHash = "76846A33FEF92030A17FFDC1C4966235";
+		
+		String[] expectedFile2HashesLines = {
+			file2hashesHeader(),
+			notebookFiles[0] + ", " + emptyHash + ", " + codeHash + ", " + codeHash + ", " + emptyHash + ", " + otherCodeHash,
+			notebookFiles[1] + ", " + codeHash + ", " + emptyHash
+		};
+		String[] expectedFrequencyLines = {
+			cloneFrequencyHeader(),
+			notebookFiles[0] + ", 1, 4, 2, 0.8000, 0.6667, 4, 2",
+			notebookFiles[1] + ", 0, 2, 1, 1.0000, 1.0000, 0, 0"
+		};
+		String[] expectedConnectionsLines = {
+			connectionsHeader(),
+			notebookFiles[0] + ", 8, 1.6000, 4, 1.3333, 4, 2, 4.0000, 2.0000",
+			notebookFiles[1] + ", 4, 2.0000, 2, 2.0000, 0, 0, 4.0000, 2.0000"
+		};
+		
+		for (String notebookFile: notebookFiles) {
+			analyzer.initializeNotebooksFrom(dataDir + "/" + notebookFile);
+		}
+		analyzer.initializeReproInfo(reproFile);
+		analyzer.clones();
+		
+		checkCsv("file2hashesA", expectedFile2HashesLines);
+		checkCsv("cloneFrequency", expectedFrequencyLines);
+		checkCsv_anyOrder("connections", expectedConnectionsLines);
 		
 		deleteCloneCsvs();
 	}

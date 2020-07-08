@@ -311,7 +311,7 @@ public class NotebookAnalyzer extends Analyzer {
 		Writer writer = new FileWriter(outputDir + "/cloneFrequency" + LocalDateTime.now() + ".csv");
 		writer.write(cloneFrequencyHeader());
 		for (Notebook notebook: file2hashes.keySet()) {
-			int numClones = 0, numUnique = 0, numEmpty = 0;
+			int numClones = 0, numUnique = 0, numEmpty = 0, numClonesNE = 0;
 			int numIntra = 0, numIntraNE = 0;	// # intra notebook clones
 			SnippetCode[] code = file2hashes.get(notebook);
 			for (SnippetCode snippet: code) {
@@ -332,7 +332,8 @@ public class NotebookAnalyzer extends Analyzer {
 					numUnique++;
 				}
 			}
-			printCloneFrequencyLine(writer, notebook.getName(), numClones, numUnique, numEmpty, numIntra, numIntraNE);
+			numClonesNE = numClones - numEmpty;
+			printCloneFrequencyLine(writer, notebook.getName(), numClones, numUnique, numEmpty, numClonesNE, numIntra, numIntraNE);
 		}
 		writer.close();
 	}

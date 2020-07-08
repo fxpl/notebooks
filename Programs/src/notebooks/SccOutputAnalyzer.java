@@ -192,7 +192,7 @@ public class SccOutputAnalyzer extends Analyzer {
 		writer.write(cloneFrequencyHeader());
 		for (String notebook: file2snippets.keySet()) {
 			int numClones = 0, numUnique = 0, numEmpty = 0;
-			int numIntra = 0, numIntraNE = 0;
+			int numIntra = 0, numIntraNE = 0;	// # intra notebook clones
 			Set<SccSnippetId> snippetsInNotebook = file2snippets.get(notebook);
 			for (SccSnippetId id: snippetsInNotebook) {
 				SccSnippet snippet = snippets.get(id);
@@ -207,7 +207,7 @@ public class SccOutputAnalyzer extends Analyzer {
 				numIntra += snippet.numIntraNotebookConnections();
 			}
 			numIntraNE = numIntra;	// No empty clones for Scc data!
-			printCloneFrequencyLine(writer, notebook, numClones, numUnique, numEmpty, numIntra, numIntraNE);
+			printCloneFrequencyLine(writer, notebook, numClones, numUnique, numEmpty, numClones, numIntra, numIntraNE);
 		}
 		writer.close();
 	}
