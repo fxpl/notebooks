@@ -75,7 +75,7 @@ public class SccOutputAnalyzer extends Analyzer {
 	 * @param statsFile Path to file stats file produced by the SourcererCC tokenizer
 	 */
 	public void initializeSnippetInfo(String statsFile, String reproFile) throws IOException {
-		Map<Integer, Notebook> notebooks = createNotebookMap(reproFile);
+		Map<Integer, LightweightNotebook> notebooks = createNotebookMap(reproFile);
 		BufferedReader statsReader = new BufferedReader(new FileReader(statsFile));
 		snippets = new HashMap<SccSnippetId, SccSnippet>();
 		file2snippets = new HashMap<String, Set<SccSnippetId>>();
@@ -92,7 +92,7 @@ public class SccOutputAnalyzer extends Analyzer {
 			// Create parent notebook
 			int notebookNumber = Integer.parseInt(snippetSubStrings[1]);
 			String notebookName = getNotebookNameFromNumber(notebookNumber);
-			Notebook notebook = notebooks.get(notebookNumber);
+			LightweightNotebook notebook = notebooks.get(notebookNumber);
 			/* Here we use the number of lines of source code (comments
 			   excluded), which is inconsistent with the clone analysis of the 
 			   notebook files, but so is the clone detection -SourcererCC
@@ -115,8 +115,8 @@ public class SccOutputAnalyzer extends Analyzer {
 	 * @param fileName Name of file with mapping from notebook number to repro
 	 * @return The map from notebook number to notebook
 	 */
-	protected static Map<Integer, Notebook> createNotebookMap(String fileName) throws IOException {
-		Map<Integer, Notebook> result = new HashMap<Integer, Notebook>();
+	protected static Map<Integer, LightweightNotebook> createNotebookMap(String fileName) throws IOException {
+		Map<Integer, LightweightNotebook> result = new HashMap<Integer, LightweightNotebook>();
 		BufferedReader reader = new BufferedReader(new FileReader(fileName));
 		String line = reader.readLine();
 		while (null != line) {
@@ -125,7 +125,7 @@ public class SccOutputAnalyzer extends Analyzer {
 				int notebookNumber = Integer.parseInt(subStrings[0]);
 				String notebookName = "nb_" + notebookNumber + ".ipynb";
 				String reproName = subStrings[1];
-				result.put(notebookNumber, new Notebook(notebookName, reproName));
+				result.put(notebookNumber, new LightweightNotebook(notebookName, reproName));
 			} catch (NumberFormatException e) {
 				System.err.println("Notebook numbers in repro file must be integers! Notebook with \"number\" '"
 						+ subStrings[0] + "' is excluded from mapping!");
