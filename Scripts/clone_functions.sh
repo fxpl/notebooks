@@ -43,17 +43,24 @@ analyzeCloneGroups() {
 ################################################################################
 # Count the number of clones and unique snippets. Check how many files contain
 # only clones and only unique snippets respectively.
-# Argument: Index of the column in the clone frequency file that contains the
-#			frequencies (different depending on if empty snippets are included.
+# Arguments:
+# 1. Index of the column in the clone frequency file that contains the
+#	frequencies (different depending on if empty snippets are included.
+# 2. Flag indicating whether empty snippets should be subtracted from the unique
+#	 clones ("true") or not ("false"). (TODO: Går det att lösa snyggare?!)
 ################################################################################
 analyzeClones() {
 	frequencyFile=`./get_last_output.sh "cloneFrequency"`
 	frequencyCol=$1
+	subtract_empty_from_unique=$2
 
 	# Total number of clones and unique snippets respectively
 	numClones=`sed -n "2,$ p" $frequencyFile | cut -d',' -f3 | paste -sd+ | bc`
 	numUnique=`sed -n "2,$ p" $frequencyFile | cut -d',' -f2 | paste -sd+ | bc`
 	numEmpty=`sed -n "2,$ p" $frequencyFile | cut -d',' -f4 | paste -sd+ | bc`	# NOTE: Nonempty clones in old format!
+	if [ "$subtract_empty_from_unique" = true ] ; then
+		numUnique=`echo "$numUnique - $numEmpty" | bc`
+	fi
 	fractionClones=`echo "$numClones / ($numClones+$numUnique)" | bc -l`
 	echo "Total number of clones (including all copies): $numClones"
 	echo "Total number of empty snippets: $numEmpty"

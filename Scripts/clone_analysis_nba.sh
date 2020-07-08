@@ -14,7 +14,7 @@ echo "CLONE GROUP DATA, ALL SNIPPETS:"
 analyzeCloneGroups $hash2filesA
 echo ""
 echo "CLONE DATA, ALL SNIPPETS:"
-analyzeClones 5
+analyzeClones 5 false
 echo ""
 echo "INTRA CLONES, ALL SNIPPETS:"
 intraClones 7
@@ -24,7 +24,7 @@ echo "CLONE GROUP DATA, EMPTY SNIPPETS EXCLUDED:"
 analyzeCloneGroups $hash2filesNE
 echo ""
 echo "CLONE DATA, EMPTY SNIPPETS EXCLUDED:"
-analyzeClones 6
+analyzeClones 6 false
 echo ""
 echo "INTRA CLONES, EMPTY SNIPPETS EXCLUDED:"
 intraClones 8
