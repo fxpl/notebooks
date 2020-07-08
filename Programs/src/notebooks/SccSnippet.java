@@ -7,7 +7,6 @@ public class SccSnippet {
 	private final int loc;
 	private int intraNotebookConnections;
 	private int interNotebookConnections;
-	private int intraReproConnections;
 	private int interReproConnections;
 	// Repros that this snippet has an inter connection to
 	private Set<String> reprosInterConnected;
@@ -48,10 +47,7 @@ public class SccSnippet {
 			this.interNotebookConnections++;
 			connected.interNotebookConnections++;
 		}
-		if (intraRepro) {
-			this.intraReproConnections++;
-			connected.intraReproConnections++;
-		} else {
+		if (!intraRepro) {
 			this.interReproConnections++;
 			connected.interReproConnections++;
 			this.reprosInterConnected.add(otherNotebook.getRepro());
@@ -94,6 +90,6 @@ public class SccSnippet {
 	}
 	
 	public int numIntraReproConnections() {
-		return intraReproConnections;
+		return intraNotebookConnections + interNotebookConnections - interReproConnections;
 	}
 }
