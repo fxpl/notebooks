@@ -203,7 +203,7 @@ public class SccOutputAnalyzer extends Analyzer {
 				if (0 == snippet.getLoc()) {
 					numEmpty++;
 				}
-				if (0 < snippet.numIntraNotebookConnections()) {
+				if (snippet.isIntraNotebookClone()) {
 					numIntra++;
 				}
 			}

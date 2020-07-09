@@ -56,7 +56,11 @@ public class SccSnippet {
 	}
 	
 	public boolean isClone() {
-		return interNotebookConnections > 0 || intraNotebookConnections > 0;
+		return isIntraNotebookClone() || interNotebookConnections > 0;
+	}
+	
+	public boolean isIntraNotebookClone() {
+		return intraNotebookConnections > 0;
 	}
 	
 	/**
@@ -70,7 +74,7 @@ public class SccSnippet {
 		return notebook;
 	}
 	
-	/**
+	/** TODO: Lägg i notebook istället!
 	 * @return The set of all repros to which this snippet is connected, except the one it self lives in
 	 */
 	public Set<String> getReprosInterConnected() {

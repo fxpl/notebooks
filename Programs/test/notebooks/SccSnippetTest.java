@@ -301,4 +301,19 @@ public class SccSnippetTest {
 		assertTrue("Snippet not considered clone after addition of addition of intra notebook connection", snippet.isClone());
 		assertTrue("Snippet not considered clone after addition of addition of intra notebook connection", otherNotebook.isClone());
 	}
+	
+	/**
+	 * Verify that a snippet is considered an intra notebook clone if and only
+	 * if an intra notebook connection is added.
+	 */
+	@Test
+	public void testIsIntraNotebookClone() {
+		assertFalse("Snippet considered intra notebook clone on creation", snippet.isIntraNotebookClone());
+		SccSnippet otherNotebook = new SccSnippet(35, new LightweightNotebook("otherRepro.ipynb", ""));
+		snippet.connect(otherNotebook);
+		assertFalse("Snippet considered intra clone after addition of inter notebook connection", snippet.isIntraNotebookClone());
+		SccSnippet sameNotebook = new SccSnippet(17, new LightweightNotebook(notebook));
+		snippet.connect(sameNotebook);
+		assertTrue("Snippet not considered intra clone after addition of intra notebook connection", snippet.isIntraNotebookClone());
+	}
 }
