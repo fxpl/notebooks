@@ -4,7 +4,6 @@ public class SccSnippet {
 	private final int loc;
 	private int intraNotebookConnections;
 	private int interNotebookConnections;
-	private int interReproConnections;
 	private final SccNotebook notebook;
 	
 	public SccSnippet(int loc, SccNotebook notebook) {
@@ -22,29 +21,14 @@ public class SccSnippet {
 	 * @param connected Snippet that has a connection to this snippet
 	 */
 	public void connect(SccSnippet connected) {
-		boolean intraNotebook = false;
-		boolean intraRepro = false;
-		SccNotebook otherNotebook = connected.getNotebook();
-		if (this.notebook.equals(otherNotebook)) {
-			intraNotebook = true;
-			intraRepro = true;
-		} else {
-			String myRepro = this.notebook.getRepro();
-			// We call toString because we want a NPE to be thrown if repro is null.
-			String otherRepo = otherNotebook.getRepro().toString();
-			intraRepro = myRepro.equals(otherRepo);
-		}
-		if (intraNotebook) {
+		SccNotebook connectedNotebook = connected.getNotebook();
+		this.notebook.connect(connectedNotebook);
+		if (this.notebook.equals(connectedNotebook)) {
 			this.intraNotebookConnections++;
 			connected.intraNotebookConnections++;
 		} else {
 			this.interNotebookConnections++;
 			connected.interNotebookConnections++;
-		}
-		if (!intraRepro) {
-			this.interReproConnections++;
-			connected.interReproConnections++;
-			this.notebook.connect(otherNotebook);
 		}
 	}
 	
@@ -71,15 +55,7 @@ public class SccSnippet {
 		return interNotebookConnections;
 	}
 	
-	public int numInterReproConnections() {
-		return interReproConnections;
-	}
-	
 	public int numIntraNotebookConnections() {
 		return intraNotebookConnections;
-	}
-	
-	public int numIntraReproConnections() {
-		return intraNotebookConnections + interNotebookConnections - interReproConnections;
 	}
 }

@@ -7,6 +7,8 @@ import java.util.Set;
 public class SccNotebook {
 	private String name;
 	private String repro = "";
+	private int intraReproConnections;
+	private int interReproConnections;
 	// Repros that this notebook has an inter connections to
 	private Set<String> reprosInterConnected;
 	
@@ -21,7 +23,14 @@ public class SccNotebook {
 	}
 	
 	public void connect(SccNotebook connected) {
-		if (!this.repro.equals(connected.repro)) {
+		// We call toString because we want a NPE to be thrown if repro is null.
+		String connectedRepo = connected.repro.toString();
+		if (this.repro.equals(connectedRepo)) {
+			this.intraReproConnections++;
+			connected.intraReproConnections++;
+		} else {
+			this.interReproConnections++;
+			connected.interReproConnections++;
 			this.reprosInterConnected.add(connected.repro);
 			connected.reprosInterConnected.add(this.repro);
 		}
@@ -55,5 +64,13 @@ public class SccNotebook {
 	 */
 	public Set<String> getReprosInterConnected() {
 		return reprosInterConnected;
+	}
+	
+	public int numInterReproConnections() {
+		return interReproConnections;
+	}
+	
+	public int numIntraReproConnections() {
+		return intraReproConnections;
 	}
 }

@@ -33,30 +33,20 @@ public class SccSnippetTest {
 				0, snippet.numIntraNotebookConnections());
 		assertEquals("Number of inter notebook connections != 0 on creation",
 				0, snippet.numInterNotebookConnections());
-		assertEquals("Number of intra repro connections != 0 on creation",
-				0, snippet.numIntraReproConnections());
-		assertEquals("Number of inter repro connections != 0 on creation",
-				0, snippet.numInterReproConnections());
 		SccSnippet sameNotebook = new SccSnippet(5, new SccNotebook(notebook));
 		snippet.connect(sameNotebook);
 		assertEquals("Number of intra notebook connections !=1 after addition of one",
 				1, snippet.numIntraNotebookConnections());
 		assertEquals("Number of inter notebook connections != 0 after addition of intra notebook connection",
 				0, snippet.numInterNotebookConnections());
-		assertEquals("Number of intra repro connections !=1 after addition of one",
-				1, snippet.numIntraReproConnections());
-		assertEquals("Number of inter repro connections != 0 after addition of intra repro connection",
-				0, snippet.numInterReproConnections());
+		
 		SccSnippet sameRepro = new SccSnippet(7, new SccNotebook("sameRepro.ipynb", reproName));
 		snippet.connect(sameRepro);
 		assertEquals("Number of intra notebook connections changed by addition of intra repro connection",
 				1, snippet.numIntraNotebookConnections());
 		assertEquals("Number of inter notebook connections !=1 after addition of one",
 				1, snippet.numInterNotebookConnections());
-		assertEquals("Number of intra repro connections !=2 after addition of two",
-				2, snippet.numIntraReproConnections());
-		assertEquals("Number of inter repro connections changed when intra repro connection was added",
-				0, snippet.numInterReproConnections());
+		
 		String otherReproName = "otherRepro";
 		SccSnippet otherRepro = new SccSnippet(32, new SccNotebook("otherRepro.ipynb", otherReproName));
 		snippet.connect(otherRepro);
@@ -64,46 +54,26 @@ public class SccSnippetTest {
 				1, snippet.numIntraNotebookConnections());
 		assertEquals("Number of inter notebook connections !=2 after addition of two",
 				2, snippet.numInterNotebookConnections());
-		assertEquals("Number of intra repro connections changed by addition of inter repro connection",
-				2, snippet.numIntraReproConnections());
-		assertEquals("Number of inter repro connections !=1 after addition of one",
-				1, snippet.numInterReproConnections());
 		
-		// Final check of number of connections, to be on the safe side. (Everything should be checked above.)
+		// Final check of number of connections, to be on the safe side. (Every case should be checked above.)
 		assertEquals("Wrong final number of intra notebook connections",
 				1, snippet.numIntraNotebookConnections());
 		assertEquals("Wrong final number of inter notebook connections",
 				2, snippet.numInterNotebookConnections());
-		assertEquals("Wrong final number of intra repro connections",
-				2, snippet.numIntraReproConnections());
-		assertEquals("Wrong final number of inter repro connections",
-				1, snippet.numInterReproConnections());
 		
 		// Also check snippets given as arguments
 		assertEquals("Wrong number of intra notebook connections for argument snippet",
 				1, sameNotebook.numIntraNotebookConnections());
 		assertEquals("Wrong number of inter notebook connections for argument snippet",
 				0, sameNotebook.numInterNotebookConnections());
-		assertEquals("Wrong number of intra repro connections for argument snippet",
-				1, sameNotebook.numIntraReproConnections());
-		assertEquals("Wrong number of inter repro connections for argument snippet",
-				0, sameNotebook.numInterReproConnections());
 		assertEquals("Wrong number of intra notebook connections for argument snippet",
 				0, sameRepro.numIntraNotebookConnections());
 		assertEquals("Wrong number of inter notebook connections for argument snippet",
 				1, sameRepro.numInterNotebookConnections());
-		assertEquals("Wrong number of intra repro connections for argument snippet",
-				1, sameRepro.numIntraReproConnections());
-		assertEquals("Wrong number of inter repro connections for argument snippet",
-				0, sameRepro.numInterReproConnections());
 		assertEquals("Wrong number of intra notebook connections for argument snippet",
 				0, otherRepro.numIntraNotebookConnections());
 		assertEquals("Wrong number of inter notebook connections for argument snippet",
 				1, otherRepro.numInterNotebookConnections());
-		assertEquals("Wrong number of intra repro connections for argument snippet",
-				0, otherRepro.numIntraReproConnections());
-		assertEquals("Wrong number of inter repro connections for argument snippet",
-				1, otherRepro.numInterReproConnections());
 	}
 	
 	/**
@@ -128,18 +98,10 @@ public class SccSnippetTest {
 				0, snippet.numInterNotebookConnections());
 		assertEquals("Inter notebook connection stored despite missing notebook info",
 				0, nullNbSnippet.numInterNotebookConnections());
-		assertEquals("Intra repro connection stored despite missing notebook info",
-				0, snippet.numIntraReproConnections());
-		assertEquals("Intra repro connection stored despite missing notebook info",
-				0, nullNbSnippet.numIntraReproConnections());
-		assertEquals("Inter repro connection stored despite missing notebook info",
-				0, snippet.numInterReproConnections());
-		assertEquals("Inter repro connection stored despite missing notebook info",
-				0, nullNbSnippet.numInterReproConnections());
 	}
 	
 	/**
-	 * Verify that a NullPointerException is throw and no connections are added
+	 * Verify that a NullPointerException is thrown and no connections are added
 	 * by addConnection when notebook info is missing in argument snippet.
 	 */
 	@Test
@@ -152,14 +114,6 @@ public class SccSnippetTest {
 			thrown = true;
 		}
 		assertTrue("No NullPointerException thrown when notebook info is missing in argument snippet.", thrown);
-		assertEquals("Intra repro connection stored despite missing notebook info",
-				0, snippet.numIntraReproConnections());
-		assertEquals("Intra repro connection stored despite missing notebook info",
-				0, nullNbSnippet.numIntraReproConnections());
-		assertEquals("Inter repro connection stored despite missing notebook info",
-				0, snippet.numInterReproConnections());
-		assertEquals("Inter repro connection stored despite missing notebook info",
-				0, nullNbSnippet.numInterReproConnections());
 		assertEquals("Intra notebook connection stored despite missing notebook info",
 				0, snippet.numIntraNotebookConnections());
 		assertEquals("Intra notebook connection stored despite missing notebook info",
@@ -179,7 +133,7 @@ public class SccSnippetTest {
 		boolean thrown = false;
 		SccSnippet nullReproSnippet = new SccSnippet(loc, new SccNotebook("nullReproNb.ipynb", null));
 		try {
-			snippet.connect(nullReproSnippet);
+			nullReproSnippet.connect(snippet);
 		} catch (NullPointerException e) {
 			thrown = true;
 		}
@@ -192,14 +146,6 @@ public class SccSnippetTest {
 				0, snippet.numInterNotebookConnections());
 		assertEquals("Inter notebook connection stored despite missing repro info",
 				0, nullReproSnippet.numInterNotebookConnections());
-		assertEquals("Intra repro connection stored despite missing repro info",
-				0, snippet.numIntraReproConnections());
-		assertEquals("Intra repro connection stored despite missing repro info",
-				0, nullReproSnippet.numIntraReproConnections());
-		assertEquals("Inter repro connection stored despite missing repro info",
-				0, snippet.numInterReproConnections());
-		assertEquals("Inter repro connection stored despite missing repro info",
-				0, nullReproSnippet.numInterReproConnections());
 	}
 	
 	/**
@@ -224,15 +170,6 @@ public class SccSnippetTest {
 				0, snippet.numInterNotebookConnections());
 		assertEquals("Inter notebook connection stored despite missing repro info",
 				0, nullReproSnippet.numInterNotebookConnections());
-		assertEquals("Intra repro connection stored despite missing repro info",
-				0, snippet.numIntraReproConnections());
-		assertEquals("Intra repro connection stored despite missing repro info",
-				0, nullReproSnippet.numIntraReproConnections());
-		assertEquals("Inter repro connection stored despite missing repro info",
-				0, snippet.numInterReproConnections());
-		assertEquals("Inter repro connection stored despite missing repro info",
-				0, nullReproSnippet.numInterReproConnections());
-		
 	}
 	
 	@Test

@@ -239,18 +239,16 @@ public class SccOutputAnalyzer extends Analyzer {
 				System.err.print("No repro information stored for notebook " + notebookName + "! ");
 				System.err.println("Connections will not be counted!");
 			} else {
-				int interConnections = 0;
-				int intraConnections = 0;
 				int nonEmptySnippets = 0;
 				Set<SccSnippetId> snippetsForNotebook = notebook2snippets.get(notebookNumber);
 				for (SccSnippetId id: snippetsForNotebook) {
 					SccSnippet snippet = snippets.get(id);
-					interConnections += snippet.numInterReproConnections();
-					intraConnections += snippet.numIntraReproConnections();
 					if (0 != snippet.getLoc()) {
 						nonEmptySnippets++;
 					}
 				}
+				int interConnections = notebook.numInterReproConnections();
+				int intraConnections = notebook.numIntraReproConnections();
 				int numInterConnectedRepros = notebook.getReprosInterConnected().size();
 				int connections = interConnections + intraConnections;
 				// Empty snippets are considered unique by SourcererCC
