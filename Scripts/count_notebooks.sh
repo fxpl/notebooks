@@ -13,7 +13,7 @@
 
 projDir="/home/maka4186/notebook_disk"
 logFile="../Logs/analyze-all-complete.out"
-codeCells=`./get_latest_output.sh "code_cells"`
+codeCells=`./get_last_output.sh "code_cells"`
 
 outputLines=`wc -l $codeCells | cut -d' ' -f1`
 outputNotebooks=`echo "$outputLines - 1" | bc`

@@ -16,7 +16,7 @@ LC_NUMERIC="en_US.UTF-8"
 
 # Langugaes
 languages=( PYTHON JULIA R SCALA OTHER UNKNOWN )
-file=`./get_latest_output.sh "languages"`
+file=`./get_last_output.sh "languages"`
 total=`sed -n "2,$ p" $file | wc -l`
 percentages="("
 numbers="("

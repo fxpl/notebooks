@@ -1,6 +1,4 @@
-rm(list=ls())
-setwd("~/github/fxpl/notebooks")
-source("../mk/PaperII/Performance/plot_for_normality_check.R")
+setwd("..")
 outputDir <- "Output"
 
 # FUNCTIONS
@@ -64,6 +62,19 @@ logHist <- function(data, specifier="", objects="Notebooks") {
 histogram <- function(data, specifier="") {
   exportAsEPS(hist(data, main="", xlab="", ylab="Notebooks"),
               paste("hist_", specifier, sep=""))
+}
+
+###############################################################################
+# Plot a histogram and a qq plot for sample, side by side.
+# Resets mfrow to 1,1 after plotting
+###############################################################################
+plot_for_normality_check <- function(sample) {
+  readline(prompt="Press enter to see normality check plot")
+  par(mfrow=c(1,2))
+  hist(sample)
+  qqnorm(sample)
+  qqline(sample)
+  par(mfrow=c(1,1))
 }
 
 ###############################################################################
@@ -157,8 +168,8 @@ exportAsEPS({
 
 # CLONES
 # Snippet occurences distribution
-logHist(snippetOccurrencesA[,2], specifier="snippetOccurencesA", objects="Snippets")
-logHist(snippetOccurrencesNE[,2], specifier="snippetOccurencesNE", objects="Snippets")
+logHist(snippetOccurrencesA$count, specifier="snippetOccurencesA", objects="Snippets")
+logHist(snippetOccurrencesNE$count, specifier="snippetOccurencesNE", objects="Snippets")
 # Notebook clone occurrences distribution
 logHist(notebookOccurencesA[,1], specifier="notebookOccurencesA")
 logHist(notebookOccurencesNE[,1], specifier="notebookOccurencesNE")
@@ -166,11 +177,11 @@ logHist(notebookOccurencesNE[,1], specifier="notebookOccurencesNE")
 # Clone sizes (LOC) distribution
 cloneGroupsA <- snippetOccurrencesA[snippetOccurrencesA$count>1,]
 print("LOC in clone groups, with empty snippet")
-printMeanAndPercentiles(cloneGroupsA[,2])
+printMeanAndPercentiles(cloneGroupsA$LOC)
 cloneSizesA <- do.call(c, apply(cloneGroupsA, 1, repeatSecondColumn))
 print("LOC in clones, with empty snippet")
 printMeanAndPercentiles(as.integer(cloneSizesA))
-logHist(cloneGroupsA[,2], specifier="cloneGroupSizesA", objects="Clone groups")
+logHist(cloneGroupsA$LOC, specifier="cloneGroupSizesA", objects="Clone groups")
 logHist(as.integer(cloneSizesA), specifier="cloneSizesA", objects="Clones")
 cloneGroupsNE <- snippetOccurrencesNE[snippetOccurrencesNE$count>1,]
 print("LOC in clone groups, without empty snippet")
@@ -203,13 +214,13 @@ print("Correlation with size (non-empty clones):")
 cor.test(nbData$non.empty.snippets, nbData$non.empty.clone.frequency, alternative="two.sided", method="spearman")
 
 # Association with language
-exportAsEPS(boxplot(clone.frequency~language, data=nbData), "lang_frequencyA")
 nbDataKnownLang <- nbData[nbData$language!=" UNKNOWN",]
+exportAsEPS(boxplot(clone.frequency~language, data=nbDataKnownLang), "lang_frequencyA")
 checkLM(nbDataKnownLang$clone.frequency, as.factor(nbDataKnownLang$language))
 print("Correlation with language (all clones):")
 kruskalWallisWithPost(nbDataKnownLang$clone.frequency, as.factor(nbDataKnownLang$language))
 
-exportAsEPS(boxplot(non.empty.clone.frequency~language, data=nbData), "lang_frequencyNE")
+exportAsEPS(boxplot(non.empty.clone.frequency~language, data=nbDataKnownLang), "lang_frequencyNE")
 checkLM(nbDataKnownLang$non.empty.clone.frequency, as.factor(nbDataKnownLang$language))
 print("Correlation with language (non-empty clones):")
 kruskalWallisWithPost(nbDataKnownLang$non.empty.clone.frequency, as.factor(nbDataKnownLang$language))

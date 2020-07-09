@@ -36,6 +36,7 @@ listDuplicated() {
 
 	sed -E "s/([0-9]) ([A-F,0-9])/\1, \2/" $specs | cut -d',' -f1 > $count
 
+	rm $list
 	sed -E "s/([0-9]) ([A-F,0-9])/\1, \2/" $specs | grep -E -v "^\s*1\, " | cut -d',' -f2- | while read hashComb
 	do
 		grep -E "ipynb\, $hashComb$" $f2h | cut -d',' -f1 | paste -sd' ' >> $list
@@ -45,8 +46,9 @@ listDuplicated() {
 }
 
 ./create_file2hashesNE_if_nonexistent.sh
-file2hashesA=`./get_latest_output.sh "file2hashesA"`
-file2hashesNE=`./get_latest_output.sh file2hashesNE`
+file2hashesA=`./get_last_output.sh "file2hashesA"`
+file2hashesNE=`./get_last_output.sh file2hashesNE`
+
 listDuplicated $file2hashesA "A"
 listDuplicated $file2hashesNE "NE"
 
