@@ -12,7 +12,7 @@
 # cells.
 ################################################################################
 
-langFile=`./get_latest_output.sh "all_languages"`
+langFile=`./get_last_output.sh "all_languages"`
 sed -n "2,$ p" $langFile \
 	| awk -F ',' \
 	'{ if(\

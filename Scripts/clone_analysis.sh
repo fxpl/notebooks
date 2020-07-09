@@ -46,9 +46,10 @@ countClones() {
 	fractionCloneGroups=`echo "$cloneGroups / ($cloneGroups+$unique)" | bc -l`
 	fractionCloneCopies=`echo "$cloneCopies / ($cloneCopies+$unique)" | bc -l`
 	echo "Total number of clone pairs/groups: $cloneGroups"
+	echo "Fraction clones (each clone group counted once): $fractionCloneGroups"
+# TODO: Räkna ut nedanstående från frequencyFile
 	echo "Total number of clones (including all copies): $cloneCopies"
 	echo "Total number of unique snippets: $unique"
-	echo "Fraction clones (each clone group counted once): $fractionCloneGroups"
 	echo "Fraction clone copies: $fractionCloneCopies"
 }
 
@@ -58,7 +59,7 @@ countClones() {
 #			frequencies.
 ################################################################################
 cloneFrequency() {
-	frequencyFile=`./get_latest_output.sh "cloneFrequency"`
+	frequencyFile=`./get_last_output.sh "cloneFrequency"`
 	frequencyCol=$1
 
 	## If fraction == 1, all snippets in the file are clones. (fraction<=1).
@@ -87,7 +88,7 @@ cloneFrequency() {
 #			number of intra clones.
 ################################################################################
 intraClones() {
-	frequencyFile=`./get_latest_output.sh "cloneFrequency"`
+	frequencyFile=`./get_last_output.sh "cloneFrequency"`
 	intraCloneCol=$1
 
 	intraClones=`sed -n "2,$ p" $frequencyFile | cut -d',' -f$intraCloneCol | grep -E -v "\ 0$" | wc -l`
@@ -101,7 +102,7 @@ intraClones() {
 
 
 # Create hash2files file without empty snippets
-hash2filesA=`./get_latest_output.sh "hash2filesA"`
+hash2filesA=`./get_last_output.sh "hash2filesA"`
 hash2filesNE=`echo $hash2filesA | sed -E "s/hash2filesA/hash2filesNE/"`
 emptyPattern="^[A-F,a-f,0-9]+\, 0\, nb_"	# Pattern for line representing an empty snippet
 sed -E "/$emptyPattern/d" $hash2filesA > $hash2filesNE

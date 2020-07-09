@@ -9,11 +9,11 @@ prefixes=( "code_cells" "snippetsPerFileNE" "loc" "languages" "cloneFrequency" "
 for prefix in ${prefixes[@]};
 do
 	rm -f ../Output/$prefix.csv
-	csvFile=`./get_latest_output.sh $prefix`
+	csvFile=`./get_last_output.sh $prefix`
 	ln -s $csvFile ../Output/$prefix.csv
 done
 
-filesPerSnippetNE=`./get_latest_output.sh filesPerSnippet2`
+filesPerSnippetNE=`./get_last_output.sh filesPerSnippet2`
 rm -f ../Output/filesPerSnippetNE.csv
 ln -s $filesPerSnippetNE ../Output/filesPerSnippetNE.csv
 
