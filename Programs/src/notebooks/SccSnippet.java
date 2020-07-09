@@ -10,15 +10,15 @@ public class SccSnippet {
 	private int interReproConnections;
 	// Repros that this snippet has an inter connection to
 	private Set<String> reprosInterConnected;
-	private final LightweightNotebook notebook;
+	private final SccNotebook notebook;
 	
-	public SccSnippet(int loc, LightweightNotebook notebook) {
+	public SccSnippet(int loc, SccNotebook notebook) {
 		this.loc = loc;
 		this.notebook = notebook;
 		reprosInterConnected = new HashSet<String>();
 	}
 	
-	public SccSnippet(String loc, LightweightNotebook notebook) {
+	public SccSnippet(String loc, SccNotebook notebook) {
 		this(Integer.parseInt(loc), notebook);
 	}
 	
@@ -30,7 +30,7 @@ public class SccSnippet {
 	public void connect(SccSnippet connected) {
 		boolean intraNotebook = false;
 		boolean intraRepro = false;
-		LightweightNotebook otherNotebook = connected.getNotebook();
+		SccNotebook otherNotebook = connected.getNotebook();
 		if (this.notebook.equals(otherNotebook)) {
 			intraNotebook = true;
 			intraRepro = true;
@@ -70,7 +70,7 @@ public class SccSnippet {
 		return loc;
 	}
 	
-	public LightweightNotebook getNotebook() {
+	public SccNotebook getNotebook() {
 		return notebook;
 	}
 	

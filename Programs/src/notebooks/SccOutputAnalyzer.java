@@ -14,7 +14,7 @@ import java.util.Set;
 
 public class SccOutputAnalyzer extends Analyzer {
 	private Map<Integer, Set<SccSnippetId>> notebook2snippets;
-	private Map<Integer, LightweightNotebook> notebooks;
+	private Map<Integer, SccNotebook> notebooks;
 	private Map <SccSnippetId, SccSnippet> snippets;
 	
 	/**
@@ -92,7 +92,7 @@ public class SccOutputAnalyzer extends Analyzer {
 			String[] snippetSubStrings = snippetFileName.split("_");
 			// Create parent notebook
 			int notebookNumber = Integer.parseInt(snippetSubStrings[1]);
-			LightweightNotebook notebook = notebooks.get(notebookNumber);
+			SccNotebook notebook = notebooks.get(notebookNumber);
 			/* Here we use the number of lines of source code (comments
 			   excluded), which is inconsistent with the clone analysis of the 
 			   notebook files, but so is the clone detection -SourcererCC
@@ -116,7 +116,7 @@ public class SccOutputAnalyzer extends Analyzer {
 	 * @return The map from notebook number to notebook
 	 */
 	protected void createNotebookMap(String fileName) throws IOException {
-		notebooks = new HashMap<Integer, LightweightNotebook>();
+		notebooks = new HashMap<Integer, SccNotebook>();
 		BufferedReader reader = new BufferedReader(new FileReader(fileName));
 		String line = reader.readLine();
 		while (null != line) {
@@ -125,7 +125,7 @@ public class SccOutputAnalyzer extends Analyzer {
 				int notebookNumber = Integer.parseInt(subStrings[0]);
 				String notebookName = getNotebookNameFromNumber(notebookNumber);
 				String reproName = subStrings[1];
-				notebooks.put(notebookNumber, new LightweightNotebook(notebookName, reproName));
+				notebooks.put(notebookNumber, new SccNotebook(notebookName, reproName));
 			} catch (NumberFormatException e) {
 				System.err.println("Notebook numbers in repro file must be integers! Notebook with \"number\" '"
 						+ subStrings[0] + "' is excluded from mapping!");

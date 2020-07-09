@@ -13,11 +13,11 @@ public class SccSnippetTest {
 	private final int loc = 21;
 	private final String notebookName = "nb_86.ipynb";
 	private final String reproName = "testRepro";
-	private LightweightNotebook notebook;
+	private SccNotebook notebook;
 	
 	@Before
 	public void setUp() {
-		notebook = new LightweightNotebook(notebookName, reproName);
+		notebook = new SccNotebook(notebookName, reproName);
 		snippet = new SccSnippet(loc, notebook);
 	}
 	
@@ -42,7 +42,7 @@ public class SccSnippetTest {
 				0, snippet.numInterReproConnections());
 		assertTrue("Inter connected repros set not empty at creation",
 				snippet.getReprosInterConnected().isEmpty());
-		SccSnippet sameNotebook = new SccSnippet(5, new LightweightNotebook(notebook));
+		SccSnippet sameNotebook = new SccSnippet(5, new SccNotebook(notebook));
 		snippet.connect(sameNotebook);
 		assertEquals("Number of intra notebook connections !=1 after addition of one",
 				1, snippet.numIntraNotebookConnections());
@@ -54,7 +54,7 @@ public class SccSnippetTest {
 				0, snippet.numInterReproConnections());
 		assertTrue("Inter connected repros set not empty after addition of intra repro connection",
 				snippet.getReprosInterConnected().isEmpty());
-		SccSnippet sameRepro = new SccSnippet(7, new LightweightNotebook("sameRepro.ipynb", reproName));
+		SccSnippet sameRepro = new SccSnippet(7, new SccNotebook("sameRepro.ipynb", reproName));
 		snippet.connect(sameRepro);
 		assertEquals("Number of intra notebook connections changed by addition of intra repro connection",
 				1, snippet.numIntraNotebookConnections());
@@ -67,7 +67,7 @@ public class SccSnippetTest {
 		assertTrue("Inter connected repros set not empty after addition of intra repro connections",
 				snippet.getReprosInterConnected().isEmpty());
 		String otherReproName = "otherRepro";
-		SccSnippet otherRepro = new SccSnippet(32, new LightweightNotebook("otherRepro.ipynb", otherReproName));
+		SccSnippet otherRepro = new SccSnippet(32, new SccNotebook("otherRepro.ipynb", otherReproName));
 		Set<String> expectedRepros = new HashSet<String>();
 		expectedRepros.add(otherReproName);
 		snippet.connect(otherRepro);
@@ -82,13 +82,13 @@ public class SccSnippetTest {
 		assertEquals("Wrong content of inter connected repro set after addition one inter repro connection",
 				expectedRepros, snippet.getReprosInterConnected());
 		
-		SccSnippet otherRepro2 = new SccSnippet(71, new LightweightNotebook("otherReproAgain.ipynb", otherReproName));
+		SccSnippet otherRepro2 = new SccSnippet(71, new SccNotebook("otherReproAgain.ipynb", otherReproName));
 		snippet.connect(otherRepro2);
 		assertEquals("Wrong content of inter connected repro set after addition of two connections to the same repro",
 				expectedRepros, snippet.getReprosInterConnected());
 		
 		String newReproName = "newRepro";
-		SccSnippet newRepro = new SccSnippet(101, new LightweightNotebook("newRepro.ipynb", newReproName));
+		SccSnippet newRepro = new SccSnippet(101, new SccNotebook("newRepro.ipynb", newReproName));
 		expectedRepros.add(newReproName);
 		snippet.connect(newRepro);
 		assertEquals("Wrong content of repro set after addition of inter connections to two different repros",
@@ -208,7 +208,7 @@ public class SccSnippetTest {
 	@Test
 	public void testConnect_nullRepro() {
 		boolean thrown = false;
-		SccSnippet nullReproSnippet = new SccSnippet(loc, new LightweightNotebook("nullReproNb.ipynb", null));
+		SccSnippet nullReproSnippet = new SccSnippet(loc, new SccNotebook("nullReproNb.ipynb", null));
 		try {
 			snippet.connect(nullReproSnippet);
 		} catch (NullPointerException e) {
@@ -240,7 +240,7 @@ public class SccSnippetTest {
 	@Test
 	public void testConnect_nullReproArg() {
 		boolean thrown = false;
-		SccSnippet nullReproSnippet = new SccSnippet(loc, new LightweightNotebook("nullReproNb.ipynb", null));
+		SccSnippet nullReproSnippet = new SccSnippet(loc, new SccNotebook("nullReproNb.ipynb", null));
 		try {
 			nullReproSnippet.connect(snippet);
 		} catch (NullPointerException e) {
@@ -283,7 +283,7 @@ public class SccSnippetTest {
 	@Test
 	public void testIsClone_inter() {
 		assertFalse("Snippet considered clone on creation", snippet.isClone());
-		SccSnippet sameNotebook = new SccSnippet(5, new LightweightNotebook(notebook));
+		SccSnippet sameNotebook = new SccSnippet(5, new SccNotebook(notebook));
 		snippet.connect(sameNotebook);
 		assertTrue("Snippet not considered clone after addition of addition of inter notebook connection", snippet.isClone());
 		assertTrue("Snippet not considered clone after addition of addition of inter notebook connection", sameNotebook.isClone());
@@ -296,7 +296,7 @@ public class SccSnippetTest {
 	@Test
 	public void testIsClone_intra() {
 		assertFalse("Snippet considered clone on creation", snippet.isClone());
-		SccSnippet otherNotebook = new SccSnippet(32, new LightweightNotebook("otherRepro.ipynb", ""));
+		SccSnippet otherNotebook = new SccSnippet(32, new SccNotebook("otherRepro.ipynb", ""));
 		snippet.connect(otherNotebook);
 		assertTrue("Snippet not considered clone after addition of addition of intra notebook connection", snippet.isClone());
 		assertTrue("Snippet not considered clone after addition of addition of intra notebook connection", otherNotebook.isClone());
@@ -309,10 +309,10 @@ public class SccSnippetTest {
 	@Test
 	public void testIsIntraNotebookClone() {
 		assertFalse("Snippet considered intra notebook clone on creation", snippet.isIntraNotebookClone());
-		SccSnippet otherNotebook = new SccSnippet(35, new LightweightNotebook("otherRepro.ipynb", ""));
+		SccSnippet otherNotebook = new SccSnippet(35, new SccNotebook("otherRepro.ipynb", ""));
 		snippet.connect(otherNotebook);
 		assertFalse("Snippet considered intra clone after addition of inter notebook connection", snippet.isIntraNotebookClone());
-		SccSnippet sameNotebook = new SccSnippet(17, new LightweightNotebook(notebook));
+		SccSnippet sameNotebook = new SccSnippet(17, new SccNotebook(notebook));
 		snippet.connect(sameNotebook);
 		assertTrue("Snippet not considered intra clone after addition of intra notebook connection", snippet.isIntraNotebookClone());
 	}
