@@ -13,8 +13,8 @@ import java.util.Map;
 import java.util.Set;
 
 public class SccOutputAnalyzer extends Analyzer {
-	private Map<String, Set<SccSnippetId>> notebook2snippets;
-	private Map<String, LightweightNotebook> notebooks;
+	private Map<Integer, Set<SccSnippetId>> notebook2snippets;
+	private Map<Integer, LightweightNotebook> notebooks;
 	private Map <SccSnippetId, SccSnippet> snippets;
 	
 	/**
@@ -79,7 +79,7 @@ public class SccOutputAnalyzer extends Analyzer {
 		createNotebookMap(reproFile);
 		BufferedReader statsReader = new BufferedReader(new FileReader(statsFile));
 		snippets = new HashMap<SccSnippetId, SccSnippet>();
-		notebook2snippets = new HashMap<String, Set<SccSnippetId>>();
+		notebook2snippets = new HashMap<Integer, Set<SccSnippetId>>();
 		String line = statsReader.readLine();
 		while(null != line) {
 			String[] columns = line.split(",");
@@ -92,20 +92,19 @@ public class SccOutputAnalyzer extends Analyzer {
 			String[] snippetSubStrings = snippetFileName.split("_");
 			// Create parent notebook
 			int notebookNumber = Integer.parseInt(snippetSubStrings[1]);
-			String notebookName = getNotebookNameFromNumber(notebookNumber);
-			LightweightNotebook notebook = notebooks.get(notebookName);
+			LightweightNotebook notebook = notebooks.get(notebookNumber);
 			/* Here we use the number of lines of source code (comments
 			   excluded), which is inconsistent with the clone analysis of the 
 			   notebook files, but so is the clone detection -SourcererCC
 			   doesn't consider comments in clone analysis. */
 			int loc = Integer.parseInt(columns[8]);
 			snippets.put(id, new SccSnippet(loc, notebook));
-			Set<SccSnippetId> snippetsForNotebook = notebook2snippets.get(notebookName);
+			Set<SccSnippetId> snippetsForNotebook = notebook2snippets.get(notebookNumber);
 			if (null == snippetsForNotebook) {
 				snippetsForNotebook = new HashSet<SccSnippetId>();
 			}
 			snippetsForNotebook.add(id);
-			notebook2snippets.put(notebookName, snippetsForNotebook);
+			notebook2snippets.put(notebookNumber, snippetsForNotebook);
 			line = statsReader.readLine();
 		}
 		statsReader.close();
@@ -117,7 +116,7 @@ public class SccOutputAnalyzer extends Analyzer {
 	 * @return The map from notebook number to notebook
 	 */
 	protected void createNotebookMap(String fileName) throws IOException {
-		notebooks = new HashMap<String, LightweightNotebook>();
+		notebooks = new HashMap<Integer, LightweightNotebook>();
 		BufferedReader reader = new BufferedReader(new FileReader(fileName));
 		String line = reader.readLine();
 		while (null != line) {
@@ -126,7 +125,7 @@ public class SccOutputAnalyzer extends Analyzer {
 				int notebookNumber = Integer.parseInt(subStrings[0]);
 				String notebookName = getNotebookNameFromNumber(notebookNumber);
 				String reproName = subStrings[1];
-				notebooks.put(notebookName, new LightweightNotebook(notebookName, reproName));
+				notebooks.put(notebookNumber, new LightweightNotebook(notebookName, reproName));
 			} catch (NumberFormatException e) {
 				System.err.println("Notebook numbers in repro file must be integers! Notebook with \"number\" '"
 						+ subStrings[0] + "' is excluded from mapping!");
@@ -190,10 +189,10 @@ public class SccOutputAnalyzer extends Analyzer {
 	private void printCloneFrequencies() throws IOException {
 		Writer writer = new FileWriter(outputDir + "/cloneFrequency" + LocalDateTime.now() + ".csv");
 		writer.write(cloneFrequencyHeader());
-		for (String notebook: notebook2snippets.keySet()) {
+		for (Integer notebookNumber: notebook2snippets.keySet()) {
 			int numClones = 0, numUnique = 0, numEmpty = 0;
 			int numIntra = 0, numIntraNE = 0;	// # intra notebook clones
-			Set<SccSnippetId> snippetsInNotebook = notebook2snippets.get(notebook);
+			Set<SccSnippetId> snippetsInNotebook = notebook2snippets.get(notebookNumber);
 			for (SccSnippetId id: snippetsInNotebook) {
 				SccSnippet snippet = snippets.get(id);
 				if (snippet.isClone()) {
@@ -209,7 +208,8 @@ public class SccOutputAnalyzer extends Analyzer {
 				}
 			}
 			numIntraNE = numIntra;	// No empty clones for Scc data!
-			printCloneFrequencyLine(writer, notebook, numClones, numUnique, numEmpty, numClones, numIntra, numIntraNE);
+			String notebookName = getNotebookNameFromNumber(notebookNumber);
+			printCloneFrequencyLine(writer, notebookName, numClones, numUnique, numEmpty, numClones, numIntra, numIntraNE);
 		}
 		writer.close();
 	}
@@ -232,13 +232,12 @@ public class SccOutputAnalyzer extends Analyzer {
 	private void printConnectionsFile() throws IOException {
 		Writer writer = new FileWriter(outputDir + "/connections" + LocalDateTime.now() + ".csv");
 		writer.write(connectionsHeader());
-		Set<String> notebooks = notebook2snippets.keySet();
-		for (String notebook: notebooks) {
+		for (Integer notebookNumber: notebook2snippets.keySet()) {
 			Set<String> interConnectedRepros = new HashSet<String>();
 			int interConnections = 0;
 			int intraConnections = 0;
 			int nonEmptySnippets = 0;
-			Set<SccSnippetId> snippetsForNotebook = notebook2snippets.get(notebook);
+			Set<SccSnippetId> snippetsForNotebook = notebook2snippets.get(notebookNumber);
 			for (SccSnippetId id: snippetsForNotebook) {
 				SccSnippet snippet = snippets.get(id);
 				interConnections += snippet.numInterReproConnections();
@@ -252,7 +251,7 @@ public class SccOutputAnalyzer extends Analyzer {
 			// Empty snippets are considered unique by SourcererCC
 			double normalizedNonEmptyConnections = ConnectionsLineBuilder.normalized(connections, nonEmptySnippets);
 			double meanNonEmptyInterReproConnections = ConnectionsLineBuilder.normalized(interConnections, interConnectedRepros.size());
-			writer.write(notebook + ", "
+			writer.write(getNotebookNameFromNumber(notebookNumber) + ", "
 					+ connections + ", " + String.format(Locale.US, "%.4f", normalizedNonEmptyConnections) + ", "
 					+ intraConnections + ", " + String.format(Locale.US, "%.4f", meanNonEmptyInterReproConnections) + "\n");
 		}
