@@ -244,6 +244,32 @@ public class SccOutputAnalyzerTest extends AnalyzerTest {
 	}
 	
 	/**
+	 * Verify that intra notebook connections are computed correctly.
+	 * @throws IOException
+	 */
+	@Test
+	public void testClones_intraNotebook() throws IOException {
+		String dataDir = "test/data/scc";
+		String statsFile = dataDir + "/file_stats_intraNb";
+		String pairFile = dataDir + "/clone_pairs_intraNb";
+		String reproFile = "test/data/hash/repros.csv";
+		
+		String[] expectedCloneFrequencyLines = {
+			cloneFrequencyHeader(),
+			"nb_9.ipynb, 0, 3, 0, 1.0000, 1.0000, 3, 3"
+		};
+		String[] expectedConnectionLines = {
+			connectionsHeader(),
+			"nb_9.ipynb, 6, 2.0000, 6, 0.0000"
+		};
+		
+		analyzer.clones(statsFile, reproFile, pairFile);
+		checkCsv_anyOrder("cloneFrequency", expectedCloneFrequencyLines);
+		checkCsv_anyOrder("connections", expectedConnectionLines);
+		deleteCloneCsvs();
+	}
+	
+	/**
 	 * Verify that SccOutputAnalyzer smoothly skips a clone pair with numbers
 	 * that don't fit in an int.
 	 * @throws IOException 

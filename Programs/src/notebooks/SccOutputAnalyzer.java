@@ -204,7 +204,9 @@ public class SccOutputAnalyzer extends Analyzer {
 				if (0 == snippet.getLoc()) {
 					numEmpty++;
 				}
-				numIntra += snippet.numIntraNotebookConnections();
+				if (0 < snippet.numIntraNotebookConnections()) {
+					numIntra++;
+				}
 			}
 			numIntraNE = numIntra;	// No empty clones for Scc data!
 			printCloneFrequencyLine(writer, notebook, numClones, numUnique, numEmpty, numClones, numIntra, numIntraNE);
