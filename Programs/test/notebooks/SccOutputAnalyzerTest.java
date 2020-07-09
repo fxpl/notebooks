@@ -341,8 +341,7 @@ public class SccOutputAnalyzerTest extends AnalyzerTest {
 		
 		String[] expectedConnectionLines = {
 			connectionsHeader(),
-			"nb_8.ipynb, 0, 0.0000, 0, 0.0000",
-			"nb_9.ipynb, 0, 0.0000, 0, 0.0000"
+			"nb_8.ipynb, 0, 0.0000, 0, 0.0000"
 		};
 		
 		analyzer.clones(statsFile, reproFile, pairFile);
@@ -364,8 +363,7 @@ public class SccOutputAnalyzerTest extends AnalyzerTest {
 		
 		String[] expectedConnectionLines = {
 			connectionsHeader(),
-			"nb_8.ipynb, 0, 0.0000, 0, 0.0000",
-			"nb_9.ipynb, 0, 0.0000, 0, 0.0000"
+			"nb_8.ipynb, 0, 0.0000, 0, 0.0000"
 		};
 		
 		analyzer.clones(statsFile, reproFile, pairFile);

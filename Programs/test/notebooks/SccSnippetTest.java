@@ -2,9 +2,6 @@ package notebooks;
 
 import static org.junit.Assert.*;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.junit.Before;
 import org.junit.Test;
 
@@ -40,8 +37,6 @@ public class SccSnippetTest {
 				0, snippet.numIntraReproConnections());
 		assertEquals("Number of inter repro connections != 0 on creation",
 				0, snippet.numInterReproConnections());
-		assertTrue("Inter connected repros set not empty at creation",
-				snippet.getReprosInterConnected().isEmpty());
 		SccSnippet sameNotebook = new SccSnippet(5, new SccNotebook(notebook));
 		snippet.connect(sameNotebook);
 		assertEquals("Number of intra notebook connections !=1 after addition of one",
@@ -52,8 +47,6 @@ public class SccSnippetTest {
 				1, snippet.numIntraReproConnections());
 		assertEquals("Number of inter repro connections != 0 after addition of intra repro connection",
 				0, snippet.numInterReproConnections());
-		assertTrue("Inter connected repros set not empty after addition of intra repro connection",
-				snippet.getReprosInterConnected().isEmpty());
 		SccSnippet sameRepro = new SccSnippet(7, new SccNotebook("sameRepro.ipynb", reproName));
 		snippet.connect(sameRepro);
 		assertEquals("Number of intra notebook connections changed by addition of intra repro connection",
@@ -64,12 +57,8 @@ public class SccSnippetTest {
 				2, snippet.numIntraReproConnections());
 		assertEquals("Number of inter repro connections changed when intra repro connection was added",
 				0, snippet.numInterReproConnections());
-		assertTrue("Inter connected repros set not empty after addition of intra repro connections",
-				snippet.getReprosInterConnected().isEmpty());
 		String otherReproName = "otherRepro";
 		SccSnippet otherRepro = new SccSnippet(32, new SccNotebook("otherRepro.ipynb", otherReproName));
-		Set<String> expectedRepros = new HashSet<String>();
-		expectedRepros.add(otherReproName);
 		snippet.connect(otherRepro);
 		assertEquals("Number of intra notebook connections changed by addition of inter repro connection",
 				1, snippet.numIntraNotebookConnections());
@@ -79,30 +68,16 @@ public class SccSnippetTest {
 				2, snippet.numIntraReproConnections());
 		assertEquals("Number of inter repro connections !=1 after addition of one",
 				1, snippet.numInterReproConnections());
-		assertEquals("Wrong content of inter connected repro set after addition one inter repro connection",
-				expectedRepros, snippet.getReprosInterConnected());
-		
-		SccSnippet otherRepro2 = new SccSnippet(71, new SccNotebook("otherReproAgain.ipynb", otherReproName));
-		snippet.connect(otherRepro2);
-		assertEquals("Wrong content of inter connected repro set after addition of two connections to the same repro",
-				expectedRepros, snippet.getReprosInterConnected());
-		
-		String newReproName = "newRepro";
-		SccSnippet newRepro = new SccSnippet(101, new SccNotebook("newRepro.ipynb", newReproName));
-		expectedRepros.add(newReproName);
-		snippet.connect(newRepro);
-		assertEquals("Wrong content of repro set after addition of inter connections to two different repros",
-				expectedRepros, snippet.getReprosInterConnected());
 		
 		// Final check of number of connections, to be on the safe side. (Everything should be checked above.)
 		assertEquals("Wrong final number of intra notebook connections",
 				1, snippet.numIntraNotebookConnections());
 		assertEquals("Wrong final number of inter notebook connections",
-				4, snippet.numInterNotebookConnections());
+				2, snippet.numInterNotebookConnections());
 		assertEquals("Wrong final number of intra repro connections",
 				2, snippet.numIntraReproConnections());
 		assertEquals("Wrong final number of inter repro connections",
-				3, snippet.numInterReproConnections());
+				1, snippet.numInterReproConnections());
 		
 		// Also check snippets given as arguments
 		assertEquals("Wrong number of intra notebook connections for argument snippet",
@@ -113,8 +88,6 @@ public class SccSnippetTest {
 				1, sameNotebook.numIntraReproConnections());
 		assertEquals("Wrong number of inter repro connections for argument snippet",
 				0, sameNotebook.numInterReproConnections());
-		assertEquals("Wrong number of elements in inter connected repros set for argument snippet",
-				0, sameNotebook.getReprosInterConnected().size());
 		assertEquals("Wrong number of intra notebook connections for argument snippet",
 				0, sameRepro.numIntraNotebookConnections());
 		assertEquals("Wrong number of inter notebook connections for argument snippet",
@@ -123,8 +96,6 @@ public class SccSnippetTest {
 				1, sameRepro.numIntraReproConnections());
 		assertEquals("Wrong number of inter repro connections for argument snippet",
 				0, sameRepro.numInterReproConnections());
-		assertEquals("Wrong number of elements in inter connected repros set for argument snippet",
-				0, sameRepro.getReprosInterConnected().size());
 		assertEquals("Wrong number of intra notebook connections for argument snippet",
 				0, otherRepro.numIntraNotebookConnections());
 		assertEquals("Wrong number of inter notebook connections for argument snippet",
@@ -133,8 +104,6 @@ public class SccSnippetTest {
 				0, otherRepro.numIntraReproConnections());
 		assertEquals("Wrong number of inter repro connections for argument snippet",
 				1, otherRepro.numInterReproConnections());
-		assertEquals("Wrong number of elements in inter connected repros set for argument snippet",
-				1, otherRepro.getReprosInterConnected().size());
 	}
 	
 	/**

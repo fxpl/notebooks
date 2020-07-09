@@ -115,7 +115,7 @@ public class SccOutputAnalyzer extends Analyzer {
 	 * @param fileName Name of file with mapping from notebook number to repro
 	 * @return The map from notebook number to notebook
 	 */
-	protected void createNotebookMap(String fileName) throws IOException {
+	private void createNotebookMap(String fileName) throws IOException {
 		notebooks = new HashMap<Integer, SccNotebook>();
 		BufferedReader reader = new BufferedReader(new FileReader(fileName));
 		String line = reader.readLine();
@@ -166,8 +166,8 @@ public class SccOutputAnalyzer extends Analyzer {
 							snippet1.connect(snippet2);
 						} catch (NullPointerException e) {
 							// Notebook or repro was null for one of the snippets
-							System.err.println("Couldn't add connection. Notebook or repro info is missing.");
-							System.err.println("Skipping line " + line);
+							System.err.println("Couldn't add connection between " + id1 + " and " + id2 + ". ");
+							System.err.println("Notebook or repro info is missing. Skipping line " + line);
 						}
 					}
 				} catch (NumberFormatException e) {
@@ -233,27 +233,33 @@ public class SccOutputAnalyzer extends Analyzer {
 		Writer writer = new FileWriter(outputDir + "/connections" + LocalDateTime.now() + ".csv");
 		writer.write(connectionsHeader());
 		for (Integer notebookNumber: notebook2snippets.keySet()) {
-			Set<String> interConnectedRepros = new HashSet<String>();
-			int interConnections = 0;
-			int intraConnections = 0;
-			int nonEmptySnippets = 0;
-			Set<SccSnippetId> snippetsForNotebook = notebook2snippets.get(notebookNumber);
-			for (SccSnippetId id: snippetsForNotebook) {
-				SccSnippet snippet = snippets.get(id);
-				interConnections += snippet.numInterReproConnections();
-				intraConnections += snippet.numIntraReproConnections();
-				if (0 != snippet.getLoc()) {
-					nonEmptySnippets++;
+			SccNotebook notebook = notebooks.get(notebookNumber);
+			if (null == notebook) {
+				String notebookName = getNotebookNameFromNumber(notebookNumber);
+				System.err.print("No repro information stored for notebook " + notebookName + "! ");
+				System.err.println("Connections will not be counted!");
+			} else {
+				int interConnections = 0;
+				int intraConnections = 0;
+				int nonEmptySnippets = 0;
+				Set<SccSnippetId> snippetsForNotebook = notebook2snippets.get(notebookNumber);
+				for (SccSnippetId id: snippetsForNotebook) {
+					SccSnippet snippet = snippets.get(id);
+					interConnections += snippet.numInterReproConnections();
+					intraConnections += snippet.numIntraReproConnections();
+					if (0 != snippet.getLoc()) {
+						nonEmptySnippets++;
+					}
 				}
-				interConnectedRepros.addAll(snippet.getReprosInterConnected());
-			}
-			int connections = interConnections + intraConnections;
-			// Empty snippets are considered unique by SourcererCC
-			double normalizedNonEmptyConnections = ConnectionsLineBuilder.normalized(connections, nonEmptySnippets);
-			double meanNonEmptyInterReproConnections = ConnectionsLineBuilder.normalized(interConnections, interConnectedRepros.size());
-			writer.write(getNotebookNameFromNumber(notebookNumber) + ", "
-					+ connections + ", " + String.format(Locale.US, "%.4f", normalizedNonEmptyConnections) + ", "
+				int numInterConnectedRepros = notebook.getReprosInterConnected().size();
+				int connections = interConnections + intraConnections;
+				// Empty snippets are considered unique by SourcererCC
+				double normalizedNonEmptyConnections = ConnectionsLineBuilder.normalized(connections, nonEmptySnippets);
+				double meanNonEmptyInterReproConnections = ConnectionsLineBuilder.normalized(interConnections, numInterConnectedRepros);
+				writer.write(notebook.getName() + ", "
+						+ connections + ", " + String.format(Locale.US, "%.4f", normalizedNonEmptyConnections) + ", "
 					+ intraConnections + ", " + String.format(Locale.US, "%.4f", meanNonEmptyInterReproConnections) + "\n");
+			}
 		}
 		writer.close();
 	}

@@ -1,21 +1,15 @@
 package notebooks;
 
-import java.util.HashSet;
-import java.util.Set;
-
 public class SccSnippet {
 	private final int loc;
 	private int intraNotebookConnections;
 	private int interNotebookConnections;
 	private int interReproConnections;
-	// Repros that this snippet has an inter connection to
-	private Set<String> reprosInterConnected;
 	private final SccNotebook notebook;
 	
 	public SccSnippet(int loc, SccNotebook notebook) {
 		this.loc = loc;
 		this.notebook = notebook;
-		reprosInterConnected = new HashSet<String>();
 	}
 	
 	public SccSnippet(String loc, SccNotebook notebook) {
@@ -50,8 +44,7 @@ public class SccSnippet {
 		if (!intraRepro) {
 			this.interReproConnections++;
 			connected.interReproConnections++;
-			this.reprosInterConnected.add(otherNotebook.getRepro());
-			connected.reprosInterConnected.add(this.notebook.getRepro());
+			this.notebook.connect(otherNotebook);
 		}
 	}
 	
@@ -72,13 +65,6 @@ public class SccSnippet {
 	
 	public SccNotebook getNotebook() {
 		return notebook;
-	}
-	
-	/** TODO: Lägg i notebook istället!
-	 * @return The set of all repros to which this snippet is connected, except the one it self lives in
-	 */
-	public Set<String> getReprosInterConnected() {
-		return reprosInterConnected;
 	}
 	
 	public int numInterNotebookConnections() {
