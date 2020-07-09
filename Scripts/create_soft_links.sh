@@ -4,7 +4,7 @@
 # Create soft links needed by statistics R script.
 ################################################################################
 
-prefixes=( "code_cells" "snippetsPerFileNE" "loc" "languages" "cloneFrequency" "connections" )
+prefixes=( "code_cells" "loc" "languages" "cloneFrequency" "connections" )
 
 for prefix in ${prefixes[@]};
 do
