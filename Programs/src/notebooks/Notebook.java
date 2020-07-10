@@ -225,9 +225,6 @@ public class Notebook {
 		if (!language.isSet()) {
 			language = getLanguageFromCodeCells(notebook);
 		}
-		if (!language.isSet()) {
-			System.err.println("No language found in " + this.path);
-		}
 		return language;
 	}
 	
