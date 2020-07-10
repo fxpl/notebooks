@@ -18,7 +18,7 @@ cd Scripts
 ./list_duplicated_notebooks.sh
 
 # Statistics for NotebookAnalyzer results
-./create_soft_links.sh	# TODO
+./create_sym_links_nba.sh
 ./get_notebook_sizes.sh
 Rscript statistics_paperIII_nba.R > ../Output/statistics_output.txt
 # Pack plots
@@ -53,8 +53,9 @@ rm $sccNotebooks
 ./clone_analysis_scc.sh > ../Output/output_clone_analysis.txt
 
 #Statistics for SccOutputAnanlyzer results
-# TODO: Hur skapa mjuklänkar här?
+./create_sym_links_scc.sh
 Rscript statistics_paperIII_scc.R > ../Output/statistics_output.txt
+# Pack plots
 ./reduce_large_images.sh
 cd ../Output
 tar -czf plots.tgz hist_clone_frequency*eps log_hist_*eps cells*jpg *Inter_*jpg

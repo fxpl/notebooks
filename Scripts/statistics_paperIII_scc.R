@@ -1,6 +1,6 @@
 source("functions_paperIII.R")
 setwd("..")
-outputDir <- "OutputSCC"
+outputDir <- "Output"
 
 cloneFreq <- read.csv(paste(outputDir, "/cloneFrequency.csv", sep=""), header=TRUE, stringsAsFactors=FALSE)
 connections <-read.csv(paste(outputDir, "/connections.csv", sep=""), header=TRUE, stringsAsFactors=FALSE)

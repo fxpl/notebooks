@@ -1,6 +1,6 @@
 source("functions_paperIII.R")
 setwd("..")
-outputDir <- "OutputNBA"
+outputDir <- "Output"
 
 # NOTEBOOK DATA
 codeCells <- read.csv(paste(outputDir, "/code_cells.csv", sep=""), header=TRUE, stringsAsFactors=FALSE)
