@@ -4,6 +4,7 @@
 # Create soft links needed by statistics R script.
 ################################################################################
 
+# TODO: Speciallösning för SCC. (Glöm inte cloneLoc!)
 prefixes=( "code_cells" "loc" "languages" "cloneFrequency" "connections" )
 
 for prefix in ${prefixes[@]};

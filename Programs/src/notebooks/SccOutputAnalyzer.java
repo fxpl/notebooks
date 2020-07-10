@@ -61,12 +61,14 @@ public class SccOutputAnalyzer extends Analyzer {
 	
 	/**
 	 * Create and fill cloneFrequencies and connections csv files with data for
-	 * all notebooks.
+	 * all notebooks. Create the cloneLoc csv file and fill it with the line
+	 * count for each clone instance.
 	 * @param notebook2snippets A map from file names to snippets
 	 * @param snippets A map with all snippets (id -> object)
 	 * @throws IOException On problems handling the output files
 	 */
 	private void writeCloneFiles() throws IOException {
+		printCloneLoc();
 		printCloneFrequencies();
 		printConnectionsFile();
 	}
@@ -184,6 +186,16 @@ public class SccOutputAnalyzer extends Analyzer {
 	
 	private static String getNotebookNameFromNumber(int notebookNumber) {
 		return "nb_" + notebookNumber + ".ipynb";
+	}
+	
+	private void printCloneLoc() throws IOException {
+		Writer writer = new FileWriter(outputDir + "/cloneLoc" + LocalDateTime.now() + ".csv");
+		for (SccSnippet snippet: snippets.values()) {
+			if (snippet.isClone()) {
+				writer.write(snippet.getLoc() + "\n");
+			}
+		}
+		writer.close();
 	}
 	
 	private void printCloneFrequencies() throws IOException {

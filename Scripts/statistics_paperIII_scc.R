@@ -4,7 +4,7 @@ outputDir <- "OutputSCC"
 
 cloneFreq <- read.csv(paste(outputDir, "/cloneFrequency.csv", sep=""), header=TRUE, stringsAsFactors=FALSE)
 connections <-read.csv(paste(outputDir, "/connections.csv", sep=""), header=TRUE, stringsAsFactors=FALSE)
-loc <- read.csv(paste(outputDir, "/clones_loc.csv", sep=""), header=TRUE)
+loc <- read.csv(paste(outputDir, "/cloneLoc.csv", sep=""), header=TRUE)
 
 # CLONES
 # Clone sizes (LOC) distribution

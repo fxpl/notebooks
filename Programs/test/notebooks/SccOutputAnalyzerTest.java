@@ -20,9 +20,10 @@ public class SccOutputAnalyzerTest extends AnalyzerTest {
 	public void setUp() {
 		analyzer = new SccOutputAnalyzer();
 		analyzer.outputDir = defaultOutputDirName;
-		cloneFilePrefixes = new String[2];
+		cloneFilePrefixes = new String[3];
 		cloneFilePrefixes[0] = "cloneFrequency";
 		cloneFilePrefixes[1] = "connections";
+		cloneFilePrefixes[2] = "cloneLoc";
 	}
 	
 	@AfterClass
@@ -177,6 +178,27 @@ public class SccOutputAnalyzerTest extends AnalyzerTest {
 				"--unknown"};
 		analyzer.analyze(args);
 		verifyExistenceOfAndRemoveCloneFiles();
+	}
+	
+	/***
+	 * Verify that the line count for each clone instance is identified
+	 * correctly and written to a csv file prefixed "cloneLoc".
+	 */
+	@Test
+	public void testCloneLocCsv() throws IOException {
+		String dataDir = "test/data/scc";
+		String statsFile = dataDir + "/file_stats_small";
+		String pairFile = dataDir + "/clone_pairs_loc";
+		String reproFile = "test/data/hash/repros.csv";
+		String[] expectedLines = {
+			"5",
+			"3",
+			"4"
+		};
+		
+		analyzer.clones(statsFile, reproFile, pairFile);
+		checkCsv_anyOrder("cloneLoc", expectedLines);
+		deleteCloneCsvs();
 	}
 	
 	/**
