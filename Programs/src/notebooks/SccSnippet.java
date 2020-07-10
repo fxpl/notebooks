@@ -21,7 +21,7 @@ public class SccSnippet {
 	 * @param connected Snippet that has a connection to this snippet
 	 */
 	public void connect(SccSnippet connected) {
-		SccNotebook connectedNotebook = connected.getNotebook();
+		SccNotebook connectedNotebook = connected.notebook;
 		this.notebook.connect(connectedNotebook);
 		if (this.notebook.equals(connectedNotebook)) {
 			this.intraNotebookConnections++;
@@ -45,10 +45,6 @@ public class SccSnippet {
 	 */
 	public int getLoc() {
 		return loc;
-	}
-	
-	public SccNotebook getNotebook() {
-		return notebook;
 	}
 	
 	public int numInterNotebookConnections() {
