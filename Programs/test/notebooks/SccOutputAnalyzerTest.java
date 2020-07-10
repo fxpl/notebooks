@@ -40,7 +40,7 @@ public class SccOutputAnalyzerTest extends AnalyzerTest {
 	public void testArgumentParsing_pairFile() throws IOException {
 		String args[] = {
 				"--stats_file=test/data/scc/file_stats",
-				"--pair_file=test/data/scc/clone_pairs",
+				"--pair_file=test/data/scc/clone_pairs.zip",
 				"--repro_file=test/data/hash/repros.csv"
 		};
 		analyzer.analyze(args);
@@ -57,7 +57,7 @@ public class SccOutputAnalyzerTest extends AnalyzerTest {
 		String outputDir = "test";
 		String args[] = {
 				"--stats_file=test/data/scc/file_stats",
-				"--pair_file=test/data/scc/clone_pairs",
+				"--pair_file=test/data/scc/clone_pairs.zip",
 				"--repro_file=test/data/hash/repros.csv",
 				"--output_dir=" + outputDir
 		};
@@ -72,7 +72,7 @@ public class SccOutputAnalyzerTest extends AnalyzerTest {
 	@Test
 	public void testArgumentParsing_statsFileMissing() {
 		String args[] = {
-				"--pair_file=test/data/scc/clone_pairs",
+				"--pair_file=test/data/scc/clone_pairs.zip",
 				"--repro_file=test/data/hash/repros.csv"
 		};
 		analyzer.analyze(args);
@@ -86,7 +86,7 @@ public class SccOutputAnalyzerTest extends AnalyzerTest {
 	@Test
 	public void testArgumentParsing_statsFileValueMissing() {
 		String args[] = {
-				"--pair_file=test/data/scc/clone_pairs",
+				"--pair_file=test/data/scc/clone_pairs.zip",
 				"--repro_file=test/data/hash/repros.csv",
 				"--stats_file"
 		};
@@ -143,7 +143,7 @@ public class SccOutputAnalyzerTest extends AnalyzerTest {
 	@Test
 	public void testArgumentParsing_reproFileMissing() {
 		String[] args = {
-				"--pair_file=test/data/scc/clone_pairs",
+				"--pair_file=test/data/scc/clone_pairs.zip",
 				"--stats_file=test/data/scc/file_stats",
 		};
 		analyzer.analyze(args);
@@ -159,7 +159,7 @@ public class SccOutputAnalyzerTest extends AnalyzerTest {
 		String[] args = {
 				"--repro_file",
 				"--stats_file=test/data/scc/file_stats",
-				"--pair_file=test/data/scc/clone_pairs"
+				"--pair_file=test/data/scc/clone_pairs.zip"
 		};
 		analyzer.analyze(args);
 		verifyAbsenceOfCloneFiles();
@@ -173,7 +173,7 @@ public class SccOutputAnalyzerTest extends AnalyzerTest {
 	public void testArgumentParsing_unknownArg() throws IOException {
 		String[] args = {
 				"--stats_file=test/data/scc/file_stats",
-				"--pair_file=test/data/scc/clone_pairs",
+				"--pair_file=test/data/scc/clone_pairs.zip",
 				"--repro_file=test/data/hash/repros.csv",
 				"--unknown"};
 		analyzer.analyze(args);
@@ -188,7 +188,7 @@ public class SccOutputAnalyzerTest extends AnalyzerTest {
 	public void testCloneLocCsv() throws IOException {
 		String dataDir = "test/data/scc";
 		String statsFile = dataDir + "/file_stats_small";
-		String pairFile = dataDir + "/clone_pairs_loc";
+		String pairFile = dataDir + "/clone_pairs_loc.zip";
 		String reproFile = "test/data/hash/repros.csv";
 		String[] expectedLines = {
 			"5",
@@ -210,7 +210,7 @@ public class SccOutputAnalyzerTest extends AnalyzerTest {
 	public void testConnectionsCsv() throws IOException {
 		String dataDir = "test/data/scc";
 		String statsFile = dataDir + "/file_stats";
-		String pairFile = dataDir + "/clone_pairs";
+		String pairFile = dataDir + "/clone_pairs.zip";
 		String reproFile = "test/data/hash/repros.csv";
 		String[] expectedLines = {
 				connectionsHeader(),
@@ -242,7 +242,7 @@ public class SccOutputAnalyzerTest extends AnalyzerTest {
 	public void testCloneFreqCsv() throws IOException {
 		String dataDir = "test/data/scc";
 		String statsFile = dataDir + "/file_stats";
-		String pairFile = dataDir + "/clone_pairs";
+		String pairFile = dataDir + "/clone_pairs.zip";
 		String reproFile = "test/data/hash/repros.csv";
 		
 		String[] expectedLines = {
@@ -273,7 +273,7 @@ public class SccOutputAnalyzerTest extends AnalyzerTest {
 	public void testClones_intraNotebook() throws IOException {
 		String dataDir = "test/data/scc";
 		String statsFile = dataDir + "/file_stats_intraNb";
-		String pairFile = dataDir + "/clone_pairs_intraNb";
+		String pairFile = dataDir + "/clone_pairs_intraNb.zip";
 		String reproFile = "test/data/hash/repros.csv";
 		
 		String[] expectedCloneFrequencyLines = {
@@ -300,7 +300,7 @@ public class SccOutputAnalyzerTest extends AnalyzerTest {
 	public void testClones_numberFormat() throws IOException {
 		String dataDir = "test/data/scc";
 		String statsFile = dataDir + "/file_stats_small";
-		String pairFile = dataDir + "/clone_pairs_overflow";
+		String pairFile = dataDir + "/clone_pairs_overflow.zip";
 		String reproFile = "test/data/hash/repros.csv";
 		
 		String[] expectedCloneFrequecyLines = {
@@ -329,7 +329,7 @@ public class SccOutputAnalyzerTest extends AnalyzerTest {
 	public void testClones_nonExistentID() throws IOException {
 		String dataDir = "test/data/scc";
 		String statsFile = dataDir + "/file_stats_small";
-		String pairFile = dataDir + "/clone_pairs_nonExistentID";
+		String pairFile = dataDir + "/clone_pairs_nonExistentID.zip";
 		String reproFile = "test/data/hash/repros.csv";
 		
 		String[] expectedCloneFrequecyLines = {
@@ -358,7 +358,7 @@ public class SccOutputAnalyzerTest extends AnalyzerTest {
 	public void testClones_nullReproLeft() throws IOException {
 		String dataDir = "test/data/scc";
 		String statsFile = dataDir + "/file_stats_xsmall";
-		String pairFile = dataDir + "/clone_pairs_xsmall";
+		String pairFile = dataDir + "/clone_pairs_xsmall.zip";
 		String reproFile = dataDir + "/repro_file_xsmall";
 		
 		String[] expectedConnectionLines = {
@@ -380,7 +380,7 @@ public class SccOutputAnalyzerTest extends AnalyzerTest {
 	public void testClones_nullReproRight() throws IOException {
 		String dataDir = "test/data/scc";
 		String statsFile = dataDir + "/file_stats_xsmall";
-		String pairFile = dataDir + "/clone_pairs_xsmall_rev";
+		String pairFile = dataDir + "/clone_pairs_xsmall_rev.zip";
 		String reproFile = dataDir + "/repro_file_xsmall";
 		
 		String[] expectedConnectionLines = {
@@ -402,7 +402,7 @@ public class SccOutputAnalyzerTest extends AnalyzerTest {
 	public void testClones_corruptPairData() throws IOException {
 		String dataDir = "test/data/scc";
 		String statsFile = dataDir + "/file_stats_small";
-		String pairFile = dataDir + "/clone_pairs_corrupt";
+		String pairFile = dataDir + "/clone_pairs_corrupt.zip";
 		String reproFile = "test/data/hash/repros.csv";
 		
 		String[] expectedCloneFrequecyLines = {

@@ -4,13 +4,18 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Writer;
 import java.time.LocalDateTime;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 public class SccOutputAnalyzer extends Analyzer {
 	private Map<Integer, Set<SccSnippetId>> notebook2snippets;
@@ -133,8 +138,12 @@ public class SccOutputAnalyzer extends Analyzer {
 		reader.close();
 	}
 
-	private void storeConnections(String pairFile) throws IOException {
-		final BufferedReader reader = new BufferedReader(new FileReader(pairFile));
+	private void storeConnections(String pairFileName) throws IOException {
+		ZipFile zippedPairFile = new ZipFile(pairFileName);
+		Enumeration<? extends ZipEntry> pairFileSet = zippedPairFile.entries();
+		ZipEntry pairFile = pairFileSet.nextElement();	// Should only be one (TODO?)
+		InputStream zipStream = zippedPairFile.getInputStream(pairFile);
+		final BufferedReader reader = new BufferedReader(new InputStreamReader(zipStream));
 		long numRead = 0;
 		String line = reader.readLine();
 		while (null != line) {
@@ -178,6 +187,7 @@ public class SccOutputAnalyzer extends Analyzer {
 			line = reader.readLine();
 		}
 		reader.close();
+		zippedPairFile.close();
 	}
 	
 	private static String getNotebookNameFromNumber(int notebookNumber) {
