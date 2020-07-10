@@ -4,7 +4,7 @@ nbPath=/huge/notebooks
 sccDataDir=/huge/SourcererCC_output
 
 # File with mapping from notebook number to repro
-reproFile=/huge/notebook-number_repro.csv
+reproFile=/huge/notebook-number_repo.csv
 
 # Directory for output data from NotebookAnalyzer
 outputNBA=./OutputNBA
