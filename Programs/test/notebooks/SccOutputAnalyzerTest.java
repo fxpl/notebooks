@@ -1,8 +1,5 @@
 package notebooks;
 
-import static org.junit.Assert.assertFalse;
-
-import java.io.File;
 import java.io.IOException;
 
 import org.junit.AfterClass;
@@ -23,6 +20,9 @@ public class SccOutputAnalyzerTest extends AnalyzerTest {
 	public void setUp() {
 		analyzer = new SccOutputAnalyzer();
 		analyzer.outputDir = defaultOutputDirName;
+		cloneFilePrefixes = new String[2];
+		cloneFilePrefixes[0] = "cloneFrequency";
+		cloneFilePrefixes[1] = "connections";
 	}
 	
 	@AfterClass
@@ -406,34 +406,5 @@ public class SccOutputAnalyzerTest extends AnalyzerTest {
 	protected static String connectionsHeader() {
 		return "file, non-empty connections, non-empty connections normalized, "
 				+ "non-empty intra repro connections, mean non-empty inter repro connections";
-	}
-	
-	@Override
-	protected void deleteCloneCsvs(String dir) {
-		TestUtils.lastOutputFile(dir, "cloneFrequency").delete();
-		TestUtils.lastOutputFile(dir, "connections").delete();
-	}
-	
-	@Override
-	protected void verifyAbsenceOfCloneFiles(String dir) {
-		String[] prefixes = {
-				//"snippetsA",
-				"cloneFrequency",
-				"connections"
-		};
-		
-		for (String prefix: prefixes) {
-			File outputFile = TestUtils.lastOutputFile(dir, prefix);
-			assertFalse("Unexpected output file: " + outputFile.getName(), outputFile.exists());
-		}
-	}
-	
-	@Override
-	protected void verifyExistenceOfAndRemoveCloneFiles(String dir) throws IOException {
-		String[] prefixes = {
-				"cloneFrequency",
-				"connections"
-		};
-		TestUtils.verifyExistenceOfAndRemove(dir, prefixes);
 	}
 }

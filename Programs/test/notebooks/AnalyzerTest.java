@@ -1,5 +1,7 @@
 package notebooks;
 
+import static org.junit.Assert.assertFalse;
+
 import java.io.File;
 import java.io.IOException;
 
@@ -7,6 +9,7 @@ public abstract class AnalyzerTest {
 	protected static String defaultOutputDirName;
 	protected static File defaultOutputDir;
 	protected static boolean deleteOutputDirOnTearDown = false;
+	protected String[] cloneFilePrefixes;
 
 	/**
 	 * Create the default output directory if it doesn't exist. (If so, it will
@@ -68,7 +71,12 @@ public abstract class AnalyzerTest {
 	 * directory.
 	 * @param dir Directory to remove files from
 	 */
-	protected abstract void deleteCloneCsvs(String dir);
+	protected void deleteCloneCsvs(String dir) {
+		for (String prefix: cloneFilePrefixes) {
+			TestUtils.lastOutputFile(dir, prefix).delete();
+			TestUtils.lastOutputFile(dir, prefix).delete();
+		}
+	}
 	
 	/**
 	 * Delete all CSV files created by the clone analysis in the default output
@@ -94,7 +102,12 @@ public abstract class AnalyzerTest {
 	 * specified directory.
 	 * @param dir Directory to look for files in
 	 */
-	protected abstract void verifyAbsenceOfCloneFiles(String dir);
+	protected void verifyAbsenceOfCloneFiles(String dir) {
+		for (String prefix: cloneFilePrefixes) {
+			File outputFile = TestUtils.lastOutputFile(dir, prefix);
+			assertFalse("Unexpected output file: " + outputFile.getName(), outputFile.exists());
+		}
+	}
 	
 	/**
 	 * Verify that no output file from the clone analysis exist in the
@@ -121,7 +134,9 @@ public abstract class AnalyzerTest {
 	 * @param dir Name of directory to look in and remove from
 	 * @throws IOException
 	 */
-	protected abstract void verifyExistenceOfAndRemoveCloneFiles(String dir) throws IOException;
+	protected void verifyExistenceOfAndRemoveCloneFiles(String dir) throws IOException {
+		TestUtils.verifyExistenceOfAndRemove(dir, cloneFilePrefixes);
+	}
 	
 	/**
 	 * Verify that all clone analysis output files exist in the default output

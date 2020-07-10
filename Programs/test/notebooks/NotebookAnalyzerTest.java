@@ -26,6 +26,11 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 	public void setUp() {
 		analyzer = new NotebookAnalyzer();
 		analyzer.outputDir = defaultOutputDirName;
+		cloneFilePrefixes = new String[4];
+		cloneFilePrefixes[0] = "file2hashesA";
+		cloneFilePrefixes[1] = "hash2filesA";
+		cloneFilePrefixes[2] = "cloneFrequency";
+		cloneFilePrefixes[3] = "connections";
 	}
 	
 	@AfterClass
@@ -912,40 +917,6 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 	public void testNumNotebooks() {
 		analyzer.initializeNotebooksFrom("test/data/count");
 		assertEquals("Wrong number of notebooks found:", 12, analyzer.numNotebooks());
-	}
-	
-	@Override
-	protected void deleteCloneCsvs(String dir) {
-		TestUtils.lastOutputFile(dir, "file2hashesA").delete();
-		TestUtils.lastOutputFile(dir, "hash2filesA").delete();
-		TestUtils.lastOutputFile(dir, "cloneFrequency").delete();
-		TestUtils.lastOutputFile(dir, "connections").delete();
-	}
-	
-	@Override
-	protected void verifyAbsenceOfCloneFiles(String dir) {
-		String[] prefixes = {
-				"file2hashesA",
-				"hash2filesA",
-				"cloneFrequency",
-				"connections"
-		};
-		
-		for (String prefix: prefixes) {
-			File outputFile = TestUtils.lastOutputFile(dir, prefix);
-			assertFalse("Unexpected output file: " + outputFile.getName(), outputFile.exists());
-		}
-	}
-	
-	@Override
-	protected void verifyExistenceOfAndRemoveCloneFiles(String dir) throws IOException {
-		String[] prefixes = {
-				"file2hashesA",
-				"hash2filesA",
-				"cloneFrequency",
-				"connections"
-		};
-		TestUtils.verifyExistenceOfAndRemove(dir, prefixes);
 	}
 	
 	/**
