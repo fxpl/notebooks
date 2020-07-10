@@ -28,8 +28,7 @@ public class SccOutputAnalyzer extends Analyzer {
 	 * of the ''hash'' of a snippet are the same.
 	 * @param statsFile Path to file stats file produced by the SourcererCC tokenizer
 	 * @param reproFile Path to file with mapping from notebook number to repro
-	 * @param pairFile: Path to output file with clone pairs from the SourcererCC clone detection
-	 * @return A map from snippets to files
+	 * @param pairFile Path to zipped output file with clone pairs from the SourcererCC clone detection
 	 * @throws IOException
 	 */
 	public void clones(String statsFile, String reproFile, String pairFile) throws IOException {
@@ -47,8 +46,7 @@ public class SccOutputAnalyzer extends Analyzer {
 	 * Note that the ''hashes'' written by this method are not the MD5 hashes
 	 * of the snippets, but just the value of a counter. However, all instances
 	 * of the ''hash'' of a snippet are the same.
-	 * @param pairFile: Path to output file with clone pairs from the SourcererCC clone detection
-	 * @return A map from snippets to files
+	 * @param pairFile Path to zipped output file with clone pairs from the SourcererCC clone detection
 	 * @throws IOException
 	 */
 	public void clones(String pairFile) throws IOException {
@@ -63,8 +61,6 @@ public class SccOutputAnalyzer extends Analyzer {
 	 * Create and fill cloneFrequencies and connections csv files with data for
 	 * all notebooks. Create the cloneLoc csv file and fill it with the line
 	 * count for each clone instance.
-	 * @param notebook2snippets A map from file names to snippets
-	 * @param snippets A map with all snippets (id -> object)
 	 * @throws IOException On problems handling the output files
 	 */
 	private void writeCloneFiles() throws IOException {
@@ -76,6 +72,7 @@ public class SccOutputAnalyzer extends Analyzer {
 	/**
 	 * Initialize the maps containing information about each snippet
 	 * @param statsFile Path to file stats file produced by the SourcererCC tokenizer
+	 * @param reproFile Path to file with mapping from notebook number to repro
 	 */
 	public void initializeSnippetInfo(String statsFile, String reproFile) throws IOException {
 		createNotebookMap(reproFile);
@@ -115,7 +112,6 @@ public class SccOutputAnalyzer extends Analyzer {
 	/**
 	 * Create a map from notebook number to notebook (including repro)
 	 * @param fileName Name of file with mapping from notebook number to repro
-	 * @return The map from notebook number to notebook
 	 */
 	private void createNotebookMap(String fileName) throws IOException {
 		notebooks = new HashMap<Integer, SccNotebook>();
