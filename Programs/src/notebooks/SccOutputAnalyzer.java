@@ -314,6 +314,7 @@ public class SccOutputAnalyzer extends Analyzer {
 				System.err.println("I/O error when initializing snippet info: " + e.getMessage());
 				e.printStackTrace();
 				System.err.println("Analysis will not be run!");
+				System.exit(1);
 			}
 			try {
 				this.clones(pairFile);
