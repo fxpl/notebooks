@@ -1,0 +1,14 @@
+# Directory containing all notebooks (ipynb files), possibly in subdirectories
+nbPath=/huge/notebooks
+# Output files from SourcererCC (clone.pairs and file.stats) should be placed here:
+sccDataDir=/huge/SourcererCC_output
+
+# File with mapping from notebook number to repro
+reproFile=/huge/notebook-number_repro.csv
+
+# Directory for output data from NotebookAnalyzer
+outputNBA=./OutputNBA
+# Directory for output data from SccOutputAnalyzer
+outputSOA=./OutputSCC
+# Directory where the files dumped by PythonDumper will be stored
+pythonDumpDir=/huge/snippets_concatenated
