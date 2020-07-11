@@ -1,11 +1,5 @@
 #!/bin/bash -l
 
-#SBATCH -A snic2019-8-228
-#SBATCH -t 5:00
-#SBATCH -p core -n 1
-#SBATCH -J language_analysis
-#SBATCH -M snowy
-
 ################################################################################
 # Count the number of notebooks written in Python, Julia, R and Scala
 # respectively. Also count the number of notebooks with another language, or no

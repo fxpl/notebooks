@@ -1,10 +1,5 @@
 #!/bin/bash
 
-#SBATCH -A snic2019-8-228
-#SBATCH -t 30:00
-#SBATCH -p core -n 1
-#SBATCH -M snowy
-
 ################################################################################
 # Let a cell sequence be all code cells in a notebook, in order. List each
 # unique cell sequence preceded by the number of notebooks containing exactly

@@ -1,11 +1,5 @@
 #!/bin/bash
 
-#SBATCH -A snic2019-8-228
-#SBATCH -p core -n 1
-#SBATCH -t 250:00:00
-#SBATCH -J notebook_sizes
-#SBATCH -M snowy
-
 ################################################################################
 # Measure the size on disk of each notebook, in bytes.
 ################################################################################

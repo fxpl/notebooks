@@ -1,10 +1,5 @@
 #!/bin/bash -l
 
-#SBATCH -A snic2019-8-228
-#SBATCH -t 1:00:00
-#SBATCH -p core -n 1
-#SBATCH -J notebook_snippetPrinter
-
 ################################################################################
 # Find the largest clone groups with median LOC >= the specified value. Print
 # the specified number of snippets from each of these this clone group to stdout.
