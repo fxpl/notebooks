@@ -42,7 +42,7 @@ rm $sccNotebooks
 
 #Statistics for SccOutputAnanlyzer results
 ./create_sym_links_scc.sh
-Rscript statistics_paperIII_scc.R > ../Output/statistics_output.txt
+Rscript statistics_paperIII_scc.R > ../Output/output_statistics.txt
 # Pack plots
 ./reduce_large_images.sh
 cd ../Output
