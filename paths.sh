@@ -3,6 +3,8 @@ nbPath=/huge/notebooks
 # Output files from SourcererCC (clone.pairs and file.stats) should be placed here:
 sccDataDir=/huge/SourcererCC_output
 
+# File with paths to all notebooks (relative to the location of the file)
+notebookPathsFile=/huge/notebook_paths.txt
 # File with mapping from notebook number to repro
 reproFile=/huge/notebook-number_repo.csv
 

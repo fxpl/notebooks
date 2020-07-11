@@ -14,9 +14,9 @@ numCloneGroups=$1
 minLOC=$2
 snippetsPerCloneGroup=$3
 
+source ../paths.sh
 hashFile=`./get_last_output.sh "hash2filesA"`
-diskPath=/home/maka4186/notebook_disk
-pathFile=$diskPath/notebook_paths.txt
+pathFileDir=`echo $notebookPathsFile | rev | cut -d'/' -f2- | rev`
 
 ################################################################################
 # Generate the specified number of random integers, all with unique values
@@ -78,7 +78,7 @@ sed -n "2,$ p" $hashFile | grep -o ',' -n | uniq -c | sort -rn \
 			snippetIndexIndex=`echo "$notebookIndex + 1" | bc`
 			notebook=`echo $line | cut -d',' -f${notebookIndex}`
 			snippetIndex=`echo $line | cut -d',' -f${snippetIndexIndex} | tr -d ' '`
-			notebookPath=$diskPath"/"`grep $notebook $pathFile`
+			notebookPath=$pathFileDir"/"`grep $notebook $notebookPathsFile`
 
 			# Print snippet
 			echo "----------------------------------------"
