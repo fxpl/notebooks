@@ -27,7 +27,7 @@ sccNotebooks="sccNotebooks.txt"
 cloneFreqSCC=`./get_last_output.sh "cloneFrequency"`
 connectionsSCC=`./get_last_output.sh "connections"`
 sed -n "2,$ p" $cloneFreqSCC | cut -d',' -f1 > $sccNotebooks
-grep -vFf sccNotebooks.txt pythonNotebooks.txt | while read notebook; do
+grep -vFf $sccNotebooks $pythonNotebooks | while read notebook; do
 	echo "$notebook, 0, 0, 0, 0, 0, 0, 0" >> $cloneFreqSCC
 	echo "$notebook, 0, 0.0000, 0, 0.0000, 0, 0, 0.0000, 0.0000" >> $connectionsSCC
 done
@@ -51,7 +51,7 @@ cd ..
 rm Output
 
 
-# CMW CLONES:
+# CMW CLONES AND STATISTICS FOR THE CORPUS:
 
 # Postprocessing of NotebookAnalyzer result
 ln -s $outputNBA Output
