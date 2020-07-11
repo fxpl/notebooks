@@ -266,6 +266,39 @@ public class SccOutputAnalyzerTest extends AnalyzerTest {
 	}
 	
 	/**
+	 * Verify that cloneFrequencies are computed correctly at clone analysis
+	 * based on SourcererCC data if the data is distributed in several files
+	 * (stored in the same zip file).
+	 * @throws IOException
+	 */
+	@Test
+	public void testCloneFreqCsv_severalFiles() throws IOException {
+		String dataDir = "test/data/scc";
+		String statsFile = dataDir + "/file_stats";
+		String pairFile = dataDir + "/clone_pairs_split.zip";
+		String reproFile = "test/data/hash/repros.csv";
+		
+		String[] expectedLines = {
+				cloneFrequencyHeader(),
+				"nb_1.ipynb, 0, 2, 0, 1.0000, 1.0000, 2, 2",
+				"nb_2.ipynb, 0, 3, 0, 1.0000, 1.0000, 2, 2",
+				"nb_3.ipynb, 1, 1, 0, 0.5000, 0.5000, 0, 0",
+				"nb_4.ipynb, 2, 0, 2, 0.0000, 0, 0, 0",
+				"nb_5.ipynb, 1, 1, 1, 0.5000, 1.0000, 0, 0",
+				"nb_6.ipynb, 0, 2, 0, 1.0000, 1.0000, 2, 2",
+				"nb_7.ipynb, 0, 3, 0, 1.0000, 1.0000, 0, 0",
+				"nb_8.ipynb, 0, 1, 0, 1.0000, 1.0000, 0, 0",
+				"nb_9.ipynb, 0, 2, 0, 1.0000, 1.0000, 2, 2",
+				"nb_10.ipynb, 1, 0, 1, 0.0000, 0, 0, 0",
+				"nb_11.ipynb, 0, 1, 0, 1.0000, 1.0000, 0, 0"
+		};
+		
+		analyzer.clones(statsFile, reproFile, pairFile);
+		checkCsv_anyOrder("cloneFrequency", expectedLines);
+		deleteCloneCsvs();
+	}
+	
+	/**
 	 * Verify that intra notebook connections are computed correctly.
 	 * @throws IOException
 	 */

@@ -141,53 +141,62 @@ public class SccOutputAnalyzer extends Analyzer {
 	private void storeConnections(String pairFileName) throws IOException {
 		ZipFile zippedPairFile = new ZipFile(pairFileName);
 		Enumeration<? extends ZipEntry> pairFileSet = zippedPairFile.entries();
-		ZipEntry pairFile = pairFileSet.nextElement();	// Should only be one (TODO?)
-		InputStream zipStream = zippedPairFile.getInputStream(pairFile);
-		final BufferedReader reader = new BufferedReader(new InputStreamReader(zipStream));
-		long numRead = 0;
-		String line = reader.readLine();
-		while (null != line) {
-			if (0 == numRead%100000000) {
-				Utils.heartBeat("Reading clone pair " + numRead + ".");
-			}
-			String[] numbers = line.split(",");
-			if (4 != numbers.length) {
-				System.err.println("Invalid line (number " + (numRead + 1) + ") in pair file: " + line);
-				System.err.println(" Skipping line!");
-			} else {
-				try {
-					SccSnippetId id1 = new SccSnippetId(numbers[0], numbers[1]);
-					SccSnippetId id2 = new SccSnippetId(numbers[2], numbers[3]);
-					SccSnippet snippet1 = snippets.get(id1);
-					SccSnippet snippet2 = snippets.get(id2);
-					if (null == snippet1) {
-						System.err.println("ID for nonexistent snippet (" + id1 + ") found on line \""
-								+ line + "\". Skipping clone pair!");
-					}
-					if (null == snippet2) {
-						System.err.println("ID for nonexistent snippet (" + id2 + ") found on line \""
-								+ line + "\". Skipping clone pair!");
-					}
-					if (null != snippet1 && null != snippet2) {
-						try {
-							snippet1.connect(snippet2);
-						} catch (NullPointerException e) {
-							// Notebook or repro was null for one of the snippets
-							System.err.println("Couldn't add connection between " + id1 + " and " + id2 + ". ");
-							System.err.println("Notebook or repro info is missing. Skipping line " + line);
-						}
-					}
-				} catch (NumberFormatException e) {
-					// We just skip this line
-					System.err.println("Number format exception when parsing line \""
-							+ line + "\": " + e.getMessage());
+		while (pairFileSet.hasMoreElements()) {
+			ZipEntry pairFile = pairFileSet.nextElement();
+			InputStream zipStream = zippedPairFile.getInputStream(pairFile);
+			final BufferedReader reader = new BufferedReader(new InputStreamReader(zipStream));
+			long numRead = 0;
+			String line = reader.readLine();
+			while (null != line) {
+				if (0 == numRead%100000000) {
+					Utils.heartBeat("Reading clone pair " + numRead + ".");
 				}
+				storeConnection(line);
+				numRead++;
+				line = reader.readLine();
 			}
-			numRead++;
-			line = reader.readLine();
+			reader.close();
 		}
-		reader.close();
 		zippedPairFile.close();
+	}
+
+	/**
+	 * @param line A line from the clone pairs file from the SourcererCC output
+	 */
+	private void storeConnection(String line) {
+		String[] numbers = line.split(",");
+		if (4 != numbers.length) {
+			System.err.print("Invalid line \"" + line + "\" in pair file.");
+			System.err.println(" Skipping line!");
+		} else {
+			try {
+				SccSnippetId id1 = new SccSnippetId(numbers[0], numbers[1]);
+				SccSnippetId id2 = new SccSnippetId(numbers[2], numbers[3]);
+				SccSnippet snippet1 = snippets.get(id1);
+				SccSnippet snippet2 = snippets.get(id2);
+				if (null == snippet1) {
+					System.err.println("ID for nonexistent snippet (" + id1 + ") found on line \""
+							+ line + "\". Skipping clone pair!");
+				}
+				if (null == snippet2) {
+					System.err.println("ID for nonexistent snippet (" + id2 + ") found on line \""
+							+ line + "\". Skipping clone pair!");
+				}
+				if (null != snippet1 && null != snippet2) {
+					try {
+						snippet1.connect(snippet2);
+					} catch (NullPointerException e) {
+						// Notebook or repro was null for one of the snippets
+						System.err.println("Couldn't add connection between " + id1 + " and " + id2 + ". ");
+						System.err.println("Notebook or repro info is missing. Skipping line " + line);
+					}
+				}
+			} catch (NumberFormatException e) {
+				// We just skip this line
+				System.err.println("Number format exception when parsing line \""
+						+ line + "\": " + e.getMessage());
+			}
+		}
 	}
 	
 	private static String getNotebookNameFromNumber(int notebookNumber) {
