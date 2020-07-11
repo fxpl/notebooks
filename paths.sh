@@ -1,6 +1,6 @@
 # Directory containing all notebooks (ipynb files), possibly in subdirectories
 nbPath=/huge/notebooks
-# Output files from SourcererCC (clone.pairs and file.stats) should be placed here:
+# Output files from SourcererCC (clone.pairs.zip and file.stats) should be placed here:
 sccDataDir=/huge/SourcererCC_output
 
 # File with paths to all notebooks (relative to the location of the file)
