@@ -1,14 +1,14 @@
 #!/bin/bash
 
 ################################################################################
-# Run all relevant post processing scripts except the R script on the output of
-# NotebookAnalyzer and SccOutputAnalyzer.
+# Run all relevant post processing scripts on the output of NotebookAnalyzer and
+# SccOutputAnalyzer.
 ################################################################################
 
 source paths.sh
 
 # Postprocessing for NotebookAnalyzer result
-ln -s $OutputNBA Output
+ln -s $outputNBA Output
 cd Scripts
 ./language_analysis.sh > ../Output/output_language_analysis.txt
 ./language_inconsistencies.sh > ../Output/output_language_inconsistencies.txt
@@ -20,7 +20,7 @@ cd Scripts
 # Statistics for NotebookAnalyzer results
 ./create_sym_links_nba.sh
 ./get_notebook_sizes.sh
-Rscript statistics_paperIII_nba.R > ../Output/statistics_output.txt
+Rscript statistics_paperIII_nba.R > ../Output/output_statistics.txt
 # Pack plots
 ./reduce_large_images.sh
 cd ../Output
@@ -28,19 +28,19 @@ tar -czf plots.tgz hist_clone_frequency*eps lang*eps log_hist_*eps cells*jpg *In
 cd -
 
 # If a notebook is written in Python and is not included in the clone frequency
-# file in OutputSCC. it is empty. Find these and add to cloneFrequency and
+# file in OutputSCC, it is empty. Find these and add to cloneFrequency and
 # connections files in OutputSCC (since empty notebooks are not included in
 # SourcererCC clones).
-pythonNotebooks="pythonNotebooks.txt"
-langFile=`./get_latest_output.sh "languages"`	# ../Output still points at NBA direcectory
+pythonNotebooks="../pythonNotebooks.txt"
+langFile=`./get_last_output.sh "languages"`	# ../Output still points at NBA direcectory
 grep -E "^nb_[0-9]+\.ipynb\, PYTHON\, " $langFile | cut -d',' -f1 > $pythonNotebooks
 cd ..
 rm Output
-ln -s $OutputSCC Output
+ln -s $outputSOA Output
 cd Scripts
 sccNotebooks="sccNotebooks.txt"
-cloneFreqSCC=`./get_latest_output.sh "cloneFrequency"`
-connectionsSCC=`./get_latest_output.sh "connections"`
+cloneFreqSCC=`./get_last_output.sh "cloneFrequency"`
+connectionsSCC=`./get_last_output.sh "connections"`
 sed -n "2,$ p" $cloneFreqSCC | cut -d',' -f1 > $sccNotebooks
 grep -vFf sccNotebooks.txt pythonNotebooks.txt | while read notebook; do
 	echo "$notebook, 0, 0, 0, 0, 0, 0, 0" >> $cloneFreqSCC

@@ -1,4 +1,4 @@
-source("functions_paperIII.R")
+source("statistics_functions_paperIII.R")
 setwd("..")
 outputDir <- "Output"
 

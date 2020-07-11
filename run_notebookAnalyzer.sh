@@ -1,7 +1,7 @@
 #!/bin/bash -l
 
 source paths.sh
-outputDirectory=OutputNBA
+outputDirectory=$outputNBA
 
 mkdir -p $outputDirectory
 java -XX:+UnlockDiagnosticVMOptions -XX:NativeMemoryTracking=summary -XX:+PrintNMTStatistics -XX:+UseParallelGC \

@@ -12,3 +12,5 @@ outputNBA=./OutputNBA
 outputSOA=./OutputSCC
 # Directory where the files dumped by PythonDumper will be stored
 pythonDumpDir=/huge/snippets_concatenated
+
+# NOTE: No directory (or file) may be named Output and placed in this directory!
