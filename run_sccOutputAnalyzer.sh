@@ -1,7 +1,7 @@
 #!/bin/bash -l
 
 source paths.sh
-pairFile=$sccDataDir/clone.pairs
+pairFile=$sccDataDir/clone.pairs.zip
 statsFile=$sccDataDir/files.stats
 outputDirectory=$outputSOA
 
