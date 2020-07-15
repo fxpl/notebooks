@@ -6,26 +6,27 @@ import java.util.Set;
 
 public class SccNotebook {
 	private String name;
-	private String repro = "";
+	private int repro;
 	private int intraReproConnections;
 	private int interReproConnections;
 	// Repros that this notebook has an inter connections to
-	private Set<String> reprosInterConnected;
+	private Set<Integer> reprosInterConnected;
 	
-	public SccNotebook(String name, String repro) {
+	public SccNotebook(String name, int repro) {
 		this.name = name;
 		this.repro = repro;
-		reprosInterConnected = new HashSet<String>();
+		reprosInterConnected = new HashSet<Integer>();
 	}
 	
 	public SccNotebook(SccNotebook model) {
 		this(model.name, model.repro);
 	}
 	
+	/**
+	 * TODO
+	 */
 	public void connect(SccNotebook connected) {
-		// We call toString because we want a NPE to be thrown if repro is null.
-		String connectedRepo = connected.repro.toString();
-		if (this.repro.equals(connectedRepo)) {
+		if (this.repro == connected.repro) {
 			this.intraReproConnections++;
 			connected.intraReproConnections++;
 		} else {
@@ -55,14 +56,10 @@ public class SccNotebook {
 		return name;
 	}
 	
-	public String getRepro() {
-		return repro;
-	}
-	
 	/**
 	 * @return The set of all repros to which this notebook is connected, except the one it self lives in
 	 */
-	public Set<String> getReprosInterConnected() {
+	public Set<Integer> getReprosInterConnected() {
 		return reprosInterConnected;
 	}
 	

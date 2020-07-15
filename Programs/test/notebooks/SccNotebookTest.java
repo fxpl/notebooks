@@ -13,12 +13,12 @@ import org.junit.Test;
 
 public class SccNotebookTest {
 	String notebookName = "nb_777.ipynb";
-	String reproName = "repro77";
+	int reproNumber = 77;
 	SccNotebook notebook;
 	
 	@Before
 	public void setUp() {
-		notebook = new SccNotebook(notebookName, reproName);
+		notebook = new SccNotebook(notebookName, reproNumber);
 	}
 	
 	@Test
@@ -26,8 +26,6 @@ public class SccNotebookTest {
 		SccNotebook notebookCopy = new SccNotebook(notebook);
 		assertEquals("Wrong name returned for notebook created using copy constructor",
 				notebookName, notebookCopy.getName());
-		assertEquals("Wrong repro name returned for notebook created using copy constructor",
-				reproName, notebookCopy.getRepro());
 	}
 	
 	@Test
@@ -39,7 +37,7 @@ public class SccNotebookTest {
 		assertTrue("Inter connected repros set not empty at creation",
 				notebook.getReprosInterConnected().isEmpty());
 		
-		SccNotebook sameRepro = new SccNotebook("sameRepro", reproName);
+		SccNotebook sameRepro = new SccNotebook("sameRepro", reproNumber);
 		notebook.connect(sameRepro);
 		assertEquals("Number of intra repro connections !=1 after addition of one",
 				1, notebook.numIntraReproConnections());
@@ -54,12 +52,12 @@ public class SccNotebookTest {
 		assertTrue("Inter connected repros set for argument not empty after addition of intra repro connections",
 				sameRepro.getReprosInterConnected().isEmpty());
 		
-		String otherReproName = "repro99";
-		SccNotebook otherRepro = new SccNotebook("otherRepro", otherReproName);
-		Set<String> myExpectedRepros = new HashSet<String>();
-		myExpectedRepros.add(otherReproName);
-		Set<String> otherExpectedRepros = new HashSet<String>();
-		otherExpectedRepros.add(reproName);
+		int otherReproNumber = 99;
+		SccNotebook otherRepro = new SccNotebook("otherRepro", otherReproNumber);
+		Set<Integer> myExpectedRepros = new HashSet<Integer>();
+		myExpectedRepros.add(otherReproNumber);
+		Set<Integer> otherExpectedRepros = new HashSet<Integer>();
+		otherExpectedRepros.add(reproNumber);
 		notebook.connect(otherRepro);
 		assertEquals("Number of intra repro connections changed by addition of inter repro connection",
 				1, notebook.numIntraReproConnections());
@@ -74,7 +72,7 @@ public class SccNotebookTest {
 		assertEquals("Wrong content of inter connected repro set for argument after addition one inter repro connection",
 				otherExpectedRepros, otherRepro.getReprosInterConnected());
 		
-		SccNotebook otherReproAgain = new SccNotebook("otherReproAgain", otherReproName);
+		SccNotebook otherReproAgain = new SccNotebook("otherReproAgain", otherReproNumber);
 		notebook.connect(otherReproAgain);
 		assertEquals("Number of inter repro connections !=2 after addition of two",
 				2, notebook.numInterReproConnections());
@@ -83,18 +81,18 @@ public class SccNotebookTest {
 		assertEquals("Wrong content of inter connected repro set for argument after addition of two connections to the same repro",
 				otherExpectedRepros, otherReproAgain.getReprosInterConnected());
 		
-		String newReproName = "newRepro";
-		SccNotebook newRepro = new SccNotebook("newRepro.ipynb", newReproName);
-		myExpectedRepros.add(newReproName);
+		int newReproNumber = 447;
+		SccNotebook newRepro = new SccNotebook("newRepro.ipynb", newReproNumber);
+		myExpectedRepros.add(newReproNumber);
 		notebook.connect(newRepro);
 		assertEquals("Wrong content of repro set after addition of inter connections to two different repros",
 				myExpectedRepros, notebook.getReprosInterConnected());
 		assertEquals("Wrong content of repro set for argument after addition of inter connections to two different repros",
 				otherExpectedRepros, newRepro.getReprosInterConnected());
 				
-		String newReproName2 = "yetAnotherRepro";
-		SccNotebook newRepro2 = new SccNotebook("otherReproAgain.ipynb", newReproName2);
-		myExpectedRepros.add(newReproName2);
+		int newReproNumber2 = 448;
+		SccNotebook newRepro2 = new SccNotebook("otherReproAgain.ipynb", newReproNumber2);
+		myExpectedRepros.add(newReproNumber2);
 		notebook.connect(newRepro2);
 		assertEquals("Wrong content of repro set after addition of inter connections to three different repros",
 				myExpectedRepros, notebook.getReprosInterConnected());
@@ -106,57 +104,9 @@ public class SccNotebookTest {
 				4, notebook.numInterReproConnections());
 	}
 	
-	/**
-	 * Verify that a NullPointerException is throw and no connections are added
-	 * by connect when repro info is missing.
-	 */
-	@Test
-	public void testConnect_nullRepro() {
-		boolean thrown = false;
-		SccNotebook nullReproNb = new SccNotebook("nullReproNb.ipynb", null);
-		try {
-			nullReproNb.connect(notebook);
-		} catch (NullPointerException e) {
-			thrown = true;
-		}
-		assertTrue("No NullPointerException thrown when repro info is missing.", thrown);
-		assertEquals("Intra repro connection stored despite missing repro info",
-				0, notebook.numIntraReproConnections());
-		assertEquals("Intra repro connection stored despite missing repro info",
-				0, nullReproNb.numIntraReproConnections());
-		assertEquals("Inter repro connection stored despite missing repro info",
-				0, notebook.numInterReproConnections());
-		assertEquals("Inter repro connection stored despite missing repro info",
-				0, nullReproNb.numInterReproConnections());
-	}
-	
-	/**
-	 * Verify that a NullPointerException is throw and no connections are added
-	 * by addConnection when repro info is missing in argument notebook.
-	 */
-	@Test
-	public void testConnect_nullReproArg() {
-		boolean thrown = false;
-		SccNotebook nullReproNb = new SccNotebook("nullReproNb.ipynb", null);
-		try {
-			notebook.connect(nullReproNb);
-		} catch (NullPointerException e) {
-			thrown = true;
-		}
-		assertTrue("No NullPointerException thrown when repro info is missing in argument notebook.", thrown);
-		assertEquals("Intra repro connection stored despite missing repro info",
-				0, notebook.numIntraReproConnections());
-		assertEquals("Intra repro connection stored despite missing repro info",
-				0, nullReproNb.numIntraReproConnections());
-		assertEquals("Inter repro connection stored despite missing repro info",
-				0, notebook.numInterReproConnections());
-		assertEquals("Inter repro connection stored despite missing repro info",
-				0, nullReproNb.numInterReproConnections());
-	}
-	
 	@Test
 	public void testEquals_equal() {
-		SccNotebook otherNotebook = new SccNotebook(notebookName, reproName);
+		SccNotebook otherNotebook = new SccNotebook(notebookName, reproNumber);
 		assertTrue("Equal notebooks considered different", notebook.equals(otherNotebook));
 	}
 	
@@ -168,18 +118,13 @@ public class SccNotebookTest {
 	
 	@Test
 	public void testEquals_diffName() {
-		SccNotebook otherNotebook = new SccNotebook("otherName", reproName);
+		SccNotebook otherNotebook = new SccNotebook("otherName", reproNumber);
 		assertFalse("Notebook with other name considered equal", notebook.equals(otherNotebook));
 	}
 	
 	@Test
 	public void testGetName() {
 		assertEquals("Wrong name returned for notebook", notebookName, notebook.getName());
-	}
-	
-	@Test
-	public void testGetRepro() {
-		assertEquals("Wrong repro returned for notebook", reproName, notebook.getRepro());
 	}
 	
 	@Test

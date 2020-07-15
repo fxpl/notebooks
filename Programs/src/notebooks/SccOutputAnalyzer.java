@@ -20,6 +20,7 @@ import java.util.zip.ZipFile;
 public class SccOutputAnalyzer extends Analyzer {
 	private Map<Integer, Set<SccSnippetId>> notebook2snippets;
 	private Map<Integer, SccNotebook> notebooks;
+	private Map<String, Integer> repros;
 	private Map <SccSnippetId, SccSnippet> snippets;
 	
 	/**
@@ -80,7 +81,7 @@ public class SccOutputAnalyzer extends Analyzer {
 	 * @param reproFile Path to file with mapping from notebook number to repro
 	 */
 	public void initializeSnippetInfo(String statsFile, String reproFile) throws IOException {
-		createNotebookMap(reproFile);
+		createNotebookMaps(reproFile);
 		BufferedReader statsReader = new BufferedReader(new FileReader(statsFile));
 		snippets = new HashMap<SccSnippetId, SccSnippet>();
 		notebook2snippets = new HashMap<Integer, Set<SccSnippetId>>();
@@ -115,10 +116,12 @@ public class SccOutputAnalyzer extends Analyzer {
 	}
 	
 	/**
-	 * Create a map from notebook number to notebook (including repro)
+	 * Create a map from repro name to integer representation, and from
+	 * notebook number to notebook
 	 * @param fileName Name of file with mapping from notebook number to repro
 	 */
-	private void createNotebookMap(String fileName) throws IOException {
+	private void createNotebookMaps(String fileName) throws IOException {
+		repros = new HashMap<String, Integer>();
 		notebooks = new HashMap<Integer, SccNotebook>();
 		BufferedReader reader = new BufferedReader(new FileReader(fileName));
 		String line = reader.readLine();
@@ -128,7 +131,11 @@ public class SccOutputAnalyzer extends Analyzer {
 				int notebookNumber = Integer.parseInt(subStrings[0]);
 				String notebookName = getNotebookNameFromNumber(notebookNumber);
 				String reproName = subStrings[1];
-				notebooks.put(notebookNumber, new SccNotebook(notebookName, reproName));
+				if (!repros.containsKey(reproName)) {
+					repros.put(reproName, repros.size());
+				}
+				int reproNumber = repros.get(reproName);
+				notebooks.put(notebookNumber, new SccNotebook(notebookName, reproNumber));
 			} catch (NumberFormatException e) {
 				System.err.println("Notebook numbers in repro file must be integers! Notebook with \"number\" '"
 						+ subStrings[0] + "' is excluded from mapping!");

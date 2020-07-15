@@ -9,12 +9,12 @@ public class SccSnippetTest {
 	private SccSnippet snippet;
 	private final int loc = 21;
 	private final String notebookName = "nb_86.ipynb";
-	private final String reproName = "testRepro";
+	private final int reproNumber = 1002;
 	private SccNotebook notebook;
 	
 	@Before
 	public void setUp() {
-		notebook = new SccNotebook(notebookName, reproName);
+		notebook = new SccNotebook(notebookName, reproNumber);
 		snippet = new SccSnippet(loc, notebook);
 	}
 	
@@ -39,15 +39,15 @@ public class SccSnippetTest {
 		assertEquals("Number of inter notebook connections != 0 after addition of intra notebook connection",
 				0, snippet.numInterNotebookConnections());
 		
-		SccSnippet sameRepro = new SccSnippet(7, new SccNotebook("sameRepro.ipynb", reproName));
+		SccSnippet sameRepro = new SccSnippet(7, new SccNotebook("sameRepro.ipynb", reproNumber));
 		snippet.connect(sameRepro);
 		assertEquals("Number of intra notebook connections changed by addition of intra repro connection",
 				1, snippet.numIntraNotebookConnections());
 		assertEquals("Number of inter notebook connections !=1 after addition of one",
 				1, snippet.numInterNotebookConnections());
 		
-		String otherReproName = "otherRepro";
-		SccSnippet otherRepro = new SccSnippet(32, new SccNotebook("otherRepro.ipynb", otherReproName));
+		int otherReproNumber = 1003;
+		SccSnippet otherRepro = new SccSnippet(32, new SccNotebook("otherRepro.ipynb", otherReproNumber));
 		snippet.connect(otherRepro);
 		assertEquals("Number of intra notebook connections changed by addition of inter repro connection",
 				1, snippet.numIntraNotebookConnections());
@@ -123,54 +123,6 @@ public class SccSnippetTest {
 				0, nullNbSnippet.numInterNotebookConnections());
 	}
 	
-	/**
-	 * Verify that a NullPointerException is throw and no connections are added
-	 * by addConnection when repro info is missing.
-	 */
-	@Test
-	public void testConnect_nullRepro() {
-		boolean thrown = false;
-		SccSnippet nullReproSnippet = new SccSnippet(loc, new SccNotebook("nullReproNb.ipynb", null));
-		try {
-			nullReproSnippet.connect(snippet);
-		} catch (NullPointerException e) {
-			thrown = true;
-		}
-		assertTrue("No NullPointerException thrown when repro info is missing.", thrown);
-		assertEquals("Intra notebook connection stored despite missing repro info",
-				0, snippet.numIntraNotebookConnections());
-		assertEquals("Intra notebook connection stored despite missing repro info",
-				0, nullReproSnippet.numIntraNotebookConnections());
-		assertEquals("Inter notebook connection stored despite missing repro info",
-				0, snippet.numInterNotebookConnections());
-		assertEquals("Inter notebook connection stored despite missing repro info",
-				0, nullReproSnippet.numInterNotebookConnections());
-	}
-	
-	/**
-	 * Verify that a NullPointerException is throw and no connections are added
-	 * by addConnection when repro info is missing in argument snippet.
-	 */
-	@Test
-	public void testConnect_nullReproArg() {
-		boolean thrown = false;
-		SccSnippet nullReproSnippet = new SccSnippet(loc, new SccNotebook("nullReproNb.ipynb", null));
-		try {
-			nullReproSnippet.connect(snippet);
-		} catch (NullPointerException e) {
-			thrown = true;
-		}
-		assertTrue("No NullPointerException thrown when repro info is missing in argument snippet.", thrown);
-		assertEquals("Intra notebook connection stored despite missing repro info",
-				0, snippet.numIntraNotebookConnections());
-		assertEquals("Intra notebook connection stored despite missing repro info",
-				0, nullReproSnippet.numIntraNotebookConnections());
-		assertEquals("Inter notebook connection stored despite missing repro info",
-				0, snippet.numInterNotebookConnections());
-		assertEquals("Inter notebook connection stored despite missing repro info",
-				0, nullReproSnippet.numInterNotebookConnections());
-	}
-	
 	@Test
 	public void testGetLoc() {
 		assertEquals("Wrong loc for snippet", loc, snippet.getLoc());
@@ -196,7 +148,7 @@ public class SccSnippetTest {
 	@Test
 	public void testIsClone_intra() {
 		assertFalse("Snippet considered clone on creation", snippet.isClone());
-		SccSnippet otherNotebook = new SccSnippet(32, new SccNotebook("otherRepro.ipynb", ""));
+		SccSnippet otherNotebook = new SccSnippet(32, new SccNotebook("otherRepro.ipynb", 0));
 		snippet.connect(otherNotebook);
 		assertTrue("Snippet not considered clone after addition of addition of intra notebook connection", snippet.isClone());
 		assertTrue("Snippet not considered clone after addition of addition of intra notebook connection", otherNotebook.isClone());
@@ -209,7 +161,7 @@ public class SccSnippetTest {
 	@Test
 	public void testIsIntraNotebookClone() {
 		assertFalse("Snippet considered intra notebook clone on creation", snippet.isIntraNotebookClone());
-		SccSnippet otherNotebook = new SccSnippet(35, new SccNotebook("otherRepro.ipynb", ""));
+		SccSnippet otherNotebook = new SccSnippet(35, new SccNotebook("otherRepro.ipynb", 0));
 		snippet.connect(otherNotebook);
 		assertFalse("Snippet considered intra clone after addition of inter notebook connection", snippet.isIntraNotebookClone());
 		SccSnippet sameNotebook = new SccSnippet(17, new SccNotebook(notebook));
