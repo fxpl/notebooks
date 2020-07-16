@@ -1,5 +1,6 @@
 package notebooks;
 
+import java.io.File;
 import java.io.IOException;
 
 import org.junit.AfterClass;
@@ -9,11 +10,19 @@ import org.junit.Test;
 
 public class SccOutputAnalyzerTest extends AnalyzerTest {
 	private SccOutputAnalyzer analyzer;
+	private static String tmpDirName = "./tmp";
+	private static File tmpDir;
+	private static boolean deleteTmpDirOnTearDown = false;
 	
 	@BeforeClass
-	public static void setUpOutputDirectory() {
+	public static void setUpDirectories() {
 		defaultOutputDirName = "scc_output_analyzer_unit_test_output";
 		AnalyzerTest.setUpOutputDirectory();
+		tmpDir = new File(tmpDirName);
+		if (!tmpDir.exists()) {
+			tmpDir.mkdir();
+			deleteTmpDirOnTearDown = true;
+		}
 	}
 	
 	@Before
@@ -28,6 +37,9 @@ public class SccOutputAnalyzerTest extends AnalyzerTest {
 	
 	@AfterClass
 	public static void tearDown() {
+		if (deleteTmpDirOnTearDown) {
+			tmpDir.delete();
+		}
 		tearDownClass();
 	}
 	
@@ -180,6 +192,36 @@ public class SccOutputAnalyzerTest extends AnalyzerTest {
 		verifyExistenceOfAndRemoveCloneFiles();
 	}
 	
+	/**
+	 * Verify that the connections file is created correctly when a specific
+	 * tmp directory is specified.
+	 */
+	@Test
+	public void testArgumentParsing_tmpDir() throws IOException {
+		String[] args = {
+				"--stats_file=test/data/scc/file_stats",
+				"--pair_file=test/data/scc/clone_pairs.zip",
+				"--repro_file=test/data/hash/repros.csv",
+				"--tmp_dir=" + tmpDirName};
+		String[] expectedLines = {
+				connectionsHeader(),
+				"nb_4.ipynb, 0, 0.0000, 0, 0.0000",
+				"nb_5.ipynb, 1, 1.0000, 0, 1.0000",
+				"nb_1.ipynb, 6, 3.0000, 2, 4.0000",
+				"nb_2.ipynb, 7, 2.3333, 3, 4.0000",
+				"nb_3.ipynb, 1, 0.5000, 1, 0.0000",
+				"nb_6.ipynb, 4, 2.0000, 4, 0.0000",
+				"nb_7.ipynb, 5, 1.6667, 2, 1.5000",
+				"nb_10.ipynb, 0, 0.0000, 0, 0.0000",
+				"nb_8.ipynb, 1, 1.0000, 0, 1.0000",
+				"nb_9.ipynb, 4, 2.0000, 2, 2.0000",
+				"nb_11.ipynb, 1, 1.0000, 0, 1.0000",
+		};
+		analyzer.analyze(args);
+		checkCsv_anyOrder("connections", expectedLines);
+		deleteCloneCsvs();
+	}
+	
 	/***
 	 * Verify that the line count for each clone instance is identified
 	 * correctly and written to a csv file prefixed "cloneLoc".
@@ -225,7 +267,6 @@ public class SccOutputAnalyzerTest extends AnalyzerTest {
 				"nb_8.ipynb, 1, 1.0000, 0, 1.0000",
 				"nb_9.ipynb, 4, 2.0000, 2, 2.0000",
 				"nb_11.ipynb, 1, 1.0000, 0, 1.0000",
-				
 		};
 
 		analyzer.clones(statsFile, reproFile, pairFile);

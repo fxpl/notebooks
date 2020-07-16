@@ -22,6 +22,7 @@ public class SccOutputAnalyzer extends Analyzer {
 	private Map<Integer, SccNotebook> notebooks;
 	private Map<String, Integer> repros;
 	private Map <SccSnippetId, SccSnippet> snippets;
+	private String tmpDir = ".";
 	
 	/**
 	 * Perform the clone analysis based on SourcererCC output files. Write
@@ -320,6 +321,8 @@ public class SccOutputAnalyzer extends Analyzer {
 				pairFile = getValueFromArgument(arg);
 			} else if (arg.startsWith("--output_dir")) {
 				outputDir = getValueFromArgument(arg);
+			} else if (arg.startsWith("--tmp_dir")) {
+				tmpDir = getValueFromArgument(arg);
 			} else {
 				System.err.println("Unknown argument: " + arg);
 			}

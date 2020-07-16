@@ -2,6 +2,8 @@
 nbPath=/huge/notebooks
 # Output files from SourcererCC (clone.pairs.zip and file.stats) should be placed here:
 sccDataDir=/huge/SourcererCC_output
+# Directory for temporary files stored by SccOutputAnalyzer
+tmpDir=/huge/soa_tmp_dir
 
 # File with paths to all notebooks (relative to the location of the file)
 notebookPathsFile=/huge/notebook_paths.txt
