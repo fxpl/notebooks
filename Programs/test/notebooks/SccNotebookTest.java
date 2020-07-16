@@ -4,9 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import java.util.HashSet;
 import java.util.Objects;
-import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -34,8 +32,8 @@ public class SccNotebookTest {
 				0, notebook.numIntraReproConnections());
 		assertEquals("Number of inter repro connections != 0 on creation",
 				0, notebook.numInterReproConnections());
-		assertTrue("Inter connected repros set not empty at creation",
-				notebook.getReprosInterConnected().isEmpty());
+		assertEquals("Inter connected repros set not empty at creation",
+				0, notebook.numReprosInterConnected());
 		
 		SccNotebook sameRepro = new SccNotebook("sameRepro", reproNumber);
 		notebook.connect(sameRepro);
@@ -47,17 +45,13 @@ public class SccNotebookTest {
 				1, sameRepro.numIntraReproConnections());
 		assertEquals("Wrong number of inter repro connections for argument snippet",
 				0, sameRepro.numInterReproConnections());
-		assertTrue("Inter connected repros set not empty after addition of intra repro connections",
-				notebook.getReprosInterConnected().isEmpty());
-		assertTrue("Inter connected repros set for argument not empty after addition of intra repro connections",
-				sameRepro.getReprosInterConnected().isEmpty());
+		assertEquals("Inter connected repros set not empty after addition of intra repro connections",
+				0, notebook.numReprosInterConnected());
+		assertEquals("Inter connected repros set for argument not empty after addition of intra repro connections",
+				0, sameRepro.numReprosInterConnected());
 		
 		int otherReproNumber = 99;
 		SccNotebook otherRepro = new SccNotebook("otherRepro", otherReproNumber);
-		Set<Integer> myExpectedRepros = new HashSet<Integer>();
-		myExpectedRepros.add(otherReproNumber);
-		Set<Integer> otherExpectedRepros = new HashSet<Integer>();
-		otherExpectedRepros.add(reproNumber);
 		notebook.connect(otherRepro);
 		assertEquals("Number of intra repro connections changed by addition of inter repro connection",
 				1, notebook.numIntraReproConnections());
@@ -67,35 +61,33 @@ public class SccNotebookTest {
 				0, otherRepro.numIntraReproConnections());
 		assertEquals("Wrong number of inter repro connections for argument snippet",
 				1, otherRepro.numInterReproConnections());
-		assertEquals("Wrong content of inter connected repro set after addition one inter repro connection",
-				myExpectedRepros, notebook.getReprosInterConnected());
-		assertEquals("Wrong content of inter connected repro set for argument after addition one inter repro connection",
-				otherExpectedRepros, otherRepro.getReprosInterConnected());
+		assertEquals("Wrong number of inter connected repros after addition one inter repro connection",
+				1, notebook.numReprosInterConnected());
+		assertEquals("Wrong number of inter connected repros for argument after addition one inter repro connection",
+				1, otherRepro.numReprosInterConnected());
 		
 		SccNotebook otherReproAgain = new SccNotebook("otherReproAgain", otherReproNumber);
 		notebook.connect(otherReproAgain);
 		assertEquals("Number of inter repro connections !=2 after addition of two",
 				2, notebook.numInterReproConnections());
-		assertEquals("Wrong content of inter connected repro set after addition of two connections to the same repro",
-				myExpectedRepros, notebook.getReprosInterConnected());
-		assertEquals("Wrong content of inter connected repro set for argument after addition of two connections to the same repro",
-				otherExpectedRepros, otherReproAgain.getReprosInterConnected());
+		assertEquals("Wrong number of inter connected repros after addition of two connections to the same repro",
+				1, notebook.numReprosInterConnected());
+		assertEquals("Wrong nymber of inter connected repros for argument after addition of two connections to the same repro",
+				1, otherReproAgain.numReprosInterConnected());
 		
 		int newReproNumber = 447;
 		SccNotebook newRepro = new SccNotebook("newRepro.ipynb", newReproNumber);
-		myExpectedRepros.add(newReproNumber);
 		notebook.connect(newRepro);
-		assertEquals("Wrong content of repro set after addition of inter connections to two different repros",
-				myExpectedRepros, notebook.getReprosInterConnected());
-		assertEquals("Wrong content of repro set for argument after addition of inter connections to two different repros",
-				otherExpectedRepros, newRepro.getReprosInterConnected());
+		assertEquals("Wrong number of inter connected repros after addition of inter connections to two different repros",
+				2, notebook.numReprosInterConnected());
+		assertEquals("Wrong number of inter connected repros after addition of inter connections to two different repros",
+				1, newRepro.numReprosInterConnected());
 				
 		int newReproNumber2 = 448;
 		SccNotebook newRepro2 = new SccNotebook("otherReproAgain.ipynb", newReproNumber2);
-		myExpectedRepros.add(newReproNumber2);
 		notebook.connect(newRepro2);
-		assertEquals("Wrong content of repro set after addition of inter connections to three different repros",
-				myExpectedRepros, notebook.getReprosInterConnected());
+		assertEquals("Wrong number of inter repro connections after addition of inter connections to three different repros",
+				3, notebook.numReprosInterConnected());
 		
 		// Final check of number of connections, to be on the safe side. (Everything should be checked above.)
 		assertEquals("Wrong final number of intra repro connections",

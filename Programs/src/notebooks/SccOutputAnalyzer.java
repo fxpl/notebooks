@@ -284,7 +284,7 @@ public class SccOutputAnalyzer extends Analyzer {
 				}
 				int interConnections = notebook.numInterReproConnections();
 				int intraConnections = notebook.numIntraReproConnections();
-				int numInterConnectedRepros = notebook.getReprosInterConnected().size();
+				int numInterConnectedRepros = notebook.numReprosInterConnected();
 				int connections = interConnections + intraConnections;
 				// Empty snippets are considered unique by SourcererCC
 				double normalizedNonEmptyConnections = ConnectionsLineBuilder.normalized(connections, nonEmptySnippets);

@@ -59,8 +59,8 @@ public class SccNotebook {
 	/**
 	 * @return The set of all repros to which this notebook is connected, except the one it self lives in
 	 */
-	public Set<Integer> getReprosInterConnected() {
-		return reprosInterConnected;
+	public int numReprosInterConnected() {
+		return reprosInterConnected.size();
 	}
 	
 	public int numInterReproConnections() {
