@@ -1,10 +1,17 @@
 package notebooks;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
 public class SccNotebook {
+	private static String dumpSubDirName = "inter_connected_repros_dump";
+	private static String dumpTargetDirName = "";
 	private String name;
 	private int repro;
 	private int intraReproConnections;
@@ -34,9 +41,76 @@ public class SccNotebook {
 		} else {
 			this.interReproConnections++;
 			connected.interReproConnections++;
+			final int maxReproSetSize = 100;
 			this.reprosInterConnected.add(connected.repro);
+			this.dumpReprosIfLargerThan(maxReproSetSize);
 			connected.reprosInterConnected.add(this.repro);
+			connected.dumpReprosIfLargerThan(maxReproSetSize);
 		}
+	}
+	
+	/**
+	 * Dump all repros to which this notebook has inter repro connections to
+	 * file if the number of repros is larger than the argument given. See
+	 * dumpRepros.
+	 * @param Maximum number of inter connected repros
+	 */
+	public void dumpReprosIfLargerThan(int size) {
+		if (size <= reprosInterConnected.size()) {
+			dumpRepros();
+		}
+	}
+	
+	/**
+	 * Read all repros that have been dumped to file
+	 * @return Set of repros that have earlier been dumped to file.
+	 */
+	private Set<Integer> dumpedRepros() {
+		Set<Integer> repros = new HashSet<Integer>();
+		String dumpFileName = reproDumpName();
+		File dumpFile = new File(dumpFileName);
+		if (dumpFile.exists()) {
+			try {
+				BufferedReader reader = new BufferedReader(new FileReader(dumpFile));
+				String line = reader.readLine();
+				while (null != line) {
+					int repro = Integer.parseInt(line);
+					repros.add(repro);
+					line = reader.readLine();
+				}
+				reader.close();
+			} catch (IOException e) {
+				System.err.println("Could not read dumped repros from "
+						+ dumpFileName + ": " + e.getMessage());
+				e.printStackTrace();
+			}
+		}
+		return repros;
+	}
+	
+	/**
+	 * Dump all repros to which this notebook has inter repro connections to
+	 * file. The file will have the same name as the notebook, but with suffix
+	 * "repros" instead of "ipynb" and be placed in
+	 * dumpDir/inter_connected_repros_dump, where dumpDir can be set with the
+	 * method set dumpDir. Default is dumpDir = ".". The inter repro connections
+	 * set will be emptied after dumping.
+	 */
+	public void dumpRepros() {
+		String dumpFileName = reproDumpName();
+		FileWriter writer;
+		try {
+			writer = new FileWriter(dumpFileName, true);
+			for (int repro: reprosInterConnected) {
+				writer.append(repro + "\n");
+			}
+			writer.close();
+		} catch (IOException e) {
+			System.err.println("Could not dump repros to "
+					+ dumpFileName + ": " + e.getMessage());
+			e.printStackTrace();
+		}
+		reprosInterConnected.clear();
 	}
 	
 	@Override
@@ -70,6 +144,41 @@ public class SccNotebook {
 	 * @return The number of repros to which this notebook is connected, except the one it self lives in
 	 */
 	public int numReprosInterConnected() {
-		return reprosInterConnected.size();
+		Set<Integer> repros = dumpedRepros();
+		repros.addAll(reprosInterConnected);
+		return repros.size();
+	}
+	
+	/**
+	 * Remove all inter repro connections dumps.
+	 */
+	public static void removeDumpDirContents() {
+		File dumpTargetDir = new File(dumpTargetDirName);
+		for (String reproFile: dumpTargetDir.list()) {
+			new File(dumpTargetDir + "/" + reproFile).delete();
+		}
+		dumpTargetDir.delete();
+	}
+	
+	/**
+	 * @return Name of the repro dump file for this notebook.
+	 */
+	private String reproDumpName() {
+		String[] nameParts = this.name.split("\\.");
+		String fileName = "";
+		for (int i=0; i<nameParts.length-1; i++) {
+			fileName += nameParts[i];
+		}
+		return dumpTargetDirName + "/" + fileName + ".repros";
+	}
+	
+	/**
+	 * Change to which directory the files with dumped inter repro connections
+	 * will be placed. The directory will be created if nonexistent.
+	 * @param dumpDir Name of directory where the dumps will be placed.
+	 */
+	public static void setDumpDir(String dumpDir) {
+		dumpTargetDirName = dumpDir + "/" + dumpSubDirName;
+		new File(dumpTargetDirName).mkdirs();
 	}
 }

@@ -62,6 +62,7 @@ public class SccOutputAnalyzer extends Analyzer {
 		System.out.println("since they are not included in the SourcererCC data!");
 		storeConnections(pairFile);
 		writeCloneFiles();
+		SccNotebook.removeDumpDirContents();
 	}
 	
 	/**
@@ -147,6 +148,7 @@ public class SccOutputAnalyzer extends Analyzer {
 	}
 
 	private void storeConnections(String pairFileName) throws IOException {
+		SccNotebook.setDumpDir(tmpDir);
 		ZipFile zippedPairFile = new ZipFile(pairFileName);
 		Enumeration<? extends ZipEntry> pairFileSet = zippedPairFile.entries();
 		while (pairFileSet.hasMoreElements()) {

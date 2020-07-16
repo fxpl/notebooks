@@ -3,7 +3,7 @@
 file_stats_file="file_stats"
 repro_file="repros"
 clone_pairs_file="clone_pairs"
-num_files=105
+num_files=209
 num_friends=`echo ${num_files} - 1 | bc`
 
 rm ${file_stats_file}
