@@ -45,14 +45,25 @@ public abstract class AnalyzerTest {
 	}
 	
 	/**
-	 * Check that the most recent file <prefix><timestamp>.csv in the default
-	 * output directory contains all lines in expectedLines, and nothing more.
+	 * Check that all expected patterns, and nothing else, can be found in the
+	 * most recent file <dir>/<prefix><timestamp>.csv.
 	 * @param prefix First part of name of file to be analyzed (see above)
-	 * @param expectedLines Array of the lines expected to be found in the file, not necessarily in order
+	 * @param expectedPatterns Array of the regular expressions expected to match lines in the file, not necessarily in order
+	 * @throws IOException
+	 */
+	protected static void checkCsv_anyOrder(String prefix, String[] expectedPatterns) throws IOException {
+		TestUtils.checkCsv_anyOrder(defaultOutputDirName, prefix, expectedPatterns);
+	}
+	
+	/**
+	 * Check that all expected patterns can be found in the most recent file
+	 * <dir>/<prefix><timestamp>.csv.
+	 * @param prefix First part of name of file to be analyzed (see above)
+	 * @param expectedPatterns Array of the regular expressions expected to match lines in the file, not necessarily in order
 	 * @throws IOException 
 	 */
-	protected static void checkCsv_anyOrder(String prefix, String[] expectedLines) throws IOException {
-		TestUtils.checkCsv_anyOrder(defaultOutputDirName, prefix, expectedLines);
+	protected static void checkCsv_contains(String prefix, String[] expectedPatterns) throws IOException {
+		TestUtils.checkCsv_contains(defaultOutputDirName, prefix, expectedPatterns);
 	}
 	
 	/**

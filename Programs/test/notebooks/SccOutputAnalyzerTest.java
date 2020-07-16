@@ -275,6 +275,31 @@ public class SccOutputAnalyzerTest extends AnalyzerTest {
 	}
 	
 	/**
+	 * Verify that connections are identified correctly at clone analysis when
+	 * the number of clone pairs > 100 (the limit for start using tmp file for
+	 * inter repro connections)
+	 * @throws IOException
+	 */
+	@Test
+	public void testConnectionsCsv_interReproOpt() throws IOException {
+		String dataDir = "test/data/scc/inter_repro_opt";
+		String statsFile = dataDir + "/file_stats";
+		String pairFile = dataDir + "/clone_pairs.zip";
+		String reproFile = dataDir + "/repros";
+		
+		String[] expectedLines = {
+				connectionsHeader(),
+				"nb_1.ipynb, 104, 104.0000, 0, 2.0000",
+				"nb_2.ipynb, 1, 1.0000, 0, 1.0000",
+				"nb_105.ipynb, 1, 1.0000, 0, 1.0000"
+		};
+		
+		analyzer.clones(statsFile, reproFile, pairFile);
+		checkCsv_contains("connections", expectedLines);
+		deleteCloneCsvs();
+	}
+	
+	/**
 	 * Verify that cloneFrequencies are computed correctly at clone analysis
 	 * based on SourcererCC data.
 	 * @throws IOException 

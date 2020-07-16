@@ -50,22 +50,17 @@ public class TestUtils {
 	}
 	
 	/**
-	 * Check that the most recent file <dir>/<prefix><timestamp>.csv contains
-	 * all lines in expectedLines, and nothing more.
+	 * Check that all expected patterns can be found in the most recent file
+	 * <dir>/<prefix><timestamp>.csv.
 	 * @param dir Directory to look for the file in
 	 * @param prefix First part of name of file to be analyzed (see above)
-	 * @param expectedLines Array of the lines expected to be found in the file, not necessarily in order
+	 * @param expectedPatterns Array of the regular expressions expected to match lines in the file, not necessarily in order
 	 * @throws IOException 
 	 */
-	static void checkCsv_anyOrder(String dir, String prefix, String[] expectedLines) throws IOException {
+	static void checkCsv_contains(String dir, String prefix, String[] expectedPatterns) throws IOException {
 		File outputFile = lastOutputFile(dir, prefix);
-		BufferedReader reader = new BufferedReader(new FileReader(outputFile));
-		long linesInFile = reader.lines().count();
-		reader.close();
-		assertEquals("Wrong number of lines in " + outputFile.getName() +"!",
-				expectedLines.length, linesInFile);
-		for (int i=0; i<expectedLines.length; i++) {
-			String expectedLine = expectedLines[i];
+		for (int i=0; i<expectedPatterns.length; i++) {
+			String expectedLine = expectedPatterns[i];
 			boolean exists = false;
 			BufferedReader outputReader = new BufferedReader(new FileReader(outputFile));
 			String nextLine = null;
@@ -78,6 +73,24 @@ public class TestUtils {
 			outputReader.close();
 			assertTrue("The line " + expectedLine + " cannot be found in " + prefix + " csv!", exists);
 		}
+	}
+	
+	/**
+	 * Check that all expected patterns, and nothing else, can be found in the
+	 * most recent file <dir>/<prefix><timestamp>.csv.
+	 * @param dir Directory to look for the file in
+	 * @param prefix First part of name of file to be analyzed (see above)
+	 * @param expectedPatterns Array of the regular expressions expected to match lines in the file, not necessarily in order
+	 * @throws IOException
+	 */
+	static void checkCsv_anyOrder(String dir, String prefix, String[] expectedPatterns) throws IOException {
+		File outputFile = lastOutputFile(dir, prefix);
+		BufferedReader reader = new BufferedReader(new FileReader(outputFile));
+		long linesInFile = reader.lines().count();
+		reader.close();
+		assertEquals("Wrong number of lines in " + outputFile.getName() +"!",
+				expectedPatterns.length, linesInFile);
+		checkCsv_contains(dir, prefix, expectedPatterns);
 	}
 	
 	/**
