@@ -1,10 +1,10 @@
 #!/bin/bash -l
 
 source paths.sh
-outputDirectory=$outputNBA
+outputDir=$outputNBA
 
-mkdir -p $outputDirectory
+mkdir -p $outputDir
 java -XX:+UnlockDiagnosticVMOptions -XX:NativeMemoryTracking=summary -XX:+PrintNMTStatistics -XX:+UseParallelGC \
 	-cp Programs/bin:Programs/external/json-20190722.jar -Xms24G -Xmx24G \
-	notebooks.NotebookAnalyzer --nb_path=$nbPath --repro_file=$reproFile --output_dir=$outputDirectory --all
+	notebooks.NotebookAnalyzer --nb_path=$nbPath --repro_file=$reproFile --output_dir=$outputDir --all
 
