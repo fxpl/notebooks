@@ -23,7 +23,9 @@ public class SccNotebook {
 	}
 	
 	/**
-	 * TODO
+	 * The notebook given as an argument should be connected to this notebook.
+	 * Update connection info with this connection.
+	 * @param connected Notebook that should be connected
 	 */
 	public void connect(SccNotebook connected) {
 		if (this.repro == connected.repro) {
@@ -47,20 +49,13 @@ public class SccNotebook {
 		}
 	}
 	
-	@Override
-	public int hashCode() {
-		return Objects.hash(this.name);
-	}
-	
 	public String getName() {
 		return name;
 	}
 	
-	/**
-	 * @return The set of all repros to which this notebook is connected, except the one it self lives in
-	 */
-	public int numReprosInterConnected() {
-		return reprosInterConnected.size();
+	@Override
+	public int hashCode() {
+		return Objects.hash(this.name);
 	}
 	
 	public int numInterReproConnections() {
@@ -69,5 +64,12 @@ public class SccNotebook {
 	
 	public int numIntraReproConnections() {
 		return intraReproConnections;
+	}
+	
+	/**
+	 * @return The number of repros to which this notebook is connected, except the one it self lives in
+	 */
+	public int numReprosInterConnected() {
+		return reprosInterConnected.size();
 	}
 }
