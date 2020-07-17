@@ -61,6 +61,7 @@ cd Scripts
 ./clone_analysis_nba.sh > ../Output/output_clone_analysis.txt
 ./print_most_common_snippets.sh 100 0 1 > ../Output/top100clones_min0.txt
 ./print_most_common_snippets.sh 100 4 1 > ../Output/top100clones_min4loc.txt
+./list_duplicated_notebooks.sh	# takes 2 days on fxpl-stat
 
 # Statistics for NotebookAnalyzer results
 ./create_sym_links_nba.sh
@@ -70,10 +71,6 @@ Rscript statistics_paperIII_nba.R > ../Output/output_statistics.txt
 ./reduce_large_images.sh
 cd ../Output
 tar -czf plots.tgz hist_clone_frequency*eps lang*eps log_hist_*eps cells*jpg *Inter_*jpg
-cd -
-
-# Information about duplicated notebooks. This takes 2 days on fxpl-stat...
-./list_duplicated_notebooks.sh
 cd ..
 rm Output
 
