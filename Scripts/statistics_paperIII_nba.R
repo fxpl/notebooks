@@ -45,16 +45,6 @@ logHist(locTotalReduced, specifier="loc")
 logHist(locNonBlankReduced, specifier="loc_non-blank")
 
 
-# LANGUAGES
-lang_percentages <- c(95.3487, 0.8214, 0.7881, 0.1896, 0.6656, 2.1867)
-labels <- c("Python", "Julia", "R", "Scala", "other", "unknown")
-colors <- c("blue", "green", "yellow", "purple", "brown", "gray")
-exportAsEPS({
-  pie(lang_percentages, labels=NA,  col=colors)
-  legend(x="topright", legend=labels, fill=colors)
-}, "languages")
-
-
 # CLONES
 # Snippet occurences distribution
 logHist(snippetOccurrencesA$count, specifier="snippetOccurencesA", objects="Snippets")
