@@ -6,9 +6,7 @@ Logs
 logs
 
 # Output directory
-Output
-OutputNBA
-OutputSCC
+Output*
 
 # From R studio
 .Rhistory
