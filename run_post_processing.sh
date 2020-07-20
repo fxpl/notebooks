@@ -29,7 +29,7 @@ connectionsSCC=`./get_last_output.sh "connections"`
 sed -n "2,$ p" $cloneFreqSCC | cut -d',' -f1 > $sccNotebooks
 grep -vFf $sccNotebooks $pythonNotebooks | while read notebook; do
 	echo "$notebook, 0, 0, 0, 0, 0, 0, 0" >> $cloneFreqSCC
-	echo "$notebook, 0, 0.0000, 0, 0.0000, 0, 0, 0.0000, 0.0000" >> $connectionsSCC
+	echo "$notebook, 0, 0.0000, 0, 0.0000" >> $connectionsSCC
 done
 rm $pythonNotebooks
 rm $sccNotebooks
