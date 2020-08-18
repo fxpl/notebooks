@@ -149,21 +149,24 @@ public class SccNotebookTest {
 		File dir = new File(dirName);
 		assertTrue("Dump dir not created", dir.exists());
 		SccNotebook.removeDumpDirContents();
-		assertFalse("Dump dir not removed", dir.exists());
+		File subDir = new File(dirName + "/inter_connected_repros_dump");
+		assertFalse("Dump dir contents not removed", subDir.exists());
+		dir.delete();
 	}
 	
 	@Test
-	public void testSetDumpDir_twoLevels() {
-		String dirName = "scc_notebook_dump_dir_unittest/test_sub_dir";
-		File dir = new File(dirName);
+	public void testRemoveDumpDirContents() {
+		String dirName = "scc_notebook_dump_dir_unittest";
 		SccNotebook.setDumpDir(dirName);
+		String subDirName = dirName + "/inter_connected_repros_dump";
 		try {
-			new File(dirName + "empty_dump_file.repros").createNewFile();
-		} catch(IOException e) {
+			new File(subDirName + "/empty_dump_file.repros").createNewFile();
+		} catch (IOException e) {
 			fail("Could not create test dump file: " + e.getMessage());
 		}
-		assertTrue("Dump dir not created", dir.exists());
 		SccNotebook.removeDumpDirContents();
-		assertFalse("Dump dir with sub dir not removed", dir.exists());
+		File subDir = new File(subDirName);
+		assertFalse("Dump dir contents not removed", subDir.exists());
+		new File(dirName).delete();
 	}
 }

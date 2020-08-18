@@ -153,18 +153,11 @@ public class SccNotebook {
 	 * Remove all inter repro connections dumps.
 	 */
 	public static void removeDumpDirContents() {
-		String[] dumpTargetDirs = dumpTargetDirName.split("/");
-		for (int i=dumpTargetDirs.length-1; i>=0; i--) {
-			String dumpTargetSubDirName = "";
-			for (int j=0; j<=i; j++) {
-				dumpTargetSubDirName += dumpTargetDirs[j] + "/";
-			}
-			File dumpTargetDir = new File(dumpTargetSubDirName);
-			for (String reproFile: dumpTargetDir.list()) {
-				new File(dumpTargetDir + "/" + reproFile).delete();
-			}
-			dumpTargetDir.delete();
+		File dumpTargetDir = new File(dumpTargetDirName);
+		for (String reproFile: dumpTargetDir.list()) {
+			new File(dumpTargetDir + "/" + reproFile).delete();
 		}
+		dumpTargetDir.delete();
 	}
 	
 	/**

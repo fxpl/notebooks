@@ -1,6 +1,7 @@
 # Eclipse files
 .classpath
 .project
+.settings
 
 # Understand file
 NotebookAnalyzer.udb
