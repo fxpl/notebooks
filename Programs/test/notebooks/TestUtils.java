@@ -133,12 +133,20 @@ public class TestUtils {
 	 */
 	static File lastOutputFile(String dir, String prefix) {
 		File directory = new File(dir);
-		String outputFileName = prefix + ".csv";
-		for (String currentFileName: directory.list()) {
-			if (currentFileName.matches(prefix + "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\.csv")
-					&& currentFileName.compareTo(outputFileName) > 0) {
-				outputFileName = currentFileName;
+		String startFileName = prefix + ".csv";
+		String outputFileName = startFileName;
+		int numTries = 0;
+		while (outputFileName.equals(startFileName) && numTries<3) {
+			/* The reason that we try 3 times is that sometimes this method
+			   doesn't find the file even though it is created, probably
+			   because we check before the write is completed. */
+			for (String currentFileName: directory.list()) {
+				if (currentFileName.matches(prefix + "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\.csv")
+						&& currentFileName.compareTo(outputFileName) > 0) {
+					outputFileName = currentFileName;
+				}
 			}
+			numTries++;
 		}
 		return new File(dir, outputFileName);
 	}
