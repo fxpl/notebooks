@@ -43,9 +43,9 @@ public class SccNotebook {
 			connected.interReproConnections++;
 			final int maxReproSetSize = 100;
 			this.reprosInterConnected.add(connected.repro);
-			this.dumpReprosIfLargerThan(maxReproSetSize);
+			this.dumpReprosIfLargerOrEq(maxReproSetSize);
 			connected.reprosInterConnected.add(this.repro);
-			connected.dumpReprosIfLargerThan(maxReproSetSize);
+			connected.dumpReprosIfLargerOrEq(maxReproSetSize);
 		}
 	}
 	
@@ -55,7 +55,7 @@ public class SccNotebook {
 	 * dumpRepros.
 	 * @param Maximum number of inter connected repros
 	 */
-	public void dumpReprosIfLargerThan(int size) {
+	public void dumpReprosIfLargerOrEq(int size) {
 		if (size <= reprosInterConnected.size()) {
 			dumpRepros();
 		}

@@ -3,8 +3,10 @@ package notebooks;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Objects;
 
 import org.junit.Before;
@@ -98,6 +100,20 @@ public class SccNotebookTest {
 	}
 	
 	@Test
+	public void testDumping() {
+		SccNotebook.setDumpDir("scc_notebook_dump_dir_unittest");
+		int otherReproNumber = 99;
+		SccNotebook otherRepro = new SccNotebook("otherRepro", otherReproNumber);
+		notebook.connect(otherRepro);
+		int yetAnotherReproNumber = 1002;
+		SccNotebook yetAnotherRepro = new SccNotebook("yetAnotherRepro", yetAnotherReproNumber);
+		notebook.connect(yetAnotherRepro);
+		notebook.dumpReprosIfLargerOrEq(2);
+		assertEquals("Dumped repros don't seem to be read correctly", 2, notebook.numReprosInterConnected());
+		SccNotebook.removeDumpDirContents();
+	}
+	
+	@Test
 	public void testEquals_equal() {
 		SccNotebook otherNotebook = new SccNotebook(notebookName, reproNumber);
 		assertTrue("Equal notebooks considered different", notebook.equals(otherNotebook));
@@ -141,6 +157,11 @@ public class SccNotebookTest {
 		String dirName = "scc_notebook_dump_dir_unittest/test_sub_dir";
 		File dir = new File(dirName);
 		SccNotebook.setDumpDir(dirName);
+		try {
+			new File(dirName + "empty_dump_file.repros").createNewFile();
+		} catch(IOException e) {
+			fail("Could not create test dump file: " + e.getMessage());
+		}
 		assertTrue("Dump dir not created", dir.exists());
 		SccNotebook.removeDumpDirContents();
 		assertFalse("Dump dir with sub dir not removed", dir.exists());
