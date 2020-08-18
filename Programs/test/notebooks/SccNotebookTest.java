@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.io.File;
 import java.util.Objects;
 
 import org.junit.Before;
@@ -123,5 +124,25 @@ public class SccNotebookTest {
 	public void testHashCode() {
 		int expectedHashCode = Objects.hash(notebookName);
 		assertEquals("Wrong hash code returned for notebook", expectedHashCode, notebook.hashCode());
+	}
+	
+	@Test
+	public void testSetDumpDir() {
+		String dirName = "scc_notebook_dump_dir_unittest";
+		SccNotebook.setDumpDir(dirName);
+		File dir = new File(dirName);
+		assertTrue("Dump dir not created", dir.exists());
+		SccNotebook.removeDumpDirContents();
+		assertFalse("Dump dir not removed", dir.exists());
+	}
+	
+	@Test
+	public void testSetDumpDir_twoLevels() {
+		String dirName = "scc_notebook_dump_dir_unittest/test_sub_dir";
+		File dir = new File(dirName);
+		SccNotebook.setDumpDir(dirName);
+		assertTrue("Dump dir not created", dir.exists());
+		SccNotebook.removeDumpDirContents();
+		assertFalse("Dump dir with sub dir not removed", dir.exists());
 	}
 }
