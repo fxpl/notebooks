@@ -9,7 +9,7 @@ public class PythonModule {
 	protected PythonModule parent;
 	
 	public PythonModule(String name) {
-		this.name = name;
+		this(name, null, null, null);
 	}
 	
 	public PythonModule(String name, ImportType importedWith) {
@@ -37,16 +37,8 @@ public class PythonModule {
 		this.parent = parent;
 	}
 	
-	public String alias() {
-		return this.alias;
-	}
-	
 	public String getName() {
 		return this.name;
-	}
-	
-	public PythonModule getParent() {
-		return this.parent;
 	}
 	
 	@Override

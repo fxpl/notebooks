@@ -22,64 +22,60 @@ public class PythonModuleTest {
 	}
 	
 	@Test
-	public void testAlias() {
-		assertEquals("Wrong alias returned for module!", alias, module.alias());
-	}
-	
-	@Test
-	public void testAlias_empty() {
-		PythonModule moduleWithoutAlias = new PythonModule(name, importedWith);
-		assertNull("Alias returned for module without alias!", moduleWithoutAlias.alias());
-	}
-	
-	@Test
 	public void testConstructor_oneParam() {
 		PythonModule oneParamModule = new PythonModule(name);
+		PythonModule expectedModule = new PythonModule(name, null, null, null);
 		assertEquals("Wrong name returned!", name, oneParamModule.getName());
 		assertNull("Import type returned for module without import type!", oneParamModule.importedWith());
-		assertNull("Alias returned for module without alias!", oneParamModule.alias());
-		assertNull("Non-null parent returned from module without parent!", oneParamModule.getParent());
+		assertEquals("Alias or parent set!", expectedModule, oneParamModule);
 	}
 	
 	@Test
 	public void testConstructor_twoParam() {
 		PythonModule twoParamModule = new PythonModule(name, importedWith);
+		PythonModule expectedModule = new PythonModule(name, null, importedWith, null);
 		assertEquals("Wrong name returned!", name, twoParamModule.getName());
 		assertEquals("Wrong import type returned for module!", importedWith, twoParamModule.importedWith());
-		assertNull("Alias returned for module without alias!", twoParamModule.alias());
-		assertNull("Non-null parent returned from module without parent!", twoParamModule.getParent());
+		assertEquals("Alias or parent set!", expectedModule, twoParamModule);
+	}
+	
+	@Test
+	public void testConstructor_fourParam() {
+		PythonModule expectedModule = new PythonModule(name, alias, null, parent);
+		// Import type is checked by testImportedWith.
+		assertEquals("Wrong name, alias or parent set!", expectedModule, module);
 	}
 	
 	@Test
 	public void testConstructor_suspicious() {
 		PythonModule withoutAlias = new PythonModule(name, ImportType.ALIAS);
+		PythonModule expectedModule = new PythonModule(name, null, ImportType.ALIAS, null);
 		assertEquals("Wrong name set!", name, withoutAlias.getName());
 		assertEquals("Wrong import type set!", ImportType.ALIAS, withoutAlias.importedWith());
-		assertNull("Alias set!", withoutAlias.alias());
-		assertNull("Parent set!", withoutAlias.getParent());
+		assertEquals("Wrong alias or parent set!", expectedModule, withoutAlias);
 		PythonModule withAlias = new PythonModule(name, alias, ImportType.FROM);
+		expectedModule = new PythonModule(name, alias, ImportType.ALIAS, null);
 		assertEquals("Wrong name set!", name, withAlias.getName());
 		assertEquals("Wrong import type set!", ImportType.FROM, withAlias.importedWith());
-		assertEquals("Wrong alias set!", alias, withAlias.alias());
-		assertNull("Parent set!", withAlias.getParent());
+		assertEquals("Wrong alias or parent set!", expectedModule, withAlias);
 	}
 	
 	@Test
 	public void testConstructorWithoutAlias() {
 		PythonModule moduleWithoutAlias = new PythonModule(name, importedWith, parent);
+		PythonModule expectedModule = new PythonModule(name, null, importedWith, parent);
 		assertEquals("Wrong name returned!", name, moduleWithoutAlias.getName());
 		assertEquals("Wrong import type returned for module!", importedWith, moduleWithoutAlias.importedWith());
-		assertNull("Alias returned for module without alias!", moduleWithoutAlias.alias());
-		assertEquals("Wrong parent module returned!", parent, module.getParent());
+		assertEquals("Wrong alias or parent set!", expectedModule, moduleWithoutAlias);
 	}
 	
 	@Test
 	public void testConstructorWithoutParent() {
 		PythonModule moduleWithoutParent = new PythonModule(name, alias, importedWith);
+		PythonModule expectedModule = new PythonModule(name, alias, importedWith, null);
 		assertEquals("Wrong name returned!", name, moduleWithoutParent.getName());
 		assertEquals("Wrong import type returned for module!", importedWith, moduleWithoutParent.importedWith());
-		assertEquals("Wrong alias returned!", alias, moduleWithoutParent.alias());
-		assertNull("Non-null parent returned from module without parent!", moduleWithoutParent.getParent());
+		assertEquals("Wrong alias or parent set!", expectedModule, moduleWithoutParent);
 	}
 	
 	// Four parameter constructor implicitly tested by other getter tests
@@ -87,17 +83,6 @@ public class PythonModuleTest {
 	@Test
 	public void testGetName() {
 		assertEquals("Wrong name returned by getName!", name, module.getName());
-	}
-	
-	@Test
-	public void testGetParent() {
-		assertEquals("Wrong module returned by getParent!", parent, module.getParent());
-	}
-	
-	@Test
-	public void testGetParent_null() {
-		PythonModule moduleWithoutParent = new PythonModule(name);
-		assertNull("Non-null parent returned from module without parent!", moduleWithoutParent.getParent());
 	}
 	
 	@Test
@@ -147,8 +132,14 @@ public class PythonModuleTest {
 	}
 	
 	@Test
+	public void testEquals_nullParent_sameAlias() {
+		PythonModule other = new PythonModule(name, alias, importedWith, null);
+		assertFalse("Python modules with different parents considered equal!", other.equals(module));
+	}
+	
+	@Test
 	public void testEquals_diffParent() {
-		PythonModule otherParent = new PythonModule("otherParentMOdule");
+		PythonModule otherParent = new PythonModule("otherParentModule");
 		PythonModule other = new PythonModule(name, alias, importedWith, otherParent);
 		assertFalse("Python modules with different parents considered equal!", module.equals(other));
 	}
@@ -236,9 +227,10 @@ public class PythonModuleTest {
 	@Test
 	public void testSetOldestAncestor_noParents() {
 		PythonModule newAncestor = new PythonModule("Lucy", ImportType.FROM);
+		PythonModule expectedDescendant = new PythonModule(name, null, ImportType.ORDINARY, newAncestor);
 		PythonModule descendant = new PythonModule(name, ImportType.ORDINARY);
 		descendant.setOldestAncestor(newAncestor);
-		assertEquals("Parent not set correctly by setParent!", newAncestor, descendant.getParent());
+		assertEquals("Parents not set correctly by setOldestAncestor!", expectedDescendant, descendant);
 	}
 	
 	@Test

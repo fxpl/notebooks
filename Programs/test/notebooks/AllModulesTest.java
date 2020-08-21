@@ -1,8 +1,6 @@
 package notebooks;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-
 import org.junit.Before;
 import org.junit.Test;
 
@@ -21,19 +19,15 @@ public class AllModulesTest {
 	}
 	
 	@Test
-	public void testAlias() {
-		assertNull("Alias set for AllModules instance!", module.alias());
-	}
-	
-	@Test
-	public void testGetParent() {
-		assertEquals("Wrong parent returned from AllModules instance!",
-				parent, module.getParent());
-	}
-	
-	@Test
 	public void testImportedWith() {
 		assertEquals("AllModules objects not imported with FROM statment!",
 				ImportType.FROM, module.importedWith());
+	}
+	
+	@Test
+	public void testConstructor() {
+		// Check parent and alias via string representation.
+		String expectedStringRepr = parent.toString() + ".*";
+		assertEquals("Wrong parent, alias or name!", expectedStringRepr, module.toString());
 	}
 }
