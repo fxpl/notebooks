@@ -1,5 +1,9 @@
 #!/bin/bash
 
+################################################################################
+# Perform post processing of the output files from SccOutputAnalyzer.
+################################################################################
+
 source clone_functions.sh
 
 echo ""

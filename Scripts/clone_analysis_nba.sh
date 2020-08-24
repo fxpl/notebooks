@@ -1,5 +1,10 @@
 #!/bin/bash
 
+################################################################################
+# Perform post processing of the output files from the clone analysis of
+# NotebookAnalyzer.
+################################################################################
+
 source clone_functions.sh
 
 # Create hash2files file without empty snippets
@@ -8,7 +13,7 @@ hash2filesNE=`echo $hash2filesA | sed -E "s/hash2filesA/hash2filesNE/"`
 emptyPattern="^[A-F,a-f,0-9]+\, 0\, nb_"	# Pattern for line representing an empty snippet
 sed -E "/$emptyPattern/d" $hash2filesA > $hash2filesNE
 
-# Perform analyses
+# Analyze the clone data
 echo ""
 echo "CLONE GROUP DATA, ALL SNIPPETS:"
 analyzeCloneGroups $hash2filesA
