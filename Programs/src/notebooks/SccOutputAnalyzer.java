@@ -1,6 +1,7 @@
 package notebooks;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -93,7 +94,7 @@ public class SccOutputAnalyzer extends Analyzer {
 			SccSnippetId id = new SccSnippetId(columns[0], columns[1]);
 			String path = columns[2];
 			// Remove directories from filename
-			String snippetFileName = path.substring(path.lastIndexOf('/') + 1);
+			String snippetFileName = path.substring(path.lastIndexOf(File.separatorChar) + 1);
 			// Remove suffix
 			snippetFileName = snippetFileName.substring(0, snippetFileName.lastIndexOf('.'));
 			String[] snippetSubStrings = snippetFileName.split("_");

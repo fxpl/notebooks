@@ -155,7 +155,7 @@ public class SccNotebook {
 	public static void removeDumpDirContents() {
 		File dumpTargetDir = new File(dumpTargetDirName);
 		for (String reproFile: dumpTargetDir.list()) {
-			new File(dumpTargetDir + "/" + reproFile).delete();
+			new File(dumpTargetDir + File.separator + reproFile).delete();
 		}
 		dumpTargetDir.delete();
 	}
@@ -169,7 +169,7 @@ public class SccNotebook {
 		for (int i=0; i<nameParts.length-1; i++) {
 			fileName += nameParts[i];
 		}
-		return dumpTargetDirName + "/" + fileName + ".repros";
+		return dumpTargetDirName + File.separator + fileName + ".repros";
 	}
 	
 	/**
@@ -178,7 +178,7 @@ public class SccNotebook {
 	 * @param dumpDir Name of directory where the dumps will be placed.
 	 */
 	public static void setDumpDir(String dumpDir) {
-		dumpTargetDirName = dumpDir + "/" + dumpSubDirName;
+		dumpTargetDirName = dumpDir + File.separator + dumpSubDirName;
 		new File(dumpTargetDirName).mkdirs();
 	}
 }

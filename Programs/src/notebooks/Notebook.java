@@ -55,7 +55,7 @@ public class Notebook {
 	 * @return The file name of the notebook, without preceding path
 	 */
 	public String getName() {
-		int namePos = path.lastIndexOf('/') + 1;
+		int namePos = path.lastIndexOf(File.separatorChar) + 1;
 		return path.substring(namePos);
 	}
 	
@@ -80,7 +80,7 @@ public class Notebook {
 		List<JSONObject> cells = this.getCodeCells();
 		String noteBookName = getNameWithoutSuffix();
 		for (int i=0; i<cells.size(); i++) {
-			String outputFile = location + "/" + noteBookName + "_" + i + "." + suffix;
+			String outputFile = location + File.separator + noteBookName + "_" + i + "." + suffix;
 			Writer writer = new FileWriter(outputFile);
 			JSONArray lines = getSource(cells.get(i));
 			for (int j=0; j<lines.length(); j++) {
@@ -102,7 +102,7 @@ public class Notebook {
 	public void dumpCodeAsZipWithSingleFile(String location, String suffix) throws IOException {
 		List<JSONObject> cells = this.getCodeCells();
 		String noteBookName = getNameWithoutSuffix();
-		String outputFile = location + "/" + noteBookName + ".zip";
+		String outputFile = location + File.separator + noteBookName + ".zip";
 		FileOutputStream zipFileStream = new FileOutputStream(outputFile);
 		ZipOutputStream targetStream = new ZipOutputStream(zipFileStream);
 		ZipEntry codeFile = new ZipEntry(noteBookName + "." + suffix);
@@ -130,7 +130,7 @@ public class Notebook {
 		String noteBookName = getNameWithoutSuffix();
 		List<JSONObject> cells = this.getCodeCells();
 		try {
-			FileOutputStream fos = new FileOutputStream(location + "/" + noteBookName + ".zip");
+			FileOutputStream fos = new FileOutputStream(location + File.separator + noteBookName + ".zip");
 			ZipOutputStream zos = new ZipOutputStream(fos);
 			for (int i=0; i<cells.size(); i++) {
 				ZipEntry entry = new ZipEntry(noteBookName + "_" + i + "." + suffix); 

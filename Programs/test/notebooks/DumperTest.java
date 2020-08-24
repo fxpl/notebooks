@@ -36,7 +36,7 @@ public abstract class DumperTest {
 		if (dir.isDirectory()) {
 			String[] contents = dir.list();
 			for (String file: contents) {
-				deleteRecursively(dirName + "/" + file);
+				deleteRecursively(dirName + File.separator + file);
 			}
 		}
 		dir.delete();

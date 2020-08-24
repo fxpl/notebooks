@@ -43,7 +43,7 @@ public class NotebookAnalyzer extends Analyzer {
 			// The file is a directory. Traverse it.
 			String[] subFiles = file.list();
 			for (String subFileName: subFiles) {
-				initializeNotebooksFrom(file.getPath() + "/" + subFileName);
+				initializeNotebooksFrom(file.getPath() + File.separator + subFileName);
 			}
 		}
 	}
