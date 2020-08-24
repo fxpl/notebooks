@@ -14,5 +14,6 @@ public class TestDataZipDumper extends Dumper {
 			System.exit(1);
 		}
 		new TestDataZipDumper().dumpAll(args[0], args[1]);
+		ThreadExecutor.tearDown();
 	}
 }

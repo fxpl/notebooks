@@ -17,6 +17,7 @@ public class SnippetPrinter {
 			System.err.println("Couldn't print snippet: " + e.toString());
 			System.exit(1);
 		}
+		ThreadExecutor.tearDown();
 	}
 
 }
