@@ -36,7 +36,7 @@ public abstract class Dumper {
 				targets.add(target);
 			}
 		} else {
-			System.out.println("Traversing " + srcFile.getPath());
+			Utils.heartBeat("Traversing " + srcFile.getPath());
 			// This is a directory. Traverse.
 			String[] subFiles = srcFile.list();
 			String targetDirName = target + File.separatorChar + srcFile.getName();

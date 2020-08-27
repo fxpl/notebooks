@@ -13,7 +13,7 @@ targetDir="$diskPath/unparseable_notebooks"
 
 mkdir -p $targetDir
 
-egrep "Could not get" $logFile | cut -d'_' -f2 | cut -d'.' -f1 | uniq -c | sed "s/^\s*//" > $unparseable
+grep -E "Could not get" $logFile | cut -d'_' -f2 | cut -d'.' -f1 | uniq -c | sed "s/^\s*//" > $unparseable
 echo "Notebook that have errors, but are not skipped:"
 cat $unparseable | grep -v "^5"
 

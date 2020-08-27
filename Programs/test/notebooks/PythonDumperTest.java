@@ -64,7 +64,7 @@ public class PythonDumperTest extends DumperTest {
 		dumper.dumpAll(src, targetDir);
 		
 		for (String fileName: expectedOutputs) {
-			File output = new File(targetDir + "/" + fileName);
+			File output = new File(targetDir + File.separator + fileName);
 			assertTrue(fileName + " is missing!", output.exists());
 			// The content of the file is checked by NotebookTest.
 		}
@@ -94,7 +94,7 @@ public class PythonDumperTest extends DumperTest {
 		dumper.dumpAll(src, targetDir);
 		
 		for (String fileName: expectedOutputs) {
-			File output = new File(targetDir + "/" + dir + "/" + fileName);
+			File output = new File(targetDir + File.separator + dir + File.separator + fileName);
 			assertTrue(fileName + " is missing!", output.exists());
 			// The content of the file is checked by NotebookTest.
 			output.delete();
@@ -114,7 +114,7 @@ public class PythonDumperTest extends DumperTest {
 		dumper.dumpAll(src, targetDir);
 		// Files in test/tmp/dir already checked by another test
 		
-		String outputFileName = targetDir + "/" + dir + "/" + subDir + "/" + expectedOutput;
+		String outputFileName = targetDir + File.separator + dir + File.separator + subDir + File.separator + expectedOutput;
 		File outputFile = new File(outputFileName);
 		assertTrue(outputFile + " is missing!", outputFile.exists());
 	}

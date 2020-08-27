@@ -1,29 +1,32 @@
 package notebooks;
 
+import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Writer;
+import java.time.LocalDateTime;
+import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Locale;
 import java.util.Map;
-import java.util.Scanner;
 import java.util.Set;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 public class SccOutputAnalyzer extends Analyzer {
-	// Information about each snippet
-	Map<SccSnippetId, Integer> notebookNumbers;
-	Map<SccSnippetId, Integer> snippetIndices;
-	Map<SccSnippetId, Integer> linesOfCode;
-	// Information about each notebook
-	private Map<String, String> repros = null;
-	Map<String, Integer> snippetsPerNotebook = null;
+	private Map<Integer, Set<SccSnippetId>> notebook2snippets;
+	private Map<Integer, SccNotebook> notebooks;
+	private Map<String, Integer> repros;
+	private Map <SccSnippetId, SccSnippet> snippets;
+	private String tmpDir = ".";
 	
 	/**
 	 * Perform the clone analysis based on SourcererCC output files. Write
-	 * file2hashesA<current-date-time>.csv, hash2filesA<current-date-time>.csv,
 	 * cloneFrequencies<current-date-time>.csv and
 	 * connections<current-date-time>.csv accordingly.
 	 * This methods initializes snippet and repro information, so you shouldn't
@@ -33,19 +36,16 @@ public class SccOutputAnalyzer extends Analyzer {
 	 * of the ''hash'' of a snippet are the same.
 	 * @param statsFile Path to file stats file produced by the SourcererCC tokenizer
 	 * @param reproFile Path to file with mapping from notebook number to repro
-	 * @param pairFile: Path to output file with clone pairs from the SourcererCC clone detection
-	 * @return A map from snippets to files
+	 * @param pairFile Path to zipped output file with clone pairs from the SourcererCC clone detection
 	 * @throws IOException
 	 */
-	public Map<SnippetCode, List<Snippet>> clones(String statsFile, String reproFile, String pairFile) throws IOException {
-		initializeSnippetInfo(statsFile);
-		initializeReproMap(reproFile);
-		return clones(pairFile);
+	public void clones(String statsFile, String reproFile, String pairFile) throws IOException {
+		initializeSnippetInfo(statsFile, reproFile);
+		clones(pairFile);
 	}
 	
 	/**
 	 * Perform the clone analysis based on SourcererCC output files. Write
-	 * file2hashesA<current-date-time>.csv, hash2filesA<current-date-time>.csv,
 	 * cloneFrequencies<current-date-time>.csv and
 	 * connections<current-date-time>.csv accordingly.
 	 * Note that you have to initialize the snippet and repro information, by
@@ -54,230 +54,311 @@ public class SccOutputAnalyzer extends Analyzer {
 	 * Note that the ''hashes'' written by this method are not the MD5 hashes
 	 * of the snippets, but just the value of a counter. However, all instances
 	 * of the ''hash'' of a snippet are the same.
-	 * @param pairFile: Path to output file with clone pairs from the SourcererCC clone detection
-	 * @return A map from snippets to files
+	 * @param pairFile Path to zipped output file with clone pairs from the SourcererCC clone detection
 	 * @throws IOException
 	 */
-	public Map<SnippetCode, List<Snippet>> clones(String pairFile) throws IOException {
+	public void clones(String pairFile) throws IOException {
 		System.out.println("Analyzing clones based on SourcererCC output files!");
 		System.out.println("NOTE THAT NOTEBOOKS WITHOUT SNIPPETS ARE NOT INCLUDED");
 		System.out.println("since they are not included in the SourcererCC data!");
-		Map<SnippetCode, List<Snippet>> snippet2file = getClones(pairFile);
-		Map<Notebook, SnippetCode[]> file2snippet = getSnippets(snippet2file);
-		new CloneFileWriter(outputDir).write(file2snippet, snippet2file);
-		return snippet2file;
+		storeConnections(pairFile);
+		writeCloneFiles();
+		SccNotebook.removeDumpDirContents();
 	}
 	
 	/**
-	 * Initialize repro information for each notebook.
-	 * @param fileName Path to file with mapping from notebook number to repro
+	 * Create and fill cloneFrequencies and connections csv files with data for
+	 * all notebooks. Create the cloneLoc csv file and fill it with the line
+	 * count for each clone instance.
+	 * @throws IOException On problems handling the output files
 	 */
-	public void initializeReproMap(String fileName) throws FileNotFoundException {
-		repros = createReproMap(fileName);
+	private void writeCloneFiles() throws IOException {
+		printCloneLoc();
+		printCloneFrequencies();
+		printConnectionsFile();
 	}
 	
 	/**
 	 * Initialize the maps containing information about each snippet
 	 * @param statsFile Path to file stats file produced by the SourcererCC tokenizer
-	 * @throws FileNotFoundException If the stats file doesn't exist
+	 * @param reproFile Path to file with mapping from notebook number to repro
 	 */
-	public void initializeSnippetInfo(String statsFile) throws FileNotFoundException {
-		Scanner statsScanner = new Scanner(new File(statsFile));
-		notebookNumbers = new HashMap<SccSnippetId, Integer>();
-		snippetIndices = new HashMap<SccSnippetId, Integer>();
-		linesOfCode = new HashMap<SccSnippetId, Integer>();
-		snippetsPerNotebook = new HashMap<String, Integer>();
-		while(statsScanner.hasNextLine()) {
-			String line = statsScanner.nextLine();
+	public void initializeSnippetInfo(String statsFile, String reproFile) throws IOException {
+		createNotebookMaps(reproFile);
+		BufferedReader statsReader = new BufferedReader(new FileReader(statsFile));
+		snippets = new HashMap<SccSnippetId, SccSnippet>();
+		notebook2snippets = new HashMap<Integer, Set<SccSnippetId>>();
+		String line = statsReader.readLine();
+		while(null != line) {
 			String[] columns = line.split(",");
-			int id1 = Integer.parseInt(columns[0]);
-			int id2 = Integer.parseInt(columns[1]);
-			SccSnippetId id = new SccSnippetId(id1, id2);
+			SccSnippetId id = new SccSnippetId(columns[0], columns[1]);
 			String path = columns[2];
 			// Remove directories from filename
-			String snippetFileName = path.substring(path.lastIndexOf('/') + 1);
+			String snippetFileName = path.substring(path.lastIndexOf(File.separatorChar) + 1);
 			// Remove suffix
 			snippetFileName = snippetFileName.substring(0, snippetFileName.lastIndexOf('.'));
 			String[] snippetSubStrings = snippetFileName.split("_");
+			// Create parent notebook
 			int notebookNumber = Integer.parseInt(snippetSubStrings[1]);
-			String notebookName = getNotebookNameFromNumber(notebookNumber);
-			Utils.addOrIncrease(snippetsPerNotebook, notebookName);
-			notebookNumbers.put(id, notebookNumber);
-			snippetIndices.put(id, Integer.parseInt(snippetSubStrings[2]));
+			SccNotebook notebook = notebooks.get(notebookNumber);
 			/* Here we use the number of lines of source code (comments
 			   excluded), which is inconsistent with the clone analysis of the 
 			   notebook files, but so is the clone detection -SourcererCC
 			   doesn't consider comments in clone analysis. */
 			int loc = Integer.parseInt(columns[8]);
-			linesOfCode.put(id, loc);
+			snippets.put(id, new SccSnippet(loc, notebook));
+			Set<SccSnippetId> snippetsForNotebook = notebook2snippets.get(notebookNumber);
+			if (null == snippetsForNotebook) {
+				snippetsForNotebook = new HashSet<SccSnippetId>();
+			}
+			snippetsForNotebook.add(id);
+			notebook2snippets.put(notebookNumber, snippetsForNotebook);
+			line = statsReader.readLine();
 		}
-		statsScanner.close();
+		statsReader.close();
 	}
 
 	/**
-	 * Create a mapping from snippets to notebooks (hash2files) using output
-	 * files from SourcererCC.
+	 * Create a map from repro name to integer representation, and from
+	 * notebook number to notebook
+	 * @param fileName Name of file with mapping from notebook number to repro
 	 */
-	private Map<SnippetCode, List<Snippet>> getClones(String pairFile) throws IOException {
-		List<List<SccSnippetId>> clones = getCloneLists(pairFile);
-		return getCloneMap(clones);
-	}
-	
-	private List<List<SccSnippetId>> getCloneLists(String pairFile) throws FileNotFoundException {
-		List<List<SccSnippetId>> clones = new ArrayList<List<SccSnippetId>>();
-		Scanner scanner = new Scanner(new File(pairFile));
-		while (scanner.hasNextLine()) {
-			String line = scanner.nextLine();
-			assert(line.matches("[0-9]+,[0-9]+,[0-9]+,[0-9]+"));
-			String[] numbers = line.split(",");
-			SccSnippetId id1 = new SccSnippetId(Integer.parseInt(numbers[0]), Integer.parseInt(numbers[1]));
-			SccSnippetId id2 = new SccSnippetId(Integer.parseInt(numbers[2]), Integer.parseInt(numbers[3]));
-			boolean bothStored = false;
-			Iterator<List<SccSnippetId>> it = clones.iterator();
-			while (!bothStored && it.hasNext()) {
-				List<SccSnippetId> existing = it.next();
-				boolean id1stored = existing.contains(id1);
-				boolean id2stored = existing.contains(id2); 
-				if(id1stored && id2stored) {
-					bothStored = true;
-				} else if (id1stored && !id2stored) {
-					existing.add(id2);
-					bothStored = true;
-				} else if(id2stored && !id1stored) {
-					existing.add(id1);
-					bothStored = true;
+	private void createNotebookMaps(String fileName) throws IOException {
+		repros = new HashMap<String, Integer>();
+		notebooks = new HashMap<Integer, SccNotebook>();
+		BufferedReader reader = new BufferedReader(new FileReader(fileName));
+		String line = reader.readLine();
+		while (null != line) {
+			String[] subStrings = line.split(",");
+			try {
+				int notebookNumber = Integer.parseInt(subStrings[0]);
+				String notebookName = getNotebookNameFromNumber(notebookNumber);
+				String reproName = subStrings[1];
+				if (!repros.containsKey(reproName)) {
+					repros.put(reproName, repros.size());
 				}
+				int reproNumber = repros.get(reproName);
+				notebooks.put(notebookNumber, new SccNotebook(notebookName, reproNumber));
+			} catch (NumberFormatException e) {
+				System.err.println("Notebook numbers in repro file must be integers! Notebook with \"number\" '"
+						+ subStrings[0] + "' is excluded from mapping!");
 			}
-			if (!bothStored) {
-				List<SccSnippetId> newCloneList = new ArrayList<SccSnippetId>();
-				newCloneList.add(id1);
-				newCloneList.add(id2);
-				clones.add(newCloneList);
-			}
+			line = reader.readLine();
 		}
-		scanner.close();
-		return clones;
+		reader.close();
 	}
-	
-	private Map<SnippetCode, List<Snippet>> getCloneMap(List<List<SccSnippetId>> clones)
-			throws FileNotFoundException {
-		Map<SnippetCode, List<Snippet>> result = new HashMap<SnippetCode, List<Snippet>>(clones.size());
-		Set<SccSnippetId> snippetIdsToAdd = notebookNumbers.keySet();
-		int hashIndex = 0;
-		
-		// Cloned snippets
-		for (List<SccSnippetId> cloned: clones) {
-			List<Snippet> snippets = new ArrayList<Snippet>();
-			int numClones = cloned.size();
-			int[] loc = new int[numClones];
-			for (int i=0; i<numClones; i++) {
-				SccSnippetId id = cloned.get(i);
-				addSnippet(id, snippets);
-				snippetIdsToAdd.remove(id);
-				loc[i] = linesOfCode.get(cloned.get(i));
+
+	private void storeConnections(String pairFileName) throws IOException {
+		SccNotebook.setDumpDir(tmpDir);
+		ZipFile zippedPairFile = new ZipFile(pairFileName);
+		Enumeration<? extends ZipEntry> pairFileSet = zippedPairFile.entries();
+		while (pairFileSet.hasMoreElements()) {
+			ZipEntry pairFile = pairFileSet.nextElement();
+			InputStream zipStream = zippedPairFile.getInputStream(pairFile);
+			final BufferedReader reader = new BufferedReader(new InputStreamReader(zipStream));
+			long numRead = 0;
+			String line = reader.readLine();
+			while (null != line) {
+				if (0 == numRead%100000000) {
+					Utils.heartBeat("Reading clone pair " + numRead + ".");
+				}
+				storeConnection(line);
+				numRead++;
+				line = reader.readLine();
 			}
-			Arrays.sort(loc);
-			int medianLoc = (loc[numClones/2] + loc[(numClones-1)/2]) / 2;
-			SnippetCode hash = new SnippetCode(medianLoc, Integer.toString(hashIndex++));
-			result.put(hash, snippets);
-			if (loc[0] != loc[loc.length-1]) {
-				System.out.println("Different line count for snippet " + hash
-						+ ". Min: " + loc[0] + ". Max: " + loc[loc.length-1] + ".");
-			}
+			reader.close();
 		}
-		
-		// Remaining snippets are unique. Add them!
-		for (SccSnippetId id: snippetIdsToAdd) {
-			List<Snippet> snippets = new ArrayList<>(1);
-			addSnippet(id, snippets);
-			snippetIdsToAdd.remove(id);
-			int loc = linesOfCode.get(id);
-			SnippetCode hash = new SnippetCode(loc, Integer.toString(hashIndex++));
-			result.put(hash, snippets);
-		}
-		return result;
+		zippedPairFile.close();
 	}
 
 	/**
-	 * Add the snippet with the specified SourcererCC snippet id to the list
-	 * specified.
-	 * @param id SourcererCC snippet id of snippet to add
-	 * @param snippets List of snippets, to which the snippet will be added
+	 * @param line A line from the clone pairs file from the SourcererCC output
 	 */
-	private void addSnippet(SccSnippetId id, List<Snippet> snippets) {
-		String notebookName = getNotebookNameFromNumber(notebookNumbers.get(id)); 
-		int snippetIndex = snippetIndices.get(id);
-		snippets.add(new Snippet(notebookName, repros.get(notebookName), snippetIndex));
-	}
-	
-	private Map<Notebook, SnippetCode[]> getSnippets(Map<SnippetCode, List<Snippet>> snippet2file) {
-		Map<Notebook, SnippetCode[]> result = new HashMap<Notebook, SnippetCode[]>(snippetsPerNotebook.size());
-		// Create arrays for snippets
-		for (String notebookName: snippetsPerNotebook.keySet()) {
-			String repro = repros.get(notebookName);
-			result.put(new Notebook(notebookName, repro), new SnippetCode[snippetsPerNotebook.get(notebookName)]);
-			
-		}
-		// Put snippet in notebook-to-snippet-map
-		for (SnippetCode hash: snippet2file.keySet()) {
-			for (Snippet snippet: snippet2file.get(hash)) {
-				SnippetCode[] snippetsInFile = result.get(new Notebook(snippet.getFileName()));
-				snippetsInFile[snippet.getSnippetIndex()] = new SnippetCode(hash);
+	private void storeConnection(String line) {
+		String[] numbers = line.split(",");
+		if (4 != numbers.length) {
+			System.err.print("Invalid line \"" + line + "\" in pair file.");
+			System.err.println(" Skipping line!");
+		} else {
+			try {
+				SccSnippetId id1 = new SccSnippetId(numbers[0], numbers[1]);
+				SccSnippetId id2 = new SccSnippetId(numbers[2], numbers[3]);
+				SccSnippet snippet1 = snippets.get(id1);
+				SccSnippet snippet2 = snippets.get(id2);
+				if (null == snippet1) {
+					System.err.println("ID for nonexistent snippet (" + id1 + ") found on line \""
+							+ line + "\". Skipping clone pair!");
+				}
+				if (null == snippet2) {
+					System.err.println("ID for nonexistent snippet (" + id2 + ") found on line \""
+							+ line + "\". Skipping clone pair!");
+				}
+				if (null != snippet1 && null != snippet2) {
+					try {
+						snippet1.connect(snippet2);
+					} catch (NullPointerException e) {
+						// Notebook or repro was null for one of the snippets
+						System.err.println("Couldn't add connection between " + id1 + " and " + id2 + ". ");
+						System.err.println("Notebook or repro info is missing. Skipping line " + line);
+					}
+				}
+			} catch (NumberFormatException e) {
+				// We just skip this line
+				System.err.println("Number format exception when parsing line \""
+						+ line + "\": " + e.getMessage());
 			}
 		}
-		return result;
 	}
 	
 	private static String getNotebookNameFromNumber(int notebookNumber) {
 		return "nb_" + notebookNumber + ".ipynb";
 	}
 	
+	private void printCloneLoc() throws IOException {
+		Writer writer = new FileWriter(outputDir + "/cloneLoc" + LocalDateTime.now() + ".csv");
+		for (SccSnippet snippet: snippets.values()) {
+			if (snippet.isClone()) {
+				writer.write(snippet.getLoc() + "\n");
+			}
+		}
+		writer.close();
+	}
+	
+	private void printCloneFrequencies() throws IOException {
+		Writer writer = new FileWriter(outputDir + "/cloneFrequency" + LocalDateTime.now() + ".csv");
+		writer.write(cloneFrequencyHeader());
+		for (Integer notebookNumber: notebook2snippets.keySet()) {
+			int numClones = 0, numUnique = 0, numEmpty = 0;
+			int numIntra = 0, numIntraNE = 0;	// # intra notebook clones
+			Set<SccSnippetId> snippetsInNotebook = notebook2snippets.get(notebookNumber);
+			for (SccSnippetId id: snippetsInNotebook) {
+				SccSnippet snippet = snippets.get(id);
+				if (snippet.isClone()) {
+					numClones++;
+				} else {
+					numUnique++;
+				}
+				if (0 == snippet.getLoc()) {
+					numEmpty++;
+				}
+				if (snippet.isIntraNotebookClone()) {
+					numIntra++;
+				}
+			}
+			numIntraNE = numIntra;	// No empty clones for Scc data!
+			String notebookName = getNotebookNameFromNumber(notebookNumber);
+			printCloneFrequencyLine(writer, notebookName, numClones, numUnique, numEmpty, numClones, numIntra, numIntraNE);
+		}
+		writer.close();
+	}
+	
+	/**
+	 * Imagine a graph where the nodes are the notebooks and each snippet that
+	 * is shared between two notebooks constitutes an edge between these
+	 * notebooks. For each node, let 'edges' be the number of edges
+	 * starting/ending at this node and 'repro' be the repro where the current
+	 * notebook resides. For every node/notebook, count:
+	 * - edges
+	 * - normalized edges (that is, edges/number of snippets, or 0 if edges=0)
+	 * - edges inside current repro
+	 * - mean number edges to other repros
+	 * Ignore empty snippets in all computations. Print the values, in the
+	 * order mentioned, separated with commas to the file
+	 * connections<current-date-time>.csv. Note that when computing the mean,
+	 * only repros for which there is a connection are included.
+	 */
+	private void printConnectionsFile() throws IOException {
+		Writer writer = new FileWriter(outputDir + "/connections" + LocalDateTime.now() + ".csv");
+		writer.write(connectionsHeader());
+		for (Integer notebookNumber: notebook2snippets.keySet()) {
+			SccNotebook notebook = notebooks.get(notebookNumber);
+			if (null == notebook) {
+				String notebookName = getNotebookNameFromNumber(notebookNumber);
+				System.err.print("No repro information stored for notebook " + notebookName + "! ");
+				System.err.println("Connections will not be counted!");
+			} else {
+				int nonEmptySnippets = 0;
+				Set<SccSnippetId> snippetsForNotebook = notebook2snippets.get(notebookNumber);
+				for (SccSnippetId id: snippetsForNotebook) {
+					SccSnippet snippet = snippets.get(id);
+					if (0 != snippet.getLoc()) {
+						nonEmptySnippets++;
+					}
+				}
+				int interConnections = notebook.numInterReproConnections();
+				int intraConnections = notebook.numIntraReproConnections();
+				int numInterConnectedRepros = notebook.numReprosInterConnected();
+				int connections = interConnections + intraConnections;
+				// Empty snippets are considered unique by SourcererCC
+				double normalizedNonEmptyConnections = ConnectionsLineBuilder.normalized(connections, nonEmptySnippets);
+				double meanNonEmptyInterReproConnections = ConnectionsLineBuilder.normalized(interConnections, numInterConnectedRepros);
+				writer.write(notebook.getName() + ", "
+						+ connections + ", " + String.format(Locale.US, "%.4f", normalizedNonEmptyConnections) + ", "
+					+ intraConnections + ", " + String.format(Locale.US, "%.4f", meanNonEmptyInterReproConnections) + "\n");
+			}
+		}
+		writer.close();
+	}
+	
+	/**
+	 * @return Header for the connections csv file
+	 */
+	private String connectionsHeader() {
+		return "file, non-empty connections, non-empty connections normalized, "
+				+ "non-empty intra repro connections, mean non-empty inter repro connections\n";
+	}
+	
 	void analyze(String[] args) {
 		String pairFile = null;
+		String statsFile = null;
+		String reproFile = null;
 		
 		// Set up
 		for (int i=0; i<args.length; i++) {
 			String arg = args[i];
 			if (arg.startsWith("--stats_file")) {
-				String statsFile = getValueFromArgument(arg);
-				try {
-					initializeSnippetInfo(statsFile);
-				} catch (FileNotFoundException e) {
-					System.err.println("Stats file not found: " + e.getMessage());
-				}
+				statsFile = getValueFromArgument(arg);
 			} else if (arg.startsWith("--repro_file")) {
-				String reproFile = getValueFromArgument(arg);
-				try {
-					this.initializeReproMap(reproFile);
-				} catch (FileNotFoundException e) {
-					System.err.println("Repro file not found: " + e.getMessage());
-				}
+				reproFile = getValueFromArgument(arg);
 			} else if (arg.startsWith("--pair_file")) {
 				pairFile = getValueFromArgument(arg);
 			} else if (arg.startsWith("--output_dir")) {
 				outputDir = getValueFromArgument(arg);
+			} else if (arg.startsWith("--tmp_dir")) {
+				tmpDir = getValueFromArgument(arg);
 			} else {
 				System.err.println("Unknown argument: " + arg);
 			}
 		}
 		
+		boolean statsFileSet = null != statsFile && !("".equals(statsFile));
+		boolean reproFileSet = null != reproFile && !("".equals(reproFile));
+		boolean pairFileSet = null != pairFile && !("".equals(pairFile));
 		// Run
-		// (If notebookNumbers is null, none of the snippet info maps are initialized.)
-		if (null != pairFile && "" != pairFile && null != notebookNumbers &&  null !=this.repros) {
+		if (pairFileSet && statsFileSet &&  reproFileSet) {
+			try {
+				this.initializeSnippetInfo(statsFile, reproFile);
+			} catch (IOException e) {
+				System.err.println("I/O error when initializing snippet info: " + e.getMessage());
+				e.printStackTrace();
+				System.err.println("Analysis will not be run!");
+				System.exit(1);
+			}
 			try {
 				this.clones(pairFile);
 				System.out.println("Clone files created!");
 			} catch (IOException e) {
-				System.err.println("I/O error: " + e.getMessage() + ". Operation interrupted.");
+				e.printStackTrace();
+				System.err.println("Operation interrupted!");
 			}
 		} else {
-			if (null == pairFile || "" == pairFile) {
+			if (!pairFileSet) {
 				System.err.println("SourcererCC clones pair file path not set!");
 			}
-			if (null == notebookNumbers) {
+			if (!statsFileSet) {
 				System.err.println("Snippet information is not initialized!");
 			}
-			if (null == this.repros) {
+			if (!reproFileSet) {
 				System.err.println("Repro information is not initialized!");
 			}
 			System.err.println("Analysis will not be run!");
@@ -287,5 +368,6 @@ public class SccOutputAnalyzer extends Analyzer {
 	public static void main(String[] args) {
 		SccOutputAnalyzer analyzer = new SccOutputAnalyzer();
 		analyzer.analyze(args);
+		ThreadExecutor.tearDown();
 	}
 }

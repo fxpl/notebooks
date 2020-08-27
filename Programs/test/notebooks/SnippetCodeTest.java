@@ -45,7 +45,8 @@ public class SnippetCodeTest {
 	@Test
 	public void testEquals_diffLOC() {
 		SnippetCode different = new SnippetCode(1000, hash);
-		assertFalse("Snippet codes considered equal when LOC differ!", code.equals(different));
+		assertTrue("Snippet codes considered different when hash is the same but LOC differ!",
+				code.equals(different));
 	}
 	
 	@Test
@@ -105,6 +106,13 @@ public class SnippetCodeTest {
 			new SnippetCode(code)
 		};
 		assertTrue("Intra clone missed!", code.isIntraClone(nbSnippets));
+	}
+	
+	@Test
+	public void testSetLOC() {
+		int newLOC  = 10;
+		code.setLOC(newLOC);
+		assertEquals("LOC not set correctly!", newLOC, code.getLOC());
 	}
 	
 	@Test

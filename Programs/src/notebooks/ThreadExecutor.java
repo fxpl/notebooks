@@ -13,7 +13,7 @@ import java.util.concurrent.Future;
  */
 public class ThreadExecutor {
 	private static ThreadExecutor instance;
-	private ExecutorService threadPool;
+	private final ExecutorService threadPool;
 	
 	private ThreadExecutor() {
 		int cores = Runtime.getRuntime().availableProcessors();

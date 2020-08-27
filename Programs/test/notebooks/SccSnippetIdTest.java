@@ -19,6 +19,14 @@ public class SccSnippetIdTest {
 	}
 	
 	@Test
+	public void testStringConstructor() {
+		String fileString = Integer.toString(file);
+		String snippetString = Integer.toString(snippet);
+		SccSnippetId stringId = new SccSnippetId(fileString, snippetString);
+		assertEquals("Snippet ID not created correctly from strings!",  id, stringId);
+	}
+	
+	@Test
 	public void testEquals_equal() {
 		SccSnippetId equal = new SccSnippetId(file, snippet);
 		assertTrue("Equal ID:s considered different!", id.equals(equal));
@@ -47,5 +55,10 @@ public class SccSnippetIdTest {
 	public void testHashCode() {
 		int expectedHashCode = Objects.hash(file, snippet);
 		assertEquals("Wrong hash code returned!", expectedHashCode, id.hashCode());
+	}
+	
+	@Test
+	public void testToString() {
+		assertEquals(file + ":" + snippet, id.toString());
 	}
 }

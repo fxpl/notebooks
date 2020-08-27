@@ -4,7 +4,7 @@ import static org.junit.Assert.assertFalse;
 
 import java.io.File;
 
-public class DumperTest {
+public abstract class DumperTest {
 	private boolean deleteTargetAtTearDown = false;
 	protected String targetDir = "test/DumperTestOutput";
 	protected Dumper dumper;
@@ -36,7 +36,7 @@ public class DumperTest {
 		if (dir.isDirectory()) {
 			String[] contents = dir.list();
 			for (String file: contents) {
-				deleteRecursively(dirName + "/" + file);
+				deleteRecursively(dirName + File.separator + file);
 			}
 		}
 		dir.delete();

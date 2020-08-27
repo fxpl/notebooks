@@ -47,11 +47,12 @@ public class Notebook {
 	 */
 	@Override
 	public boolean equals(Object other) {
-		if (other.getClass() != this.getClass()) {
+		if (other instanceof Notebook) {
+			Notebook otherNotebook = (Notebook)other;
+			return this.getName().equals(otherNotebook.getName());
+		} else {
 			return false;
 		}
-		Notebook otherNotebook = (Notebook)other;
-		return this.getName().equals(otherNotebook.getName());
 	}
 	
 	/**
@@ -167,7 +168,7 @@ public class Notebook {
 	 * @return The file name of the notebook, without preceding path
 	 */
 	public String getName() {
-		int namePos = path.lastIndexOf('/') + 1;
+		int namePos = path.lastIndexOf(File.separatorChar) + 1;
 		return path.substring(namePos);
 	}
 	
@@ -192,7 +193,7 @@ public class Notebook {
 		List<JSONObject> cells = this.getCodeCells();
 		String noteBookName = getNameWithoutSuffix();
 		for (int i=0; i<cells.size(); i++) {
-			String outputFile = location + "/" + noteBookName + "_" + i + "." + suffix;
+			String outputFile = location + File.separator + noteBookName + "_" + i + "." + suffix;
 			Writer writer = new FileWriter(outputFile);
 			JSONArray lines = getSource(cells.get(i));
 			for (int j=0; j<lines.length(); j++) {
@@ -214,7 +215,7 @@ public class Notebook {
 	public void dumpCodeAsZipWithSingleFile(String location, String suffix) throws IOException {
 		List<JSONObject> cells = this.getCodeCells();
 		String noteBookName = getNameWithoutSuffix();
-		String outputFile = location + "/" + noteBookName + ".zip";
+		String outputFile = location + File.separator + noteBookName + ".zip";
 		FileOutputStream zipFileStream = new FileOutputStream(outputFile);
 		ZipOutputStream targetStream = new ZipOutputStream(zipFileStream);
 		ZipEntry codeFile = new ZipEntry(noteBookName + "." + suffix);
@@ -242,7 +243,7 @@ public class Notebook {
 		String noteBookName = getNameWithoutSuffix();
 		List<JSONObject> cells = this.getCodeCells();
 		try {
-			FileOutputStream fos = new FileOutputStream(location + "/" + noteBookName + ".zip");
+			FileOutputStream fos = new FileOutputStream(location + File.separator + noteBookName + ".zip");
 			ZipOutputStream zos = new ZipOutputStream(fos);
 			for (int i=0; i<cells.size(); i++) {
 				ZipEntry entry = new ZipEntry(noteBookName + "_" + i + "." + suffix); 
@@ -337,9 +338,6 @@ public class Notebook {
 		if (!language.isSet()) {
 			language = getLanguageFromCodeCells(notebook);
 		}
-		if (!language.isSet()) {
-			System.err.println("No language found in " + this.path);
-		}
 		return language;
 	}
 	
@@ -405,6 +403,10 @@ public class Notebook {
 		}
 	}
 	
+	@Override
+	public String toString() {
+		return this.getName();
+	}
 	
 	/**
 	 * Count lines of code and set all loc variables.
@@ -445,11 +447,12 @@ public class Notebook {
 	 * @return Array containing all cells of the notebook
 	 */
 	private static JSONArray getCellArray(JSONObject notebook) {
-		JSONArray cells;
+		JSONArray cells = new JSONArray();
 		if (notebook.has("cells")) {
-			cells = notebook.getJSONArray("cells");
-		} else {
-			cells = new JSONArray();
+			JSONArray notebookCells = notebook.getJSONArray("cells");
+			for (int i=0; i< notebookCells.length(); i++) {
+				cells.put(notebookCells.getJSONObject(i));
+			}
 		}
 		if (notebook.has("worksheets")) {
 			// Not according to spec, but occurring

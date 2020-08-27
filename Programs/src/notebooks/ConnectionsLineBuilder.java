@@ -34,7 +34,7 @@ public class ConnectionsLineBuilder implements Callable<String> {
 	@Override
 	public String call() throws Exception {
 		if (heartBeat) {
-			System.out.println("Analyzing connections of " + notebook.getName());
+			Utils.heartBeat("Analyzing connections of " + notebook.getName());
 		}
 		int connections = 0;
 		int nonEmptyConnections = 0;	// Connections excluding empty snippets
@@ -132,7 +132,7 @@ public class ConnectionsLineBuilder implements Callable<String> {
 	 * @param denominator
 	 * @return numerator normalized according to description above
 	*/
-	private static double normalized(int numerator, int denominator) {
+	static double normalized(int numerator, int denominator) {
 		if (0 == denominator) {
 			return 0;
 		} else {

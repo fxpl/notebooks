@@ -13,22 +13,29 @@ import notebooks.LangSpec;
 import notebooks.LangName;
 import notebooks.Snippet;
 
-/**
- * TODO: Skapa separat katalog för temporärt testdata!
- */
-
-public class NotebookAnalyzerTest {
-	
+public class NotebookAnalyzerTest extends AnalyzerTest {
 	private NotebookAnalyzer analyzer;
+	
+	@BeforeClass
+	public static void setUpOutputDirectory() {
+		defaultOutputDirName = "notebook_analyzer_unit_test_output";
+		AnalyzerTest.setUpOutputDirectory();
+	}
 	
 	@Before
 	public void setUp() {
 		analyzer = new NotebookAnalyzer();
+		analyzer.outputDir = defaultOutputDirName;
+		cloneFilePrefixes = new String[4];
+		cloneFilePrefixes[0] = "file2hashesA";
+		cloneFilePrefixes[1] = "hash2filesA";
+		cloneFilePrefixes[2] = "cloneFrequency";
+		cloneFilePrefixes[3] = "connections";
 	}
 	
 	@AfterClass
 	public static void tearDown() {
-		ThreadExecutor.tearDown();
+		tearDownClass();
 	}
 	
 	@Test
@@ -57,24 +64,24 @@ public class NotebookAnalyzerTest {
 		String[] expectedConnectionsLines = {connectionsHeader(),
 				notebookFile + ", 0, 0.0000, 0, 0.0000, 0, 0, 0.0000, 0.0000"};
 		
-		analyzer.initializeNotebooksFrom(testDir + "/" + notebookFile);
-		analyzer.initializeReproInfo(testDir + "/" + reproFile);
+		analyzer.initializeNotebooksFrom(testDir + File.separator + notebookFile);
+		analyzer.initializeReproInfo(testDir + File.separator + reproFile);
 		analyzer.allAnalyzes();
 		
-		TestUtils.checkCsv("code_cells", expectedCodeCellsLines);
-		TestUtils.checkCsv("loc", expectedLOCLines);
-		TestUtils.checkCsv("languages", expectedLangLines);
-		TestUtils.checkCsv("all_languages", expectedAllLangLines);
-		TestUtils.checkCsv("file2hashesA", expectedFile2hashesLines);
-		TestUtils.checkCsv("hash2filesA", expectedHash2filesLines);
-		TestUtils.checkCsv("cloneFrequency", expectedCloneFreqLines);
-		TestUtils.checkCsv("connections", expectedConnectionsLines);
+		checkCsv("code_cells", expectedCodeCellsLines);
+		checkCsv("loc", expectedLOCLines);
+		checkCsv("languages", expectedLangLines);
+		checkCsv("all_languages", expectedAllLangLines);
+		checkCsv("file2hashesA", expectedFile2hashesLines);
+		checkCsv("hash2filesA", expectedHash2filesLines);
+		checkCsv("cloneFrequency", expectedCloneFreqLines);
+		checkCsv("connections", expectedConnectionsLines);
 		
-		TestUtils.lastOutputFile("code_cells").delete();
-		TestUtils.lastOutputFile("loc").delete();
-		TestUtils.lastOutputFile("languages").delete();
-		TestUtils.lastOutputFile("all_languages").delete();
-		TestUtils.deleteCloneCsvs();
+		lastOutputFile("code_cells").delete();
+		lastOutputFile("loc").delete();
+		lastOutputFile("languages").delete();
+		lastOutputFile("all_languages").delete();
+		deleteCloneCsvs();
 	}
 	
 	@Test
@@ -100,23 +107,23 @@ public class NotebookAnalyzerTest {
 		String[] expectedConnectionsLines = {connectionsHeader(),
 				notebookFile + ", 0, 0.0000, 0, 0.0000, 0, 0, 0.0000, 0.0000"};
 		
-		analyzer.initializeNotebooksFrom(testDir + "/" + notebookFile);
+		analyzer.initializeNotebooksFrom(testDir + File.separator + notebookFile);
 		analyzer.allAnalyzes();
 		
-		TestUtils.checkCsv("code_cells", expectedCodeCellsLines);
-		TestUtils.checkCsv("loc", expectedLOCLines);
-		TestUtils.checkCsv("languages", expectedLangLines);
-		TestUtils.checkCsv("all_languages", expectedAllLangLines);
-		TestUtils.checkCsv("file2hashesA", expectedFile2hashesLines);
-		TestUtils.checkCsv("hash2filesA", expectedHash2filesLines);
-		TestUtils.checkCsv("cloneFrequency", expectedCloneFreqLines);
-		TestUtils.checkCsv("connections", expectedConnectionsLines);
+		checkCsv("code_cells", expectedCodeCellsLines);
+		checkCsv("loc", expectedLOCLines);
+		checkCsv("languages", expectedLangLines);
+		checkCsv("all_languages", expectedAllLangLines);
+		checkCsv("file2hashesA", expectedFile2hashesLines);
+		checkCsv("hash2filesA", expectedHash2filesLines);
+		checkCsv("cloneFrequency", expectedCloneFreqLines);
+		checkCsv("connections", expectedConnectionsLines);
 		
-		TestUtils.lastOutputFile("code_cells").delete();
-		TestUtils.lastOutputFile("loc").delete();
-		TestUtils.lastOutputFile("languages").delete();
-		TestUtils.lastOutputFile("all_languages").delete();
-		TestUtils.deleteCloneCsvs();
+		lastOutputFile("code_cells").delete();
+		lastOutputFile("loc").delete();
+		lastOutputFile("languages").delete();
+		lastOutputFile("all_languages").delete();
+		deleteCloneCsvs();
 	}
 	
 	/**
@@ -136,11 +143,11 @@ public class NotebookAnalyzerTest {
 		};
 		
 		for (String file: files) {
-			analyzer.initializeNotebooksFrom(dataDir + "/" + file);
+			analyzer.initializeNotebooksFrom(dataDir + File.separator + file);
 		}
 		analyzer.allLanguageValues();
-		TestUtils.checkCsv("all_languages", expectedLines);
-		TestUtils.lastOutputFile("all_languages").delete();
+		checkCsv("all_languages", expectedLines);
+		lastOutputFile("all_languages").delete();
 		
 	}
 	
@@ -159,17 +166,17 @@ public class NotebookAnalyzerTest {
 				+ ", " + LangSpec.CODE_CELLS,	// header
 				file + ", " + LangName.UNKNOWN + ", " + LangName.UNKNOWN + ", "	+ LangName.UNKNOWN + ", " + LangName.UNKNOWN + ", " + LangName.UNKNOWN
 		};
-		analyzer.initializeNotebooksFrom(dataDir + "/" + file);
+		analyzer.initializeNotebooksFrom(dataDir + File.separator + file);
 		analyzer.allLanguageValues();
-		TestUtils.checkCsv("all_languages", expectedLInes);
-		TestUtils.lastOutputFile("all_languages").delete();
+		checkCsv("all_languages", expectedLInes);
+		lastOutputFile("all_languages").delete();
 	}
 	
 	/**
 	 * Verify that the output files for number of code cells, loc, languages,
 	 * all language values, and clone output files are created when the
 	 * argument "-all" is given.
-	 * throws IOException
+	 * @throws IOException
 	 */
 	@Test
 	public void testArgumentParsing_allAnalyses() throws IOException {
@@ -185,71 +192,71 @@ public class NotebookAnalyzerTest {
 				"connections"
 		};
 		analyzer.analyze(arg);
-		TestUtils.verifyExistenceAndRemove(expectedFilePrefixes);
+		verifyExistenceOfAndRemove(expectedFilePrefixes);
 	}
 	
 	/**
 	 * Verify that the clone output files are created when the argument
 	 * "-clones" is given.
-	 * throws IOException
+	 * @throws IOException
 	 */
 	@Test
 	public void testArgumentParsing_clones() throws IOException {
 		String[] arg = {"--clones"};
 		analyzer.analyze(arg);
-		TestUtils.verifyExistenceOfAndRemoveCloneFiles();
+		verifyExistenceOfAndRemoveCloneFiles();
 	}
 	
 	/**
 	 * Verify that output file with number of code cells are created when the
 	 * argument "-count" is given.
-	 * throws IOException
+	 * @throws IOException
 	 */
 	@Test
 	public void testArgumentParsing_count() throws IOException {
 		String[] arg = {"--count"};
 		String[] expectedFilePrefix = {"code_cells"};
 		analyzer.analyze(arg);
-		TestUtils.verifyExistenceAndRemove(expectedFilePrefix);
+		verifyExistenceOfAndRemove(expectedFilePrefix);
 	}
 	
 	/**
 	 * Verify that the language output file is created when the argument
 	 * "-lang" is given.
-	 * throws IOException
+	 * @throws IOException
 	 */
 	@Test
 	public void testArgumentParsing_lang() throws IOException {
 		String[] arg = {"--lang"};
 		String[] expectedFilePrefix = {"languages"};
 		analyzer.analyze(arg);
-		TestUtils.verifyExistenceAndRemove(expectedFilePrefix);
+		verifyExistenceOfAndRemove(expectedFilePrefix);
 	}
 	
 	/**
 	 * Verify that the all language values output file is created when the
 	 * argument "-lang_all" is given.
-	 * throws IOException
+	 * @throws IOException
 	 */
 	@Test
 	public void testArgumentParsing_lang_all() throws IOException {
 		String[] arg = {"--lang_all"};
 		String[] expectedFilePrefix = {"all_languages"};
 		analyzer.analyze(arg);
-		TestUtils.verifyExistenceAndRemove(expectedFilePrefix);
+		verifyExistenceOfAndRemove(expectedFilePrefix);
 	}
 	
 	/**
 	 * Verify that the loc output file is created when the argument "-loc" is
 	 * given.
-	 * throws IOException
+	 * @throws IOException
 	 */
 	@Test
 	public void testArgumentParsing_loc() throws IOException {
 		String[] arg = {"--loc"};
 		String[] expectedFilePrefix = {"loc"};
 		analyzer.analyze(arg);
-		TestUtils.verifyExistenceAndRemove(expectedFilePrefix);
+		verifyExistenceOfAndRemove(expectedFilePrefix);
 	}
 	
 	/**
@@ -262,7 +269,7 @@ public class NotebookAnalyzerTest {
 		String[] arg = {"--modules"};
 		String[] expectedFilePrefix = {"modules"};
 		analyzer.analyze(arg);
-		TestUtils.verifyExistenceAndRemove(expectedFilePrefix);
+		verifyExistenceOfAndRemove(expectedFilePrefix);
 	}
 	
 	/**
@@ -280,7 +287,7 @@ public class NotebookAnalyzerTest {
 				"loc"
 		};
 		analyzer.analyze(args);
-		TestUtils.verifyExistenceAndRemove(expectedFilePrefixes);
+		verifyExistenceOfAndRemove(expectedFilePrefixes);
 	}
 	
 	/**
@@ -308,8 +315,8 @@ public class NotebookAnalyzerTest {
 				"two.ipynb, 2"
 		};
 		analyzer.analyze(args);
-		TestUtils.checkCsv("code_cells", expectedLines);
-		TestUtils.lastOutputFile("code_cells").delete();
+		checkCsv("code_cells", expectedLines);
+		lastOutputFile("code_cells").delete();
 	}
 	
 	/**
@@ -337,7 +344,7 @@ public class NotebookAnalyzerTest {
 		};
 		String[] expectedOutputPrefix = {"code_cells"};
 		analyzer.analyze(args);
-		TestUtils.verifyExistenceAndRemove(outputDir, expectedOutputPrefix);
+		TestUtils.verifyExistenceOfAndRemove(outputDir, expectedOutputPrefix);
 	}
 	
 	/**
@@ -358,8 +365,8 @@ public class NotebookAnalyzerTest {
 				"nb_2.ipynb, 1, 1.0000, 1, 1.0000, 0, 0, 1.0000, 1.0000"
 		};
 		analyzer.analyze(args);
-		TestUtils.checkCsv_anyOrder("connections", expectedConnectionsLines);
-		TestUtils.deleteCloneCsvs();
+		checkCsv_anyOrder("connections", expectedConnectionsLines);
+		deleteCloneCsvs();
 	}
 	
 	/**
@@ -379,8 +386,8 @@ public class NotebookAnalyzerTest {
 				"nb_2.ipynb, 1, 1.0000, 1, 1.0000, 1, 1, 0.0000, 0.0000"
 		};
 		analyzer.analyze(args);
-		TestUtils.checkCsv_anyOrder("connections", expectedConnectionLines);
-		TestUtils.deleteCloneCsvs();
+		checkCsv_anyOrder("connections", expectedConnectionLines);
+		deleteCloneCsvs();
 	}
 	
 	/**
@@ -401,8 +408,8 @@ public class NotebookAnalyzerTest {
 				"nb_2.ipynb, 1, 1.0000, 1, 1.0000, 1, 1, 0.0000, 0.0000"
 		};
 		analyzer.analyze(args);
-		TestUtils.checkCsv_anyOrder("connections", expectedConnectionLines);
-		TestUtils.deleteCloneCsvs();
+		checkCsv_anyOrder("connections", expectedConnectionLines);
+		deleteCloneCsvs();
 	}
 	
 	/**
@@ -423,8 +430,8 @@ public class NotebookAnalyzerTest {
 				"nb_2.ipynb, 1, 1.0000, 1, 1.0000, 1, 1, 0.0000, 0.0000"
 		};
 		analyzer.analyze(args);
-		TestUtils.checkCsv_anyOrder("connections", expectedConnectionLines);
-		TestUtils.deleteCloneCsvs();
+		checkCsv_anyOrder("connections", expectedConnectionLines);
+		deleteCloneCsvs();
 	}
 
 	/**
@@ -472,9 +479,9 @@ public class NotebookAnalyzerTest {
 		
 		// Actual values
 		for (String file: files) {
-			analyzer.initializeNotebooksFrom(dataDir + "/" + file);
+			analyzer.initializeNotebooksFrom(dataDir + File.separator + file);
 		}
-		analyzer.initializeReproInfo(dataDir + "/" + reproFile);
+		analyzer.initializeReproInfo(dataDir + File.separator + reproFile);
 		Map<SnippetCode, List<Snippet>> clones = analyzer.clones();
 		
 		// Check values
@@ -485,14 +492,12 @@ public class NotebookAnalyzerTest {
 			assertEquals("Wrong number of snippets stored for " + snippetCode + ":", expectedSnippets.size(), actualSnippets.size());
 			assertTrue("Wrong snippets stored for " + snippetCode, actualSnippets.containsAll(expectedSnippets));
 		}
-		TestUtils.deleteCloneCsvs();
+		deleteCloneCsvs();
 	}
 	
 	/**
-	 * Verify that the output files file2hashesA<current-date-time>.csv,
-	 * hash2filesA<current-date-time>.csv cloneFrequency<current-date-time>.csv
-	 * and connections<current-date-time>.csv have the right content after
-	 * clone analysis of an empty notebook.
+	 * Verify that the clone output files have the right content after clone
+	 * analysis of an empty notebook.
 	 * @throws IOException
 	 */
 	@Test
@@ -501,7 +506,8 @@ public class NotebookAnalyzerTest {
 		String notebookFile = "nb_100.ipynb";
 		String reproMapName = "repros.csv";
 		String[] expectedSnippetLines = {
-				file2hashesHeader()
+				file2hashesHeader(),
+				notebookFile
 		};
 		String[] expectedClonesLines = {
 				hash2filesHeader()
@@ -516,23 +522,21 @@ public class NotebookAnalyzerTest {
 		};
 		
 		// Actual values
-		analyzer.initializeNotebooksFrom(dataDir + "/" + notebookFile);
-		analyzer.initializeReproInfo(dataDir + "/" + reproMapName);
+		analyzer.initializeNotebooksFrom(dataDir + File.separator + notebookFile);
+		analyzer.initializeReproInfo(dataDir + File.separator + reproMapName);
 		analyzer.clones();
 		
-		TestUtils.checkCsv("file2hashesA", expectedSnippetLines);
-		TestUtils.checkCsv("hash2filesA", expectedClonesLines);
-		TestUtils.checkCsv("cloneFrequency", expectedFrequencyLines);
-		TestUtils.checkCsv("connections", expectedConnectionsLines);
+		checkCsv("file2hashesA", expectedSnippetLines);
+		checkCsv("hash2filesA", expectedClonesLines);
+		checkCsv("cloneFrequency", expectedFrequencyLines);
+		checkCsv("connections", expectedConnectionsLines);
 		
-		TestUtils.deleteCloneCsvs();
+		deleteCloneCsvs();
 	}
 	
 	/**
-	 * Verify that the output files file2hashesA<current-date-time>.csv,
-	 * hash2filesA<current-date-time>.csv, cloneFrequency<current-date-time>.csv
-	 * and connections<current-date-time>.csv have the right content after
-	 * clone analysis of a notebook with a single snippet.
+	 * Verify that the clone output files have the right content after clone
+	 * analysis of a notebook with a single snippet.
 	 * @throws IOException
 	 */
 	@Test
@@ -551,7 +555,7 @@ public class NotebookAnalyzerTest {
 		};
 		String[] expectedFrequencyLiens = {
 				cloneFrequencyHeader(),
-				notebookFile + ", 0, 2, 2, 1.0000, 1.0000, 2, 2"
+				notebookFile + ", 0, 2, 0, 1.0000, 1.0000, 2, 2"
 		};
 		String[] expectedConnectionsLines = {
 				connectionsHeader(),
@@ -559,23 +563,21 @@ public class NotebookAnalyzerTest {
 		};
 		
 		// Actual values
-		analyzer.initializeNotebooksFrom(dataDir + "/" + notebookFile);
-		analyzer.initializeReproInfo(dataDir + "/" + reproFile);
+		analyzer.initializeNotebooksFrom(dataDir + File.separator + notebookFile);
+		analyzer.initializeReproInfo(dataDir + File.separator + reproFile);
 		analyzer.clones();
 		
-		TestUtils.checkCsv("file2hashesA", expectedSnippetLines);
-		TestUtils.checkCsv("hash2filesA", expectedClonesLines);
-		TestUtils.checkCsv("cloneFrequency", expectedFrequencyLiens);
-		TestUtils.checkCsv("connections", expectedConnectionsLines);
+		checkCsv("file2hashesA", expectedSnippetLines);
+		checkCsv("hash2filesA", expectedClonesLines);
+		checkCsv("cloneFrequency", expectedFrequencyLiens);
+		checkCsv("connections", expectedConnectionsLines);
 		
-		TestUtils.deleteCloneCsvs();
+		deleteCloneCsvs();
 	}
 	
 	/**
-	 * Verify that the output files file2hashesA<current-date-time>.csv, 
-	 * hash2filesA<current-date-time>.csv, cloneFrequency<current-date-time>.csv
-	 * and connections<current-date-time>.csv have the right content after
-	 * clone analysis of a notebooks with a clone.
+	 * Verify that the clone output files have the right content after clone
+	 * analysis of a notebooks with a clone.
 	 * @throws IOException
 	 */
 	@Test
@@ -594,7 +596,7 @@ public class NotebookAnalyzerTest {
 		};
 		String[] expectedFrequencyLines = {
 				cloneFrequencyHeader(),
-				notebookFile + ", 0, 2, 2, 1.0000, 1.0000, 2, 2"
+				notebookFile + ", 0, 2, 0, 1.0000, 1.0000, 2, 2"
 		};
 		String[] expectedConnectionsLines = {
 				connectionsHeader(),
@@ -602,23 +604,23 @@ public class NotebookAnalyzerTest {
 		};
 		
 		// Actual values
-		analyzer.initializeNotebooksFrom(dataDir + "/" + notebookFile);
-		analyzer.initializeReproInfo(dataDir + "/" + reproFile);
+		analyzer.initializeNotebooksFrom(dataDir + File.separator + notebookFile);
+		analyzer.initializeReproInfo(dataDir + File.separator + reproFile);
 		analyzer.clones();
 		
-		TestUtils.checkCsv("file2hashesA", expectedFile2HashesLines);
-		TestUtils.checkCsv("hash2filesA", expectedHash2FileLines);
-		TestUtils.checkCsv("cloneFrequency", expectedFrequencyLines);
-		TestUtils.checkCsv("connections", expectedConnectionsLines);
+		checkCsv("file2hashesA", expectedFile2HashesLines);
+		checkCsv("hash2filesA", expectedHash2FileLines);
+		checkCsv("cloneFrequency", expectedFrequencyLines);
+		checkCsv("connections", expectedConnectionsLines);
 		
-		TestUtils.deleteCloneCsvs();
+		deleteCloneCsvs();
 	}
 	
 	/**
 	 * Verify that the output files file2hashesA<current-date-time>.csv,
 	 * cloneFrequency<current-date-time>.csv and
 	 * connections<current-date-time>.csv have the right content after clone
-	 * analysis of a notebooks with both clones and a unique snippet.
+	 * analysis of a notebook with both clones and a unique snippet.
 	 * @throws IOException
 	 */
 	@Test
@@ -635,23 +637,122 @@ public class NotebookAnalyzerTest {
 		// hash2Files is hard to test since we don't know in which order the hashes are stored
 		String[] expectedFrequencyLines = {
 			cloneFrequencyHeader(),
-			notebookFile + ", 1, 2, 2, 0.6667, 0.6667, 2, 2"
+			notebookFile + ", 1, 2, 0, 0.6667, 0.6667, 2, 2"
 		};
 		String[] expectedConnectionsLines = {
 			connectionsHeader(),
 			notebookFile + ", 2, 0.6667, 2, 0.6667, 2, 2, 0.0000, 0.0000"
 		};
 		
-		// Actual values
-		analyzer.initializeNotebooksFrom(dataDir + "/" + notebookFile);
-		analyzer.initializeReproInfo(dataDir + "/" + reproFile);
+		analyzer.initializeNotebooksFrom(dataDir + File.separator + notebookFile);
+		analyzer.initializeReproInfo(dataDir + File.separator + reproFile);
 		analyzer.clones();
 		
-		TestUtils.checkCsv("file2hashesA", expectedFile2HashesLines);
-		TestUtils.checkCsv("cloneFrequency", expectedFrequencyLines);
-		TestUtils.checkCsv("connections", expectedConnectionsLines);
+		checkCsv("file2hashesA", expectedFile2HashesLines);
+		checkCsv("cloneFrequency", expectedFrequencyLines);
+		checkCsv("connections", expectedConnectionsLines);
 		
-		TestUtils.deleteCloneCsvs();
+		deleteCloneCsvs();
+	}
+	
+	/**
+	 * Verify that the output files file2hashesA<current-date-time>.csv,
+	 * cloneFrequency<current-date-time>.csv and
+	 * connections<current-date-time>.csv have the right content after clone
+	 * analysis of a notebook with an empty clone.
+	 * @throws IOException
+	 */
+	@Test
+	public void testClones_csv_emptyClone() throws IOException {
+		String dataDir = "test/data/hash_maintenance";
+		String[] notebookFiles = {"nb_1.ipynb", "nb_2.ipynb", "nb_4.ipynb"};
+		String reproFile = "test/data/hash/repros.csv";
+		String emptyHash = "D41D8CD98F00B204E9800998ECF8427E";
+		String codeHash = "82B3B93D07679915D2486E460668A907";
+		String otherCodeHash = "76846A33FEF92030A17FFDC1C4966235";
+		String uniqueCodeHash = "8944C013B85704C3D9125C531AC33417";
+		
+		String[] expectedFile2HashesLines = {
+			file2hashesHeader(),
+			notebookFiles[0] + ", " + emptyHash + ", " + codeHash + ", " + codeHash + ", " + emptyHash + ", " + uniqueCodeHash + ", " + otherCodeHash,
+			notebookFiles[1] + ", " + codeHash + ", " + emptyHash,
+			notebookFiles[2] + ", " + "DB51AD8A14D6C61A115D05D6810463CB" + ", " + otherCodeHash
+		};
+		String[] expectedFrequencyLines = {
+			cloneFrequencyHeader(),
+			notebookFiles[0] + ", 1, 5, 2, 0.8333, 0.7500, 4, 2",
+			notebookFiles[1] + ", 0, 2, 1, 1.0000, 1.0000, 0, 0",
+			notebookFiles[2] + ", 1, 1, 0, 0.5000, 0.5000, 0, 0"
+		};
+		String[] expectedConnectionsLines = {
+			connectionsHeader(),
+			notebookFiles[0] + ", 9, 1.5000, 5, 1.2500, 4, 2, 2.5000, 1.5000",
+			notebookFiles[1] + ", 4, 2.0000, 2, 2.0000, 0, 0, 4.0000, 2.0000",
+			notebookFiles[2] + ", 1, 0.5000, 1, 0.5000, 0, 0, 1.0000, 1.0000"
+		};
+		
+		for (String notebookFile: notebookFiles) {
+			System.out.println("Initializing from " + notebookFile);
+			analyzer.initializeNotebooksFrom(dataDir + File.separator + notebookFile);
+		}
+		analyzer.initializeReproInfo(reproFile);
+		analyzer.clones();
+		
+		checkCsv_anyOrder("file2hashesA", expectedFile2HashesLines);
+		checkCsv_anyOrder("cloneFrequency", expectedFrequencyLines);
+		checkCsv_anyOrder("connections", expectedConnectionsLines);
+		
+		deleteCloneCsvs();
+	}
+	
+	/**
+	 * When there is an odd number of clones with different LOC, verify that
+	 * only one line is stored for this clone in hash2files, and that the line
+	 * count is the median of the line counts of the clones.
+	 */
+	@Test
+	public void testHash2files_csv_clonesWithDifferentLOC_odd() throws IOException {
+		String dataDir = "test/data/hash";
+		String[] files = {"nb_12.ipynb", "nb_13.ipynb", "nb_14.ipynb"};
+		String reproFile = "repros.csv";
+		String[] expectedLines = {
+			hash2filesHeader(),
+			"159651F111F7381E9043CA7D2671E3E2\\, 2\\, nb_[0-9]+\\.ipynb\\, [0-9]+.*"
+		};
+		
+		for (String file: files) {
+			analyzer.initializeNotebooksFrom(dataDir + File.separator + file);
+		}
+		analyzer.initializeReproInfo(dataDir + File.separator + reproFile);
+		analyzer.clones();
+
+		checkCsv_matches("hash2filesA", expectedLines);
+		deleteCloneCsvs();
+	}
+	
+	/**
+	 * When there is an even number of clones with different LOC, verify that
+	 * only one line is stored for this clone in hash2files, and that the line
+	 * count is the median of the line counts of the clones.
+	 */
+	@Test
+	public void testHash2files_csv_clonesWithDifferentLOC_even() throws IOException {
+		String dataDir = "test/data/hash";
+		String[] files = {"nb_12.ipynb", "nb_13.ipynb"};
+		String reproFile = "repros.csv";
+		String[] expectedLines = {
+			hash2filesHeader(),
+			"159651F111F7381E9043CA7D2671E3E2\\, 1\\, nb_[0-9]+\\.ipynb\\, [0-9]+.*"
+		};
+		
+		for (String file: files) {
+			analyzer.initializeNotebooksFrom(dataDir + File.separator + file);
+		}
+		analyzer.initializeReproInfo(dataDir + File.separator + reproFile);
+		analyzer.clones();
+		
+		checkCsv_matches("hash2filesA", expectedLines);
+		deleteCloneCsvs();
 	}
 	
 	/**
@@ -676,16 +777,19 @@ public class NotebookAnalyzerTest {
 				"nb_10.ipynb, 3, 3.0000, 0, 0.0000, 0, 0, 3.0000, 0.0000",
 				"nb_8.ipynb, 1, 1.0000, 1, 1.0000, 0, 0, 1.0000, 1.0000",
 				"nb_9.ipynb, 4, 2.0000, 4, 2.0000, 2, 2, 2.0000, 2.0000",
-				"nb_11.ipynb, 1, 1.0000, 1, 1.0000, 0, 0, 1.0000, 1.0000"
+				"nb_11.ipynb, 1, 1.0000, 1, 1.0000, 0, 0, 1.0000, 1.0000",
+				"nb_12.ipynb, 2, 2.0000, 2, 2.0000, 0, 0, 1.0000, 1.0000",
+				"nb_13.ipynb, 2, 2.0000, 2, 2.0000, 0, 0, 1.0000, 1.0000",
+				"nb_14.ipynb, 2, 2.0000, 2, 2.0000, 0, 0, 1.0000, 1.0000"
 		};
 		
 		analyzer.initializeNotebooksFrom(dataDir);
-		analyzer.initializeReproInfo(dataDir + "/" + reproFile);
+		analyzer.initializeReproInfo(dataDir + File.separator + reproFile);
 		analyzer.clones();
 		
-		TestUtils.checkCsv_anyOrder("connections", expectedLines);
+		checkCsv_anyOrder("connections", expectedLines);
 		
-		TestUtils.deleteCloneCsvs();
+		deleteCloneCsvs();
 	}
 	
 	/**
@@ -704,7 +808,7 @@ public class NotebookAnalyzerTest {
 		expected.put(LangName.UNKNOWN, 9);
 		Map<LangName, Integer> actual = analyzer.languages();
 		assertEquals("Error in language extraction:", expected, actual);
-		TestUtils.lastOutputFile("languages").delete();
+		lastOutputFile("languages").delete();
 	}
 	
 	/**
@@ -725,13 +829,13 @@ public class NotebookAnalyzerTest {
 		}
 		
 		for (String file: files) {
-			analyzer.initializeNotebooksFrom(dataDir + "/" + file);
+			analyzer.initializeNotebooksFrom(dataDir + File.separator + file);
 		}
 		analyzer.languages();
 		
-		TestUtils.checkCsv("languages", expectedLines);
+		checkCsv("languages", expectedLines);
 		
-		TestUtils.lastOutputFile("languages").delete();
+		lastOutputFile("languages").delete();
 	}
 	
 	/**
@@ -743,7 +847,7 @@ public class NotebookAnalyzerTest {
 	public void testLOC_total() throws IOException {
 		analyzer.initializeNotebooksFrom("test/data/loc");
 		assertEquals("Wrong LOC!", 55, analyzer.LOC());
-		TestUtils.lastOutputFile("loc").delete();
+		lastOutputFile("loc").delete();
 	}
 	
 	/**
@@ -765,13 +869,13 @@ public class NotebookAnalyzerTest {
 		}
 		
 		for (String file: files) {
-			analyzer.initializeNotebooksFrom(dataDir + "/" + file);
+			analyzer.initializeNotebooksFrom(dataDir + File.separator + file);
 		}
 		analyzer.LOC();
 		
-		TestUtils.checkCsv("loc", expectedLines);	
+		checkCsv("loc", expectedLines);	
 
-		TestUtils.lastOutputFile("loc").delete();
+		lastOutputFile("loc").delete();
 	}
 	
 	/**
@@ -812,7 +916,7 @@ public class NotebookAnalyzerTest {
 						modules.get(i).get(j).importedWith());
 			}
 		}
-		TestUtils.lastOutputFile("modules").delete();
+		lastOutputFile("modules").delete();
 	}
 	
 	/**
@@ -838,8 +942,8 @@ public class NotebookAnalyzerTest {
 		}
 		analyzer.modules();
 		
-		TestUtils.checkCsv("modules", expectedLines);
-		TestUtils.lastOutputFile("modules").delete();
+		checkCsv("modules", expectedLines);
+		lastOutputFile("modules").delete();
 	}
 	
 	/**
@@ -859,8 +963,8 @@ public class NotebookAnalyzerTest {
 		
 		assertEquals("Wrong modules returned for invalid file!",
 				expectedModules, modules);
-		TestUtils.checkCsv("modules", expectedLines);
-		TestUtils.lastOutputFile("modules").delete();
+		checkCsv("modules", expectedLines);
+		lastOutputFile("modules").delete();
 	}
 	
 	/**
@@ -888,7 +992,7 @@ public class NotebookAnalyzerTest {
 		expectedModulesString = "1. moduleZ: 4\n";
 		modulesString = NotebookAnalyzer.mostCommonModulesAsString(modules, 1);
 		assertEquals("Wrong top modules reported!", expectedModulesString, modulesString);
-		TestUtils.lastOutputFile("modules").delete();
+		lastOutputFile("modules").delete();
 	}
 	
 	/**
@@ -911,7 +1015,7 @@ public class NotebookAnalyzerTest {
 		String importTypeString = NotebookAnalyzer.importTypeSummary(modules);
 		assertEquals("Wrong import types reported!",
 				expectedImportTypeString, importTypeString);
-		TestUtils.lastOutputFile("modules").delete();
+		lastOutputFile("modules").delete();
 	}
 
 	/**
@@ -923,7 +1027,7 @@ public class NotebookAnalyzerTest {
 	public void testNumCodeCells_total() throws IOException {
 		analyzer.initializeNotebooksFrom("test/data/count");
 		assertEquals("Wrong number of cells found in notebooks!", 15, analyzer.numCodeCells());
-		TestUtils.lastOutputFile("code_cells").delete();
+		lastOutputFile("code_cells").delete();
 	}
 	
 	/**
@@ -943,13 +1047,13 @@ public class NotebookAnalyzerTest {
 		}
 		
 		for (String file: files) {
-			analyzer.initializeNotebooksFrom(dataDir + "/" + file);
+			analyzer.initializeNotebooksFrom(dataDir + File.separator + file);
 		}
 		analyzer.numCodeCells();
 		
-		TestUtils.checkCsv("code_cells", expectedLines);
+		checkCsv("code_cells", expectedLines);
 		
-		TestUtils.lastOutputFile("code_cells").delete();
+		lastOutputFile("code_cells").delete();
 	}
 
 	/**
@@ -960,6 +1064,7 @@ public class NotebookAnalyzerTest {
 		analyzer.initializeNotebooksFrom("test/data/count");
 		assertEquals("Wrong number of notebooks found:", 12, analyzer.numNotebooks());
 	}
+
 	
 	/**
 	 * @return Expected header of all_languages files
@@ -968,14 +1073,6 @@ public class NotebookAnalyzerTest {
 		return "file, " + LangSpec.METADATA_LANGUAGE + ", " + LangSpec.METADATA_LANGUAGEINFO_NAME
 				+ ", " + LangSpec.METADATA_KERNELSPEC_LANGUAGE + ", " + LangSpec.METADATA_KERNELSPEC_NAME
 				+ ", " + LangSpec.CODE_CELLS;
-	}
-	
-	/**
-	 * @return Expected header of cloneFrequency files
-	 */
-	private static String cloneFrequencyHeader() {
-		return "file, unique, clones, non-empty clones, clone frequency, non-empty clone frequency, "
-				+ "intra clones, non-empty intra clones";
 	}
 	
 	/**
@@ -999,7 +1096,7 @@ public class NotebookAnalyzerTest {
 	private static String file2hashesHeader() {
 		return "file, snippets";
 	}
-	
+
 	/**
 	 * @return Expected header of hash2files files
 	 */

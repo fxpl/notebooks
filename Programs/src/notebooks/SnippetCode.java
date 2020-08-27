@@ -8,7 +8,7 @@ import java.util.Objects;
  * Represents the code inside a snippet.
  */
 public class SnippetCode {
-	private final int LOC;
+	private int LOC;
 	private final String hash;
 	
 	public SnippetCode(int LOC, String hash) {
@@ -30,12 +30,12 @@ public class SnippetCode {
 	
 	@Override
 	public boolean equals(Object other) {
-		if (other.getClass() != this.getClass()) {
+		if (other instanceof SnippetCode) {
+			SnippetCode otherCode = (SnippetCode)other;
+			return this.hash.equals(otherCode.getHash());
+		} else {
 			return false;
 		}
-		SnippetCode otherCode = (SnippetCode)other;
-		return this.hash.equals(otherCode.getHash())
-				&& this.LOC == otherCode.LOC;
 	}
 	
 	@Override
@@ -51,11 +51,12 @@ public class SnippetCode {
 			return true;
 		} else {
 			String emptyHash = "";
+			final String algorithm = "MD5";
 			try {
-				MessageDigest hasher = MessageDigest.getInstance("MD5");
+				MessageDigest hasher = MessageDigest.getInstance(algorithm);
 				emptyHash = Utils.toHexString(hasher.digest("".getBytes()));
 			} catch (NoSuchAlgorithmException e) {
-				System.err.println("MessageDigest cannot hash using MD5!");
+				System.err.println("MessageDigest cannot hash using " + algorithm + "!");
 			}
 			return emptyHash.equals(this.hash);
 		}
@@ -76,6 +77,10 @@ public class SnippetCode {
 			}
 		}
 		return false;
+	}
+	
+	public void setLOC(int LOC) {
+		this.LOC = LOC;
 	}
 	
 	@Override

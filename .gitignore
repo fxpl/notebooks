@@ -5,8 +5,8 @@ slurm-*.out
 Logs
 logs
 
-# Output directory
-Output
+# Output directories
+Output*
 
 # From R studio
 .Rhistory

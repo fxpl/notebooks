@@ -59,7 +59,7 @@ public class NotebookTest {
 		
 		// Run
 		for (String nbFile: inFiles) {
-			Notebook nb = new Notebook(dataDir + "/" + nbFile);
+			Notebook nb = new Notebook(dataDir + File.separator + nbFile);
 			nb.dumpCode(outputDir, suffix);
 		}
 		
@@ -95,7 +95,7 @@ public class NotebookTest {
 		
 		// Run
 		for (String nbFile: notebooks) {
-			Notebook nb = new Notebook(dataDir + "/" + nbFile + ".ipynb");
+			Notebook nb = new Notebook(dataDir + File.separator + nbFile + ".ipynb");
 			nb.dumpCodeAsZipWithSingleFile(outputDir, suffix);
 		}
 		
@@ -147,7 +147,7 @@ public class NotebookTest {
 		
 		// Run
 		for (String nbFile: inFiles) {
-			Notebook nb = new Notebook(dataDir + "/" + nbFile);
+			Notebook nb = new Notebook(dataDir + File.separator + nbFile);
 			nb.dumpCodeAsZip(outputDir, suffix);
 		}
 
@@ -268,7 +268,7 @@ public class NotebookTest {
 		int[][] expectedLOC = {{0, 0}, {0}, {1}, {1, 1}};
 		
 		for (int i=0; i<files.length; i++) {
-			Notebook notebook = new Notebook(dataDir + "/" + files[i]);
+			Notebook notebook = new Notebook(dataDir + File.separator + files[i]);
 			SnippetCode[] snippetCodes = notebook.snippetCodes();
 			for (int j=0; j<expectedHashStrings[i].length; j++) {
 				assertEquals("Wrong hash:", expectedHashStrings[i][j], snippetCodes[j].getHash());
@@ -302,7 +302,7 @@ public class NotebookTest {
 				LangName.UNKNOWN, LangName.UNKNOWN,
 				LangName.UNKNOWN, LangName.PYTHON};
 		for (int i=0; i<files.length; i++) {
-			Notebook notebook = new Notebook(dataDir + "/" + files[i]);
+			Notebook notebook = new Notebook(dataDir + File.separator + files[i]);
 			assertEquals("Wrong language:", languages[i], notebook.language().getName());
 		}
 	}
@@ -327,7 +327,7 @@ public class NotebookTest {
 				LangSpec.METADATA_LANGUAGEINFO_NAME, LangSpec.METADATA_LANGUAGEINFO_NAME,
 				LangSpec.CODE_CELLS, LangSpec.CODE_CELLS};
 		for (int i=0; i<files.length; i++) {
-			Notebook notebook = new Notebook(dataDir + "/" + files[i]);
+			Notebook notebook = new Notebook(dataDir + File.separator + files[i]);
 			assertEquals("Wrong language specification location:", langSpecs[i], notebook.language().getSpec());
 		}
 	}
@@ -421,7 +421,7 @@ public class NotebookTest {
 				"missing_source.ipynb", "two_codeCells_26loc_worksheet.ipynb"};
 		int[] LOC = {0, 6, 6, 13, 2, 3, 2, 23};
 		for (int i=0; i<files.length; i++) {
-			Notebook notebook = new Notebook(dataDir + "/" + files[i]);
+			Notebook notebook = new Notebook(dataDir + File.separator + files[i]);
 			assertEquals("Wrong LOC!", LOC[i], notebook.LOC());
 		}
 	}
@@ -471,7 +471,7 @@ public class NotebookTest {
 				"missing_cell_type.ipynb", "four_cells_and_worksheets.ipynb"};
 		int[] numCodeCells = {0, 1, 2, 3, 3, 0, 0, 2, 4};
 		for (int i=0; i<files.length; i++) {
-			Notebook notebook = new Notebook(dataDir + "/" + files[i]);
+			Notebook notebook = new Notebook(dataDir + File.separator + files[i]);
 			assertEquals("Wrong number of code cells!",
 					numCodeCells[i], notebook.numCodeCells());
 		}
@@ -487,7 +487,7 @@ public class NotebookTest {
 		int[][] expectedNumChars = {{15, 30}, {15, 30}, {14}};
 		String[] files = {"nb1.ipynb", "nb1_str.ipynb", "nb2.ipynb"};
 		for (int i=0; i<files.length; i++) {
-			Notebook notebook = new Notebook(dataDir + "/" + files[i]);
+			Notebook notebook = new Notebook(dataDir + File.separator + files[i]);
 			int[] numChars = notebook.numCodeChars();
 			for (int j=0; j<numChars.length; j++) {
 				assertEquals("Wrong number of code characters returned for " + files[i] + ", snippet " + j + "!", 
@@ -513,7 +513,7 @@ public class NotebookTest {
 		String expectedOutput = "def my_function\n\ta = 2\n\tb = 2\n";
 		
 		// Verify behavior
-		Notebook notebook = new Notebook(dataDir + "/" + file);
+		Notebook notebook = new Notebook(dataDir + File.separator + file);
 		notebook.printSnippet(snippetIndex);
 		assertEquals("Wrong code printed", expectedOutput, output.toString());
 		
@@ -814,5 +814,35 @@ public class NotebookTest {
 			assertEquals("Incorrect import type stored for notebook " + i + "!",
 					expectedModules.get(i).importedWith(), modules.get(i).importedWith());
 		}
+	}
+
+	/**
+	 * Verify that the number of code cells doesn't increase every time we
+	 * fetch them (and both keys "cells" and "worksheets" are present in the
+	 * notebook).
+	 */
+	@Test
+	public void testRefBugFix() {
+		Notebook notebook = new Notebook("test/data/refBug/nb_1390458.ipynb");
+		assertEquals("Wrong number of code cells reported!", 1, notebook.numCodeCells());
+		assertEquals("Wrong LOC reported!", 1, notebook.LOC());
+		SnippetCode[] hashes = notebook.snippetCodes();
+		assertEquals("Wrong number of hashes reported!", 1, hashes.length);
+	}
+	
+	/**
+	 * Verify that the right string representation is returned for a notebook,
+	 * with and without directory names in the path.
+	 */
+	@Test
+	public void testToString_fullPath() {
+		String name = "nb_76.ipynb";
+		String path = "some/nonexistent/path/" + name;
+		// Only name
+		Notebook notebook = new Notebook(name);
+		assertEquals("Wrong string representation of notebook", name, notebook.toString());
+		// Full path
+		notebook = new Notebook(path);
+		assertEquals("Wrong string representation of notebook", name, notebook.toString());
 	}
 }

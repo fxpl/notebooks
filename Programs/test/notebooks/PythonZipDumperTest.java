@@ -38,7 +38,7 @@ public class PythonZipDumperTest extends DumperTest {
 		dumper.dumpAll(src, targetDir);
 		
 		for (String fileName: expectedZipFiles) {
-			File output = new File(targetDir + "/" + fileName);
+			File output = new File(targetDir + File.separator + fileName);
 			assertTrue(fileName + " is missing!", output.exists());
 			// The content of the file is checked by NotebookTest.
 		}
