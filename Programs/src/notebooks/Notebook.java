@@ -27,8 +27,6 @@ public class Notebook {
 	private WeakReference<JSONObject> contents;
 	private ReentrantLock contentsLock = new ReentrantLock();
 	
-	final static private String MODULEIDENTIFIER = "[A-Za-z_][A-Za-z0-9_\\.]*";
-	
 	public Notebook(String path) {
 		this(path, "");
 	}
@@ -83,6 +81,7 @@ public class Notebook {
 	 * @return A list of all modules found in importStatment
 	 */
 	private List<PythonModule> modulesInImport(String importStatement) throws NotebookException {
+		final String MODULEIDENTIFIER = PythonModule.IDENTIFIER;
 		final String moduleDescr = "" + MODULEIDENTIFIER + "(\\s*as\\s+" + MODULEIDENTIFIER + "\\s*)?";
 		final String moduleList = "(" + moduleDescr + "\\s*,\\s*)*" + moduleDescr;
 		String importStatementTemplate = "\\s*import\\s+(" + moduleList + ")\\s+";
@@ -118,6 +117,7 @@ public class Notebook {
 	 * @return A List of all modules in identifierList 
 	 */
 	private List<PythonModule> modulesInIdentifierList(String identifierList) {
+		final String MODULEIDENTIFIER = PythonModule.IDENTIFIER;
 		final Pattern ordinaryPattern = Pattern.compile("(" + MODULEIDENTIFIER + ")");
 		final Pattern asPattern = Pattern.compile("(" + MODULEIDENTIFIER + ")\\s+as\\s+(" + MODULEIDENTIFIER + ")");
 		List<PythonModule> result = new ArrayList<PythonModule>();

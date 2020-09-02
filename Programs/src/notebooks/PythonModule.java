@@ -1,12 +1,21 @@
 package notebooks;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class PythonModule {
+	final static public String IDENTIFIER = "[A-Za-z_][A-Za-z0-9_\\.]*";
+	final static private String ARGUMENTIDENTIFIER = "(\\\"|\\\')?[A-Za-z0-9_\\\\.]*(\\\"|\\\')?";
+	final static private String ARGUMENTLIST = "(\\s*" + ARGUMENTIDENTIFIER + "\\s*\\,\\s*)*" + ARGUMENTIDENTIFIER + "?\\s*";
+	
 	protected String name;
 	protected ImportType importedWith;
 	protected String alias;
 	protected PythonModule parent;
+	protected Map<String, Integer> functionUsages;
 	
 	public PythonModule(String name) {
 		this(name, null, null, null);
@@ -35,6 +44,7 @@ public class PythonModule {
 		this.alias = alias;
 		this.importedWith = importedWith;
 		this.parent = parent;
+		this.functionUsages = new HashMap<String, Integer>();
 	}
 	
 	public String getName() {
@@ -93,6 +103,21 @@ public class PythonModule {
 		}
 	}
 	
+	/**
+	 * If the line given as argument contains a usage of this module, register
+	 * the function called.
+	 * @param line Code line to check for usage
+	 */
+	public void registerUsage(String line) {
+		// TODO: Ta höjd för nästlade uttryck och uttryck i listor/arrayer!
+		Pattern usagePattern = Pattern.compile(
+				"(\\s*" + IDENTIFIER + "\\s*\\=\\s*)?" + this.qualifier() + "\\s*\\.\\s*(" + IDENTIFIER + ")\\s*\\(" + ARGUMENTLIST + "\\).*");
+		Matcher usageMatcher = usagePattern.matcher(line);
+		if (usageMatcher.matches()) {
+			Utils.addOrIncrease(functionUsages, usageMatcher.group(2));
+		}
+	}
+	
 	public void setOldestAncestor(PythonModule ancestor) {
 		if (null == parent) {
 			this.parent = ancestor;
@@ -112,5 +137,25 @@ public class PythonModule {
 			result += "(" + alias + ")";
 		}
 		return result;
+	}
+	
+	private String qualifier() {
+		if (ImportType.ALIAS == this.importedWith) {
+			return alias;
+		} else if (ImportType.FROM == this.importedWith) {
+			return "";
+		} else if (ImportType.ORDINARY == this.importedWith) {
+			String qualifier = "";
+			if (null != parent) {
+				qualifier += parent.qualifier();
+			}
+			if (!"".equals(qualifier)) {
+				qualifier += ".";
+			}
+			return qualifier + this.name;
+		} else {
+			System.err.println("Unknown import type " + this.importedWith + ". No qualifier will be returned!");
+			return "";
+		}
 	}
 }

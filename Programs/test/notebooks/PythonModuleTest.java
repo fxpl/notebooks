@@ -2,6 +2,8 @@ package notebooks;
 
 import static org.junit.Assert.*;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 import org.junit.Before;
@@ -222,6 +224,115 @@ public class PythonModuleTest {
 	@Test
 	public void testImportedWith() {
 		assertEquals("Wrong import type retured!", importedWith, module.importedWith());
+	}
+	
+	@Test
+	public void testRegisterUsage_alias() {
+		// import parentModuleName.name as alias
+		module.registerUsage(alias + ".fun0()");
+		module.registerUsage("a = " + alias + ".fun0()");
+		module.registerUsage(alias + ".fun1(3)");
+		module.registerUsage(alias + ".fun3(8, 6, 2)");
+		module.registerUsage(alias + ".fun3( 9 , 3 , 5 )");
+		module.registerUsage(alias + " . fun3(13, 22 , 0)");
+		module.registerUsage(name + ".funX()");	// Should not be registered
+		module.registerUsage(parentModuleName + "." + name + ".funY()"); // Should not be registered
+		
+		Map<String, Integer> expectedFunctionUsages = new HashMap<String, Integer>();
+		expectedFunctionUsages.put("fun0", 2);
+		expectedFunctionUsages.put("fun1", 1);
+		expectedFunctionUsages.put("fun3", 3);
+		
+		assertEquals("Wrong function usages stored for module imported with alias.",
+				expectedFunctionUsages, module.functionUsages);
+	}
+	
+	@Test
+	public void testRegisterUsage() {
+		// import name
+		PythonModule functionsModule = new PythonModule(name, ImportType.ORDINARY);
+		functionsModule.registerUsage(name + ".fun( arg1, arg2, arg3 )");
+		functionsModule.registerUsage(name + ".fun( \"apa\", arg2, \"kossa\" )");
+		functionsModule.registerUsage(name + ".fun( \'apa\', arg2, \'kossa\' )");
+		
+		Map<String, Integer> expectedFunctionUsages = new HashMap<String, Integer>();
+		expectedFunctionUsages.put("fun", 3);
+		
+		assertEquals("Wrong function usages stored for module without alias.",
+				expectedFunctionUsages, functionsModule.functionUsages);
+	}
+	
+	@Test
+	public void testRegisterUsage_parent() {
+		// import parentModuleName.name
+		PythonModule parent = new PythonModule(parentModuleName, ImportType.ORDINARY);
+		PythonModule module = new PythonModule(name, ImportType.ORDINARY, parent);
+		
+		module.registerUsage("funA()");	// Not fun from this module
+		module.registerUsage(name + ".funB()");	// Not fun from this module
+		module.registerUsage(parentModuleName + "." + name + ".funC()"); // Should be registered
+		
+		Map<String, Integer> expectedFunctionUsages = new HashMap<String, Integer>();
+		expectedFunctionUsages.put("funC", 1);
+		
+		assertEquals("Wrong function usages stored for module with parent.",
+				expectedFunctionUsages, module.functionUsages);
+	}
+	
+	@Test
+	public void testRegisterUsage_from() {
+		// from parentModuleName import name
+		PythonModule parent = new PythonModule(parentModuleName, ImportType.FROM);
+		PythonModule module = new PythonModule(name, ImportType.ORDINARY, parent);
+		
+		module.registerUsage(name + ".fun0()"); // Should be registered
+		module.registerUsage("funX()"); // Should not be registered
+		module.registerUsage(parentModuleName + "." + name + ".funY()"); // Should not be registered
+		
+		Map<String, Integer> expectedFunctionUsages = new HashMap<String, Integer>();
+		expectedFunctionUsages.put("fun0", 1);
+		
+		assertEquals("Wrong function usages stored for module imported from parent.",
+				expectedFunctionUsages, module.functionUsages);
+	}
+	
+	@Test
+	public void testRegisterUsage_submodule_from() {
+		// from parentModuleName import name.subModuleName
+		String subModuleName = "subModule";
+		PythonModule grandParent = new PythonModule(parentModuleName, ImportType.FROM);
+		PythonModule parent = new PythonModule(name, ImportType.ORDINARY, grandParent);
+		PythonModule module = new PythonModule(subModuleName, ImportType.ORDINARY, parent);
+		
+		module.registerUsage("funA()"); // Should not be registered
+		module.registerUsage(subModuleName + ".funB()");	// Should not be registered
+		module.registerUsage(name + "." + subModuleName + ".funC()");	// Should be registered
+		module.registerUsage(parentModuleName + "." + name + "." + subModuleName + ".funD()");	// Should not be registered
+		
+		Map<String, Integer> expectedFunctionUsages = new HashMap<String, Integer>();
+		expectedFunctionUsages.put("funC", 1);
+		
+		assertEquals("Wrong function usages stored.", expectedFunctionUsages, module.functionUsages);
+	}
+	
+	@Test
+	public void testRegisterUsage_submodule_from_with_alias() {
+		// from parentModuleName import name.subModuleName as alias
+		String subModuleName = "subModule";
+		PythonModule grandParent = new PythonModule(parentModuleName, ImportType.FROM);
+		PythonModule parent = new PythonModule(name, ImportType.ORDINARY, grandParent);
+		PythonModule module = new PythonModule(subModuleName, alias, ImportType.ALIAS, parent);
+		
+		module.registerUsage("funA()"); // Should not be registered
+		module.registerUsage(subModuleName + ".funB()");	// Should not be registered
+		module.registerUsage(name + "." + subModuleName + ".funC()");	// Should not be registered
+		module.registerUsage(parentModuleName + "." + name + "." + subModuleName + ".funD()");	// Should not be registered
+		module.registerUsage(alias + ".funE()");
+		
+		Map<String, Integer> expectedFunctionUsages = new HashMap<String, Integer>();
+		expectedFunctionUsages.put("funE", 1);
+		
+		assertEquals("Wrong function usages stored.", expectedFunctionUsages, module.functionUsages);
 	}
 	
 	@Test
