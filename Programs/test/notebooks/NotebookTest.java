@@ -558,9 +558,9 @@ public class NotebookTest {
 	public void testSingleImport() {
 		String dataDir = "test/data/modules";
 		String file = "nb_1.ipynb";
-		List<PythonModule> expectedModules = new ArrayList<PythonModule>(1);
-		expectedModules.add(new PythonModule("kossan_mu", ImportType.ORDINARY));
-		verifyImports(dataDir + "/" + file, expectedModules);
+		PythonModule expectedModule = new PythonModule("kossan_mu", ImportType.ORDINARY);
+		expectedModule.functionUsages.put("function", 2);
+		verifyImport(dataDir + "/" + file, expectedModule);
 	}
 	
 	/**
@@ -625,9 +625,16 @@ public class NotebookTest {
 		String dataDir = "test/data/modules";
 		String file = "nb_4.ipynb";
 		List<PythonModule> expectedModules = new ArrayList<PythonModule>(3);
-		expectedModules.add(new PythonModule("module1", ImportType.ORDINARY));
-		expectedModules.add(new PythonModule("module2", "mod2", ImportType.ALIAS));
-		expectedModules.add(new PythonModule("module3", "mod3", ImportType.ALIAS));
+		PythonModule module = new PythonModule("module1", ImportType.ORDINARY);
+		module.functionUsages.put("fun1", 1);
+		module.functionUsages.put("fun2", 1);
+		module.functionUsages.put("fun3", 1);
+		expectedModules.add(module);
+		module = new PythonModule("module2", "mod2", ImportType.ALIAS);
+		module.functionUsages.put("f", 2);
+		expectedModules.add(module);
+		module = new PythonModule("module3", "mod3", ImportType.ALIAS);
+		expectedModules.add(module);
 		verifyImports(dataDir + "/" + file, expectedModules);
 	}
 	
@@ -824,8 +831,13 @@ public class NotebookTest {
 		assertEquals("Incorrect list of module returned!",
 				expectedModules, modules);
 		for (int i=0; i<expectedModules.size(); i++) {
-			assertEquals("Incorrect import type stored for notebook " + i + "!",
-					expectedModules.get(i).importedWith(), modules.get(i).importedWith());
+			
+			PythonModule expectedModule = expectedModules.get(i);
+			PythonModule actualModule = modules.get(i);
+			assertEquals("Incorrect import type stored for module " + i + "!",
+					expectedModule.importedWith(), actualModule.importedWith());
+			assertEquals("Wrong function usages stored for module " + i + "!",
+					expectedModule.functionUsages, actualModule.functionUsages);
 		}
 	}
 

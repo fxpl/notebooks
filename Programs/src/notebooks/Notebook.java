@@ -69,6 +69,10 @@ public class Notebook {
 					} catch (NotebookException e) {
 						System.err.println("Could not add imported modules: " + e.getMessage());
 					}
+				} else {
+					for (PythonModule module: modules) {
+						module.registerUsage(line);
+					}
 				}
 			}
 		}
