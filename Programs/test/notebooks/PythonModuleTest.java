@@ -347,6 +347,20 @@ public class PythonModuleTest {
 	}
 	
 	@Test
+	public void testRegisterUsage_from_submodule() {
+		// from parentModuleName.subModuleName import name
+		PythonModule parent = new PythonModule("parentModuleName.subModuleName", ImportType.FROM);
+		PythonModule module = new PythonModule(name, ImportType.ORDINARY, parent);
+		
+		module.registerUsage(name + ".fun()");
+		Map<String, Integer> expectedFunctionUsages = new HashMap<String, Integer>();
+		expectedFunctionUsages.put("fun", 1);
+		
+		assertEquals("Wrong function usages stored for from import where parent has a submodule.",
+				expectedFunctionUsages, module.functionUsages);
+	}
+	
+	@Test
 	public void testRegisterUsage_submodule_from_with_alias() {
 		// from parentModuleName import name.subModuleName as alias
 		String subModuleName = "subModule";
@@ -364,6 +378,22 @@ public class PythonModuleTest {
 		expectedFunctionUsages.put("funE", 1);
 		
 		assertEquals("Wrong function usages stored.", expectedFunctionUsages, module.functionUsages);
+	}
+	
+	@Test
+	public void testRegisterUsage_function_from() {
+		// from parentModule import function
+		PythonModule parent = new PythonModule(parentModuleName, ImportType.FROM);
+		PythonModule module = new PythonModule(name, ImportType.ORDINARY, parent);
+		
+		module.registerUsage(name + "(x, y=z)");
+		module.registerUsage("[1, 5, 0, " + name + "(x, y=z), 3, " + name + "(\"apa\")]");
+		
+		Map<String, Integer> expectedFunctionUsages = new HashMap<String, Integer>();
+		expectedFunctionUsages.put(name, 3);
+		
+		assertEquals("Wrong function usages stored when function is imported.",
+				expectedFunctionUsages, module.functionUsages);
 	}
 	
 	@Test

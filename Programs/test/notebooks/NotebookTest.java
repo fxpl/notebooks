@@ -768,6 +768,19 @@ public class NotebookTest {
 	}
 	
 	/**
+	 * Verify that a module/function in a "from" import statement can be
+	 * identified correctly when the parent has a submodule.
+	 */
+	@Test
+	public void testFromImportWithParentSubmodule() {
+		String dataDir = "test/data/modules";
+		String file = "nb_34.ipynb";
+		PythonModule expectedParent = new PythonModule("Base.Sub", ImportType.FROM);
+		PythonModule expectedModule = new PythonModule("A", ImportType.ORDINARY, expectedParent);
+		verifyImport(dataDir + "/" + file, expectedModule);
+	}
+	
+	/**
 	 * Verify that modules are is imported when in an invalid import statement.
 	 */
 	@Test

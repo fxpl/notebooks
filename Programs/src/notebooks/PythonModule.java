@@ -107,11 +107,21 @@ public class PythonModule {
 	 * @param line Code line to check for usage
 	 */
 	public void registerUsage(String line) {
+		// Usages of functions located in an imported module
 		Pattern usagePattern = Pattern.compile(
 				"(?<!\\.)" + this.qualifier() + "\\s*\\.\\s*(" + IDENTIFIER + ")\\s*\\(");
 		Matcher usageMatcher = usagePattern.matcher(line);
 		while (usageMatcher.find()) {
 			Utils.addOrIncrease(functionUsages, usageMatcher.group(1));
+		}
+		
+		// Usages of imported function (only possible with from imports)
+		if (null != parent && ImportType.FROM == parent.importedWith()) {
+			usagePattern = Pattern.compile("(?<!\\.)" + this.qualifier() + "\\s*\\(");
+			usageMatcher = usagePattern.matcher(line);
+			while (usageMatcher.find()) {
+				Utils.addOrIncrease(functionUsages, name);
+			}
 		}
 	}
 	
