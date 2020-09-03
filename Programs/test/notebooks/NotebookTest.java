@@ -570,9 +570,8 @@ public class NotebookTest {
 	public void testSingleImportWithAlias() {
 		String dataDir = "test/data/modules";
 		String file = "nb_2.ipynb";
-		List<PythonModule> expectedModules = new ArrayList<PythonModule>(1);
-		expectedModules.add(new PythonModule("kalv", "naut", ImportType.ALIAS));
-		verifyImports(dataDir + "/" + file, expectedModules);
+		PythonModule expectedModule = new PythonModule("kalv", "naut", ImportType.ALIAS);
+		verifyImport(dataDir + "/" + file, expectedModule);
 	}
 	
 	/**
@@ -583,10 +582,9 @@ public class NotebookTest {
 	public void testSingleImportAllFrom() {
 		String dataDir = "test/data/modules";
 		String file = "nb_3.ipynb";
-		List<PythonModule> expectedModules = new ArrayList<PythonModule>(1);
 		PythonModule parent = new PythonModule("ko", ImportType.FROM);
-		expectedModules.add(new AllModules(parent));
-		verifyImports(dataDir + "/" + file, expectedModules);
+		PythonModule expectedModule = new AllModules(parent);
+		verifyImport(dataDir + "/" + file, expectedModule);
 	}
 	
 	/**
@@ -597,10 +595,9 @@ public class NotebookTest {
 	public void testImportOrdinaryFrom() {
 		String dataDir = "test/data/modules";
 		String file = "nb_6.ipynb";
-		List<PythonModule> expectedModules = new ArrayList<PythonModule>(1);
 		PythonModule expectedParent = new PythonModule("ko", ImportType.FROM);
-		expectedModules.add(new PythonModule("mage", ImportType.ORDINARY, expectedParent));
-		verifyImports(dataDir + "/" + file, expectedModules);
+		PythonModule expectedModule = new PythonModule("mage", ImportType.ORDINARY, expectedParent);
+		verifyImport(dataDir + "/" + file, expectedModule);
 	}
 	
 	/**
