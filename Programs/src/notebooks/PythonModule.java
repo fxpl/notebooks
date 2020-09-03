@@ -8,8 +8,6 @@ import java.util.regex.Pattern;
 
 public class PythonModule {
 	final static public String IDENTIFIER = "[A-Za-z_][A-Za-z0-9_\\.]*";
-	final static private String ARGUMENTIDENTIFIER = "(\\\"|\\\')?[A-Za-z0-9_\\\\.]*(\\\"|\\\')?";
-	final static private String ARGUMENTLIST = "(\\s*" + ARGUMENTIDENTIFIER + "\\s*\\,\\s*)*" + ARGUMENTIDENTIFIER + "?\\s*";
 	
 	protected String name;
 	protected ImportType importedWith;
@@ -109,12 +107,11 @@ public class PythonModule {
 	 * @param line Code line to check for usage
 	 */
 	public void registerUsage(String line) {
-		// TODO: Ta höjd för nästlade uttryck och uttryck i listor/arrayer!
 		Pattern usagePattern = Pattern.compile(
-				"(\\s*" + IDENTIFIER + "\\s*\\=\\s*)?" + this.qualifier() + "\\s*\\.\\s*(" + IDENTIFIER + ")\\s*\\(" + ARGUMENTLIST + "\\).*");
+				"(?<!\\.)" + this.qualifier() + "\\s*\\.\\s*(" + IDENTIFIER + ")\\s*\\(");
 		Matcher usageMatcher = usagePattern.matcher(line);
-		if (usageMatcher.matches()) {
-			Utils.addOrIncrease(functionUsages, usageMatcher.group(2));
+		while (usageMatcher.find()) {
+			Utils.addOrIncrease(functionUsages, usageMatcher.group(1));
 		}
 	}
 	

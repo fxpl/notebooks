@@ -235,15 +235,46 @@ public class PythonModuleTest {
 		module.registerUsage(alias + ".fun3(8, 6, 2)");
 		module.registerUsage(alias + ".fun3( 9 , 3 , 5 )");
 		module.registerUsage(alias + " . fun3(13, 22 , 0)");
-		module.registerUsage(name + ".funX()");	// Should not be registered
-		module.registerUsage(parentModuleName + "." + name + ".funY()"); // Should not be registered
+		module.registerUsage("otherModule.fun32(" + alias + ".funX().)");
+		module.registerUsage("[1, 2, 3, " + alias + ".funX(), 5]");
+		module.registerUsage(name + ".funY()");	// Should not be registered
+		module.registerUsage(parentModuleName + "." + name + ".funZ()"); // Should not be registered
 		
 		Map<String, Integer> expectedFunctionUsages = new HashMap<String, Integer>();
 		expectedFunctionUsages.put("fun0", 2);
 		expectedFunctionUsages.put("fun1", 1);
 		expectedFunctionUsages.put("fun3", 3);
+		expectedFunctionUsages.put("funX", 2);
 		
 		assertEquals("Wrong function usages stored for module imported with alias.",
+				expectedFunctionUsages, module.functionUsages);
+	}
+	
+	@Test
+	public void testRegisterUsage_mult_occurrences() {
+		module.registerUsage("[1, " + alias + ".f(8), 6, 2, " + alias + ".f(6), 0]");
+		module.registerUsage("[1, " + alias + ".fun1(8), 6, 2, " + alias + ".fun2(6), 0]");
+		
+		Map<String, Integer> expectedFunctionUsages = new HashMap<String, Integer>();
+		expectedFunctionUsages.put("f", 2);
+		expectedFunctionUsages.put("fun1", 1);
+		expectedFunctionUsages.put("fun2", 1);
+		
+		assertEquals("Wrong function usages stored when function is called multiple times.",
+				expectedFunctionUsages, module.functionUsages);
+	}
+	
+	@Test
+	public void testRegisterUsage_nested() {
+		module.registerUsage(alias + ".f(" + alias + ".f(x))");
+		module.registerUsage(alias + ".fun1(" + alias + ".fun2(a,b,c))");
+		
+		Map<String, Integer> expectedFunctionUsages = new HashMap<String, Integer>();
+		expectedFunctionUsages.put("f", 2);
+		expectedFunctionUsages.put("fun1", 1);
+		expectedFunctionUsages.put("fun2", 1);
+		
+		assertEquals("Wrong function usages stored for nested function calls.",
 				expectedFunctionUsages, module.functionUsages);
 	}
 	
@@ -251,7 +282,7 @@ public class PythonModuleTest {
 	public void testRegisterUsage() {
 		// import name
 		PythonModule functionsModule = new PythonModule(name, ImportType.ORDINARY);
-		functionsModule.registerUsage(name + ".fun( arg1, arg2, arg3 )");
+		functionsModule.registerUsage(name + ".fun( arg1, arg2, a=arg3 )");
 		functionsModule.registerUsage(name + ".fun( \"apa\", arg2, \"kossa\" )");
 		functionsModule.registerUsage(name + ".fun( \'apa\', arg2, \'kossa\' )");
 		
