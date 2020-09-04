@@ -904,7 +904,7 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 		expectedModules.get(4).add(3, new PythonModule("module13", "mod13", ImportType.ALIAS));
 		
 		for (String file: files) {
-			analyzer.initializeNotebooksFrom(dataDir + "/" + file);
+			analyzer.initializeNotebooksFrom(dataDir + File.separator + file);
 		}
 		List<List<PythonModule>> modules = analyzer.modules();
 		for (int i=0; i<pythonFiles.length; i++) {
@@ -938,7 +938,7 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 			"nb_5.ipynb, module10, module11(mod), module12, module13(mod13)"
 		};
 		for (String file: files) {
-			analyzer.initializeNotebooksFrom(dataDir + "/" + file);
+			analyzer.initializeNotebooksFrom(dataDir + File.separator + file);
 		}
 		analyzer.modules();
 		
@@ -958,7 +958,7 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 		String[] expectedLines = {
 			modulesHeader()
 		};
-		analyzer.initializeNotebooksFrom(dataDir + "/" + file);
+		analyzer.initializeNotebooksFrom(dataDir + File.separator + file);
 		List<List<PythonModule>> modules = analyzer.modules();
 		
 		assertEquals("Wrong modules returned for invalid file!",
@@ -978,7 +978,7 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 		String[] files = {"nb_10.ipynb", "nb_R.ipynb", "nb_11.ipynb",
 				"nb_12.ipynb", "nb_13.ipynb"};
 		for (String file: files) {
-			analyzer.initializeNotebooksFrom(dataDir + "/" + file);
+			analyzer.initializeNotebooksFrom(dataDir + File.separator + file);
 		}
 		List<List<PythonModule>> modules = analyzer.modules();
 		// All modules
@@ -1030,7 +1030,7 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 				+ "ALIAS: 5 (50.00%)\n"
 				+ "FROM: 1 (10.00%)\n";
 		for (String file: files) {
-			analyzer.initializeNotebooksFrom(dataDir + "/" + file);
+			analyzer.initializeNotebooksFrom(dataDir + File.separator + file);
 		}
 		List<List<PythonModule>> modules = analyzer.modules();
 		String importTypeString = NotebookAnalyzer.importTypeSummary(modules);
