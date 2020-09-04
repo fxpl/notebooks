@@ -1043,6 +1043,63 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 	}
 	
 	/**
+	 * Verify that functionUsages creates CSV files with all used functions
+	 * from the most commonly imported modules, sorted on number of usages in
+	 * descending order.
+	 * @throws IOException on errors handling input files of files to be checked
+	 */
+	@Test
+	public void testfunctionUsages() {
+		String dataDir = "test/data/modules";
+		String[] files = {"nb_36.ipynb", "nb_37.ipynb", "nb_38.ipynb"};
+		// Expected output
+		String[] expectedALines = {
+				functionUsagesHeader(),
+				"fun1, 5",
+				"fun4, 1"
+		};
+		String[] expectedBLines = {
+				functionUsagesHeader(),
+				"fun1, 3"
+		};
+		String[] expectedCLines = {
+				functionUsagesHeader(),
+				"fun2, 2"
+		};
+		String[] expectedDLines = {
+				functionUsagesHeader()
+		};
+		
+		// Create module lists
+		for (String file: files) {
+			analyzer.initializeNotebooksFrom(dataDir + File.separator + file);
+		}
+		List<List<PythonModule>> modules = analyzer.modules();
+		lastOutputFile("modules").delete();	// Side effect of modules call
+		List<Quantity> modulesSorted = NotebookAnalyzer.sortedModules(modules);
+		
+		// Print for all modules
+		analyzer.functionUsages(modules, modulesSorted, Integer.MAX_VALUE);
+		checkCsv("A-functions", expectedALines);
+		lastOutputFile("A-functions").delete();
+		checkCsv("B-functions", expectedBLines);
+		lastOutputFile("B-functions").delete();
+		checkCsv("C-functions", expectedCLines);
+		lastOutputFile("C-functions").delete();
+		checkCsv("D-functions", expectedDLines);
+		lastOutputFile("D-functions").delete();
+		
+		// Print for top 2 modules (A and B) only
+		analyzer.functionUsages(modules, modulesSorted, 2);
+		checkCsv("A-functions", expectedALines);
+		lastOutputFile("A-functions").delete();
+		checkCsv("B-functions", expectedBLines);
+		lastOutputFile("B-functions").delete();
+		verifyAbsenceOf(defaultOutputDirName, "C-functions");
+		verifyAbsenceOf(defaultOutputDirName, "D-functions");
+	}
+	
+	/**
 	 * Verify that a correct summary of the import type frequencies is created
 	 * by importTypeSummary.
 	 * @throws IOException on errors handling the input files
@@ -1170,5 +1227,12 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 	 */
 	private String modulesHeader() {
 		return "notebook, modules ...";
+	}
+	
+	/**
+	 * @return Expected heade of function usages files
+	 */
+	private String functionUsagesHeader() {
+		return "function, usages";
 	}
 }

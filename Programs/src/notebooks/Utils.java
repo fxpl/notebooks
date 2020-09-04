@@ -57,15 +57,26 @@ public class Utils {
 	
 	/**
 	 * If map contains a value for key, increase it with 1. Else add an entry
-	 * with for key with the value 1.
-	 * @param map Map to modify as stated above
+	 * for key with the value 1.
+	 * @param map Map to modify as described above
 	 * @param key Key for the entry that will be changed/added
 	 */
 	public static void addOrIncrease(Map<String, Integer> map, String key) {
+		addOrIncrease(map, key, 1);
+	}
+	
+	/**
+	 * If map contains a value for key, increase it with the specified number
+	 * Else add an entry for key with the specified number as value.
+	 * @param map Map to modify as described above
+	 * @param key Key for the entry that will be changed/added
+	 * @param valueIncr The value that should be put as or added to the value
+	 */
+	public static void addOrIncrease(Map<String, Integer> map, String key, int valueIncr) {
 		if (map.containsKey(key)) {
-			map.put(key, map.get(key) + 1);
+			map.put(key, map.get(key) + valueIncr);
 		} else {
-			map.put(key, 1);
+			map.put(key, valueIncr);
 		}
 	}
 	

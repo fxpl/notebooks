@@ -26,6 +26,10 @@ public class Quantity implements Comparable<Quantity> {
 				&& this.count == otherQuantity.count;
 	}
 	
+	public String getName() {
+		return name;
+	}
+	
 	@Override
 	public int hashCode() {
 		return Objects.hash(name, count);
@@ -34,5 +38,12 @@ public class Quantity implements Comparable<Quantity> {
 	@Override
 	public String toString() {
 		return name + ": " + count;
+	}
+	
+	/**
+	 * @return A string represenation suitable for CSV files
+	 */
+	public String toCsvString() {
+		return name + ", " + count;
 	}
 }

@@ -227,6 +227,36 @@ public class PythonModuleTest {
 	}
 	
 	@Test
+	public void testMerge() {
+		module.functionUsages.put("fun0", 5);
+		module.functionUsages.put("fun1", 2);
+		module.functionUsages.put("fun2", 1);
+		PythonModule moduleToMerge = new PythonModule(name, ImportType.ORDINARY, parent);
+		moduleToMerge.functionUsages.put("fun0", 3);
+		moduleToMerge.functionUsages.put("fun1", 2);
+		moduleToMerge.functionUsages.put("fun3", 6);
+		
+		Map <String, Integer> expectedFunctionUsages = new HashMap<String, Integer>(4);
+		expectedFunctionUsages.put("fun0", 8);
+		expectedFunctionUsages.put("fun1", 4);
+		expectedFunctionUsages.put("fun2", 1);
+		expectedFunctionUsages.put("fun3", 6);
+		
+		module.merge(moduleToMerge);
+		assertEquals("Modules merged incorrectly.", expectedFunctionUsages, module.functionUsages);
+	}
+	
+	@Test
+	public void testMerge_diffModule() {
+		PythonModule moduleToMerge = new PythonModule(name); // No parent => not the same module
+		moduleToMerge.functionUsages.put("fun0", 3);
+		
+		module.merge(moduleToMerge);
+		assertTrue("Modules merged despite representing different modules.",
+				module.functionUsages.isEmpty());
+	}
+	
+	@Test
 	public void testRegisterUsage_alias() {
 		// import parentModuleName.name as alias
 		module.registerUsage(alias + ".fun0()");

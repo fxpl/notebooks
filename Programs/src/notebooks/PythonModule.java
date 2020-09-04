@@ -2,6 +2,7 @@ package notebooks;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -9,11 +10,11 @@ import java.util.regex.Pattern;
 public class PythonModule {
 	final static public String IDENTIFIER = "[A-Za-z_][A-Za-z0-9_\\.]*";
 	
-	protected String name;
-	protected ImportType importedWith;
-	protected String alias;
+	protected final String name;
+	protected final ImportType importedWith;
+	protected final String alias;
 	protected PythonModule parent;
-	protected Map<String, Integer> functionUsages;
+	protected final Map<String, Integer> functionUsages;
 	
 	public PythonModule(String name) {
 		this(name, null, null, null);
@@ -98,6 +99,23 @@ public class PythonModule {
 			return null == other.parent && this.name.equals(other.name);
 		} else {
 			return this.name.equals(other.name) && this.parent.is(other.parent);
+		}
+	}
+	
+	/**
+	 * Merge the function usage map of the module given as argument into the
+	 * function usage map of this module: Add entries whose keys (function
+	 * names) are missing. When a key is already stored in functionUsages,
+	 * store the sum of the entry values in the two maps. Note that merging is
+	 * only done if the modules represent the same Python module (that is have
+	 * the same names and the same ancestors).
+	 */
+	public void merge(PythonModule other) {
+		if(other.is(this)) {
+			Map<String, Integer> usagesToAdd = other.functionUsages;
+			for (Entry<String, Integer> usage: usagesToAdd.entrySet()) {
+				Utils.addOrIncrease(functionUsages, usage.getKey(), usage.getValue());
+			}
 		}
 	}
 	

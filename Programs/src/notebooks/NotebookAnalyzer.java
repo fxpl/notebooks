@@ -715,6 +715,54 @@ public class NotebookAnalyzer extends Analyzer {
 		}
 		return result;
 	}
+	
+	/**
+	 * For each of the most commonly imported modules, create a file called
+	 * <moduleName>-functions<timestamp>.csv, where moduleName is the name of
+	 * the module. In the file, list all functions from this module that are
+	 * used in the corpus. Sort on number of usages in descending order. If
+	 * maxNum < the number of modules, only maxNum files are created. Else one
+	 * file is created for every module.
+	 * @param allModules A list containing lists of modules used in each notebook
+	 * @param modulesSorted Contains one entry for each module, sorted on the number of usages of each module, in descencing order
+	 * @param maxNum Maximum number of output files to create
+	 * @throws IOException On problems handling the output files
+	 */
+	void functionUsages(List<List<PythonModule>> allModules, List<Quantity> modulesSorted, int maxNum) throws IOException {
+		// TODO: Parallellisera!
+		int numModules = Math.min(modulesSorted.size(), maxNum);
+		List<PythonModule> modulesWithFunctions = new ArrayList<PythonModule>(numModules);
+		for (int i=0; i<numModules; i++) {
+			Quantity quantity = modulesSorted.get(i);
+			modulesWithFunctions.add(new PythonModule(quantity.getName()));
+			// Import type and parents don't matter here.
+		}
+		for (PythonModule module: modulesWithFunctions) {
+			for (List<PythonModule> modulesList: allModules) {
+				for (PythonModule moduleFromCorpus: modulesList) {
+					if (moduleFromCorpus.is(module)) {
+						module.merge(moduleFromCorpus);
+					}
+				}
+			}
+			List<Quantity> functionQuantities = sortedQuantities(module.functionUsages);
+			String csvFileName = outputDir + File.separator + module.name + "-functions" + LocalDateTime.now() + ".csv";
+			Writer writer = new FileWriter(csvFileName);
+			writer.write(functionUsagesHeader());
+			for (Quantity function: functionQuantities) {
+				writer.write(function.toCsvString() + "\n");
+			}
+			writer.close();
+		}
+	}
+
+
+	/**
+	 * @return Header for the function usage csv files
+	 */
+	private String functionUsagesHeader() {
+		return "function, usages\n";
+	}
 
 	/**
 	 * Create a list containing quantities (name + count) created from each
@@ -929,11 +977,12 @@ public class NotebookAnalyzer extends Analyzer {
 				System.out.println("File with all language values created!");
 			}
 			if (modules) {
+				// TODO: Bryt ut detta block till en egen funktion!
 				List<List<PythonModule>> allModules = this.modules();
 				System.out.println("\nMost common modules:");
 				List<Quantity> modulesSorted = sortedModules(allModules);
 				System.out.print(mostCommonModulesAsString(modulesSorted, 100));
-				// TODO: Även funktionsanvändningar! (Separat metod för sorterade ModuleQuantities. Använd resultat för både mostCommonModulesAsString och för funktionslistor.)
+				this.functionUsages(allModules, modulesSorted, 10);
 				System.out.println("\nImport types:");
 				System.out.println(importTypeSummary(allModules));
 			}

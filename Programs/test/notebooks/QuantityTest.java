@@ -50,6 +50,11 @@ public class QuantityTest {
 	}
 	
 	@Test
+	public void testGetName() {
+		assertEquals("Wrong name returned for quantity.", name, quantity.getName());
+	}
+	
+	@Test
 	public void testHashCode() {
 		int expectedHashCode = Objects.hash(name, count);
 		assertEquals("Wrong hash code retured for quantity.",
@@ -60,5 +65,11 @@ public class QuantityTest {
 	public void testToString() {
 		String expected = name + ": " + count;
 		assertEquals("Wrong string representation of quantity!", expected, quantity.toString());
+	}
+	
+	@Test
+	public void testToCsvString() {
+		String expected = name + ", " + count;
+		assertEquals("Wrong CSV string representation of quantity!", expected, quantity.toCsvString());
 	}
 }

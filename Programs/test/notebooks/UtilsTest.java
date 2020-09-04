@@ -3,11 +3,51 @@ package notebooks;
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Test;
 
 public class UtilsTest {
+	
+	/**
+	 * Verify that addOrIncrease adds an entry with the specified value when
+	 * the key is not in the map and increases its value with the specified
+	 * number if it exists.
+	 */
+	@Test
+	public void testAddOrIncrease() {
+		Map<String, Integer> map = new HashMap<String, Integer>();
+		String key1 = "key1";
+		String key2 = "key2";
+		Utils.addOrIncrease(map, key1, 5);
+		assertEquals("Wrong value stored for new key.", new Integer(5), map.get(key1));
+		Utils.addOrIncrease(map, key1, 3);
+		assertEquals("Value increased incorrectly for existing key.", new Integer(8), map.get(key1));
+		Utils.addOrIncrease(map, key2, 9);
+		assertEquals("Existing key modified when new key was added.", new Integer(8), map.get(key1));
+		assertEquals("Wrong value stored for new key.", new Integer(9), map.get(key2));
+	}
+	
+	/**
+	 * Verify that the addOrIncrease that does not take an increase value as
+	 * argument behaves as the three parameter addOrIncrease but with the
+	 * increase value 1.
+	 */
+	@Test
+	public void testAddOrIncrease1() {
+		Map<String, Integer> map = new HashMap<String, Integer>();
+		String key1 = "key1";
+		String key2 = "key2";
+		Utils.addOrIncrease(map, key1);
+		assertEquals("Wrong value stored for new key.", new Integer(1), map.get(key1));
+		Utils.addOrIncrease(map, key1);
+		assertEquals("Value increased incorrectly for existing key.", new Integer(2), map.get(key1));
+		Utils.addOrIncrease(map, key2);
+		assertEquals("Existing key modified when new key was added.", new Integer(2), map.get(key1));
+		assertEquals("Wrong value stored for new key.", new Integer(1), map.get(key2));
+	}
 	
 	/**
 	 * Verify that the median is computed correctly for an odd number of

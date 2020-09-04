@@ -115,9 +115,19 @@ public abstract class AnalyzerTest {
 	 */
 	protected void verifyAbsenceOfCloneFiles(String dir) {
 		for (String prefix: cloneFilePrefixes) {
-			File outputFile = TestUtils.lastOutputFile(dir, prefix);
-			assertFalse("Unexpected output file: " + outputFile.getName(), outputFile.exists());
+			verifyAbsenceOf(dir, prefix);
 		}
+	}
+	
+	/**
+	 * Verify that no output file whose name starts with the specified prefix
+	 * exists in the specified directory.
+	 * @param dir Directory to look for files in
+	 * @param prefix Prefix of unwanted file name
+	 */
+	protected void verifyAbsenceOf(String dir, String prefix) {
+		File outputFile = TestUtils.lastOutputFile(dir, prefix);
+		assertFalse("Unexpected output file: " + outputFile.getName(), outputFile.exists());
 	}
 	
 	/**
