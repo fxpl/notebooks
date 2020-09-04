@@ -1049,7 +1049,7 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 	 * @throws IOException on errors handling input files of files to be checked
 	 */
 	@Test
-	public void testfunctionUsages() {
+	public void testfunctionUsages() throws IOException {
 		String dataDir = "test/data/modules";
 		String[] files = {"nb_36.ipynb", "nb_37.ipynb", "nb_38.ipynb"};
 		// Expected output
