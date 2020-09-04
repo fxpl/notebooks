@@ -1,16 +1,16 @@
 package notebooks;
 
-public class ModuleQuantity implements Comparable<ModuleQuantity> {
+public class Quantity implements Comparable<Quantity> {
 	private String name;
 	private int count;
 
-	public ModuleQuantity(String name, int quantity) {
+	public Quantity(String name, int quantity) {
 		this.name = name;
 		this.count = quantity;
 	}
 
 	@Override
-	public int compareTo(ModuleQuantity other) {
+	public int compareTo(Quantity other) {
 		return this.count - other.count;
 	}
 

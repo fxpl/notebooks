@@ -697,17 +697,29 @@ public class NotebookAnalyzer extends Analyzer {
 				Utils.addOrIncrease(moduleQuantities, module.pedigreeString());
 			}
 		}
-		List<ModuleQuantity> moduleQuantitesSorted = new ArrayList<ModuleQuantity>(moduleQuantities.size());
-		for (String key: moduleQuantities.keySet()) {
-			moduleQuantitesSorted.add(new ModuleQuantity(key, moduleQuantities.get(key)));
-		}
-		Collections.sort(moduleQuantitesSorted, Collections.reverseOrder());
+		List<Quantity> moduleQuantitesSorted = sortedQuantities(moduleQuantities);
 		final int modulesToPrint = Math.min(maxNum, moduleQuantitesSorted.size());
 		String result ="";
 		for (int i=0; i<modulesToPrint; i++) {
 			result += (i+1) + ". " + moduleQuantitesSorted.get(i) + "\n";
 		}
 		return result;
+	}
+
+	/**
+	 * Create a list containing quantities (name + count) created from each
+	 * key-value pair in the map passed as an argument. The list is sorted on
+	 * the counts of the quantities, in descending order.
+	 * @param quantities Map with name-value pairs
+	 * @return Sorted list of quantities as described above.
+	 */
+	private static List<Quantity> sortedQuantities(Map<String, Integer> quantities) {
+		List<Quantity> quantitesSorted = new ArrayList<Quantity>(quantities.size());
+		for (String key: quantities.keySet()) {
+			quantitesSorted.add(new Quantity(key, quantities.get(key)));
+		}
+		Collections.sort(quantitesSorted, Collections.reverseOrder());
+		return quantitesSorted;
 	}
 	
 	/**
