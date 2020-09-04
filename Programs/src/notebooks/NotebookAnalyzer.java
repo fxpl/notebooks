@@ -684,24 +684,34 @@ public class NotebookAnalyzer extends Analyzer {
 	}
 	
 	/**
-	 * Create a string containing the most common modules and their quantity
-	 * (i.e. how many times they are imported).
+	 * Count how many times each module has been imported (its count). Return a
+	 * list of quantities (name + count) representing the modules, sorted on
+	 * count in descending order.
 	 * @param modules List of list of all imported modules
-	 * @param maxNum Maximum number of modules to include in the string
-	 * @return A list of the most common modules and their quantity
+	 * @return A list of the most common modules and their count
 	 */
-	static String mostCommonModulesAsString(List<List<PythonModule>> modules, int maxNum) {
+	static List<Quantity> sortedModules(List<List<PythonModule>> modules) {
 		Map<String, Integer> moduleQuantities = new HashMap<String, Integer>();
 		for (List<PythonModule> notebookModules: modules) {
 			for (PythonModule module: notebookModules) {
 				Utils.addOrIncrease(moduleQuantities, module.pedigreeString());
 			}
 		}
-		List<Quantity> moduleQuantitesSorted = sortedQuantities(moduleQuantities);
-		final int modulesToPrint = Math.min(maxNum, moduleQuantitesSorted.size());
+		return sortedQuantities(moduleQuantities);
+	}
+	
+	/**
+	 * Create a string containing the most common modules and their count
+	 * (i.e. how many times they are imported).
+	 * @param modules List of list of all imported modules, sorted in descending order
+	 * @param maxNum Maximum number of modules to include in the string
+	 * @return A string containing a list of the most common modules and their count
+	 */
+	static String mostCommonModulesAsString(List<Quantity> modules, int maxNum) {
+		final int modulesToPrint = Math.min(maxNum, modules.size());
 		String result ="";
 		for (int i=0; i<modulesToPrint; i++) {
-			result += (i+1) + ". " + moduleQuantitesSorted.get(i) + "\n";
+			result += (i+1) + ". " + modules.get(i) + "\n";
 		}
 		return result;
 	}
@@ -921,7 +931,8 @@ public class NotebookAnalyzer extends Analyzer {
 			if (modules) {
 				List<List<PythonModule>> allModules = this.modules();
 				System.out.println("\nMost common modules:");
-				System.out.print(mostCommonModulesAsString(allModules, 100));
+				List<Quantity> modulesSorted = sortedModules(allModules);
+				System.out.print(mostCommonModulesAsString(modulesSorted, 100));
 				// TODO: Även funktionsanvändningar! (Separat metod för sorterade ModuleQuantities. Använd resultat för både mostCommonModulesAsString och för funktionslistor.)
 				System.out.println("\nImport types:");
 				System.out.println(importTypeSummary(allModules));

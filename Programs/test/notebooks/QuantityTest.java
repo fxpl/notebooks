@@ -2,6 +2,8 @@ package notebooks;
 
 import static org.junit.Assert.*;
 
+import java.util.Objects;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -22,6 +24,36 @@ public class QuantityTest {
 		assertEquals("Equal quantities considered different!", 0, quantity.compareTo(same));
 		assertTrue("Smaller quantity not identified!", quantity.compareTo(larger) < 0);
 		assertTrue("Larger quantity not identified!", larger.compareTo(quantity) > 0);
+	}
+	
+	@Test
+	public void testEquals_diffType() {
+		assertFalse("String considered equal to Quantity.", quantity.equals("hej"));
+	}
+	
+	@Test
+	public void testEquals_equal() {
+		Quantity other = new Quantity(name, count);
+		assertTrue("Equal quantities considered different.", quantity.equals(other));
+	}
+	
+	@Test
+	public void testEquals_diffName() {
+		Quantity other = new Quantity("otherName", count);
+		assertFalse("Quantities with different names considered equal.", quantity.equals(other));
+	}
+	
+	@Test
+	public void testEquals_diffCount() {
+		Quantity other = new Quantity(name, 119);
+		assertFalse("Quantities with different count considered equal.", quantity.equals(other));
+	}
+	
+	@Test
+	public void testHashCode() {
+		int expectedHashCode = Objects.hash(name, count);
+		assertEquals("Wrong hash code retured for quantity.",
+				expectedHashCode, quantity.hashCode());
 	}
 	
 	@Test

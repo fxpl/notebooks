@@ -968,51 +968,77 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 	}
 	
 	/**
-	 * Verify that the correct string representation of the most commonly
-	 * imported modules is created correctly.
+	 * Verify that the correct modules top list is returned by sortedModules.
 	 * @throws IOException on errors handling the input files
 	 */
 	@Test
-	public void testMostCommonModulesAsString() throws IOException {
+	public void testSortedModules() throws IOException {
 		String dataDir = "test/data/modules";
 		String[] files = {"nb_10.ipynb", "nb_R.ipynb", "nb_11.ipynb",
 				"nb_12.ipynb", "nb_13.ipynb"};
 		for (String file: files) {
 			analyzer.initializeNotebooksFrom(dataDir + File.separator + file);
 		}
+		
+		List<Quantity> expectedModulesSorted = new ArrayList<Quantity>();
+		expectedModulesSorted.add(0, new Quantity("moduleZ", 4));
+		expectedModulesSorted.add(1, new Quantity("moduleY", 3));
+		expectedModulesSorted.add(2, new Quantity("moduleW", 2));
+		expectedModulesSorted.add(3, new Quantity("parentModule.moduleX", 1));
+		
 		List<List<PythonModule>> modules = analyzer.modules();
-		// All modules
-		String expectedModulesString = "1. moduleZ: 4\n"
-				+ "2. moduleY: 3\n"
-				+ "3. moduleW: 2\n"
-				+ "4. parentModule.moduleX: 1\n";
-		String modulesString = NotebookAnalyzer.mostCommonModulesAsString(modules, files.length);
-		assertEquals("Wrong top modules reported!", expectedModulesString, modulesString);
-		// Limited number of modules
-		expectedModulesString = "1. moduleZ: 4\n";
-		modulesString = NotebookAnalyzer.mostCommonModulesAsString(modules, 1);
-		assertEquals("Wrong top modules reported!", expectedModulesString, modulesString);
+		List<Quantity> modulesSorted = NotebookAnalyzer.sortedModules(modules);
+		
+		assertEquals("Incorrect list of most commonly imported modules.",
+				expectedModulesSorted, modulesSorted);
 		lastOutputFile("modules").delete();
 	}
 	
 	/**
-	 * Verify that pedigree is taken into consideration when top list is
-	 * created.
+	 * Verify that pedigree is taken into consideration when modules top list
+	 * is created.
 	 */
 	@Test
-	public void testMostCommonModulesAsString_diffParents() throws IOException {
+	public void testSortedModules_diffParents() throws IOException {
 		String dataDir = "test/data/modules";
 		String[] files = {"nb_30.ipynb", "nb_31.ipynb", "nb_35.ipynb"};
 		for (String file: files) {
 			analyzer.initializeNotebooksFrom(dataDir + File.separator + file);
 		}
-		List<List<PythonModule>> modules = analyzer.modules();
 		
-		String expectedModulesAsString = "1. A.B.C: 2\n"
-				+ "2. B.C: 1\n";
-		String modulesString = NotebookAnalyzer.mostCommonModulesAsString(modules, 100);
-		assertEquals("Wrong top modules reported when name is same but ancestors differ.",
-				expectedModulesAsString, modulesString);
+		List<Quantity> expectedModulesSorted = new ArrayList<Quantity>(2);
+		expectedModulesSorted.add(0, new Quantity("A.B.C", 2));
+		expectedModulesSorted.add(1, new Quantity("B.C", 1));
+		List<List<PythonModule>> modules = analyzer.modules();
+		List<Quantity> modulesSorted = NotebookAnalyzer.sortedModules(modules);
+		assertEquals("Wrong module quantities stored when name is same but ancestors differ.",
+				expectedModulesSorted, modulesSorted);
+	}
+	
+	/**
+	 * Verify that the string representation of the most commonly imported
+	 * modules is created correctly.
+	 * @throws IOException on errors handling the input files
+	 */
+	@Test
+	public void testMostCommonModulesAsString() throws IOException {
+		List<Quantity> modulesSorted = new ArrayList<Quantity>();
+		modulesSorted.add(0, new Quantity("moduleZ", 4));
+		modulesSorted.add(1, new Quantity("moduleY", 3));
+		modulesSorted.add(2, new Quantity("moduleW", 2));
+		modulesSorted.add(3, new Quantity("parentModule.moduleX", 1));
+		
+		// All modules
+		String expectedModulesString = "1. moduleZ: 4\n"
+				+ "2. moduleY: 3\n"
+				+ "3. moduleW: 2\n"
+				+ "4. parentModule.moduleX: 1\n";
+		String modulesString = NotebookAnalyzer.mostCommonModulesAsString(modulesSorted, Integer.MAX_VALUE);
+		assertEquals("Wrong top modules reported!", expectedModulesString, modulesString);
+		// Limited number of modules
+		expectedModulesString = "1. moduleZ: 4\n";
+		modulesString = NotebookAnalyzer.mostCommonModulesAsString(modulesSorted, 1);
+		assertEquals("Wrong top modules reported!", expectedModulesString, modulesString);
 		lastOutputFile("modules").delete();
 	}
 	
