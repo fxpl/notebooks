@@ -996,6 +996,27 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 	}
 	
 	/**
+	 * Verify that pedigree is taken into consideration when top list is
+	 * created.
+	 */
+	@Test
+	public void testMostCommonModulesAsString_diffParents() throws IOException {
+		String dataDir = "test/data/modules";
+		String[] files = {"nb_30.ipynb", "nb_31.ipynb", "nb_35.ipynb"};
+		for (String file: files) {
+			analyzer.initializeNotebooksFrom(dataDir + File.separator + file);
+		}
+		List<List<PythonModule>> modules = analyzer.modules();
+		
+		String expectedModulesAsString = "1. A.B.C: 2\n"
+				+ "2. B.C: 1\n";
+		String modulesString = NotebookAnalyzer.mostCommonModulesAsString(modules, 100);
+		assertEquals("Wrong top modules reported when name is same but ancestors differ.",
+				expectedModulesAsString, modulesString);
+		lastOutputFile("modules").delete();
+	}
+	
+	/**
 	 * Verify that a correct summary of the import type frequencies is created
 	 * by importTypeSummary.
 	 * @throws IOException on errors handling the input files
