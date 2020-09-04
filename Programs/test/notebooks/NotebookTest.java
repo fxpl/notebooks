@@ -825,7 +825,7 @@ public class NotebookTest {
 	private void verifyImports(String file, List<PythonModule> expectedModules) {
 		Notebook notebook = new Notebook(file);
 		List<PythonModule> modules = notebook.modules();
-		assertEquals("Incorrect list of module returned!",
+		assertEquals("Incorrect list of modules returned!",
 				expectedModules, modules);
 		for (int i=0; i<expectedModules.size(); i++) {
 			
