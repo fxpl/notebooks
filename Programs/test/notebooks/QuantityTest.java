@@ -26,6 +26,7 @@ public class QuantityTest {
 		assertTrue("Larger quantity not identified!", larger.compareTo(quantity) > 0);
 	}
 	
+	@SuppressWarnings("unlikely-arg-type")
 	@Test
 	public void testEquals_diffType() {
 		assertFalse("String considered equal to Quantity.", quantity.equals("hej"));
