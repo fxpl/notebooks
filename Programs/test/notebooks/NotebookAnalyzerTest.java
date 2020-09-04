@@ -985,7 +985,7 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 		String expectedModulesString = "1. moduleZ: 4\n"
 				+ "2. moduleY: 3\n"
 				+ "3. moduleW: 2\n"
-				+ "4. moduleX: 1\n";
+				+ "4. parentModule.moduleX: 1\n";
 		String modulesString = NotebookAnalyzer.mostCommonModulesAsString(modules, files.length);
 		assertEquals("Wrong top modules reported!", expectedModulesString, modulesString);
 		// Limited number of modules

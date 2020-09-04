@@ -102,6 +102,20 @@ public class PythonModule {
 	}
 	
 	/**
+	 * Create and return a string containing the module name preceded by all
+	 * ancestors' names, in descending order, separated with ".".
+	 * @return The string described above
+	 */
+	public String pedigreeString() {
+		String result = "";
+		if (null != parent) {
+			result += parent.toString() + ".";
+		}
+		result += name;
+		return result;
+	}
+	
+	/**
 	 * If the line given as argument contains a usage of this module, register
 	 * the function called.
 	 * @param line Code line to check for usage
@@ -135,11 +149,7 @@ public class PythonModule {
 	
 	@Override
 	public String toString() {
-		String result = "";
-		if (null != parent) {
-			result += parent.toString() + ".";
-		}
-		result += name;
+		String result = pedigreeString();
 		if (null != alias) {
 			result += "(" + alias + ")";
 		}

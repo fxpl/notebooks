@@ -429,29 +429,35 @@ public class PythonModuleTest {
 	
 	@Test
 	public void testToString_noAlias() {
-		PythonModule moduleWithoutAlias = new PythonModule(name, importedWith, parent);
+		PythonModule moduleWithoutAlias = new PythonModule(name, ImportType.ORDINARY, parent);
 		String expected = parentModuleName + "." + name;
 		assertEquals("Wrong string representation returned for module without alias!",
 				expected, moduleWithoutAlias.toString());
 	}
 	
 	@Test
-	public void testToString_noParent() {
-		PythonModule moduleWithoutParent = new PythonModule(name, alias, importedWith);
-		String expected = name + "(" + alias + ")";
-		assertEquals("Wrong string representation returned for module without parent!",
-				expected, moduleWithoutParent.toString());
+	public void testPedigreeString() {
+		String expected = parentModuleName + "." + name;
+		assertEquals("Wrong pedigree string returned.", expected, module.pedigreeString());
 	}
 	
 	@Test
-	public void testToString_grandParent() {
+	public void testPedigreeString_noParent() {
+		PythonModule moduleWithoutParent = new PythonModule(name, alias, importedWith);
+		String expected = name;
+		assertEquals("Wrong pedigree string returned for module without parent!",
+				expected, moduleWithoutParent.pedigreeString());
+	}
+	
+	@Test
+	public void testPedigreeString_grandParent() {
 		final String parentName = "pappa";
 		final String grandParentName = "farmor";
 		PythonModule grandParent = new PythonModule(grandParentName);
 		PythonModule parent = new PythonModule(parentName, null, grandParent);
 		PythonModule module = new PythonModule(name, importedWith, parent);
 		String expected = grandParentName + "." + parentName + "." + name;
-		assertEquals("Wrong string representation returned for module with grand parent!",
-				expected, module.toString());
+		assertEquals("Wrong pedigree string returned for module with grand parent!",
+				expected, module.pedigreeString());
 	}
 }

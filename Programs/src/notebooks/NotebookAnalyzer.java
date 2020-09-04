@@ -691,11 +691,10 @@ public class NotebookAnalyzer extends Analyzer {
 	 * @return A list of the most common modules and their quantity
 	 */
 	static String mostCommonModulesAsString(List<List<PythonModule>> modules, int maxNum) {
-		// TODO: Inte bara namn behöver vara samma!
 		Map<String, Integer> moduleQuantities = new HashMap<String, Integer>();
 		for (List<PythonModule> notebookModules: modules) {
 			for (PythonModule module: notebookModules) {
-				Utils.addOrIncrease(moduleQuantities, module.getName());
+				Utils.addOrIncrease(moduleQuantities, module.pedigreeString());
 			}
 		}
 		List<ModuleQuantity> moduleQuantitesSorted = new ArrayList<ModuleQuantity>(moduleQuantities.size());
@@ -911,6 +910,7 @@ public class NotebookAnalyzer extends Analyzer {
 				List<List<PythonModule>> allModules = this.modules();
 				System.out.println("\nMost common modules:");
 				System.out.print(mostCommonModulesAsString(allModules, 100));
+				// TODO: Även funktionsanvändningar! (Separat metod för sorterade ModuleQuantities. Använd resultat för både mostCommonModulesAsString och för funktionslistor.)
 				System.out.println("\nImport types:");
 				System.out.println(importTypeSummary(allModules));
 			}
