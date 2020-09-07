@@ -21,7 +21,7 @@ public class AllModulesTest {
 	@Test
 	public void testImportedWith() {
 		assertEquals("AllModules objects not imported with FROM statment!",
-				ImportType.FROM, module.importedWith());
+				ImportType.ORDINARY, module.importedWith());
 	}
 	
 	@Test
