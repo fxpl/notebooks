@@ -906,7 +906,7 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 		for (String file: files) {
 			analyzer.initializeNotebooksFrom(dataDir + File.separator + file);
 		}
-		List<List<PythonModule>> modules = analyzer.modules();
+		List<List<PythonModule>> modules = analyzer.listModules();
 		for (int i=0; i<pythonFiles.length; i++) {
 			assertEquals("Wrong modules returned for " + pythonFiles[i] + "!",
 					expectedModules.get(i), modules.get(i));
@@ -940,10 +940,15 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 		for (String file: files) {
 			analyzer.initializeNotebooksFrom(dataDir + File.separator + file);
 		}
-		analyzer.modules();
-		
+		List<Quantity> modulesSorted = analyzer.modules();
 		checkCsv("modules", expectedLines);
+		
 		lastOutputFile("modules").delete();
+		int numFunctionFiles = Math.min(modulesSorted.size(), 10);
+		for (int i=0; i<numFunctionFiles; i++) {
+			String fileNamePrefix = modulesSorted.get(i).getName() + "-functions";
+			lastOutputFile(fileNamePrefix).delete();
+		}
 	}
 	
 	/**
@@ -954,16 +959,16 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 	public void testModules_invalidFile() throws IOException {
 		String dataDir = "test/data/modules";
 		String file = "empty.ipynb";
-		List<List<PythonModule>> expectedModules = new ArrayList<>(0);
-		String[] expectedLines = {
+		List<Quantity> expectedModules = new ArrayList<>(0);
+		String[] expectedModulesLines = {
 			modulesHeader()
 		};
 		analyzer.initializeNotebooksFrom(dataDir + File.separator + file);
-		List<List<PythonModule>> modules = analyzer.modules();
+		List<Quantity> modules = analyzer.modules();
 		
 		assertEquals("Wrong modules returned for invalid file!",
 				expectedModules, modules);
-		checkCsv("modules", expectedLines);
+		checkCsv("modules", expectedModulesLines);
 		lastOutputFile("modules").delete();
 	}
 	
@@ -986,7 +991,7 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 		expectedModulesSorted.add(2, new Quantity("moduleW", 2));
 		expectedModulesSorted.add(3, new Quantity("parentModule.moduleX", 1));
 		
-		List<List<PythonModule>> modules = analyzer.modules();
+		List<List<PythonModule>> modules = analyzer.listModules();
 		List<Quantity> modulesSorted = NotebookAnalyzer.sortedModules(modules);
 		
 		assertEquals("Incorrect list of most commonly imported modules.",
@@ -1009,10 +1014,11 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 		List<Quantity> expectedModulesSorted = new ArrayList<Quantity>(2);
 		expectedModulesSorted.add(0, new Quantity("A.B.C", 2));
 		expectedModulesSorted.add(1, new Quantity("B.C", 1));
-		List<List<PythonModule>> modules = analyzer.modules();
-		List<Quantity> modulesSorted = NotebookAnalyzer.sortedModules(modules);
+		List<Quantity> modulesSorted = analyzer.modules();
 		assertEquals("Wrong module quantities stored when name is same but ancestors differ.",
 				expectedModulesSorted, modulesSorted);
+		lastOutputFile("A.B.C-functions").delete();
+		lastOutputFile("B.C-functions").delete();
 	}
 	
 	/**
@@ -1043,9 +1049,9 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 	}
 	
 	/**
-	 * Verify that functionUsages creates CSV files with all used functions
-	 * from the most commonly imported modules, sorted on number of usages in
-	 * descending order.
+	 * Verify that the module analysis creates CSV files with all used
+	 * functions from the most commonly imported modules, sorted on number of
+	 * usages in descending order.
 	 * @throws IOException on errors handling input files of files to be checked
 	 */
 	@Test
@@ -1074,7 +1080,7 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 		for (String file: files) {
 			analyzer.initializeNotebooksFrom(dataDir + File.separator + file);
 		}
-		List<List<PythonModule>> modules = analyzer.modules();
+		List<List<PythonModule>> modules = analyzer.listModules();
 		lastOutputFile("modules").delete();	// Side effect of modules call
 		List<Quantity> modulesSorted = NotebookAnalyzer.sortedModules(modules);
 		
@@ -1095,31 +1101,8 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 		lastOutputFile("A-functions").delete();
 		checkCsv("B-functions", expectedBLines);
 		lastOutputFile("B-functions").delete();
-		verifyAbsenceOf(defaultOutputDirName, "C-functions");
-		verifyAbsenceOf(defaultOutputDirName, "D-functions");
-	}
-	
-	/**
-	 * Verify that a correct summary of the import type frequencies is created
-	 * by importTypeSummary.
-	 * @throws IOException on errors handling the input files
-	 */
-	@Test
-	public void testImportTypeSummary() throws IOException {
-		String dataDir = "test/data/modules";
-		String[] files = {"nb_1.ipynb", "nb_2.ipynb", "nb_R.ipynb",
-				"nb_3.ipynb", "nb_4.ipynb", "nb_5.ipynb"};
-		String expectedImportTypeString = "ORDINARY: 4 (40.00%)\n"
-				+ "ALIAS: 5 (50.00%)\n"
-				+ "FROM: 1 (10.00%)\n";
-		for (String file: files) {
-			analyzer.initializeNotebooksFrom(dataDir + File.separator + file);
-		}
-		List<List<PythonModule>> modules = analyzer.modules();
-		String importTypeString = NotebookAnalyzer.importTypeSummary(modules);
-		assertEquals("Wrong import types reported!",
-				expectedImportTypeString, importTypeString);
-		lastOutputFile("modules").delete();
+		verifyAbsenceOf("C-functions");
+		verifyAbsenceOf("D-functions");
 	}
 
 	/**

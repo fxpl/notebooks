@@ -135,6 +135,8 @@ public class TestUtils {
 		File directory = new File(dir);
 		String startFileName = prefix + ".csv";
 		String outputFileName = startFileName;
+		prefix = prefix.replace("*", "\\*");
+		prefix = prefix.replace(".", "\\.");
 		int numTries = 0;
 		while (outputFileName.equals(startFileName) && numTries<3) {
 			/* The reason that we try 3 times is that sometimes this method

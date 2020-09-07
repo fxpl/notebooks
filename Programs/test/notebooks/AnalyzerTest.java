@@ -121,6 +121,15 @@ public abstract class AnalyzerTest {
 	
 	/**
 	 * Verify that no output file whose name starts with the specified prefix
+	 * exists in the default output directory.
+	 * @param prefix Prefix of unwanted file name
+	 */
+	protected void verifyAbsenceOf(String prefix) {
+		verifyAbsenceOf(defaultOutputDirName, prefix);
+	}
+	
+	/**
+	 * Verify that no output file whose name starts with the specified prefix
 	 * exists in the specified directory.
 	 * @param dir Directory to look for files in
 	 * @param prefix Prefix of unwanted file name

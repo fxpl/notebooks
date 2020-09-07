@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.*;
 
@@ -380,11 +379,7 @@ public class NotebookAnalyzer extends Analyzer {
 		for (int i=0; i<connectionsToPrint; i++) {
 			try {
 				writer.write(result.get(i).get());
-			} catch (InterruptedException e) {
-				System.err.println("Printing of connections for notebook "
-						+ notebooks.get(i).getName() + " was interrupted!");
-				e.printStackTrace();
-			} catch (ExecutionException e) {
+			} catch (InterruptedException | ExecutionException e) {
 				System.err.println("Printing connections for notebook "
 						+ notebooks.get(i).getName() + " failed!");
 				e.printStackTrace();
@@ -615,13 +610,31 @@ public class NotebookAnalyzer extends Analyzer {
 	}
 	
 	/**
-	 * Create a file modules<current-date-time>.csv with the header line
+	 * Create a file modules<timestamp>.csv with the header line
 	 * followed by the modules imported in each notebook as a comma separated
-	 * list. The data for each notebooks is printed on a separate line .
+	 * list. The data for each notebooks is printed on a separate line.
+	 * For each of the 10 most commonly imported modules, create a file
+	 * <moduleName>-functions<timestamp>.csv containing the functions for this
+	 * module that are used in the corpus, sorted on number of usages in
+	 * descending order.
+	 * @return @return A list of the all modules used and their count, sorted on count in descending order
+	 * @throws IOException On problems handling the output file
+	 */
+	public List<Quantity> modules() throws IOException {
+		List<List<PythonModule>> allModules = this.listModules();
+		List<Quantity> modulesSorted = sortedModules(allModules);
+		this.functionUsages(allModules, modulesSorted, 10);
+		return modulesSorted;
+	}
+	
+	/**
+	 * Create a file modules<timestamp>.csv with the header line followed by
+	 * the modules imported in each notebook as a comma separated list. The
+	 * data for each notebooks is printed on a separate line.
 	 * @return A list where each element is a list of the modules found in the corresponding notebook
 	 * @throws IOException On problems with handling the output file
 	 */
-	public List<List<PythonModule>> modules() throws IOException {
+	List<List<PythonModule>> listModules() throws IOException {
 		List<Callable<Language>> languageTasks
 			= new ArrayList<Callable<Language>>(notebooks.size());
 		for (Notebook notebook: notebooks) {
@@ -688,7 +701,7 @@ public class NotebookAnalyzer extends Analyzer {
 	 * list of quantities (name + count) representing the modules, sorted on
 	 * count in descending order.
 	 * @param modules List of list of all imported modules
-	 * @return A list of the most common modules and their count
+	 * @return A list of the all modules used and their count, sorted on count in descending order
 	 */
 	static List<Quantity> sortedModules(List<List<PythonModule>> modules) {
 		Map<String, Integer> moduleQuantities = new HashMap<String, Integer>();
@@ -778,49 +791,6 @@ public class NotebookAnalyzer extends Analyzer {
 		}
 		Collections.sort(quantitesSorted, Collections.reverseOrder());
 		return quantitesSorted;
-	}
-	
-	/**
-	 * Create a string containing a list of import types and their quantity and
-	 * percentage (i.e. how many times they have been imported and the
-	 * percentage of imports that they constitute).
-	 * @param modules List of all imported modules
-	 * @return A list of the import type quantities + percentages
-	 */
-	static String importTypeSummary(List<List<PythonModule>> modules) {
-		// TODO: Extrahera ursprungsimporttypen istället(!?)
-		int ordinary = 0;
-		int alias = 0;
-		int from = 0;
-		int total = 0;
-		for (List<PythonModule> notebookModules: modules) {
-			for (PythonModule module: notebookModules) {
-				switch (module.importedWith()) {
-				case ORDINARY:
-					ordinary++;
-					break;
-				case ALIAS:
-					alias++;
-					break;
-				case FROM:
-					from++;
-					break;
-				default:
-					System.err.println("Unknown import type: " + module.importedWith());
-					break;
-				}
-				total++;
-			}
-		}
-		double ordinaryPercent = 100.0 * ordinary/total;
-		double aliasPercent = 100.0 * alias/total;
-		double fromPercent = 100.0 * from/total;
-		return ImportType.ORDINARY.toString() + ": " + ordinary
-				+ " (" + String.format(Locale.US, "%.2f", ordinaryPercent) + "%)\n"
-				+ ImportType.ALIAS.toString() + ": " + alias
-				+ " (" + String.format(Locale.US,  "%.2f", aliasPercent) + "%)\n"
-				+ ImportType.FROM.toString() + ": " + from
-				+ " (" + String.format(Locale.US, "%.2f", fromPercent) + "%)\n";
 	}
 
 	/**
@@ -977,14 +947,9 @@ public class NotebookAnalyzer extends Analyzer {
 				System.out.println("File with all language values created!");
 			}
 			if (modules) {
-				// TODO: Bryt ut detta block till en egen funktion!
-				List<List<PythonModule>> allModules = this.modules();
+				List<Quantity> modulesSorted = modules();
 				System.out.println("\nMost common modules:");
-				List<Quantity> modulesSorted = sortedModules(allModules);
 				System.out.print(mostCommonModulesAsString(modulesSorted, 100));
-				this.functionUsages(allModules, modulesSorted, 10);
-				System.out.println("\nImport types:");
-				System.out.println(importTypeSummary(allModules));
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
