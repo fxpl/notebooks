@@ -742,22 +742,31 @@ public class NotebookAnalyzer extends Analyzer {
 	 * @throws IOException On problems handling the output files
 	 */
 	void functionUsages(List<List<PythonModule>> allModules, List<Quantity> modulesSorted, int maxNum) throws IOException {
-		// TODO: Parallellisera!
+		// Create list with top modules
 		int numModules = Math.min(modulesSorted.size(), maxNum);
-		List<PythonModule> modulesWithFunctions = new ArrayList<PythonModule>(numModules);
+		List<PythonModule> topModulesWithFunctions = new ArrayList<PythonModule>(numModules);
 		for (int i=0; i<numModules; i++) {
 			Quantity quantity = modulesSorted.get(i);
-			modulesWithFunctions.add(new PythonModule(quantity.getName()));
+			topModulesWithFunctions.add(new PythonModule(quantity.getName()));
 			// Import type and parents don't matter here.
 		}
-		for (PythonModule module: modulesWithFunctions) {
-			for (List<PythonModule> modulesList: allModules) {
-				for (PythonModule moduleFromCorpus: modulesList) {
-					if (moduleFromCorpus.is(module)) {
-						module.merge(moduleFromCorpus);
-					}
-				}
-			}
+		
+		// Merge all modules from allModules into the top modules (in parallel)
+		List<Callable<Void>> tasks = new ArrayList<Callable<Void>>(numModules);
+		CountDownLatch counter = new CountDownLatch(numModules);
+		for (PythonModule module: topModulesWithFunctions) {
+			tasks.add(new ModulesMerger(module, allModules, counter));
+		}
+		ThreadExecutor.getInstance().invokeAll(tasks);
+		try {
+			counter.await();	// Block until all tasks have finished.
+		} catch (InterruptedException e) {
+			System.err.println("Thread was interrupted while merging modules:" + e);
+			e.printStackTrace();
+		}
+		
+		// Write result
+		for (PythonModule module: topModulesWithFunctions) {
 			List<Quantity> functionQuantities = sortedQuantities(module.functionUsages);
 			String csvFileName = outputDir + File.separator + module.name + "-functions" + LocalDateTime.now() + ".csv";
 			Writer writer = new FileWriter(csvFileName);
