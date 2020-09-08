@@ -63,7 +63,7 @@ public class Notebook {
 			JSONArray lines = getSource(cell);
 			List<String> splitLines = splitSource(lines);
 			for (String line: splitLines) {
-				if (line.trim().startsWith("import") || line.trim().startsWith("from")) {	// TODO: Mellanslag
+				if (line.trim().startsWith("import ") || line.trim().startsWith("from ")) {
 					try {
 						modules.addAll(modulesInImport(line));
 					} catch (NotebookException e) {

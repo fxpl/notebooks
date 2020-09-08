@@ -845,6 +845,18 @@ public class NotebookTest {
 	}
 	
 	/**
+	 * Verify that lines started with "import" or "from" not followed by a space
+	 * are smoothly ignored in import analysis.
+	 */
+	@Test
+	public void testImportStartToBeIgnored() {
+		String dataDir = "test/data/modules";
+		String file = "nb_42.ipynb";
+		List<PythonModule> expectedModules = new ArrayList<PythonModule>(0);
+		verifyImports(dataDir + File.separator + file, expectedModules);
+	}
+	
+	/**
 	 * Verify that modules are is imported when in an invalid import statement.
 	 */
 	@Test
