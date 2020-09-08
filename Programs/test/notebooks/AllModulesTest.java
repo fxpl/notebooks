@@ -6,7 +6,7 @@ import org.junit.Test;
 
 public class AllModulesTest {
 	private PythonModule module;
-	private final PythonModule parent = new PythonModule("module");
+	private final PythonModule parent = new PythonModule("module", ImportType.FROM);
 	
 	@Before
 	public void setUp() {
@@ -20,7 +20,7 @@ public class AllModulesTest {
 	
 	@Test
 	public void testImportedWith() {
-		assertEquals("AllModules objects not imported with FROM statment!",
+		assertEquals("AllModules objects not imported with ORDINARY statment!",
 				ImportType.ORDINARY, module.importedWith());
 	}
 	
