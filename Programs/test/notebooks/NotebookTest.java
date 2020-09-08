@@ -857,6 +857,29 @@ public class NotebookTest {
 	}
 	
 	/**
+	 * Verify that import statements can be identified correctly when followed
+	 * by comments.
+	 */
+	@Test
+	public void testImportWithComment() {
+		String dataDir = "test/data/modules";
+		String file = "nb_43.ipynb";
+		List<PythonModule> expectedModules = new ArrayList<PythonModule>(4);
+		PythonModule parentModule = new PythonModule("A", ImportType.ORDINARY);
+		PythonModule expectedModule = parentModule;
+		expectedModules.add(expectedModule);
+		expectedModule = new PythonModule("B", "b", ImportType.ALIAS, parentModule);
+		expectedModules.add(expectedModule);
+		parentModule = new PythonModule("A", ImportType.FROM);
+		expectedModule = new PythonModule("C", ImportType.ORDINARY, parentModule);
+		expectedModules.add(expectedModule);
+		parentModule = new PythonModule("D", ImportType.FROM);
+		expectedModule = new AllModules(parentModule);
+		expectedModules.add(expectedModule);
+		verifyImports(dataDir + File.separator + file, expectedModules);
+	}
+	
+	/**
 	 * Verify that modules are is imported when in an invalid import statement.
 	 */
 	@Test

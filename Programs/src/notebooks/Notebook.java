@@ -109,12 +109,13 @@ public class Notebook {
 		final String MODULEIDENTIFIER = PythonModule.IDENTIFIER;
 		final String moduleDescr = "" + MODULEIDENTIFIER + "(\\s*as\\s+" + MODULEIDENTIFIER + "\\s*)?";
 		final String moduleList = "(" + moduleDescr + "\\s*,\\s*)*" + moduleDescr;
-		String importStatementTemplate = "\\s*import\\s+(" + moduleList + ")\\s*";
+		final String comment = "#.*";
+		String importStatementTemplate = "\\s*import\\s+(" + moduleList + ")\\s*(" + comment + ")?";
 		Pattern importPattern = Pattern.compile(importStatementTemplate);
 		Matcher importMatcher = importPattern.matcher(importStatement);
 		Pattern fromPattern = Pattern.compile("\\s*from\\s+(" + MODULEIDENTIFIER + ")\\s+(" + importStatementTemplate + ")");
 		Matcher fromMatcher = fromPattern.matcher(importStatement);
-		Pattern allFromPattern = Pattern.compile("\\s*from\\s+(" + MODULEIDENTIFIER + ")\\s+import\\s+\\*\\s*");
+		Pattern allFromPattern = Pattern.compile("\\s*from\\s+(" + MODULEIDENTIFIER + ")\\s+import\\s+\\*\\s*(" + comment + ")?");
 		Matcher allFromMatcher = allFromPattern.matcher(importStatement);
 		if (importMatcher.matches()) {
 			return modulesInIdentifierList(importMatcher.group(1));
