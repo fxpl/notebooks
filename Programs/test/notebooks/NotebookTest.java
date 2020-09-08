@@ -785,6 +785,66 @@ public class NotebookTest {
 	}
 	
 	/**
+	 * Verify that import statements can be identified correctly when there are
+	 * newlines in a code line.
+	 */
+	@Test
+	public void testImportWithNewLinesInLine() {
+		String dataDir = "test/data/modules";
+		String file = "nb_39.ipynb";
+		List<PythonModule> expectedModules = new ArrayList<PythonModule>(3);
+		PythonModule expectedModule = new PythonModule("A", ImportType.ORDINARY);
+		expectedModules.add(expectedModule);
+		PythonModule expectedParent = new PythonModule("B", ImportType.ORDINARY);
+		expectedModule = new PythonModule("C", ImportType.ORDINARY, expectedParent);
+		expectedModules.add(expectedModule);
+		expectedParent = new PythonModule("D", ImportType.FROM);
+		expectedModule = new PythonModule("E", "e", ImportType.ALIAS, expectedParent);
+		expectedModules.add(expectedModule);
+		verifyImports(dataDir + File.separator + file, expectedModules);
+	}
+	
+	/**
+	 * Verify that import statements can be identified correctly when there are
+	 * semicolons in a code line.
+	 */
+	@Test
+	public void testImportWithSemicolonsInLine() {
+		String dataDir = "test/data/modules";
+		String file = "nb_40.ipynb";
+		List<PythonModule> expectedModules = new ArrayList<PythonModule>(3);
+		PythonModule expectedModule = new PythonModule("A", ImportType.ORDINARY);
+		expectedModules.add(expectedModule);
+		PythonModule expectedParent = new PythonModule("B", ImportType.ORDINARY);
+		expectedModule = new PythonModule("C", ImportType.ORDINARY, expectedParent);
+		expectedModules.add(expectedModule);
+		expectedParent = new PythonModule("D", ImportType.FROM);
+		expectedModule = new PythonModule("E", "e", ImportType.ALIAS, expectedParent);
+		expectedModules.add(expectedModule);
+		verifyImports(dataDir + File.separator + file, expectedModules);
+	}
+	
+	/**
+	 * Verify that import statements can be identified correctly when there are
+	 * both newlines and semicolons in a code line.
+	 */
+	@Test
+	public void testImportWithNewlinesAndSemicolonsInLine() {
+		String dataDir = "test/data/modules";
+		String file = "nb_41.ipynb";
+		List<PythonModule> expectedModules = new ArrayList<PythonModule>(3);
+		PythonModule expectedModule = new PythonModule("A", ImportType.ORDINARY);
+		expectedModules.add(expectedModule);
+		PythonModule expectedParent = new PythonModule("B", ImportType.ORDINARY);
+		expectedModule = new PythonModule("C", ImportType.ORDINARY, expectedParent);
+		expectedModules.add(expectedModule);
+		expectedParent = new PythonModule("D", ImportType.FROM);
+		expectedModule = new PythonModule("E", "e", ImportType.ALIAS, expectedParent);
+		expectedModules.add(expectedModule);
+		verifyImports(dataDir + File.separator + file, expectedModules);
+	}
+	
+	/**
 	 * Verify that modules are is imported when in an invalid import statement.
 	 */
 	@Test

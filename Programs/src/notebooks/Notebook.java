@@ -61,13 +61,13 @@ public class Notebook {
 		List<JSONObject> codeCells = getCodeCells();
 		for (JSONObject cell: codeCells) {
 			JSONArray lines = getSource(cell);
-			for (int i=0; i<lines.length(); i++) {
-				String line = lines.getString(i);
-				if (line.trim().startsWith("import") || line.trim().startsWith("from")) {
+			List<String> splitLines = splitSource(lines);
+			for (String line: splitLines) {
+				if (line.trim().startsWith("import") || line.trim().startsWith("from")) {	// TODO: Mellanslag
 					try {
 						modules.addAll(modulesInImport(line));
 					} catch (NotebookException e) {
-						System.err.println("Could not add imported modules: " + e.getMessage());
+						System.err.println("Could not add imported modules for " + this.path + ": " + e.getMessage());
 					}
 				} else {
 					for (PythonModule module: modules) {
@@ -80,6 +80,27 @@ public class Notebook {
 	}
 	
 	/**
+	 * Split each line in lines on newlines and ';'. Return a list containing
+	 * all sub lines.
+	 * @param lines The lines to split
+	 * @return A list containing the sub lines
+	 */
+	private List<String> splitSource(JSONArray lines) {
+		List<String> result = new ArrayList<String>(lines.length()); // Most of the times, lines do not need to be split
+		for (int i=0; i<lines.length(); i++) {
+			String line = lines.getString(i);
+			String[] subLines = line.split("\\n");
+			for (String subLine: subLines) {
+				String[] subStatements = subLine.split(";");
+				for (String subStatement: subStatements) {
+					result.add(subStatement);
+				}
+			}
+		}
+		return result;
+	}
+	
+	/**
 	 * Identify all module(s) in a Python importStatement.
 	 * @param importStatement Python import statement in which modules will be identified.
 	 * @return A list of all modules found in importStatment
@@ -88,12 +109,12 @@ public class Notebook {
 		final String MODULEIDENTIFIER = PythonModule.IDENTIFIER;
 		final String moduleDescr = "" + MODULEIDENTIFIER + "(\\s*as\\s+" + MODULEIDENTIFIER + "\\s*)?";
 		final String moduleList = "(" + moduleDescr + "\\s*,\\s*)*" + moduleDescr;
-		String importStatementTemplate = "\\s*import\\s+(" + moduleList + ")\\s+";
+		String importStatementTemplate = "\\s*import\\s+(" + moduleList + ")\\s*";
 		Pattern importPattern = Pattern.compile(importStatementTemplate);
 		Matcher importMatcher = importPattern.matcher(importStatement);
 		Pattern fromPattern = Pattern.compile("\\s*from\\s+(" + MODULEIDENTIFIER + ")\\s+(" + importStatementTemplate + ")");
 		Matcher fromMatcher = fromPattern.matcher(importStatement);
-		Pattern allFromPattern = Pattern.compile("\\s*from\\s+(" + MODULEIDENTIFIER + ")\\s+import\\s+\\*\\s+");
+		Pattern allFromPattern = Pattern.compile("\\s*from\\s+(" + MODULEIDENTIFIER + ")\\s+import\\s+\\*\\s*");
 		Matcher allFromMatcher = allFromPattern.matcher(importStatement);
 		if (importMatcher.matches()) {
 			return modulesInIdentifierList(importMatcher.group(1));
@@ -157,13 +178,13 @@ public class Notebook {
 	
 	/**
 	 * Build the parent of a Python module.
-	 * @param names Array of names of all ancestors, and the module itself. Sorted with oldest first
+	 * @param names Array of names of all ancestors, and the module itself. Sorted with oldest first.
 	 * @return The parent of the module with name = last element in names
 	 */
 	private PythonModule getParentModule(String[] names) {
 		PythonModule parent = null;
 		for (int j=0; j<names.length-1; j++) {
-			parent = new PythonModule(names[j], null, parent);
+			parent = new PythonModule(names[j], null, parent);	// TODO: Inte null-typ!
 		}
 		return parent;
 	}
