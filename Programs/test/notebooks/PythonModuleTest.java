@@ -466,7 +466,8 @@ public class PythonModuleTest {
 	@Test
 	public void testToString_noAlias() {
 		PythonModule moduleWithoutAlias = new PythonModule(name, ImportType.ORDINARY, parent);
-		String expected = parentModuleName + "." + name;
+		String qualifier = parentModuleName + "." + name;
+		String expected = qualifier + "(" + qualifier + ")";
 		assertEquals("Wrong string representation returned for module without alias!",
 				expected, moduleWithoutAlias.toString());
 	}
@@ -476,7 +477,7 @@ public class PythonModuleTest {
 		// from parentModuleName import name
 		PythonModule parent = new PythonModule(parentModuleName, ImportType.FROM);
 		PythonModule moduleWithFromParent = new PythonModule(name, ImportType.ORDINARY, parent);
-		String expected = parentModuleName + "." + name;
+		String expected = parentModuleName + "." + name + "(" + name + ")";
 		assertEquals("Wrong string representation returned for module imported with from!",
 				expected, moduleWithFromParent.toString());
 	}

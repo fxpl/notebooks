@@ -931,11 +931,11 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 				"nb_3.ipynb", "nb_4.ipynb", "nb_5.ipynb"};
 		String[] expectedLines = {
 			modulesHeader(),
-			"nb_1.ipynb, kossan_mu",
+			"nb_1.ipynb, kossan_mu(kossan_mu)",
 			"nb_2.ipynb, kalv(naut)",
 			"nb_3.ipynb, ko.*",
-			"nb_4.ipynb, module1, module2(mod2), module3(mod3)",
-			"nb_5.ipynb, module10, module11(mod), module12, module13(mod13)"
+			"nb_4.ipynb, module1(module1), module2(mod2), module3(mod3)",
+			"nb_5.ipynb, module10(module10), module11(mod), module12(module12), module13(mod13)"
 		};
 		for (String file: files) {
 			analyzer.initializeNotebooksFrom(dataDir + File.separator + file);

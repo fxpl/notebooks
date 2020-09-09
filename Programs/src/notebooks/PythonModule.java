@@ -51,12 +51,9 @@ public class PythonModule {
 		return this.name;
 	}
 	
-	/* TODO: toString presenterar inte importtyp, men equals kollar den
-	   så när importtyperna är olika säger testerna att fel module har returnerats,
-	   med expected: <stringrep> och actual: <stringrep>, där stringrep är identiska!*/ 
 	@Override
 	public boolean equals(Object other) {
-		if (null == other || other.getClass() != this.getClass()) {
+		if (null == other || !(other instanceof PythonModule)) {
 			return false;
 		}
 		PythonModule otherModule = (PythonModule) other;
@@ -76,6 +73,7 @@ public class PythonModule {
 		}
 		if (null == importedWith) {
 			if (null != otherModule.importedWith) {
+				// TODO: Testtäck!
 				return false;
 			}
 		} else if (!this.importedWith.equals(otherModule.importedWith)) {
@@ -138,7 +136,7 @@ public class PythonModule {
 	public String pedigreeString() {
 		String result = "";
 		if (null != parent) {
-			result += parent.toString() + ".";
+			result += parent.pedigreeString() + ".";
 		}
 		result += name;
 		return result;
@@ -178,11 +176,7 @@ public class PythonModule {
 	
 	@Override
 	public String toString() {
-		String result = pedigreeString();
-		if (null != alias) {
-			result += "(" + alias + ")";
-		}
-		return result;
+		return pedigreeString() + "(" + qualifier() + ")";
 	}
 	
 	private String qualifier() {

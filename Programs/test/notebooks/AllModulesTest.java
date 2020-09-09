@@ -26,8 +26,16 @@ public class AllModulesTest {
 	
 	@Test
 	public void testConstructor() {
-		// Check parent and alias via string representation.
-		String expectedStringRepr = parent.toString() + ".*";
-		assertEquals("Wrong parent, alias or name!", expectedStringRepr, module.toString());
+		/* If this tests fails, but testGetName and testImportedWith, the
+		   problem is in the parent or with the alias. */
+		PythonModule expected = new PythonModule("*", null, ImportType.ORDINARY, parent);
+		assertEquals("Incorrect module returned by constructor!", expected, module);
+	}
+	
+	@Test
+	public void testToString() {
+		String expected = "module.*";
+		assertEquals("Wrong string representation returned for AllModules object!",
+				expected, module.toString());
 	}
 }
