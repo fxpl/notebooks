@@ -138,8 +138,8 @@ public class TestUtils {
 		prefix = prefix.replace("*", "\\*");
 		prefix = prefix.replace(".", "\\.");
 		int numTries = 0;
-		while (outputFileName.equals(startFileName) && numTries<3) {
-			/* The reason that we try 3 times is that sometimes this method
+		while (outputFileName.equals(startFileName) && numTries<5) {
+			/* The reason that we try 5 times is that sometimes this method
 			   doesn't find the file even though it is created, probably
 			   because we check before the write is completed. */
 			for (String currentFileName: directory.list()) {
