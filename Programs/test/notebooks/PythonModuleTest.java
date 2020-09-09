@@ -26,9 +26,10 @@ public class PythonModuleTest {
 	@Test
 	public void testConstructor_oneParam() {
 		PythonModule oneParamModule = new PythonModule(name);
-		PythonModule expectedModule = new PythonModule(name, null, null, null);
+		PythonModule expectedModule = new PythonModule(name, null, ImportType.ORDINARY, null);
 		assertEquals("Wrong name returned!", name, oneParamModule.getName());
-		assertNull("Import type returned for module without import type!", oneParamModule.importedWith());
+		assertEquals("Wrong import type returned for module without import type!",
+				ImportType.ORDINARY, oneParamModule.importedWith());
 		assertEquals("Alias or parent set!", expectedModule, oneParamModule);
 	}
 	
@@ -155,13 +156,13 @@ public class PythonModuleTest {
 	@Test
 	public void testEquals_diffGrandParent() {
 		PythonModule grandParent1 = new PythonModule("farfar");
-		PythonModule parent1 = new PythonModule("pappa", null, grandParent1);	// TODO
+		PythonModule parent1 = new PythonModule("pappa", ImportType.ORDINARY, grandParent1);
 		PythonModule module1 = new PythonModule(name, ImportType.ORDINARY, parent1);
 		PythonModule grandParent2 = new PythonModule("farmor");
-		PythonModule parent2 = new PythonModule("pappa", null, grandParent2);	// TODO
+		PythonModule parent2 = new PythonModule("pappa", ImportType.ORDINARY, grandParent2);
 		PythonModule module2 = new PythonModule(name, ImportType.ORDINARY, parent2);
 		assertFalse("Modules with different grand parents considered equal!", module1.equals(module2));
-	} 
+	}
 	
 	@Test
 	public void testHashCode() {
@@ -208,8 +209,8 @@ public class PythonModuleTest {
 		String parentName = "mamma";
 		String diffParentName = "mormor";
 		PythonModule diffGrandParent = new PythonModule(diffParentName);
-		PythonModule diffParent = new PythonModule(parentName, null, diffGrandParent);
-		PythonModule other = new PythonModule(name, null, diffParent);
+		PythonModule diffParent = new PythonModule(parentName, ImportType.ORDINARY, diffGrandParent);
+		PythonModule other = new PythonModule(name, ImportType.ALIAS, diffParent);
 		assertFalse("Modules with different grand parents considered same!", module.is(other));
 	}
 	
@@ -218,7 +219,7 @@ public class PythonModuleTest {
 		final String parentName = "pappa";
 		final String grandParentName = "farmor";
 		PythonModule grandParent1 = new PythonModule(grandParentName);
-		PythonModule parent1 = new PythonModule(parentName, null, grandParent1);
+		PythonModule parent1 = new PythonModule(parentName, ImportType.ORDINARY, grandParent1);
 		PythonModule module1 = new PythonModule(name, alias, importedWith, parent1);
 		PythonModule grandParent2 = new PythonModule(grandParentName);
 		PythonModule parent2 = new PythonModule(parentName, null, grandParent2);

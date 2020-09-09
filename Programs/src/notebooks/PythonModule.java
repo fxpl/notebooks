@@ -16,9 +16,8 @@ public class PythonModule {
 	protected PythonModule parent;
 	protected final Map<String, Integer> functionUsages;
 	
-	// TODO: Ta bort denna konstruktor, eftersom vi inte vill ha importType null. Eller använd ORDINARY?!
 	public PythonModule(String name) {
-		this(name, null, null, null);
+		this(name, null, ImportType.ORDINARY, null);
 	}
 	
 	public PythonModule(String name, ImportType importedWith) {
