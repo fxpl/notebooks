@@ -72,7 +72,6 @@ public class PythonModule {
 		}
 		if (null == importedWith) {
 			if (null != otherModule.importedWith) {
-				// TODO: Testtäck!
 				return false;
 			}
 		} else if (!this.importedWith.equals(otherModule.importedWith)) {

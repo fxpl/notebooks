@@ -119,6 +119,22 @@ public class PythonModuleTest {
 	}
 	
 	@Test
+	public void testEquals_diffImportType() {
+		PythonModule other = new PythonModule(name, alias, ImportType.ORDINARY, parent);
+		assertFalse("Python modules with different import types considered equal!", module.equals(other));
+	}
+	
+	@Test
+	public void testEquals_nullImportType() {
+		PythonModule other = new PythonModule(name, alias, null, parent);
+		assertFalse("Python module without import type considered equal to python module with import type!",
+				other.equals(module));
+		assertFalse("Python module with import type considered equal to python module without import type!",
+				module.equals(other));
+		assertTrue("Python module without alias not considered equal to itself!", other.equals(other));
+	}
+	
+	@Test
 	public void testEquals_diffAlias() {
 		PythonModule other = new PythonModule(name, "otherAlias", importedWith);
 		assertFalse("Python modules with different alias considered equal!", module.equals(other));
