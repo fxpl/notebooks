@@ -450,6 +450,17 @@ public class PythonModuleTest {
 	}
 	
 	@Test
+	public void testRegisterUsage_subModuleFunction() {
+		PythonModule moduleWithoutSub = new PythonModule(name, ImportType.ORDINARY);
+		moduleWithoutSub.registerUsage(name + ".subName.function()");
+		
+		Map<String, Integer> expectedFunctionUsages = new HashMap<String, Integer>(0);
+		
+		assertEquals("Function from sub module registered.",
+				expectedFunctionUsages, moduleWithoutSub.functionUsages);
+	}
+	
+	@Test
 	public void testSetOldestAncestor_noParents() {
 		PythonModule newAncestor = new PythonModule("Lucy", ImportType.FROM);
 		PythonModule expectedDescendant = new PythonModule(name, null, ImportType.ORDINARY, newAncestor);

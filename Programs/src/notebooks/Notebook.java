@@ -106,7 +106,7 @@ public class Notebook {
 	 * @return A list of all modules found in importStatment
 	 */
 	private List<PythonModule> modulesInImport(String importStatement) throws NotebookException {
-		final String MODULEIDENTIFIER = PythonModule.IDENTIFIER;
+		final String MODULEIDENTIFIER = PythonModule.MODULE_IDENTIFIER;
 		final String moduleDescr = "" + MODULEIDENTIFIER + "(\\s*as\\s+" + MODULEIDENTIFIER + "\\s*)?";
 		final String moduleList = "(" + moduleDescr + "\\s*,\\s*)*" + moduleDescr;
 		final String comment = "#.*";
@@ -143,7 +143,7 @@ public class Notebook {
 	 * @return A List of all modules in identifierList 
 	 */
 	private List<PythonModule> modulesInIdentifierList(String identifierList) {
-		final String MODULEIDENTIFIER = PythonModule.IDENTIFIER;
+		final String MODULEIDENTIFIER = PythonModule.MODULE_IDENTIFIER;
 		final Pattern ordinaryPattern = Pattern.compile("(" + MODULEIDENTIFIER + ")");
 		final Pattern asPattern = Pattern.compile("(" + MODULEIDENTIFIER + ")\\s+as\\s+(" + MODULEIDENTIFIER + ")");
 		List<PythonModule> result = new ArrayList<PythonModule>();
