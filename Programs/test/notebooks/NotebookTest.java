@@ -718,8 +718,8 @@ public class NotebookTest {
 	public void testImportWithSubmodules() {
 		String dataDir = "test/data/modules";
 		String file = "nb_30.ipynb";
-		PythonModule expectedGrandParent = new PythonModule("A", null);
-		PythonModule expectedParent = new PythonModule("B", null, expectedGrandParent);
+		PythonModule expectedGrandParent = new PythonModule("A", ImportType.ORDINARY);
+		PythonModule expectedParent = new PythonModule("B", ImportType.ORDINARY, expectedGrandParent);
 		PythonModule expectedModule = new PythonModule("C", ImportType.ORDINARY, expectedParent);
 		verifyImport(dataDir + File.separator + file, expectedModule);
 	}
@@ -732,8 +732,8 @@ public class NotebookTest {
 	public void testImportWithSubmodulesAndAlias() {
 		String dataDir = "test/data/modules";
 		String file = "nb_31.ipynb";
-		PythonModule expectedGrandParent = new PythonModule("A", null);
-		PythonModule expectedParent = new PythonModule("B", null, expectedGrandParent);
+		PythonModule expectedGrandParent = new PythonModule("A", ImportType.ORDINARY);
+		PythonModule expectedParent = new PythonModule("B", ImportType.ORDINARY, expectedGrandParent);
 		PythonModule expectedModule = new PythonModule("C", "child", ImportType.ALIAS, expectedParent);
 		verifyImport(dataDir + File.separator + file, expectedModule);
 	}
@@ -747,7 +747,7 @@ public class NotebookTest {
 		String dataDir = "test/data/modules";
 		String file = "nb_32.ipynb";
 		PythonModule expectedGrandParent = new PythonModule("Base", ImportType.FROM);
-		PythonModule expectedParent = new PythonModule("A", null, expectedGrandParent);
+		PythonModule expectedParent = new PythonModule("A", ImportType.ORDINARY, expectedGrandParent);
 		PythonModule expectedModule = new PythonModule("B", ImportType.ORDINARY, expectedParent);
 		verifyImport(dataDir + File.separator + file, expectedModule);
 	}
@@ -762,8 +762,8 @@ public class NotebookTest {
 		String dataDir = "test/data/modules";
 		String file = "nb_33.ipynb";
 		PythonModule expectedGrandParent = new PythonModule("Base", ImportType.FROM);
-		PythonModule expectedParent1 = new PythonModule("A", null, expectedGrandParent);
-		PythonModule expectedParent2 = new PythonModule("C", null, expectedGrandParent);
+		PythonModule expectedParent1 = new PythonModule("A", ImportType.ORDINARY, expectedGrandParent);
+		PythonModule expectedParent2 = new PythonModule("C", ImportType.ORDINARY, expectedGrandParent);
 		List<PythonModule> expectedModules = new ArrayList<PythonModule>(1);
 		expectedModules.add(new PythonModule("B", "sub", ImportType.ALIAS, expectedParent1));
 		expectedModules.add(new PythonModule("D", ImportType.ORDINARY, expectedParent2));
@@ -922,12 +922,10 @@ public class NotebookTest {
 		List<PythonModule> modules = notebook.modules();
 		assertEquals("Incorrect list of modules returned!",
 				expectedModules, modules);
+
 		for (int i=0; i<expectedModules.size(); i++) {
-			
 			PythonModule expectedModule = expectedModules.get(i);
 			PythonModule actualModule = modules.get(i);
-			assertEquals("Incorrect import type stored for module " + i + "!",
-					expectedModule.importedWith(), actualModule.importedWith());
 			assertEquals("Wrong function usages stored for module " + i + "!",
 					expectedModule.functionUsages, actualModule.functionUsages);
 		}

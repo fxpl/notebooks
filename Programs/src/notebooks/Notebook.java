@@ -185,7 +185,7 @@ public class Notebook {
 	private PythonModule getParentModule(String[] names) {
 		PythonModule parent = null;
 		for (int j=0; j<names.length-1; j++) {
-			parent = new PythonModule(names[j], null, parent);	// TODO: Inte null-typ!
+			parent = new PythonModule(names[j], ImportType.ORDINARY, parent);
 		}
 		return parent;
 	}

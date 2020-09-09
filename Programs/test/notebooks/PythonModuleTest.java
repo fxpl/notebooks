@@ -55,11 +55,13 @@ public class PythonModuleTest {
 		PythonModule expectedModule = new PythonModule(name, null, ImportType.ALIAS, null);
 		assertEquals("Wrong name set!", name, withoutAlias.getName());
 		assertEquals("Wrong import type set!", ImportType.ALIAS, withoutAlias.importedWith());
+		// If name or import type differs it should already have failed!
 		assertEquals("Wrong alias or parent set!", expectedModule, withoutAlias);
 		PythonModule withAlias = new PythonModule(name, alias, ImportType.FROM);
-		expectedModule = new PythonModule(name, alias, ImportType.ALIAS, null);
+		expectedModule = new PythonModule(name, alias, ImportType.FROM, null);
 		assertEquals("Wrong name set!", name, withAlias.getName());
 		assertEquals("Wrong import type set!", ImportType.FROM, withAlias.importedWith());
+		// If name or import type differs it should already have failed!
 		assertEquals("Wrong alias or parent set!", expectedModule, withAlias);
 	}
 	
@@ -70,6 +72,7 @@ public class PythonModuleTest {
 		assertEquals("Wrong name returned!", name, moduleWithoutAlias.getName());
 		assertEquals("Wrong import type returned for module!",
 				ImportType.ORDINARY, moduleWithoutAlias.importedWith());
+		// If name or import type differs it should already have failed!
 		assertEquals("Wrong alias or parent set!", expectedModule, moduleWithoutAlias);
 	}
 	
@@ -79,6 +82,7 @@ public class PythonModuleTest {
 		PythonModule expectedModule = new PythonModule(name, alias, importedWith, null);
 		assertEquals("Wrong name returned!", name, moduleWithoutParent.getName());
 		assertEquals("Wrong import type returned for module!", importedWith, moduleWithoutParent.importedWith());
+		// If name or import type differs it should already have failed!
 		assertEquals("Wrong alias or parent set!", expectedModule, moduleWithoutParent);
 	}
 	
@@ -151,10 +155,10 @@ public class PythonModuleTest {
 	@Test
 	public void testEquals_diffGrandParent() {
 		PythonModule grandParent1 = new PythonModule("farfar");
-		PythonModule parent1 = new PythonModule("pappa", null, grandParent1);
+		PythonModule parent1 = new PythonModule("pappa", null, grandParent1);	// TODO
 		PythonModule module1 = new PythonModule(name, ImportType.ORDINARY, parent1);
 		PythonModule grandParent2 = new PythonModule("farmor");
-		PythonModule parent2 = new PythonModule("pappa", null, grandParent2);
+		PythonModule parent2 = new PythonModule("pappa", null, grandParent2);	// TODO
 		PythonModule module2 = new PythonModule(name, ImportType.ORDINARY, parent2);
 		assertFalse("Modules with different grand parents considered equal!", module1.equals(module2));
 	} 
@@ -468,6 +472,16 @@ public class PythonModuleTest {
 	}
 	
 	@Test
+	public void testToString_from() {
+		// from parentModuleName import name
+		PythonModule parent = new PythonModule(parentModuleName, ImportType.FROM);
+		PythonModule moduleWithFromParent = new PythonModule(name, ImportType.ORDINARY, parent);
+		String expected = parentModuleName + "." + name;
+		assertEquals("Wrong string representation returned for module imported with from!",
+				expected, moduleWithFromParent.toString());
+	}
+	
+	@Test
 	public void testPedigreeString() {
 		String expected = parentModuleName + "." + name;
 		assertEquals("Wrong pedigree string returned.", expected, module.pedigreeString());
@@ -485,8 +499,8 @@ public class PythonModuleTest {
 	public void testPedigreeString_grandParent() {
 		final String parentName = "pappa";
 		final String grandParentName = "farmor";
-		PythonModule grandParent = new PythonModule(grandParentName);
-		PythonModule parent = new PythonModule(parentName, null, grandParent);
+		PythonModule grandParent = new PythonModule(grandParentName, ImportType.ORDINARY);
+		PythonModule parent = new PythonModule(parentName, ImportType.ORDINARY, grandParent);
 		PythonModule module = new PythonModule(name, alias, importedWith, parent);
 		String expected = grandParentName + "." + parentName + "." + name;
 		assertEquals("Wrong pedigree string returned for module with grand parent!",

@@ -16,6 +16,7 @@ public class PythonModule {
 	protected PythonModule parent;
 	protected final Map<String, Integer> functionUsages;
 	
+	// TODO: Ta bort denna konstruktor, eftersom vi inte vill ha importType null. Eller använd ORDINARY?!
 	public PythonModule(String name) {
 		this(name, null, null, null);
 	}
@@ -50,6 +51,9 @@ public class PythonModule {
 		return this.name;
 	}
 	
+	/* TODO: toString presenterar inte importtyp, men equals kollar den
+	   så när importtyperna är olika säger testerna att fel module har returnerats,
+	   med expected: <stringrep> och actual: <stringrep>, där stringrep är identiska!*/ 
 	@Override
 	public boolean equals(Object other) {
 		if (null == other || other.getClass() != this.getClass()) {
@@ -68,6 +72,13 @@ public class PythonModule {
 				return false;
 			}
 		} else if (!this.parent.equals(otherModule.parent)) {
+			return false;
+		}
+		if (null == importedWith) {
+			if (null != otherModule.importedWith) {
+				return false;
+			}
+		} else if (!this.importedWith.equals(otherModule.importedWith)) {
 			return false;
 		}
 		return this.name.equals(otherModule.name);
