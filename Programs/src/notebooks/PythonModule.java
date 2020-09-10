@@ -47,10 +47,6 @@ public class PythonModule {
 		this.functionUsages = new HashMap<String, Integer>();
 	}
 	
-	public String getName() {	// TODO: Kan tas bort.
-		return this.name;
-	}
-	
 	@Override
 	public boolean equals(Object other) {
 		if (null == other || !(other instanceof PythonModule)) {
@@ -153,7 +149,7 @@ public class PythonModule {
 		}
 		
 		// Usages of imported function (only possible with from imports)
-		if (null != parent && ImportType.FROM == parent.importedWith()) {
+		if (null != parent && ImportType.FROM == parent.importedWith) {
 			usagePattern = Pattern.compile("(?<!\\.)" + this.qualifier() + "\\s*\\(");
 			usageMatcher = usagePattern.matcher(line);
 			while (usageMatcher.find()) {

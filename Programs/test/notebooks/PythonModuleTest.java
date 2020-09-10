@@ -27,7 +27,7 @@ public class PythonModuleTest {
 	public void testConstructor_oneParam() {
 		PythonModule oneParamModule = new PythonModule(name);
 		PythonModule expectedModule = new PythonModule(name, null, ImportType.ORDINARY, null);
-		assertEquals("Wrong name returned!", name, oneParamModule.getName());
+		assertEquals("Wrong name set!", name, oneParamModule.name);
 		assertEquals("Wrong import type returned for module without import type!",
 				ImportType.ORDINARY, oneParamModule.importedWith());
 		assertEquals("Alias or parent set!", expectedModule, oneParamModule);
@@ -37,7 +37,7 @@ public class PythonModuleTest {
 	public void testConstructor_twoParam() {
 		PythonModule twoParamModule = new PythonModule(name, ImportType.ORDINARY);
 		PythonModule expectedModule = new PythonModule(name, null, ImportType.ORDINARY, null);
-		assertEquals("Wrong name returned!", name, twoParamModule.getName());
+		assertEquals("Wrong name set!", name, twoParamModule.name);
 		assertEquals("Wrong import type returned for module!",
 				ImportType.ORDINARY, twoParamModule.importedWith());
 		assertEquals("Alias or parent set!", expectedModule, twoParamModule);
@@ -54,13 +54,13 @@ public class PythonModuleTest {
 	public void testConstructor_suspicious() {
 		PythonModule withoutAlias = new PythonModule(name, ImportType.ALIAS);
 		PythonModule expectedModule = new PythonModule(name, null, ImportType.ALIAS, null);
-		assertEquals("Wrong name set!", name, withoutAlias.getName());
+		assertEquals("Wrong name set!", name, withoutAlias.name);
 		assertEquals("Wrong import type set!", ImportType.ALIAS, withoutAlias.importedWith());
 		// If name or import type differs it should already have failed!
 		assertEquals("Wrong alias or parent set!", expectedModule, withoutAlias);
 		PythonModule withAlias = new PythonModule(name, alias, ImportType.FROM);
 		expectedModule = new PythonModule(name, alias, ImportType.FROM, null);
-		assertEquals("Wrong name set!", name, withAlias.getName());
+		assertEquals("Wrong name set!", name, withAlias.name);
 		assertEquals("Wrong import type set!", ImportType.FROM, withAlias.importedWith());
 		// If name or import type differs it should already have failed!
 		assertEquals("Wrong alias or parent set!", expectedModule, withAlias);
@@ -70,7 +70,7 @@ public class PythonModuleTest {
 	public void testConstructorWithoutAlias() {
 		PythonModule moduleWithoutAlias = new PythonModule(name, ImportType.ORDINARY, parent);
 		PythonModule expectedModule = new PythonModule(name, null, ImportType.ORDINARY, parent);
-		assertEquals("Wrong name returned!", name, moduleWithoutAlias.getName());
+		assertEquals("Wrong name set!", name, moduleWithoutAlias.name);
 		assertEquals("Wrong import type returned for module!",
 				ImportType.ORDINARY, moduleWithoutAlias.importedWith());
 		// If name or import type differs it should already have failed!
@@ -81,18 +81,13 @@ public class PythonModuleTest {
 	public void testConstructorWithoutParent() {
 		PythonModule moduleWithoutParent = new PythonModule(name, alias, importedWith);
 		PythonModule expectedModule = new PythonModule(name, alias, importedWith, null);
-		assertEquals("Wrong name returned!", name, moduleWithoutParent.getName());
+		assertEquals("Wrong name returned!", name, moduleWithoutParent.name);
 		assertEquals("Wrong import type returned for module!", importedWith, moduleWithoutParent.importedWith());
 		// If name or import type differs it should already have failed!
 		assertEquals("Wrong alias or parent set!", expectedModule, moduleWithoutParent);
 	}
 	
-	// Four parameter constructor implicitly tested by other getter tests
-	
-	@Test
-	public void testGetName() {
-		assertEquals("Wrong name returned by getName!", name, module.getName());
-	}
+	// Four parameter constructor is implicitly tested by other getter tests
 	
 	@Test
 	public void testEquals_equal() {

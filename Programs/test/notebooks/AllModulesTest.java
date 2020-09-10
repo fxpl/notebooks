@@ -20,11 +20,6 @@ public class AllModulesTest {
 	}
 	
 	@Test
-	public void testGetName() {
-		assertEquals("Wrong name retued for AllModules instance!", "*", module.getName());
-	}
-	
-	@Test
 	public void testImportedWith() {
 		assertEquals("AllModules objects not imported with ORDINARY statment!",
 				ImportType.ORDINARY, module.importedWith());
