@@ -3,11 +3,11 @@ package notebooks;
 import java.util.Objects;
 
 public class Quantity implements Comparable<Quantity> {
-	private String name;
+	private String identifier;
 	private int count;
 
-	public Quantity(String name, int quantity) {
-		this.name = name;
+	public Quantity(String identifier, int quantity) {
+		this.identifier = identifier;
 		this.count = quantity;
 	}
 
@@ -22,28 +22,28 @@ public class Quantity implements Comparable<Quantity> {
 			return false;
 		}
 		Quantity otherQuantity = (Quantity)other;
-		return this.name.equals(otherQuantity.name)
+		return this.identifier.equals(otherQuantity.identifier)
 				&& this.count == otherQuantity.count;
 	}
 	
-	public String getName() {
-		return name;
+	public String getIdentifier() {
+		return identifier;
 	}
 	
 	@Override
 	public int hashCode() {
-		return Objects.hash(name, count);
+		return Objects.hash(identifier, count);
 	}
 
 	@Override
 	public String toString() {
-		return name + ": " + count;
+		return identifier + ": " + count;
 	}
 	
 	/**
 	 * @return A string represenation suitable for CSV files
 	 */
 	public String toCsvString() {
-		return name + ", " + count;
+		return identifier + ", " + count;
 	}
 }

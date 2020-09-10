@@ -1,6 +1,8 @@
 package notebooks;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -34,6 +36,43 @@ public class AllModulesTest {
 		   problem is in the parent or with the alias. */
 		PythonModule expected = new PythonModule("*", null, ImportType.ORDINARY, parent);
 		assertEquals("Incorrect module returned by constructor!", expected, module);
+	}
+	
+	@Test public void testIs_null() {
+		assertFalse("Module instance considered being null.", module.is(null));
+		assertFalse("Module instance considered being null.", module.is((AllModules)null));
+	}
+	
+	@Test
+	public void testIs_same() {
+		PythonModule otherParent = new PythonModule("module", ImportType.FROM);
+		PythonModule other = new AllModules(otherParent);
+		assertTrue("Identical AllModules instances considered different.", other.is(module));
+	}
+	
+	@Test
+	public void testIs_sameButDiffTypes() {
+		PythonModule other = new PythonModule("module", ImportType.ORDINARY);
+		assertTrue("Modules representing the same module considered different when of different types.",
+				module.is(other));
+		assertTrue("Modules representing the same module considered different when of different types.",
+				other.is(module));
+	}
+	
+	@Test
+	public void testIs_sameTypeButDifferent() {
+		PythonModule otherParent = new PythonModule("otherParent", ImportType.FROM);
+		PythonModule other = new AllModules(otherParent);
+		assertFalse("Modules instances representing different modules considered same when being AllModules instances.",
+				module.is(other));
+		assertFalse("Modules instances representing different modules considered same when being AllModules instances.",
+				other.is(module));
+	}
+	
+	@Test
+	public void testPedigreeString() {
+		assertEquals("Wrong pedigree string returned for AllModule instance.",
+				"module", module.pedigreeString());
 	}
 	
 	@Test

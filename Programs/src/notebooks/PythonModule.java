@@ -47,7 +47,7 @@ public class PythonModule {
 		this.functionUsages = new HashMap<String, Integer>();
 	}
 	
-	public String getName() {
+	public String getName() {	// TODO: Kan tas bort.
 		return this.name;
 	}
 	
@@ -103,11 +103,8 @@ public class PythonModule {
 		if (null == other) {
 			return false;
 		}
-		if (null == parent) {
-			return null == other.parent && this.name.equals(other.name);
-		} else {
-			return this.name.equals(other.name) && this.parent.is(other.parent);
-		}
+		return other.sameAs(this);
+		// Because we want to call sameAs in the subtype if other is a subtype instance.
 	}
 	
 	/**
@@ -176,6 +173,17 @@ public class PythonModule {
 	@Override
 	public String toString() {
 		return pedigreeString() + "(" + qualifier() + ")";
+	}
+	
+	/*
+	 * Helper method for is.
+	 */
+	protected boolean sameAs(PythonModule other) {
+		if (null == parent) {
+			return null == other.parent && this.name.equals(other.name);
+		} else {
+			return this.name.equals(other.name) && this.parent.is(other.parent);
+		}
 	}
 	
 	protected String qualifier() {

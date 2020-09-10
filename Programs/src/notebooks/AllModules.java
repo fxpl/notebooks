@@ -20,7 +20,30 @@ public class AllModules extends PythonModule {
 	public String toString() {
 		/* The import type is obvious and doesn't need to be considered.
 		   Hence, the pedigree string contains all information needed. */
-		return pedigreeString();
+		return pedigreeString() + ".*";
+	}
+	
+	@Override
+	public boolean is(PythonModule other) {
+		return this.sameAs(other);
+	}
+	
+	@Override
+	public boolean sameAs(PythonModule other) {
+		if (null == other) {
+			return false;
+		}
+		if (other instanceof AllModules) {
+			return other.parent.is(this.parent);
+		} else {
+			return other.is(this.parent);
+		}
+	}
+	
+	@Override
+	public String pedigreeString() {
+		return parent.pedigreeString();
+		// If there is not a parent, something is terribly wrong!
 	}
 	
 	@Override

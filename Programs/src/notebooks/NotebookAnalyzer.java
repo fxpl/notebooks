@@ -747,10 +747,9 @@ public class NotebookAnalyzer extends Analyzer {
 		List<PythonModule> topModulesWithFunctions = new ArrayList<PythonModule>(numModules);
 		for (int i=0; i<numModules; i++) {
 			Quantity quantity = modulesSorted.get(i);
-			topModulesWithFunctions.add(new PythonModule(quantity.getName()));
-			// Import type and parents don't matter here.
+			PythonModule module = getModuleFromPedigreeString(quantity.getIdentifier());
+			topModulesWithFunctions.add(module);
 		}
-		
 		// Merge all modules from allModules into the top modules (in parallel)
 		List<Callable<Void>> tasks = new ArrayList<Callable<Void>>(numModules);
 		CountDownLatch counter = new CountDownLatch(numModules);
@@ -768,7 +767,7 @@ public class NotebookAnalyzer extends Analyzer {
 		// Write result
 		for (PythonModule module: topModulesWithFunctions) {
 			List<Quantity> functionQuantities = sortedQuantities(module.functionUsages);
-			String csvFileName = outputDir + File.separator + module.name + "-functions" + LocalDateTime.now() + ".csv";
+			String csvFileName = outputDir + File.separator + module.pedigreeString() + "-functions" + LocalDateTime.now() + ".csv";
 			Writer writer = new FileWriter(csvFileName);
 			writer.write(functionUsagesHeader());
 			for (Quantity function: functionQuantities) {
@@ -776,6 +775,23 @@ public class NotebookAnalyzer extends Analyzer {
 			}
 			writer.close();
 		}
+	}
+
+	public static PythonModule getModuleFromPedigreeString(String pedigreeString) {
+		PythonModule parent = null;
+		PythonModule module;
+		String[] identifierParts = pedigreeString.split("\\.");
+		for (int j=0; j<identifierParts.length-1; j++) {
+			module = new PythonModule(identifierParts[j], ImportType.ORDINARY, parent);
+			parent = module;
+		}
+		String moduleName = identifierParts[identifierParts.length - 1];
+		if ("*".equals(moduleName)) {
+			module = new AllModules(parent);
+		} else {
+			module = new PythonModule(moduleName, ImportType.ORDINARY, parent);
+		}
+		return module;
 	}
 
 

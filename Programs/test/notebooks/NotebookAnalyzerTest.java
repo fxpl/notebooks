@@ -946,7 +946,7 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 		lastOutputFile("modules").delete();
 		int numFunctionFiles = Math.min(modulesSorted.size(), 10);
 		for (int i=0; i<numFunctionFiles; i++) {
-			String fileNamePrefix = modulesSorted.get(i).getName() + "-functions";
+			String fileNamePrefix = modulesSorted.get(i).getIdentifier() + "-functions";
 			lastOutputFile(fileNamePrefix).delete();
 		}
 	}
@@ -1052,10 +1052,10 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 	 * Verify that the module analysis creates CSV files with all used
 	 * functions from the most commonly imported modules, sorted on number of
 	 * usages in descending order.
-	 * @throws IOException on errors handling input files of files to be checked
+	 * @throws IOException on errors handling input files or files to be checked
 	 */
 	@Test
-	public void testfunctionUsages() throws IOException {
+	public void testFunctionUsages() throws IOException {
 		String dataDir = "test/data/modules";
 		String[] files = {"nb_36.ipynb", "nb_37.ipynb", "nb_38.ipynb"};
 		// Expected output
@@ -1068,11 +1068,11 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 				functionUsagesHeader(),
 				"fun1, 3"
 		};
-		String[] expectedCLines = {
+		String[] expectedDLines = {
 				functionUsagesHeader(),
 				"fun2, 2"
 		};
-		String[] expectedDLines = {
+		String[] expectedELines = {
 				functionUsagesHeader()
 		};
 		
@@ -1086,23 +1086,48 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 		
 		// Print for all modules
 		analyzer.functionUsages(modules, modulesSorted, Integer.MAX_VALUE);
-		checkCsv("A-functions", expectedALines);
-		lastOutputFile("A-functions").delete();
+		checkCsv("Base.A-functions", expectedALines);
+		lastOutputFile("Base.A-functions").delete();
 		checkCsv("B-functions", expectedBLines);
 		lastOutputFile("B-functions").delete();
-		checkCsv("C-functions", expectedCLines);
-		lastOutputFile("C-functions").delete();
-		checkCsv("D-functions", expectedDLines);
-		lastOutputFile("D-functions").delete();
+		checkCsv("C.D-functions", expectedDLines);
+		lastOutputFile("C.D-functions").delete();
+		checkCsv("E-functions", expectedELines);
+		lastOutputFile("E-functions").delete();
 		
 		// Print for top 2 modules (A and B) only
 		analyzer.functionUsages(modules, modulesSorted, 2);
-		checkCsv("A-functions", expectedALines);
-		lastOutputFile("A-functions").delete();
+		checkCsv("Base.A-functions", expectedALines);
+		lastOutputFile("Base.A-functions").delete();
 		checkCsv("B-functions", expectedBLines);
 		lastOutputFile("B-functions").delete();
-		verifyAbsenceOf("C-functions");
-		verifyAbsenceOf("D-functions");
+		verifyAbsenceOf("C.D-functions");
+		verifyAbsenceOf("E-functions");
+	}
+	
+	/**
+	 * Verify that the module functions listing works also when you have done
+	 * from ... import *.
+	 * @throws IOException on errors handling input files or files to be checked
+	 */
+	@Test
+	public void testFunctionUsages_allFunctionsImported() throws IOException {
+		String dataDir = "test/data/modules";
+		String[] files = {"nb_44.ipynb", "nb_45.ipynb"};
+		
+		String[] expectedLines = {
+				functionUsagesHeader(),
+				"sin, 3",
+				"tan, 2"
+		};
+		
+		for (String file: files) {
+			analyzer.initializeNotebooksFrom(dataDir + File.separator + file);
+		}
+		analyzer.modules();	// Will call functionUsages, and the preparation steps.
+		lastOutputFile("modules").delete();
+		checkCsv("numpy-functions", expectedLines);
+		lastOutputFile("numpy-functions").delete();
 	}
 
 	/**

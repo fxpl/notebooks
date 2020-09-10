@@ -51,8 +51,8 @@ public class QuantityTest {
 	}
 	
 	@Test
-	public void testGetName() {
-		assertEquals("Wrong name returned for quantity.", name, quantity.getName());
+	public void testGetIdentifier() {
+		assertEquals("Wrong name returned for quantity.", name, quantity.getIdentifier());
 	}
 	
 	@Test
