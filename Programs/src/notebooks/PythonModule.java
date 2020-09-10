@@ -178,7 +178,7 @@ public class PythonModule {
 		return pedigreeString() + "(" + qualifier() + ")";
 	}
 	
-	private String qualifier() {
+	protected String qualifier() {
 		if (ImportType.ALIAS == this.importedWith) {
 			return alias;
 		} else if (ImportType.FROM == this.importedWith) {
