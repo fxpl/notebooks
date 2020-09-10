@@ -72,42 +72,42 @@ public class AllModulesTest {
 	
 	@Test
 	public void testRegisterUsage() {
-		// from numpy import *
-		PythonModule numpyModule = new PythonModule("numpy", ImportType.FROM);
-		PythonModule numpyFunctions = new AllModules(numpyModule);
+		// from math import *
+		PythonModule mathModule = new PythonModule("math", ImportType.FROM);
+		PythonModule mathFunctions = new AllModules(mathModule);
 		
-		numpyFunctions.registerUsage("nonNumpyFunction()");
-		numpyFunctions.registerUsage("someOtherFunction(a=sin(1.85), b=sin(3.2), c=sin(5.7))");
-		numpyFunctions.registerUsage("b = cos ( 1.85 ) \n");
-		numpyFunctions.registerUsage("c = sin( 0 )");
+		mathFunctions.registerUsage("nonMathFunction()");
+		mathFunctions.registerUsage("someOtherFunction(a=sin(1.85), b=sin(3.2), c=sin(5.7))");
+		mathFunctions.registerUsage("b = cos ( 1.85 ) \n");
+		mathFunctions.registerUsage("c = sin( 0 )");
 		
 		Map<String, Integer> expectedFunctionUsages = new HashMap<String, Integer>(2);
 		expectedFunctionUsages.put("sin", 4);
 		expectedFunctionUsages.put("cos", 1);
 		
-		assertEquals("numpy functions imported with \"*\" are not identified correctly.",
-				expectedFunctionUsages, numpyFunctions.functionUsages);
+		assertEquals("math functions imported with \"*\" are not identified correctly.",
+				expectedFunctionUsages, mathFunctions.functionUsages);
 	}
 	
 	@Test
 	public void testRegisterUsage_twoModules() {
-		PythonModule pandasModule1 = new PythonModule("pandas", ImportType.FROM);
-		PythonModule pandasFunctions1 = new AllModules(pandasModule1);
-		pandasFunctions1.registerUsage("a = read_csv('my_data.csv')");
+		PythonModule osModule1 = new PythonModule("os", ImportType.FROM);
+		PythonModule osFunctions1 = new AllModules(osModule1);
+		osFunctions1.registerUsage("p = getcwd()");
 		
-		PythonModule pandasModule2 = new PythonModule("pandas", ImportType.FROM);
-		PythonModule pandasFunctions2 = new AllModules(pandasModule2);
-		pandasFunctions2.registerUsage("b = read_json({data=7})");
+		PythonModule osModule2 = new PythonModule("os", ImportType.FROM);
+		PythonModule osFunctions2 = new AllModules(osModule2);
+		osFunctions2.registerUsage("listdir()");
 		
 		Map<String, Integer> expectedFunctionUsages1 = new HashMap<String, Integer>(1);
-		expectedFunctionUsages1.put("read_csv", 1);
+		expectedFunctionUsages1.put("getcwd", 1);
 		Map<String, Integer> expectedFunctionUsages2 = new HashMap<String, Integer>(1);
-		expectedFunctionUsages2.put("read_json", 1);
+		expectedFunctionUsages2.put("listdir", 1);
 		
-		assertEquals("pandas functions imported with \"*\" are not identified correctly when two pandas instances exist.",
-				expectedFunctionUsages1, pandasFunctions1.functionUsages);
-		assertEquals("pandas functions imported with \"*\" are not identified correctly when two pandas instances exist.",
-				expectedFunctionUsages2, pandasFunctions2.functionUsages);
+		assertEquals("os functions imported with \"*\" are not identified correctly when two os instances exist.",
+				expectedFunctionUsages1, osFunctions1.functionUsages);
+		assertEquals("os functions imported with \"*\" are not identified correctly when two os instances exist.",
+				expectedFunctionUsages2, osFunctions2.functionUsages);
 	}
 	
 	@Test

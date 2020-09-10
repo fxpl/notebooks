@@ -1126,8 +1126,8 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 		}
 		analyzer.modules();	// Will call functionUsages, and the preparation steps.
 		lastOutputFile("modules").delete();
-		checkCsv("numpy-functions", expectedLines);
-		lastOutputFile("numpy-functions").delete();
+		checkCsv("math-functions", expectedLines);
+		lastOutputFile("math-functions").delete();
 	}
 
 	/**
