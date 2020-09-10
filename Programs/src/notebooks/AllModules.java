@@ -98,8 +98,13 @@ public class AllModules extends PythonModule {
 			BufferedReader pythonOutputReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
 			String pythonOutput = pythonOutputReader.readLine();
 			pythonOutputReader.close();
-			String[] functions = null == pythonOutput ? new String[0] : pythonOutput.split(" ");
-			functionsInModules.put(module, functions);
+			if (null == pythonOutput) {
+				System.err.println("Module " + module + " is not available. Some function calls for this module will not be identified.");
+				functionsInModules.put(module, new String[0]);
+			} else {
+				String[] functions = pythonOutput.split(" ");
+				functionsInModules.put(module, functions);
+			}
 		} catch (IOException e) {
 			// TODO: Finns det något testfall som kan täcka den här branchen?
 			System.err.println("Couldn't get functions for module " + module + ": " + e.getMessage());
