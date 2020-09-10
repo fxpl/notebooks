@@ -72,7 +72,8 @@ for running each program can be found in the scripts `run_notebookAnalyzer.sh`,
 
 #### Notebook Analyzer
 When running notebook analyzer, `org.json` must be in the class path. A jar file
-is provided in `Programs/external`.
+is provided in `Programs/external`. If you want to use the modules
+functionality, also Programs/python must be in the class path.
 
 `NotebookAnalyzer` takes the following arguments:
  * `--nb_path=NB_PATH`, where `NB_PATH` is the path to a directory containing

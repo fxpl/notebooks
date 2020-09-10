@@ -27,11 +27,16 @@ public class AllModules extends PythonModule {
 	public void registerUsage(String line) {
 		String parentModule = parent.pedigreeString();
 		if (!functionsInModules.containsKey(parentModule)) {
-			storeFunctionsFor(parentModule);
+			String scriptPath = locateFileInClassPath("importscript.py");
+			storeFunctionsFor(parentModule, scriptPath);
 		}
 		if (functionsInModules.containsKey(parentModule)) {
 			storeFunctionUsages(line);
 		}
+	}
+
+	private String locateFileInClassPath(String fileName) {
+		return getClass().getClassLoader().getResource(fileName).getPath();
 	}
 
 	/**
@@ -55,9 +60,8 @@ public class AllModules extends PythonModule {
 	 * array in functionsInModules with the module as key.
 	 * @param module Module for which we want functions
 	 */
-	private static void storeFunctionsFor(String module) {
-		String scriptName = "importscript.py";	// TODO: Sökväg till den här!
-		ProcessBuilder processBuilder = new ProcessBuilder("python3", scriptName, module);
+	private static void storeFunctionsFor(String module, String scriptPath) {
+		ProcessBuilder processBuilder = new ProcessBuilder("python3", scriptPath, module);
 		try {
 			Process process = processBuilder.start();
 			BufferedReader errorReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
@@ -66,7 +70,7 @@ public class AllModules extends PythonModule {
 			if (null != errorOutput) {
 				// TODO: Finns det något testfall som kan täcka den här branchen?
 				System.err.println("An error occurred when executing the Python script "
-						+ scriptName + " for module " + module + ": " + errorOutput);
+						+ scriptPath + " for module " + module + ": " + errorOutput);
 			}
 			BufferedReader pythonOutputReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
 			String pythonOutput = pythonOutputReader.readLine();

@@ -2,6 +2,7 @@
 	<property name="junit.path" value="./external/junit4.jar"/>
 	<property name="junit.path" value="./external/hamcrest-all.jar"/>
 	<property name="json.path" value="./external/json-20190722.jar"/>
+	<property name="python.path" value="./python"/>
 	<property name="bin" value="./bin"/>
 	<property name="dbg" value="on"/>
 
@@ -33,6 +34,7 @@
 				<pathelement location="${junit.path}"/>
 				<pathelement location="${hamcrest.path}"/>
 				<pathelement location = "${json.path}"/>
+				<pathelement location = "${python.path}"/>
 			</classpath>
 
 			<formatter type="plain"/>
