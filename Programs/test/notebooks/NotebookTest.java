@@ -588,6 +588,19 @@ public class NotebookTest {
 	}
 	
 	/**
+	 * Verify that the module is identified in a "from module import*"
+	 * statement --that is also when the space is missing after import.
+	 */
+	@Test
+	public void testSingleImportAllFromNoSpace() {
+		String dataDir = "test/data/modules";
+		String file = "nb_50.ipynb";
+		PythonModule parent = new PythonModule("ko", ImportType.FROM);
+		PythonModule expectedModule = new AllModules(parent);
+		verifyImport(dataDir + File.separator + file, expectedModule);
+	}
+	
+	/**
 	 * Verify that a module in a "from" import statement can be identified
 	 * correctly.
 	 */
