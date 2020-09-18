@@ -61,7 +61,7 @@ public class Notebook {
 		List<JSONObject> codeCells = getCodeCells();
 		for (JSONObject cell: codeCells) {
 			JSONArray lines = getSource(cell);
-			List<String> splitLines = splitSource(lines);
+			List<String> splitLines = new PythonPreprocessor(lines).process();
 			for (String line: splitLines) {
 				if (line.trim().startsWith("import ") || line.trim().startsWith("from ")) {
 					try {
@@ -80,27 +80,6 @@ public class Notebook {
 	}
 	
 	/**
-	 * Split each line in lines on newlines and ';'. Return a list containing
-	 * all sub lines.
-	 * @param lines The lines to split
-	 * @return A list containing the sub lines
-	 */
-	private List<String> splitSource(JSONArray lines) {
-		List<String> result = new ArrayList<String>(lines.length()); // Most of the times, lines do not need to be split
-		for (int i=0; i<lines.length(); i++) {
-			String line = lines.getString(i);
-			String[] subLines = line.split("\\n");
-			for (String subLine: subLines) {
-				String[] subStatements = subLine.split(";");
-				for (String subStatement: subStatements) {
-					result.add(subStatement);
-				}
-			}
-		}
-		return result;
-	}
-	
-	/**
 	 * Identify all module(s) in a Python importStatement.
 	 * @param importStatement Python import statement in which modules will be identified.
 	 * @return A list of all modules found in importStatment
@@ -111,11 +90,11 @@ public class Notebook {
 		final String moduleList = "(" + moduleDescr + "\\s*,\\s*)*" + moduleDescr;
 		final String comment = "#.*";
 		String importStatementTemplate = "\\s*import\\s+(" + moduleList + ")\\s*(" + comment + ")?";
-		Pattern importPattern = Pattern.compile(importStatementTemplate);
+		Pattern importPattern = Pattern.compile(importStatementTemplate + "\\n?");
 		Matcher importMatcher = importPattern.matcher(importStatement);
-		Pattern fromPattern = Pattern.compile("\\s*from\\s+(" + MODULEIDENTIFIER + ")\\s+(" + importStatementTemplate + ")");
+		Pattern fromPattern = Pattern.compile("\\s*from\\s+(" + MODULEIDENTIFIER + ")\\s+(" + importStatementTemplate + ")\\n?");
 		Matcher fromMatcher = fromPattern.matcher(importStatement);
-		Pattern allFromPattern = Pattern.compile("\\s*from\\s+(" + MODULEIDENTIFIER + ")\\s+import\\s*\\*\\s*(" + comment + ")?");
+		Pattern allFromPattern = Pattern.compile("\\s*from\\s+(" + MODULEIDENTIFIER + ")\\s+import\\s*\\*\\s*(" + comment + ")?\\n?");
 		Matcher allFromMatcher = allFromPattern.matcher(importStatement);
 		if (importMatcher.matches()) {
 			return modulesInIdentifierList(importMatcher.group(1));
