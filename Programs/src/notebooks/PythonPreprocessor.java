@@ -19,7 +19,7 @@ public class PythonPreprocessor {
 	 * @param delimiters Existing string delimiters
 	 * @return A copy of code, with all strings removed
 	 */
-	String removeStrings(String code, String[] delimiters) {
+	public String removeStrings(String code, String[] delimiters) {
 		// Find positions of delimiters
 		int numDelimiters = delimiters.length;
 		List<List<Integer>> delimiterPositions = new ArrayList<List<Integer>>(numDelimiters);
@@ -49,8 +49,8 @@ public class PythonPreprocessor {
 				if (!otherTrue(inString, i) && delimiterPositions.get(i).contains(index) && previous != '\\') {
 					inString[i] = !inString[i];
 					index += delimiters[i].length(); // Skip delimiter
-					if (!inString[i]) {
-						result += "\n";
+					if (!inString[i] && code.charAt(index) != '\n') {
+						result += ";";
 					}
 					isDelimiter = true;
 				}
@@ -107,6 +107,26 @@ public class PythonPreprocessor {
 		}
 		return false;
 	}
+	
+	/**
+	 * Remove comments starting with '#'. (Strings are expected to be removed
+	 * already!)
+	 * @param code A piece of code to remove comments from
+	 * @return A copy of code, with all comments removed
+	 */
+	public String removeComments(String code) {
+		String result = "";
+		int index = 0;
+		char[] chars = code.toCharArray();
+		while (index < chars.length) {
+			char c = chars[index];
+			if ('#' == c) {
+				while ('\n' != chars[++index]);
+			}
+			result += chars[index++];
+		}
+		return result;
+	}
 
 	/**
 	 * Remove strings from input, and split all elements at newline and ';'.
@@ -121,6 +141,7 @@ public class PythonPreprocessor {
 		
 		code = removeStrings(code, new String[]{"\"\"\"", "'''"});
 		code = removeStrings(code, new String[]{"\"", "'"});
+		code = removeComments(code);
 
 		// TODO: Bryt ut metod
 		String[] lines = code.split("\n");

@@ -44,15 +44,15 @@ public class PythonPreprocessorTest {
 	@Test
 	public void testProcess_multiLineStrings() {
 		String[] strings = {"import numpy as np \"\"\"This is a multi \n", "line comment string with \\\"\\\"\\\" inside\"\"\"import pandas as pd\n",
-				"b = np.sin(a)\n", "'''Some other \n", "multi line string'''", "c = np.cos(b) '''And now, a string with # and \n and \\n and \\'\\'\\' to test\n'''",
-				"d = np.tan(c)'''Some string'''e = np.exp(d)"};
+				"b = np.sin(a)\n", "'''Some other \n", "multi line string'''\n", "c = np.cos(b) '''And now, a string with # and \n and \\n and \\'\\'\\' to test\n'''\n",
+				"d = np.tan(c)'''Some string'''e = np.exp(d)\n"};
 		List<String> expectedOutput = new ArrayList<String>(7);
-		expectedOutput.add(0, "import numpy as np \n");
+		expectedOutput.add(0, "import numpy as np ");
 		expectedOutput.add(1, "import pandas as pd\n");
 		expectedOutput.add(2, "b = np.sin(a)\n");
 		expectedOutput.add(3, "\n");
 		expectedOutput.add(4, "c = np.cos(b) \n");
-		expectedOutput.add(5, "d = np.tan(c)\n");
+		expectedOutput.add(5, "d = np.tan(c)");
 		expectedOutput.add(6, "e = np.exp(d)\n");
 		processAndCheck(strings, expectedOutput);
 	}
@@ -62,9 +62,9 @@ public class PythonPreprocessorTest {
 		String[] strings = {"import numpy as np '''This is a string with \" and ' inside.''' import pandas as pd\n",
 		"b = np.sin(a) \"\"\"This is a string with \" and ' inside.\"\"\" c = np.cos(b)\n"};
 		List<String> expectedOutput = new ArrayList<String>(4);
-		expectedOutput.add(0, "import numpy as np \n");
+		expectedOutput.add(0, "import numpy as np ");
 		expectedOutput.add(1, " import pandas as pd\n");
-		expectedOutput.add(2, "b = np.sin(a) \n");
+		expectedOutput.add(2, "b = np.sin(a) ");
 		expectedOutput.add(3, " c = np.cos(b)\n");
 		processAndCheck(strings, expectedOutput);
 	}
@@ -74,9 +74,9 @@ public class PythonPreprocessorTest {
 		String[] strings = {"import numpy as np '''This is a string with \"\"\" inside.''' import pandas as pd\n",
 				"b = np.sin(a) \"\"\"This is a string with ''' inside.\"\"\" c = np.cos(b)\n"};
 		List<String> expectedOutput = new ArrayList<String>(4);
-		expectedOutput.add(0, "import numpy as np \n");
+		expectedOutput.add(0, "import numpy as np ");
 		expectedOutput.add(1, " import pandas as pd\n");
-		expectedOutput.add(2, "b = np.sin(a) \n");
+		expectedOutput.add(2, "b = np.sin(a) ");
 		expectedOutput.add(3, " c = np.cos(b)\n");
 		processAndCheck(strings, expectedOutput);
 	}
@@ -84,16 +84,31 @@ public class PythonPreprocessorTest {
 	@Test
 	public void testProcess_strings() {
 		String[] strings = {"import numpy as np \"This is a comment string with \\\" inside.\"import pandas as pd\n",
-				"b = np.sin(a)\n", "'Some other string '", "c = np.cos(b) 'And now, a string with # and \n and \\n and \\' to test\n'",
-				"d = np.tan(c)'Some string'e = np.exp(d)"};
+				"b = np.sin(a)\n", "'Some other string '\n", "c = np.cos(b) 'And now, a string with # and \n and \\n and \\' to test\n'\n",
+				"d = np.tan(c)'Some string'e = np.exp(d)\n"};
 		List<String> expectedOutput = new ArrayList<String>(7);
-		expectedOutput.add(0, "import numpy as np \n");
+		expectedOutput.add(0, "import numpy as np ");
 		expectedOutput.add(1, "import pandas as pd\n");
 		expectedOutput.add(2, "b = np.sin(a)\n");
 		expectedOutput.add(3, "\n");
 		expectedOutput.add(4, "c = np.cos(b) \n");
-		expectedOutput.add(5, "d = np.tan(c)\n");
+		expectedOutput.add(5, "d = np.tan(c)");
 		expectedOutput.add(6, "e = np.exp(d)\n");
+		processAndCheck(strings, expectedOutput);
+	}
+	
+	@Test
+	public void testProcess_comments() {
+		String[] strings = {"import numpy as np # This is a comment\n",
+				"import matplotlib.pyplot as plt# This comment contains \"a string\"\n",
+				"b = np.sin(a) # This comment contains 'a single quoted string' # and a comment, and ends with a \\\n",
+				"c = np.cos(b)\n"
+		};
+		List<String> expectedOutput = new ArrayList<String>(4);
+		expectedOutput.add(0, "import numpy as np \n");
+		expectedOutput.add(1, "import matplotlib.pyplot as plt\n");
+		expectedOutput.add(2, "b = np.sin(a) \n");
+		expectedOutput.add(3, "c = np.cos(b)\n");
 		processAndCheck(strings, expectedOutput);
 	}
 	
@@ -116,12 +131,13 @@ public class PythonPreprocessorTest {
 	
 	/*
 	 * TODO:
+	 * Fnuttar i kommetarer. Index i add.
 	 * Mergea alla strängar (OK)
 	 * Ta bort (i ordning):
 	 * Trippelfnuttade strängar (OK)
 	 * Vanligt fnuttade strängar (OK)
-	 * Kommentarer
-	 * Escapade radbrytningar
+	 * Kommentarer (och ta bort ur regexpar)
+	 * Escapade radbrytningar (räknas som bortkommenterad om i kommentar! :-))
 	 * Radbrytningar inom parenteser, även flera nivåer
 	 * 
 	 * Splitta på \n och ; (OK)
