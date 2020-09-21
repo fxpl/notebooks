@@ -113,14 +113,16 @@ public class PythonPreprocessor {
 	 * @return A list of sublines
 	 */
 	public List<String> process() {
+		// TODO: Bryt ut metod
 		String code = "";
 		for (int i=0; i<input.length(); i++) {
 			code += input.getString(i);
 		}
 		
-		String[] delimiters = {"\"\"\"", "'''", "\"", "'"};
-		code = removeStrings(code, delimiters);
+		code = removeStrings(code, new String[]{"\"\"\"", "'''"});
+		code = removeStrings(code, new String[]{"\"", "'"});
 
+		// TODO: Bryt ut metod
 		String[] lines = code.split("\n");
 		for (String line: lines) {
 			line += "\n";
