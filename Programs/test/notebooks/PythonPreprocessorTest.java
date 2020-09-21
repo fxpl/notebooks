@@ -161,7 +161,7 @@ public class PythonPreprocessorTest {
 	 * Ta bort (i ordning):
 	 * Trippelfnuttade strängar (OK)
 	 * Vanligt fnuttade strängar (OK)
-	 * Kommentarer (och ta bort ur regexpar)
+	 * Kommentarer (och ta bort ur regexpar) (OK)
 	 * Escapade radbrytningar (räknas som bortkommenterad om i kommentar! :-))
 	 * Radbrytningar inom parenteser, även flera nivåer
 	 * 
