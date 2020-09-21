@@ -15,11 +15,11 @@ public class PythonPreprocessor {
 	}
 	
 	/**
-	 * @param code A piece of code to remove strings from
+	 * @param code A piece of code to remove strings and comments from
 	 * @param delimiters Existing string delimiters
-	 * @return A copy of code, with all strings removed
+	 * @return A copy of code, with all strings and comments removed
 	 */
-	public String removeStrings(String code, String[] delimiters) {
+	public String removeStringsAndComments(String code, String[] delimiters) {
 		// Find positions of delimiters
 		int numDelimiters = delimiters.length;
 		List<List<Integer>> delimiterPositions = new ArrayList<List<Integer>>(numDelimiters);
@@ -45,6 +45,11 @@ public class PythonPreprocessor {
 		while (index < code.length()) {
 			char current = code.charAt(index);
 			boolean isDelimiter = false;
+			// Skip comments	TODO: Stämmer inte med namnet!
+			if (!anyTrue(inString) && '#' == current) {
+				while ('\n' != code.charAt(++index));
+			}
+			// Remove strings
 			for (int i=0; i<numDelimiters; i++) {
 				if (!otherTrue(inString, i) && delimiterPositions.get(i).contains(index) && previous != '\\') {
 					inString[i] = !inString[i];
@@ -107,26 +112,6 @@ public class PythonPreprocessor {
 		}
 		return false;
 	}
-	
-	/**
-	 * Remove comments starting with '#'. (Strings are expected to be removed
-	 * already!)
-	 * @param code A piece of code to remove comments from
-	 * @return A copy of code, with all comments removed
-	 */
-	public String removeComments(String code) {
-		String result = "";
-		int index = 0;
-		char[] chars = code.toCharArray();
-		while (index < chars.length) {
-			char c = chars[index];
-			if ('#' == c) {
-				while ('\n' != chars[++index]);
-			}
-			result += chars[index++];
-		}
-		return result;
-	}
 
 	/**
 	 * Remove strings from input, and split all elements at newline and ';'.
@@ -139,9 +124,8 @@ public class PythonPreprocessor {
 			code += input.getString(i);
 		}
 		
-		code = removeStrings(code, new String[]{"\"\"\"", "'''"});
-		code = removeStrings(code, new String[]{"\"", "'"});
-		code = removeComments(code);
+		code = removeStringsAndComments(code, new String[]{"\"\"\"", "'''"});
+		code = removeStringsAndComments(code, new String[]{"\"", "'"});
 
 		// TODO: Bryt ut metod
 		String[] lines = code.split("\n");

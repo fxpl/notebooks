@@ -98,6 +98,22 @@ public class PythonPreprocessorTest {
 	}
 	
 	@Test
+	public void testProcess_stringConstants() {
+		String[] strings = {
+				"var1 = 'apa'\n",
+				"var2 = \"kossa\"\n",
+				"function(a=\"milou\", b=\"oscar\")\n",
+		};
+		List<String> expectedOutput = new ArrayList<String>(3);
+		expectedOutput.add("var1 = \n");
+		expectedOutput.add("var2 = \n");
+		expectedOutput.add("function(a=");
+		expectedOutput.add(", b=");
+		expectedOutput.add(")\n");
+		processAndCheck(strings, expectedOutput);
+	}
+	
+	@Test
 	public void testProcess_comments() {
 		String[] strings = {"import numpy as np # This is a comment\n",
 				"import matplotlib.pyplot as plt# This comment contains \"a string\"\n",
@@ -109,6 +125,16 @@ public class PythonPreprocessorTest {
 		expectedOutput.add(1, "import matplotlib.pyplot as plt\n");
 		expectedOutput.add(2, "b = np.sin(a) \n");
 		expectedOutput.add(3, "c = np.cos(b)\n");
+		processAndCheck(strings, expectedOutput);
+	}
+	
+	@Test
+	public void testProcess_commentsWithQuotes() {
+		String[] strings = {"import numpy as np # This is \" containing comment.\n",
+				"import pandas as pd#This is a ' containing comment.\n"};
+		List<String> expectedOutput = new ArrayList<String>(2);
+		expectedOutput.add("import numpy as np \n");
+		expectedOutput.add("import pandas as pd\n");
 		processAndCheck(strings, expectedOutput);
 	}
 	
@@ -131,7 +157,7 @@ public class PythonPreprocessorTest {
 	
 	/*
 	 * TODO:
-	 * Fnuttar i kommetarer. Index i add.
+	 * Index i add.
 	 * Mergea alla strängar (OK)
 	 * Ta bort (i ordning):
 	 * Trippelfnuttade strängar (OK)
