@@ -17,8 +17,9 @@ public class ThreadExecutor {
 	
 	private ThreadExecutor() {
 		int cores = Runtime.getRuntime().availableProcessors();
-		System.out.println("Setting up a thread pool with " + (2*cores) + " threads.");
-		threadPool = Executors.newFixedThreadPool(2*cores);
+		int threads = 2 * cores;
+		System.out.println("Setting up a thread pool with " + threads + " threads.");
+		threadPool = Executors.newFixedThreadPool(threads);
 	}
 	
 	/**
