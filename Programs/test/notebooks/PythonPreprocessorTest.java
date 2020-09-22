@@ -138,7 +138,7 @@ public class PythonPreprocessorTest {
 		processAndCheck(strings, expectedOutput);
 	}
 	
-	//@Test
+	@Test
 	public void testProcess_escapedNewline() {
 		String[] strings = {"abc\\\n", "def\n"};
 		List<String> expectedOutput = new ArrayList<String>(1);
@@ -146,11 +146,11 @@ public class PythonPreprocessorTest {
 		processAndCheck(strings, expectedOutput);
 	}
 	
-	//@Test
+	@Test
 	public void testProcess_excapedNewlineInComment() {
-		String[] strings = {"abc #\\\n", "def\n"};
+		String[] strings = {"abc#\\\n", "def\n"};
 		List<String> expectedOutput = new ArrayList<String>(2);
-		expectedOutput.add(strings[0]);
+		expectedOutput.add("abc\n");
 		expectedOutput.add(strings[1]);
 		processAndCheck(strings, expectedOutput);
 	}
@@ -162,7 +162,7 @@ public class PythonPreprocessorTest {
 	 * Trippelfnuttade strängar (OK)
 	 * Vanligt fnuttade strängar (OK)
 	 * Kommentarer (och ta bort ur regexpar) (OK)
-	 * Escapade radbrytningar (räknas som bortkommenterad om i kommentar! :-))
+	 * Escapade radbrytningar (räknas som bortkommenterad om i kommentar! :-)) (OK)
 	 * Radbrytningar inom parenteser, även flera nivåer
 	 * 
 	 * Splitta på \n och ; (OK)

@@ -45,7 +45,7 @@ public class PythonPreprocessor {
 		while (index < code.length()) {
 			char current = code.charAt(index);
 			boolean isDelimiter = false;
-			// Skip comments	TODO: Stämmer inte med namnet!
+			// Skip comments
 			if (!anyTrue(inString) && '#' == current) {
 				while ('\n' != code.charAt(++index));
 			}
@@ -112,6 +112,20 @@ public class PythonPreprocessor {
 		}
 		return false;
 	}
+	
+	public String removeEscapedNewLines(String code) {
+		String result = "";
+		int index = 0;
+		while (index < code.length()-1) {
+			if ('\\' == code.charAt(index) && '\n' == code.charAt(index+1)) {
+				index += 2;
+				result += ' ';
+			} else {
+				result += code.charAt(index++);
+			}
+		}
+		return result;
+	}
 
 	/**
 	 * Remove strings from input, and split all elements at newline and ';'.
@@ -126,6 +140,7 @@ public class PythonPreprocessor {
 		
 		code = removeStringsAndComments(code, new String[]{"\"\"\"", "'''"});
 		code = removeStringsAndComments(code, new String[]{"\"", "'"});
+		code = removeEscapedNewLines(code);
 
 		// TODO: Bryt ut metod
 		String[] lines = code.split("\n");
