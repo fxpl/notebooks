@@ -126,6 +126,25 @@ public class PythonPreprocessor {
 		}
 		return result;
 	}
+	
+	public String removeNewlinesInBrackets(String code) {
+		String result = "";
+		int bracketLevel = 0;
+		int index = 0;
+		// Comments and strings are already removed
+		while (index < code.length()) {
+			if ('(' == code.charAt(index)) {
+				bracketLevel++;
+			} else if (')' == code.charAt(index)) {
+				bracketLevel--;
+			} else if ('\n' == code.charAt(index) && 0 < bracketLevel) {
+				index++;
+				continue;
+			}
+			result += code.charAt(index++);
+		}
+		return result;
+	}
 
 	/**
 	 * Remove strings from input, and split all elements at newline and ';'.
@@ -141,6 +160,7 @@ public class PythonPreprocessor {
 		code = removeStringsAndComments(code, new String[]{"\"\"\"", "'''"});
 		code = removeStringsAndComments(code, new String[]{"\"", "'"});
 		code = removeEscapedNewLines(code);
+		code = removeNewlinesInBrackets(code);
 
 		// TODO: Bryt ut metod
 		String[] lines = code.split("\n");

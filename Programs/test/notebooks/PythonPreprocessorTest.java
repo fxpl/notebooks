@@ -155,18 +155,32 @@ public class PythonPreprocessorTest {
 		processAndCheck(strings, expectedOutput);
 	}
 	
-	/*
-	 * TODO:
-	 * Mergea alla strängar (OK)
-	 * Ta bort (i ordning):
-	 * Trippelfnuttade strängar (OK)
-	 * Vanligt fnuttade strängar (OK)
-	 * Kommentarer (och ta bort ur regexpar) (OK)
-	 * Escapade radbrytningar (räknas som bortkommenterad om i kommentar! :-)) (OK)
-	 * Radbrytningar inom parenteser, även flera nivåer
-	 * 
-	 * Splitta på \n och ; (OK)
-	 */
+	@Test
+	public void testProcess_newLinesInBrackets() {
+		String[] strings = {
+				"function(a, \n",
+				"b, c\n",
+				")\n",
+				"f1(z, f2(f3(a), \n",
+				"b),\n",
+				"c)\n"
+		};
+		List<String> expectedOutput = new ArrayList<String>(2);
+		expectedOutput.add("function(a, b, c)\n");
+		expectedOutput.add("f1(z, f2(f3(a), b),c)\n");
+		processAndCheck(strings, expectedOutput);
+	}
+	
+	@Test
+	public void testProcess_bracketsInMultiLineString() {
+		String[] strings = {
+				"\"\"\" Some string with a (\n",
+				"inside\"\"\"\n"
+		};
+		List<String> expectedOutput = new ArrayList<String>(1);
+		expectedOutput.add("\n");
+		processAndCheck(strings, expectedOutput);
+	}
 
 	private void processAndCheck(String[] inputStrings, List<String> expectedResult) {
 		JSONArray input = new JSONArray();
