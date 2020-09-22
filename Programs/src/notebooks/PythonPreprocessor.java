@@ -6,33 +6,28 @@ import java.util.List;
 import org.json.JSONArray;
 
 public class PythonPreprocessor {
-	// TODO: Är det rimligt att ha dessa som instansvariabler?
-	JSONArray input;
+	String code = "";
 	List<String> processed;
 	
 	public PythonPreprocessor(JSONArray input) {
-		this.input = input;
+		mergeStrings(input);
 		processed = new ArrayList<String>();
 	}
 	
 	/**
-	 * Merge all strings in input
-	 * @return A single string containing all strings in input, in order
+	 * Merge all strings the JSON array given as argument. Store the result in
+	 * the instance variable 'code'.
 	 */
-	public String mergeInputStrings() {
-		String code = "";
-		for (int i=0; i<input.length(); i++) {
-			code += input.getString(i);
+	private void mergeStrings(JSONArray strings) {
+		for (int i=0; i<strings.length(); i++) {
+			code += strings.getString(i);
 		}
-		return code;
 	}
 	
 	/**
-	 * Remove all escaped newlines from code
-	 * @param code A piece of code to remove escaped newlines from
-	 * @return A copy of the code with all escaped newlines removed
+	 * Remove all escaped newlines from the code handled by the preprocessor
 	 */
-	public String removeEscapedNewLines(String code) {
+	public void removeEscapedNewLines() {
 		String result = "";
 		int index = 0;
 		while (index < code.length()-1) {
@@ -43,15 +38,14 @@ public class PythonPreprocessor {
 				result += code.charAt(index++);
 			}
 		}
-		return result;
+		code = result;
 	}
 	
 	/**
-	 * Remove all newlines that occur between brackets
-	 * @param code A piece of code to remove newlines from
-	 * @return A copy of code with newlines between brackets removed
+	 * Remove all newlines that occur between brackets in the code handled by
+	 * the preprocessor.
 	 */
-	public String removeNewlinesInBrackets(String code) {
+	public void removeNewlinesInBrackets() {
 		String result = "";
 		int bracketLevel = 0;
 		int index = 0;
@@ -67,15 +61,15 @@ public class PythonPreprocessor {
 			}
 			result += code.charAt(index++);
 		}
-		return result;
+		code = result;
 	}
 	
 	/**
-	 * @param code A piece of code to remove strings and comments from
+	 * Remove all strings and comments from the code handled by the
+	 * preprocessor.
 	 * @param delimiters Existing string delimiters
-	 * @return A copy of code, with all strings and comments removed
 	 */
-	public String removeStringsAndComments(String code, String[] delimiters) {
+	public void removeStringsAndComments(String[] delimiters) {
 		// Find positions of delimiters
 		int numDelimiters = delimiters.length;
 		List<List<Integer>> delimiterPositions = new ArrayList<List<Integer>>(numDelimiters);
@@ -124,7 +118,7 @@ public class PythonPreprocessor {
 			}
 			previous = current;
 		}
-		return result;
+		code = result;
 	}
 	
 	/**
@@ -170,11 +164,10 @@ public class PythonPreprocessor {
 	}
 	
 	/**
-	 * Split a piece of code at newlines and semicolons. Put each substring in
-	 * the list processed. Keep newlines, but not semicolons.
-	 * @param code A piece of code to split
+	 * Split a the code handled by the preprocessor at newlines and semicolons.
+	 * Keep newlines, but not semicolons.
 	 */
-	public void splitCode(String code) {
+	private void splitCode() {
 		String[] lines = code.split("\n");
 		for (String line: lines) {
 			line += "\n";
@@ -187,17 +180,15 @@ public class PythonPreprocessor {
 
 	/**
 	 * Remove strings from input, and split all elements at newline and ';'.
-	 * @return A list of sublines
+	 * @return A list of sub lines
 	 */
 	public List<String> process() {
-		String code = mergeInputStrings();
-		
-		code = removeStringsAndComments(code, new String[]{"\"\"\"", "'''"});
-		code = removeStringsAndComments(code, new String[]{"\"", "'"});
-		code = removeEscapedNewLines(code);
-		code = removeNewlinesInBrackets(code);
+		removeStringsAndComments(new String[]{"\"\"\"", "'''"});
+		removeStringsAndComments(new String[]{"\"", "'"});
+		removeEscapedNewLines();
+		removeNewlinesInBrackets();
 
-		splitCode(code);
+		splitCode();
 		return processed;
 	}
 }
