@@ -641,6 +641,19 @@ public class NotebookTest {
 	}
 	
 	/**
+	 * Verify that a module in a "from" import statement can be identified
+	 * correctly when parentheses are put around the module/function name.
+	 */
+	@Test
+	public void testImportOrdinaryFromWithParantheses() {
+		String dataDir = "test/data/modules";
+		String file = "nb_8.ipynb";
+		PythonModule expectedParent = new PythonModule("ko", ImportType.FROM);
+		PythonModule expectedModule = new PythonModule("mage", ImportType.ORDINARY, expectedParent);
+		verifyImport(dataDir + File.separator + file, expectedModule);
+	}
+	
+	/**
 	 * Verify that several Python module imports in one cell can be identified.
 	 */
 	@Test

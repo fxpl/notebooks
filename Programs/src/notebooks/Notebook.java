@@ -93,6 +93,8 @@ public class Notebook {
 		Matcher importMatcher = importPattern.matcher(importStatement);
 		Pattern fromPattern = Pattern.compile("\\s*from\\s+(" + MODULEIDENTIFIER + ")\\s+(" + importStatementTemplate + ")");
 		Matcher fromMatcher = fromPattern.matcher(importStatement);
+		Pattern fromPatternWithParentheses = Pattern.compile("\\s*from\\s+(" + MODULEIDENTIFIER + ")\\s+(import\\s+\\(?(" + moduleList + "\\)?)\\s*)");
+		Matcher fromWithParenthesesMatcher = fromPatternWithParentheses.matcher(importStatement);
 		Pattern allFromPattern = Pattern.compile("\\s*from\\s+(" + MODULEIDENTIFIER + ")\\s+import\\s*\\*\\s*");
 		Matcher allFromMatcher = allFromPattern.matcher(importStatement);
 		if (importMatcher.matches()) {
@@ -109,6 +111,10 @@ public class Notebook {
 				child.setOldestAncestor(parent);
 			}
 			return result;
+		} else if(fromWithParenthesesMatcher.matches()) {
+			String ImportStatementWithoutParentheses =
+					importStatement.replaceAll("\\(", "").replaceAll("\\)", "");
+			return modulesInImport(ImportStatementWithoutParentheses);
 		} else {
 			throw new NotebookException("Invalid import statement: " + importStatement);
 		}
