@@ -85,17 +85,18 @@ public class Notebook {
 	 * @return A list of all modules found in importStatment
 	 */
 	private List<PythonModule> modulesInImport(String importStatement) throws NotebookException {
-		final String MODULEIDENTIFIER = PythonModule.MODULE_IDENTIFIER;
-		final String moduleDescr = "" + MODULEIDENTIFIER + "(\\s*as\\s+" + MODULEIDENTIFIER + "\\s*)?";
+		final String MODULE_IDENTIFIER = PythonModule.MODULE_IDENTIFIER;
+		final String MODULE_SEQUENCE = PythonModule.MODULE_SEQUENCE;
+		final String moduleDescr = "" + MODULE_SEQUENCE + "(\\s*as\\s+" + MODULE_IDENTIFIER + "\\s*)?";
 		final String moduleList = "(" + moduleDescr + "\\s*,\\s*)*" + moduleDescr;
 		String importStatementTemplate = "\\s*import\\s+(" + moduleList + ")\\s*";
 		Pattern importPattern = Pattern.compile(importStatementTemplate);
 		Matcher importMatcher = importPattern.matcher(importStatement);
-		Pattern fromPattern = Pattern.compile("\\s*from\\s+(" + MODULEIDENTIFIER + ")\\s+(" + importStatementTemplate + ")");
+		Pattern fromPattern = Pattern.compile("\\s*from\\s+(" + MODULE_SEQUENCE + ")\\s+(" + importStatementTemplate + ")");
 		Matcher fromMatcher = fromPattern.matcher(importStatement);
-		Pattern fromPatternWithParentheses = Pattern.compile("\\s*from\\s+(" + MODULEIDENTIFIER + ")\\s+(import\\s+\\(?(" + moduleList + "\\)?)\\s*)");
+		Pattern fromPatternWithParentheses = Pattern.compile("\\s*from\\s+(" + MODULE_SEQUENCE + ")\\s+(import\\s+\\(?(" + moduleList + "\\)?)\\s*)");
 		Matcher fromWithParenthesesMatcher = fromPatternWithParentheses.matcher(importStatement);
-		Pattern allFromPattern = Pattern.compile("\\s*from\\s+(" + MODULEIDENTIFIER + ")\\s+import\\s*\\*\\s*");
+		Pattern allFromPattern = Pattern.compile("\\s*from\\s+(" + MODULE_SEQUENCE + ")\\s+import\\s*\\*\\s*");
 		Matcher allFromMatcher = allFromPattern.matcher(importStatement);
 		if (importMatcher.matches()) {
 			return modulesInIdentifierList(importMatcher.group(1));
@@ -105,7 +106,9 @@ public class Notebook {
 			result.add(new AllModules(parent));
 			return result;
 		} else if (fromMatcher.matches()) {
-			List<PythonModule> result = modulesInImport(fromMatcher.group(2));
+			int importStart = importStatement.indexOf("import");
+			String substatement = importStatement.substring(importStart);
+			List<PythonModule> result = modulesInImport(substatement);
 			PythonModule parent = new PythonModule(fromMatcher.group(1), ImportType.FROM);
 			for (PythonModule child: result) {
 				child.setOldestAncestor(parent);
@@ -127,9 +130,10 @@ public class Notebook {
 	 * @return A List of all modules in identifierList 
 	 */
 	private List<PythonModule> modulesInIdentifierList(String identifierList) {
-		final String MODULEIDENTIFIER = PythonModule.MODULE_IDENTIFIER;
-		final Pattern ordinaryPattern = Pattern.compile("(" + MODULEIDENTIFIER + ")");
-		final Pattern asPattern = Pattern.compile("(" + MODULEIDENTIFIER + ")\\s+as\\s+(" + MODULEIDENTIFIER + ")");
+		final String MODULE_IDENTIFIER = PythonModule.MODULE_IDENTIFIER;
+		final String MODULE_SEQUENCE = PythonModule.MODULE_SEQUENCE;
+		final Pattern ordinaryPattern = Pattern.compile("(" + MODULE_SEQUENCE + ")");
+		final Pattern asPattern = Pattern.compile("(" + MODULE_SEQUENCE + ")\\s+as\\s+(" + MODULE_IDENTIFIER + ")");
 		List<PythonModule> result = new ArrayList<PythonModule>();
 		String[] identifiers = identifierList.split(",");
 		for (int i=0; i<identifiers.length; i++) {
@@ -138,13 +142,13 @@ public class Notebook {
 			Matcher asMatcher = asPattern.matcher(identifier);
 			if (ordinaryMatcher.matches()) {
 				String[] moduleNames = identifier.split("\\.");
-				String name = lastElementOf(moduleNames);
+				String name = lastElementOf(moduleNames).trim();
 				PythonModule parent = getParentModule(moduleNames);
 				result.add(new PythonModule(name, ImportType.ORDINARY, parent));
 			} else if (asMatcher.matches()) {
 				String[] moduleNames = asMatcher.group(1).split("\\.");
-				String name = lastElementOf(moduleNames);
-				String alias = asMatcher.group(2);
+				String name = lastElementOf(moduleNames).trim();
+				String alias = asMatcher.group(asMatcher.groupCount());
 				PythonModule parent = getParentModule(moduleNames);
 				result.add(new PythonModule(name, alias, ImportType.ALIAS, parent));
 			} else {
@@ -169,7 +173,7 @@ public class Notebook {
 	private PythonModule getParentModule(String[] names) {
 		PythonModule parent = null;
 		for (int j=0; j<names.length-1; j++) {
-			parent = new PythonModule(names[j], ImportType.ORDINARY, parent);
+			parent = new PythonModule(names[j].trim(), ImportType.ORDINARY, parent);
 		}
 		return parent;
 	}
