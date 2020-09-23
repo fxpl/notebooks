@@ -685,10 +685,12 @@ public class Notebook {
 		}
 		if (source instanceof JSONArray) {
 			JSONArray result = (JSONArray)source;
-			if (!result.isEmpty()) {
-				// A newline is already stored in the end of each line, except the last one!
-				String lastLine = result.getString(result.length()-1);
-				result.put(result.length()-1, lastLine + "\n");
+			// Add newlines if missing
+			for (int i=0; i<result.length(); i++) {
+				String line = result.getString(i);
+				if (0 == line.length() || '\n' != line.charAt(line.length()-1)) {
+					result.put(i, line + "\n");
+				}
 			}
 			return result;
 		} else if (source instanceof String) {

@@ -564,6 +564,19 @@ public class NotebookTest {
 	}
 	
 	/**
+	 * Verify that a single import can be verified also when newlines are
+	 * missing in the end of the lines stored in the source code JSON array.
+	 */
+	@Test
+	public void testSingleImport_noNewLines() {
+		String dataDir = "test/data/modules";
+		String file = "nb_1b.ipynb";
+		PythonModule expectedModule = new PythonModule("kossan_mu", ImportType.ORDINARY);
+		expectedModule.functionUsages.put("function", 2);
+		verifyImport(dataDir + File.separator + file, expectedModule);
+	}
+	
+	/**
 	 * Verify that a single Python module import with alias can be identified.
 	 */
 	@Test
