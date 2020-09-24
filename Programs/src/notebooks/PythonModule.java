@@ -8,8 +8,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class PythonModule {
-	final static public String MODULE_IDENTIFIER = "[A-Za-z_][A-Za-z0-9_]*";
-	final static public String MODULE_SEQUENCE = MODULE_IDENTIFIER + "\\s*(\\.\\s*" + MODULE_IDENTIFIER + "\\s*)*";
+	// Name of single module (or function)
+	final static public String IDENTIFIER = "[A-Za-z_][A-Za-z0-9_]*";
+	// Module, possibly with submodule(s)
+	final static public String MODULE_IDENTIFIER = IDENTIFIER + "\\s*(\\.\\s*" + IDENTIFIER + "\\s*)*";
 	
 	protected final String name;
 	protected final ImportType importedWith;
@@ -142,7 +144,7 @@ public class PythonModule {
 	public void registerUsage(String line) {
 		// Usages of functions located in an imported module
 		Pattern usagePattern = Pattern.compile(
-				"(?<!\\.)" + this.qualifier() + "\\s*\\.\\s*(" + MODULE_IDENTIFIER + ")\\s*\\(");
+				"(?<!\\.)" + this.qualifier() + "\\s*\\.\\s*(" + IDENTIFIER + ")\\s*\\(");
 		Matcher usageMatcher = usagePattern.matcher(line);
 		while (usageMatcher.find()) {
 			Utils.addOrIncrease(functionUsages, usageMatcher.group(1));
