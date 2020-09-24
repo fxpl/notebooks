@@ -63,7 +63,7 @@ public class Notebook {
 			JSONArray lines = getSource(cell);
 			List<String> splitLines = new PythonPreprocessor(lines).process();
 			for (String line: splitLines) {
-				if (line.trim().startsWith("import ") || line.trim().startsWith("from ")) {
+				if (line.trim().startsWith("import") || line.trim().startsWith("from")) {
 					try {
 						modules.addAll(modulesInImport(line));
 					} catch (NotebookException e) {
@@ -92,11 +92,12 @@ public class Notebook {
 		String importStatementTemplate = "\\s*import\\s+(" + moduleList + ")\\s*";
 		Pattern importPattern = Pattern.compile(importStatementTemplate);
 		Matcher importMatcher = importPattern.matcher(importStatement);
-		Pattern fromPattern = Pattern.compile("\\s*from\\s+(" + MODULE_SEQUENCE + ")\\s+(" + importStatementTemplate + ")");
+		String fromPatternStart = "\\s*from\\s+((\\.*" + MODULE_SEQUENCE + ")|(\\.+))";
+		Pattern fromPattern = Pattern.compile(fromPatternStart + "\\s+(" + importStatementTemplate + ")");
 		Matcher fromMatcher = fromPattern.matcher(importStatement);
-		Pattern fromPatternWithParentheses = Pattern.compile("\\s*from\\s+(" + MODULE_SEQUENCE + ")\\s+(import\\s+\\(?(" + moduleList + "\\)?)\\s*)");
+		Pattern fromPatternWithParentheses = Pattern.compile(fromPatternStart + "\\s+(import\\s+\\(?(" + moduleList + "\\)?)\\s*)");
 		Matcher fromWithParenthesesMatcher = fromPatternWithParentheses.matcher(importStatement);
-		Pattern allFromPattern = Pattern.compile("\\s*from\\s+(" + MODULE_SEQUENCE + ")\\s+import\\s*\\*\\s*");
+		Pattern allFromPattern = Pattern.compile(fromPatternStart + "\\s+import\\s*\\*\\s*");
 		Matcher allFromMatcher = allFromPattern.matcher(importStatement);
 		if (importMatcher.matches()) {
 			return modulesInIdentifierList(importMatcher.group(1));

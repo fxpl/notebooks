@@ -919,6 +919,31 @@ public class NotebookTest {
 	}
 	
 	/**
+	 * Verify that submodules of modules whose names consist of or start with
+	 * dots can be imported with FROM imports.
+	 */
+	@Test
+	public void testFromImportWithDots() {
+		String dataDir = "test/data/modules";
+		String file = "nb_51.ipynb";
+		List<PythonModule> expectedModules = new ArrayList<PythonModule>(4);
+		PythonModule parentModule = new PythonModule(".", ImportType.FROM);
+		expectedModules.add(new PythonModule("someModule", ImportType.ORDINARY, parentModule));
+		parentModule = new PythonModule("...", ImportType.FROM);
+		expectedModules.add(new PythonModule("someOtherModule", ImportType.ORDINARY, parentModule));
+		parentModule = new PythonModule(".module", ImportType.FROM);
+		expectedModules.add(new PythonModule("function", ImportType.ORDINARY, parentModule));
+		parentModule = new PythonModule("...module2", ImportType.FROM);
+		expectedModules.add(new PythonModule("function2", ImportType.ORDINARY, parentModule));
+		parentModule = new PythonModule(".module3", ImportType.FROM);
+		expectedModules.add(new PythonModule("function3a", ImportType.ORDINARY, parentModule));
+		expectedModules.add(new PythonModule("function3b", ImportType.ORDINARY, parentModule));
+		parentModule = new PythonModule(".module4", ImportType.FROM);
+		expectedModules.add(new AllModules(parentModule));
+		verifyImports(dataDir + File.separator + file, expectedModules);
+	}
+	
+	/**
 	 * Verify that modules are is imported when in an invalid import statement.
 	 */
 	@Test
