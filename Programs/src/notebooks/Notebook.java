@@ -119,6 +119,10 @@ public class Notebook {
 					importStatement.replaceAll("\\(", "").replaceAll("\\)", "");
 			return modulesInImport(ImportStatementWithoutParentheses);
 		} else {
+			if (importStatement.endsWith("\n")) {
+				// In order to avoid two newlines in error messages
+				importStatement = importStatement.substring(0, importStatement.length()-1);
+			}
 			throw new NotebookException("Invalid import statement: " + importStatement);
 		}
 	}
