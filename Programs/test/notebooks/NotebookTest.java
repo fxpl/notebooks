@@ -944,6 +944,19 @@ public class NotebookTest {
 	}
 	
 	/**
+	 * Verify that lines that start with import or from not followed by white
+	 * spaces are ignored, and that the same holds for from import that lack
+	 * the keyword "import".
+	 */
+	@Test
+	public void testImportNonImportStatements() {
+		String dataDir = "test/data/modules";
+		String file = "nb_52.ipynb";
+		List<PythonModule> expectedModules = new ArrayList<PythonModule>(0);
+		verifyImports(dataDir + File.separator + file, expectedModules);
+	}
+	
+	/**
 	 * Verify that modules are is imported when in an invalid import statement.
 	 */
 	@Test

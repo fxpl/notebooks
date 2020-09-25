@@ -63,7 +63,7 @@ public class Notebook {
 			JSONArray lines = getSource(cell);
 			List<String> splitLines = new PythonPreprocessor(lines).process();
 			for (String line: splitLines) {
-				if (line.trim().startsWith("import") || line.trim().startsWith("from")) {
+				if (line.trim().matches("import\\s+.*") || line.trim().matches("from\\s+.*\\s+import.*")) {
 					try {
 						modules.addAll(modulesInImport(line));
 					} catch (NotebookException e) {
