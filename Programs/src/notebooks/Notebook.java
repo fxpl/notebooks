@@ -94,7 +94,7 @@ public class Notebook {
 		String fromPatternStart = "\\s*from\\s+((\\.*" + MODULE_IDENTIFIER + ")|(\\.+))";
 		Pattern fromPattern = Pattern.compile(fromPatternStart + "\\s+(" + importStatementTemplate + ")");
 		Matcher fromMatcher = fromPattern.matcher(importStatement);
-		Pattern fromPatternWithParentheses = Pattern.compile(fromPatternStart + "\\s+(import\\s+\\(?(" + moduleList + "\\)?)\\s*)");
+		Pattern fromPatternWithParentheses = Pattern.compile(fromPatternStart + "\\s+(import\\s+\\(?(\\s*" + moduleList + "\\)?)\\s*)");
 		Matcher fromWithParenthesesMatcher = fromPatternWithParentheses.matcher(importStatement);
 		Pattern allFromPattern = Pattern.compile(fromPatternStart + "\\s+import\\s*\\*\\s*");
 		Matcher allFromMatcher = allFromPattern.matcher(importStatement);
