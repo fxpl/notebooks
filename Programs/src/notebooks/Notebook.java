@@ -106,8 +106,8 @@ public class Notebook {
 			result.add(new AllModules(parent));
 			return result;
 		} else if (fromMatcher.matches()) {
-			int importStart = importStatement.indexOf("import");
-			String substatement = importStatement.substring(importStart);
+			int importStart = indexOf("\\simport\\s", importStatement);
+			String substatement = importStatement.substring(importStart).trim();
 			List<PythonModule> result = modulesInImport(substatement);
 			PythonModule parent = new PythonModule(fromMatcher.group(1), ImportType.FROM);
 			for (PythonModule child: result) {
@@ -126,7 +126,7 @@ public class Notebook {
 			throw new NotebookException("Invalid import statement: " + importStatement);
 		}
 	}
-	
+
 	/**
 	 * Identify all modules in the identifier list from a Python import (that
 	 * is, everything stated after "import").
@@ -159,6 +159,23 @@ public class Notebook {
 			}
 		}
 		return result;
+	}
+	
+	/**
+	 * Get the index of the first occurrence of the regular expression in the
+	 * string. If the regular expression cannot be found, -1 is returned.
+	 * @param regexp Regular expression to look for
+	 * @param string String to find the regular expression in.
+	 * @param The index of the first occurrence of the regexp in the string, or -1 if it doesn't occur
+	 */
+	private int indexOf(String regexp, String string) {
+		Pattern pattern = Pattern.compile(regexp);
+		Matcher matcher = pattern.matcher(string);
+		if (matcher.find()) {
+			return matcher.start();
+		} else {
+			return -1;
+		}
 	}
 	
 	/**

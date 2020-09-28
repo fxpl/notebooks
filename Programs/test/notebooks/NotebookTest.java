@@ -971,6 +971,19 @@ public class NotebookTest {
 	}
 	
 	/**
+	 * Verify that "import" is only considered a key word if it has spaces
+	 * around it.
+	 */
+	@Test
+	public void testImportImportNonKeyword() {
+		String dataDir = "test/data/modules";
+		String file = "nb_53.ipynb";
+		PythonModule parent = new PythonModule("importlib", ImportType.FROM);
+		PythonModule expectedModule = new PythonModule("reload", ImportType.ORDINARY, parent);
+		verifyImport(dataDir + File.separator + file, expectedModule);
+	}
+	
+	/**
 	 * Verify that modules are is imported when in an invalid import statement.
 	 */
 	@Test
