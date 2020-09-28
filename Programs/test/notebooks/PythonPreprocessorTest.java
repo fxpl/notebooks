@@ -43,56 +43,82 @@ public class PythonPreprocessorTest {
 	
 	@Test
 	public void testProcess_multiLineStrings() {
-		String[] strings = {"import numpy as np \"\"\"This is a multi \n", "line comment string with \\\"\\\"\\\" inside\"\"\"import pandas as pd\n",
-				"b = np.sin(a)\n", "'''Some other \n", "multi line string'''\n", "c = np.cos(b) '''And now, a string with # and \n and \\n and \\'\\'\\' to test\n'''\n",
-				"d = np.tan(c)'''Some string'''e = np.exp(d)\n"};
-		List<String> expectedOutput = new ArrayList<String>(7);
-		expectedOutput.add("import numpy as np ");
+		String[] strings = {"import numpy as np\n",
+				"\"\"\"This is a multi \n", "line comment string with \\\"\\\"\\\" inside\"\"\"\n",
+				"import pandas as pd\n", "b = np.sin(a)\n",
+				"'''Some other \n", "multi line string'''\n",
+				"c = np.cos(b)\n",
+				"'''And now, a string with # and \n and \\n and \\'\\'\\' to test\n'''\n",
+				"d = np.tan(c)\n", "'''Some string'''\n", "e = np.exp(d)\n"};
+		List<String> expectedOutput = new ArrayList<String>(10);
+		expectedOutput.add("import numpy as np\n");
+		expectedOutput.add("\n");
 		expectedOutput.add("import pandas as pd\n");
 		expectedOutput.add("b = np.sin(a)\n");
 		expectedOutput.add("\n");
-		expectedOutput.add("c = np.cos(b) \n");
-		expectedOutput.add("d = np.tan(c)");
+		expectedOutput.add("c = np.cos(b)\n");
+		expectedOutput.add("\n");
+		expectedOutput.add("d = np.tan(c)\n");
+		expectedOutput.add("\n");
 		expectedOutput.add("e = np.exp(d)\n");
 		processAndCheck(strings, expectedOutput);
 	}
 	
 	@Test
 	public void testProcess_mulitLineStringsWithSingleLineStringsDelimiter() {
-		String[] strings = {"import numpy as np '''This is a string with \" and ' inside.''' import pandas as pd\n",
-		"b = np.sin(a) \"\"\"This is a string with \" and ' inside.\"\"\" c = np.cos(b)\n"};
-		List<String> expectedOutput = new ArrayList<String>(4);
-		expectedOutput.add("import numpy as np ");
-		expectedOutput.add(" import pandas as pd\n");
-		expectedOutput.add("b = np.sin(a) ");
-		expectedOutput.add(" c = np.cos(b)\n");
+		String[] strings = {"import numpy as np\n",
+				"'''This is a string with \" and ' inside.'''\n",
+				"import pandas as pd\n", "b = np.sin(a)\n",
+				"\"\"\"This is a string with \" and ' inside.\"\"\"\n",
+				"c = np.cos(b)\n"};
+		List<String> expectedOutput = new ArrayList<String>(6);
+		expectedOutput.add("import numpy as np\n");
+		expectedOutput.add("\n");
+		expectedOutput.add("import pandas as pd\n");
+		expectedOutput.add("b = np.sin(a)\n");
+		expectedOutput.add("\n");
+		expectedOutput.add("c = np.cos(b)\n");
 		processAndCheck(strings, expectedOutput);
 	}
 	
 	@Test
 	public void testProcess_delimitersInMultiLineString() {
-		String[] strings = {"import numpy as np '''This is a string with \"\"\" inside.''' import pandas as pd\n",
-				"b = np.sin(a) \"\"\"This is a string with ''' inside.\"\"\" c = np.cos(b)\n"};
-		List<String> expectedOutput = new ArrayList<String>(4);
-		expectedOutput.add("import numpy as np ");
-		expectedOutput.add(" import pandas as pd\n");
-		expectedOutput.add("b = np.sin(a) ");
-		expectedOutput.add(" c = np.cos(b)\n");
+		String[] strings = {"import numpy as np\n",
+				"'''This is a string with \"\"\" inside.'''\n",
+				"import pandas as pd\n",
+				"b = np.sin(a)\n",
+				"\"\"\"This is a string with ''' inside.\"\"\"\n",
+				"c = np.cos(b)\n"};
+		List<String> expectedOutput = new ArrayList<String>(6);
+		expectedOutput.add("import numpy as np\n");
+		expectedOutput.add("\n");
+		expectedOutput.add("import pandas as pd\n");
+		expectedOutput.add("b = np.sin(a)\n");
+		expectedOutput.add("\n");
+		expectedOutput.add("c = np.cos(b)\n");
 		processAndCheck(strings, expectedOutput);
 	}
 	
 	@Test
 	public void testProcess_strings() {
-		String[] strings = {"import numpy as np \"This is a comment string with \\\" inside.\"import pandas as pd\n",
-				"b = np.sin(a)\n", "'Some other string '\n", "c = np.cos(b) 'And now, a string with # and \n and \\n and \\' to test\n'\n",
-				"d = np.tan(c)'Some string'e = np.exp(d)\n"};
-		List<String> expectedOutput = new ArrayList<String>(7);
-		expectedOutput.add("import numpy as np ");
-		expectedOutput.add("import pandas as pd\n");
+		String[] strings = {"import numpy as np; \"This is a comment string with \\\" inside.\"; import pandas as pd\n",
+				"b = np.sin(a)\n",
+				"'Some other string '\n",
+				"c = np.cos(b)\n",
+				"'And now, a string with # and \n and \\n and \\' to test\n'\n",
+				"d = np.tan(c)\n",
+				"'Some string'\n",
+				"e = np.exp(d)\n"};
+		List<String> expectedOutput = new ArrayList<String>(9);
+		expectedOutput.add("import numpy as np");
+		expectedOutput.add(" ");
+		expectedOutput.add(" import pandas as pd\n");
 		expectedOutput.add("b = np.sin(a)\n");
 		expectedOutput.add("\n");
-		expectedOutput.add("c = np.cos(b) \n");
-		expectedOutput.add("d = np.tan(c)");
+		expectedOutput.add("c = np.cos(b)\n");
+		expectedOutput.add("\n");
+		expectedOutput.add("d = np.tan(c)\n");
+		expectedOutput.add("\n");
 		expectedOutput.add("e = np.exp(d)\n");
 		processAndCheck(strings, expectedOutput);
 	}
@@ -107,9 +133,7 @@ public class PythonPreprocessorTest {
 		List<String> expectedOutput = new ArrayList<String>(3);
 		expectedOutput.add("var1 = \n");
 		expectedOutput.add("var2 = \n");
-		expectedOutput.add("function(a=");
-		expectedOutput.add(", b=");
-		expectedOutput.add(")\n");
+		expectedOutput.add("function(a=, b=)\n");
 		processAndCheck(strings, expectedOutput);
 	}
 	
@@ -179,6 +203,14 @@ public class PythonPreprocessorTest {
 		};
 		List<String> expectedOutput = new ArrayList<String>(1);
 		expectedOutput.add("\n");
+		processAndCheck(strings, expectedOutput);
+	}
+	
+	@Test
+	public void testProcess_stringOnLine() {
+		String[] strings = {"import pytz   pytz.timezone('US/Eastern')\n"};
+		List<String> expectedOutput = new ArrayList<String>(1);
+		expectedOutput.add("import pytz   pytz.timezone()\n");
 		processAndCheck(strings, expectedOutput);
 	}
 

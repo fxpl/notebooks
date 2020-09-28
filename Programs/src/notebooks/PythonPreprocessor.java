@@ -104,9 +104,6 @@ public class PythonPreprocessor {
 				if (!otherTrue(inString, i) && delimiterPositions.get(i).contains(index) && previous != '\\') {
 					inString[i] = !inString[i];
 					index += delimiters[i].length(); // Skip delimiter
-					if (!inString[i] && code.charAt(index) != '\n') {
-						result += ";";
-					}
 					isDelimiter = true;
 				}
 			}
