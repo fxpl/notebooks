@@ -645,9 +645,23 @@ public class NotebookTest {
 	 * correctly when parentheses are put around the module/function name.
 	 */
 	@Test
-	public void testImportOrdinaryFromWithParantheses() {
+	public void testImportOrdinaryFromWithParentheses() {
 		String dataDir = "test/data/modules";
 		String file = "nb_8.ipynb";
+		PythonModule expectedParent = new PythonModule("ko", ImportType.FROM);
+		PythonModule expectedModule = new PythonModule("mage", ImportType.ORDINARY, expectedParent);
+		verifyImport(dataDir + File.separator + file, expectedModule);
+	}
+	
+	/**
+	 * Verify that a module in a "from" import statement can be identified
+	 * correctly when parentheses are put around the module/function name, also
+	 * when there is no space in front of the left parenthesis.
+	 */
+	@Test
+	public void testImportOrdinaryFromWithParentheses_noSpaceBefore() {
+		String dataDir = "test/data/modules";
+		String file = "nb_9.ipynb";
 		PythonModule expectedParent = new PythonModule("ko", ImportType.FROM);
 		PythonModule expectedModule = new PythonModule("mage", ImportType.ORDINARY, expectedParent);
 		verifyImport(dataDir + File.separator + file, expectedModule);
