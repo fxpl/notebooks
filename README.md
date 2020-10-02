@@ -58,11 +58,14 @@ Additionally, both `SccOutputAnalyzer` need a file with a mapping from each
 notebook number (`<num>` from the file name) to a repository, stored in a
 separate file. This file is also needed by `NotebookAnalyzer` when running the
 clone analysis.
-
 The repository mapping file should be an CSV file containing one line per
 notebook. Each line is supposed to contain two values: the notebook number and
 the repository, for example:
 ```3197563,https://github.com/someUser/someRepro```
+
+If you want to use our input data (approximately 1 TB notebooks and
+the accopanying notebook-repository mapping file), it can be downloaded from
+https://export.uppmax.uu.se/snic2020-6-136/notebooks.zip.
 
 ### Execution
 
@@ -250,21 +253,17 @@ repository.
 
 Scripts whose name start with `move_` were used to move notebooks that we
 didn't want to include in our analyses. You will not be able to run these; they
-are only included for transparancy.
+are only included for transparency.
 
 The scripts not mentioned in  this section are helper scripts for the post
 processing scripts.
-
-
-## The Jupyter notebook corpus
-The corpus files (~1TB) and the notebook-repository mapping will be linked from here shortly. If you cannot wait, please put an issue and request it. 
 
 
 ## Repeating our results
 If you want to repeat the results of "Jupyter Notebooks on Github:
 Characteristics and Code Clones" by Källén, Sigvardsson and Wrigstad" you need
 to do the following:
-1. Download all notebooks and the notebook-repro mapping file.
+1. Download all notebooks and the notebook-repository mapping file from https://export.uppmax.uu.se/snic2020-6-136/notebooks.zip.
 2. Change the paths in `paths.sh` according to the inline comments.
 3. Execute `run_notebookAnalyzer.sh`.
 4. Execute `run_pythonDumper.sh`.
