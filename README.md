@@ -255,15 +255,11 @@ The scripts not mentioned in  this section are helper scripts for the post
 processing scripts.
 
 
-## The Jupyter notebook corpus
-The corpus files (~1TB) and the notebook-repository mapping will be linked from here shortly. If you cannot wait, please put an issue and request it. 
-
-
 ## Repeating our results
 If you want to repeat the results of "Jupyter Notebooks on Github:
 Characteristics and Code Clones" by Källén, Sigvardsson and Wrigstad" you need
 to do the following:
-1. Download all notebooks and the notebook-repro mapping file.
+1. Download all notebooks and the notebook-repository mapping file from https://export.uppmax.uu.se/snic2020-6-136/notebooks.zip.
 2. Change the paths in `paths.sh` according to the inline comments.
 3. Execute `run_notebookAnalyzer.sh`.
 4. Execute `run_pythonDumper.sh`.
