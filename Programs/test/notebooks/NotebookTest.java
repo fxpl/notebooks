@@ -984,6 +984,18 @@ public class NotebookTest {
 	}
 	
 	/**
+	 * Verify that a "from" import is ignored if the space is after import is
+	 * missing, and there are no parantheses.
+	 */
+	@Test
+	public void testFromImportMissingSpace() {
+		String dataDir = "test/data/modules";
+		String file = "nb_54.ipynb";
+		List<PythonModule> expectedModules = new ArrayList<PythonModule>(0);
+		verifyImports(dataDir + File.separator + file, expectedModules);
+	}
+	
+	/**
 	 * Verify that modules are is imported when in an invalid import statement.
 	 */
 	@Test

@@ -91,10 +91,13 @@ public class Notebook {
 		String importStatementTemplate = "\\s*import\\s+(" + moduleList + ")\\s*";
 		Pattern importPattern = Pattern.compile(importStatementTemplate);
 		Matcher importMatcher = importPattern.matcher(importStatement);
+		// TODO: Bara 1 eller 3 punkter i sista fallet
 		String fromPatternStart = "\\s*from\\s+((\\.*" + MODULE_IDENTIFIER + ")|(\\.+))";
 		Pattern fromPattern = Pattern.compile(fromPatternStart + "\\s+(" + importStatementTemplate + ")");
 		Matcher fromMatcher = fromPattern.matcher(importStatement);
-		Pattern fromPatternWithParentheses = Pattern.compile(fromPatternStart + "\\s+(import\\s*\\(?(\\s*" + moduleList + "\\)?)\\s*)");
+		// TODO: Det kan ligga ett kommatecken före slutparentesen...
+		// TODO(?): Inga submoduler i B i 'from A import B'
+		Pattern fromPatternWithParentheses = Pattern.compile(fromPatternStart + "\\s+(import\\s*\\((\\s*" + moduleList + "\\))\\s*)");
 		Matcher fromWithParenthesesMatcher = fromPatternWithParentheses.matcher(importStatement);
 		Pattern allFromPattern = Pattern.compile(fromPatternStart + "\\s+import\\s*\\*\\s*");
 		Matcher allFromMatcher = allFromPattern.matcher(importStatement);
