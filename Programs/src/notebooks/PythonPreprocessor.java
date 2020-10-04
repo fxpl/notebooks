@@ -43,17 +43,20 @@ public class PythonPreprocessor {
 	
 	/**
 	 * Remove all newlines that occur between brackets in the code handled by
-	 * the preprocessor.
+	 * the preprocessor. Different types of brackets can be used. Left and
+	 * right brackets are specified as arguments.
+	 * @param leftBracket Left bracket, e.g. '(' or '['
+	 * @param rightBracket Right bracket, e.g. ')' or ']'
 	 */
-	public void removeNewlinesInBrackets() {
+	public void removeNewlinesInBrackets(char leftBracket, char rightBracket) {
 		String result = "";
 		int bracketLevel = 0;
 		int index = 0;
 		// Comments and strings are already removed
 		while (index < code.length()) {
-			if ('(' == code.charAt(index)) {
+			if (leftBracket == code.charAt(index)) {
 				bracketLevel++;
-			} else if (')' == code.charAt(index)) {
+			} else if (rightBracket == code.charAt(index)) {
 				bracketLevel--;
 			} else if ('\n' == code.charAt(index) && 0 < bracketLevel) {
 				index++;
@@ -183,7 +186,9 @@ public class PythonPreprocessor {
 		removeStringsAndComments(new String[]{"\"\"\"", "'''"});
 		removeStringsAndComments(new String[]{"\"", "'"});
 		removeEscapedNewLines();
-		removeNewlinesInBrackets();
+		removeNewlinesInBrackets('(', ')');
+		removeNewlinesInBrackets('[', ']');
+		removeNewlinesInBrackets('{', '}');
 
 		splitCode();
 		return processed;
