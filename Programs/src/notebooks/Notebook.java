@@ -85,17 +85,14 @@ public class Notebook {
 	 * @return A list of all modules found in importStatment
 	 */
 	private List<PythonModule> modulesInImport(String importStatement) throws NotebookException {
-		final String MODULE_IDENTIFIER = PythonModule.MODULE_IDENTIFIER;
-		final String moduleDescr = "" + MODULE_IDENTIFIER + "(\\s*as\\s+" + PythonModule.IDENTIFIER + "\\s*)?";
-		final String moduleList = "(" + moduleDescr + "\\s*,\\s*)*" + moduleDescr;
-		String importStatementTemplate = "\\s*import\\s+(" + moduleList + ")\\s*";
-		Pattern importPattern = Pattern.compile(importStatementTemplate);
+		final String SUB_MODULE_IDENTIFIER = PythonModule.SUB_MODULE_IDENTIFIER;
+		final String subModuleList = moduleList(SUB_MODULE_IDENTIFIER);
+		Pattern importPattern = Pattern.compile("\\s*import\\s+(" + subModuleList + ")\\s*");
 		Matcher importMatcher = importPattern.matcher(importStatement);
-		// TODO: Bara 1 eller 3 punkter i sista fallet
-		String fromPatternStart = "\\s*from\\s+((\\.*" + MODULE_IDENTIFIER + ")|(\\.+))";
-		Pattern fromPattern = Pattern.compile(fromPatternStart + "\\s+(" + importStatementTemplate + ")");
+		final String moduleList = moduleList(PythonModule.IDENTIFIER);
+		String fromPatternStart = "\\s*from\\s+((\\.*" + SUB_MODULE_IDENTIFIER + ")|(\\.+))";
+		Pattern fromPattern = Pattern.compile(fromPatternStart + "\\s+(import\\s+(" + moduleList + ")\\s*)");
 		Matcher fromMatcher = fromPattern.matcher(importStatement);
-		// TODO(?): Inga submoduler i B i 'from A import B'
 		Pattern fromPatternWithParentheses = Pattern.compile(fromPatternStart + "\\s+(import\\s*\\((\\s*" + moduleList + "\\,?\\s*\\))\\s*)");
 		Matcher fromWithParenthesesMatcher = fromPatternWithParentheses.matcher(importStatement);
 		Pattern allFromPattern = Pattern.compile(fromPatternStart + "\\s+import\\s*\\*\\s*");
@@ -130,15 +127,25 @@ public class Notebook {
 	}
 
 	/**
+	 * Create a regular expression that matches the list of modules in a Python
+	 * import statement (including aliases).
+	 * @param moduleIdentifier Regular expression matching the name of a module
+	 * @return A regular expression matching the list of modules in a Python import statement
+	 */
+	public String moduleList(final String moduleIdentifier) {
+		final String moduleDescr = "" + moduleIdentifier + "\\s*(\\s+as\\s+" + PythonModule.IDENTIFIER + "\\s*)?";
+		return "(" + moduleDescr + "\\s*,\\s*)*" + moduleDescr;
+	}
+
+	/**
 	 * Identify all modules in the identifier list from a Python import (that
 	 * is, everything stated after "import").
 	 * @param identifierList the module list described above 
 	 * @return A List of all modules in identifierList 
 	 */
 	private List<PythonModule> modulesInIdentifierList(String identifierList) {
-		final String MODULE_IDENTIFIER = PythonModule.MODULE_IDENTIFIER;
-		final Pattern ordinaryPattern = Pattern.compile("(" + MODULE_IDENTIFIER + ")");
-		final Pattern asPattern = Pattern.compile("(" + MODULE_IDENTIFIER + ")\\s+as\\s+(" + PythonModule.IDENTIFIER + ")");
+		final Pattern ordinaryPattern = Pattern.compile("(" + PythonModule.SUB_MODULE_IDENTIFIER + ")");
+		final Pattern asPattern = Pattern.compile("(" + PythonModule.SUB_MODULE_IDENTIFIER + ")\\s+as\\s+(" + PythonModule.IDENTIFIER + ")");
 		List<PythonModule> result = new ArrayList<PythonModule>();
 		String[] identifiers = identifierList.split(",");
 		for (int i=0; i<identifiers.length; i++) {

@@ -11,7 +11,7 @@ public class PythonModule {
 	// Name of single module (or function)
 	final static public String IDENTIFIER = "[A-Za-z_][A-Za-z0-9_]*";
 	// Module, possibly with submodule(s)
-	final static public String MODULE_IDENTIFIER = IDENTIFIER + "\\s*(\\.\\s*" + IDENTIFIER + "\\s*)*";
+	final static public String SUB_MODULE_IDENTIFIER = IDENTIFIER + "\\s*(\\.\\s*" + IDENTIFIER + "\\s*)*";
 	
 	protected final String name;
 	protected final ImportType importedWith;

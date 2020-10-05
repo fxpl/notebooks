@@ -809,20 +809,6 @@ public class NotebookTest {
 	}
 	
 	/**
-	 * Verify that a module in a "from" import statement can be identified
-	 * correctly when it is a sub module of other module(s).
-	 */
-	@Test
-	public void testFromImportWithSubmodule() {
-		String dataDir = "test/data/modules";
-		String file = "nb_32.ipynb";
-		PythonModule expectedGrandParent = new PythonModule("Base", ImportType.FROM);
-		PythonModule expectedParent = new PythonModule("A", ImportType.ORDINARY, expectedGrandParent);
-		PythonModule expectedModule = new PythonModule("B", ImportType.ORDINARY, expectedParent);
-		verifyImport(dataDir + File.separator + file, expectedModule);
-	}
-	
-	/**
 	 * Verify that a list of modules in a "from" import statement can be
 	 * identified correctly when they have aliases and/or additional parent
 	 * modules.
@@ -831,13 +817,11 @@ public class NotebookTest {
 	public void testFromImportWithSubmodulesAndAlias() {
 		String dataDir = "test/data/modules";
 		String file = "nb_33.ipynb";
-		PythonModule expectedGrandParent = new PythonModule("Base", ImportType.FROM);
-		PythonModule expectedParent1 = new PythonModule("A", ImportType.ORDINARY, expectedGrandParent);
-		PythonModule expectedParent2 = new PythonModule("C", ImportType.ORDINARY, expectedGrandParent);
 		List<PythonModule> expectedModules = new ArrayList<PythonModule>(1);
-		expectedModules.add(new PythonModule("B", "sub", ImportType.ALIAS, expectedParent1));
-		expectedModules.add(new PythonModule("D", ImportType.ORDINARY, expectedParent2));
-		expectedModules.add(new PythonModule("E", "sub2", ImportType.ALIAS, expectedGrandParent));
+		PythonModule expectedParent = new PythonModule("Base", ImportType.FROM);
+		expectedModules.add(new PythonModule("A", "sub", ImportType.ALIAS, expectedParent));
+		expectedModules.add(new PythonModule("B", ImportType.ORDINARY, expectedParent));
+		expectedModules.add(new PythonModule("C", "sub2", ImportType.ALIAS, expectedParent));
 		verifyImports(dataDir + File.separator + file, expectedModules);
 	}
 	
