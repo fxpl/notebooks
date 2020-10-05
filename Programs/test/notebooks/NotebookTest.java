@@ -762,6 +762,23 @@ public class NotebookTest {
 		expectedModules.add(new PythonModule("moduleC", ImportType.ORDINARY, expectedParent));
 		verifyImports(dataDir + File.separator + file, expectedModules);
 	}
+	
+	/**
+	 * Verify that modules in a from import are imported when there is a
+	 * trailing comma, if the submodules are within parentheses, but not
+	 * otherwise.
+	 */
+	@Test
+	public void testFromImportWithTrailingComma() {
+		String dataDir = "test/data/modules";
+		String file = "nb_24.ipynb";
+		List<PythonModule> expectedModules = new ArrayList<PythonModule>(3);
+		PythonModule expectedParent = new PythonModule("Base", ImportType.FROM);
+		expectedModules.add(new PythonModule("moduleA", ImportType.ORDINARY, expectedParent));
+		expectedModules.add(new PythonModule("moduleB", "b", ImportType.ALIAS, expectedParent));
+		expectedModules.add(new PythonModule("moduleC", ImportType.ORDINARY, expectedParent));
+		verifyImports(dataDir + File.separator + file, expectedModules);
+	}
 
 	/**
 	 * Verify that a module in an import statement is identified correctly when
@@ -985,7 +1002,7 @@ public class NotebookTest {
 	
 	/**
 	 * Verify that a "from" import is ignored if the space is after import is
-	 * missing, and there are no parantheses.
+	 * missing, and there are no parentheses.
 	 */
 	@Test
 	public void testFromImportMissingSpace() {

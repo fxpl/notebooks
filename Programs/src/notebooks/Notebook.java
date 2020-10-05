@@ -95,9 +95,8 @@ public class Notebook {
 		String fromPatternStart = "\\s*from\\s+((\\.*" + MODULE_IDENTIFIER + ")|(\\.+))";
 		Pattern fromPattern = Pattern.compile(fromPatternStart + "\\s+(" + importStatementTemplate + ")");
 		Matcher fromMatcher = fromPattern.matcher(importStatement);
-		// TODO: Det kan ligga ett kommatecken före slutparentesen...
 		// TODO(?): Inga submoduler i B i 'from A import B'
-		Pattern fromPatternWithParentheses = Pattern.compile(fromPatternStart + "\\s+(import\\s*\\((\\s*" + moduleList + "\\))\\s*)");
+		Pattern fromPatternWithParentheses = Pattern.compile(fromPatternStart + "\\s+(import\\s*\\((\\s*" + moduleList + "\\,?\\s*\\))\\s*)");
 		Matcher fromWithParenthesesMatcher = fromPatternWithParentheses.matcher(importStatement);
 		Pattern allFromPattern = Pattern.compile(fromPatternStart + "\\s+import\\s*\\*\\s*");
 		Matcher allFromMatcher = allFromPattern.matcher(importStatement);
@@ -119,7 +118,7 @@ public class Notebook {
 			return result;
 		} else if(fromWithParenthesesMatcher.matches()) {
 			String ImportStatementWithoutParentheses =
-					importStatement.replaceAll("(?<!\\s)\\(", " ").replaceAll("\\(", "").replaceAll("\\)", "");
+					importStatement.replaceAll("(?<!\\s)\\(", " ").replaceAll("\\(", "").replaceAll("\\,?\\s*\\)", "");
 			return modulesInImport(ImportStatementWithoutParentheses);
 		} else {
 			if (importStatement.endsWith("\n")) {
