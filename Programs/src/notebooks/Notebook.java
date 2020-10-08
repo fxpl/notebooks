@@ -63,7 +63,8 @@ public class Notebook {
 			JSONArray lines = getSource(cell);
 			List<String> splitLines = new PythonPreprocessor(lines).process();
 			for (String line: splitLines) {
-				if (line.trim().matches("import\\s+.*") || line.trim().matches("from\\s+.*\\s+import.*")) {
+				line = line.trim();
+				if (line.matches("import\\s+.*") || line.matches("from\\s+.*\\s+import.*")) {
 					try {
 						modules.addAll(modulesInImport(line));
 					} catch (NotebookException e) {
@@ -87,15 +88,15 @@ public class Notebook {
 	private List<PythonModule> modulesInImport(String importStatement) throws NotebookException {
 		final String SUB_MODULE_IDENTIFIER = PythonModule.SUB_MODULE_IDENTIFIER;
 		final String subModuleList = moduleList(SUB_MODULE_IDENTIFIER);
-		Pattern importPattern = Pattern.compile("\\s*import\\s+(" + subModuleList + ")\\s*");
+		Pattern importPattern = Pattern.compile("import\\s+(" + subModuleList + ")");
 		Matcher importMatcher = importPattern.matcher(importStatement);
 		final String moduleList = moduleList(PythonModule.IDENTIFIER);
-		String fromPatternStart = "\\s*from\\s+((\\.*" + SUB_MODULE_IDENTIFIER + ")|(\\.+))";
-		Pattern fromPattern = Pattern.compile(fromPatternStart + "\\s+(import\\s+(" + moduleList + ")\\s*)");
+		String fromPatternStart = "from\\s+((\\.*" + SUB_MODULE_IDENTIFIER + ")|(\\.+))";
+		Pattern fromPattern = Pattern.compile(fromPatternStart + "\\s+(import\\s+(" + moduleList + "))");
 		Matcher fromMatcher = fromPattern.matcher(importStatement);
-		Pattern fromPatternWithParentheses = Pattern.compile(fromPatternStart + "\\s+(import\\s*\\((\\s*" + moduleList + "\\,?\\s*\\))\\s*)");
+		Pattern fromPatternWithParentheses = Pattern.compile(fromPatternStart + "\\s+(import\\s*\\(\\s*" + moduleList + "\\,?\\s*\\))");
 		Matcher fromWithParenthesesMatcher = fromPatternWithParentheses.matcher(importStatement);
-		Pattern allFromPattern = Pattern.compile(fromPatternStart + "\\s+import\\s*\\*\\s*");
+		Pattern allFromPattern = Pattern.compile(fromPatternStart + "\\s+import\\s*\\*");
 		Matcher allFromMatcher = allFromPattern.matcher(importStatement);
 		if (importMatcher.matches()) {
 			return modulesInIdentifierList(importMatcher.group(1));
