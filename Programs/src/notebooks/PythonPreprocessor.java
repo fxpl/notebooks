@@ -68,11 +68,12 @@ public class PythonPreprocessor {
 	}
 	
 	/**
-	 * Remove all strings and comments from the code handled by the
-	 * preprocessor.
-	 * @param delimiters Existing string delimiters
+	 * Remove everything that should only be removed when it is not inside a
+	 * string, that is comments (starting with '#') and the newlines that occur
+	 * between brackets, from the code handled by the preprocessor.
+	 * @param delimiters Existing string delimiters. I a delimiter a is a substring of a delimiter b, b must precede a in the array.
 	 */
-	public void removeStringsAndComments(String[] delimiters) {
+	public void removeOutsideString(String[] delimiters) {
 		// Find positions of delimiters
 		int numDelimiters = delimiters.length;
 		List<List<Integer>> delimiterPositions = new ArrayList<List<Integer>>(numDelimiters);
@@ -83,13 +84,15 @@ public class PythonPreprocessor {
 			for (int d=0; d<numDelimiters; d++) {
 				if (charSequenceFound(code, i, delimiters[d])) {
 					delimiterPositions.get(d).add(i);
+					break;
 				}
 			}
 		}
 		
-		// Remove strings
+		// Do the actual cleaning
 		String result = "";
 		int index = 0;
+		int bracketLevel = 0;
 		boolean[] inString = new boolean[numDelimiters];
 		for (int i=0; i<numDelimiters; i++) {
 			inString[i] = false;
@@ -97,25 +100,26 @@ public class PythonPreprocessor {
 		char previous = ' ';
 		while (index < code.length()) {
 			char current = code.charAt(index);
-			boolean isDelimiter = false;
-			// Skip comments
-			if (!anyTrue(inString) && '#' == current) {
-				while ('\n' != code.charAt(++index));
+			if (!anyTrue(inString)) { // We are not inside a string. Do clean.
+				if('#' == current && '\\' != previous) {
+					while ('\n' != code.charAt(++index));
+				} else if ('(' == current) {
+					bracketLevel++;
+				} else if (')' == current) {
+					bracketLevel--;
+				} else if ('\n' == code.charAt(index) && 0 < bracketLevel) {
+					index++;
+					continue;
+				}
 			}
-			// Remove strings
+			// Keep track of whether we are inside a string
 			for (int i=0; i<numDelimiters; i++) {
-				if (!otherTrue(inString, i) && delimiterPositions.get(i).contains(index) && previous != '\\') {
+				if (!otherTrue(inString, i) && delimiterPositions.get(i).contains(index) && '\\' != previous) {
 					inString[i] = !inString[i];
-					index += delimiters[i].length(); // Skip delimiter
-					isDelimiter = true;
 				}
 			}
-			if (!isDelimiter) {
-				if (!anyTrue(inString)) {
-					result += code.charAt(index);
-				}
-				index++;
-			}
+			result += code.charAt(index);
+			index++;
 			previous = current;
 		}
 		code = result;
@@ -183,13 +187,8 @@ public class PythonPreprocessor {
 	 * @return A list of sub lines
 	 */
 	public List<String> process() {
-		removeStringsAndComments(new String[]{"\"\"\"", "'''"});
-		removeStringsAndComments(new String[]{"\"", "'"});
+		removeOutsideString(new String[]{"\"\"\"", "'''", "\"", "'"});
 		removeEscapedNewLines();
-		removeNewlinesInBrackets('(', ')');
-		/*removeNewlinesInBrackets('[', ']');
-		removeNewlinesInBrackets('{', '}');*/
-
 		splitCode();
 		return processed;
 	}

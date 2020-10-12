@@ -42,66 +42,8 @@ public class PythonPreprocessorTest {
 	}
 	
 	@Test
-	public void testProcess_multiLineStrings() {
-		String[] strings = {"import numpy as np\n",
-				"\"\"\"This is a multi \n", "line comment string with \\\"\\\"\\\" inside\"\"\"\n",
-				"import pandas as pd\n", "b = np.sin(a)\n",
-				"'''Some other \n", "multi line string'''\n",
-				"c = np.cos(b)\n",
-				"'''And now, a string with # and \n and \\n and \\'\\'\\' to test\n'''\n",
-				"d = np.tan(c)\n", "'''Some string'''\n", "e = np.exp(d)\n"};
-		List<String> expectedOutput = new ArrayList<String>(10);
-		expectedOutput.add("import numpy as np\n");
-		expectedOutput.add("\n");
-		expectedOutput.add("import pandas as pd\n");
-		expectedOutput.add("b = np.sin(a)\n");
-		expectedOutput.add("\n");
-		expectedOutput.add("c = np.cos(b)\n");
-		expectedOutput.add("\n");
-		expectedOutput.add("d = np.tan(c)\n");
-		expectedOutput.add("\n");
-		expectedOutput.add("e = np.exp(d)\n");
-		processAndCheck(strings, expectedOutput);
-	}
-	
-	@Test
-	public void testProcess_mulitLineStringsWithSingleLineStringsDelimiter() {
-		String[] strings = {"import numpy as np\n",
-				"'''This is a string with \" and ' inside.'''\n",
-				"import pandas as pd\n", "b = np.sin(a)\n",
-				"\"\"\"This is a string with \" and ' inside.\"\"\"\n",
-				"c = np.cos(b)\n"};
-		List<String> expectedOutput = new ArrayList<String>(6);
-		expectedOutput.add("import numpy as np\n");
-		expectedOutput.add("\n");
-		expectedOutput.add("import pandas as pd\n");
-		expectedOutput.add("b = np.sin(a)\n");
-		expectedOutput.add("\n");
-		expectedOutput.add("c = np.cos(b)\n");
-		processAndCheck(strings, expectedOutput);
-	}
-	
-	@Test
-	public void testProcess_delimitersInMultiLineString() {
-		String[] strings = {"import numpy as np\n",
-				"'''This is a string with \"\"\" inside.'''\n",
-				"import pandas as pd\n",
-				"b = np.sin(a)\n",
-				"\"\"\"This is a string with ''' inside.\"\"\"\n",
-				"c = np.cos(b)\n"};
-		List<String> expectedOutput = new ArrayList<String>(6);
-		expectedOutput.add("import numpy as np\n");
-		expectedOutput.add("\n");
-		expectedOutput.add("import pandas as pd\n");
-		expectedOutput.add("b = np.sin(a)\n");
-		expectedOutput.add("\n");
-		expectedOutput.add("c = np.cos(b)\n");
-		processAndCheck(strings, expectedOutput);
-	}
-	
-	@Test
 	public void testProcess_strings() {
-		String[] strings = {"import numpy as np; \"This is a comment string with \\\" inside.\"; import pandas as pd\n",
+		String[] strings = {"import numpy as np; \"This is a comment string with \\\" and # inside.\"; import pandas as pd\n",
 				"b = np.sin(a)\n",
 				"'Some other string '\n",
 				"c = np.cos(b)\n",
@@ -109,31 +51,19 @@ public class PythonPreprocessorTest {
 				"d = np.tan(c)\n",
 				"'Some string'\n",
 				"e = np.exp(d)\n"};
-		List<String> expectedOutput = new ArrayList<String>(9);
+		List<String> expectedOutput = new ArrayList<String>(12);
 		expectedOutput.add("import numpy as np");
-		expectedOutput.add(" ");
+		expectedOutput.add(" \"This is a comment string with \\\" and # inside.\"");
 		expectedOutput.add(" import pandas as pd\n");
 		expectedOutput.add("b = np.sin(a)\n");
-		expectedOutput.add("\n");
+		expectedOutput.add("'Some other string '\n");
 		expectedOutput.add("c = np.cos(b)\n");
-		expectedOutput.add("\n");
+		expectedOutput.add("'And now, a string with # and \n");
+		expectedOutput.add(" and \\n and \\' to test\n");
+		expectedOutput.add("'\n");
 		expectedOutput.add("d = np.tan(c)\n");
-		expectedOutput.add("\n");
+		expectedOutput.add("'Some string'\n");
 		expectedOutput.add("e = np.exp(d)\n");
-		processAndCheck(strings, expectedOutput);
-	}
-	
-	@Test
-	public void testProcess_stringConstants() {
-		String[] strings = {
-				"var1 = 'apa'\n",
-				"var2 = \"kossa\"\n",
-				"function(a=\"milou\", b=\"oscar\")\n",
-		};
-		List<String> expectedOutput = new ArrayList<String>(3);
-		expectedOutput.add("var1 = \n");
-		expectedOutput.add("var2 = \n");
-		expectedOutput.add("function(a=, b=)\n");
 		processAndCheck(strings, expectedOutput);
 	}
 	
@@ -167,6 +97,14 @@ public class PythonPreprocessorTest {
 		String[] strings = {"abc\\\n", "def\n"};
 		List<String> expectedOutput = new ArrayList<String>(1);
 		expectedOutput.add("abc def\n");
+		processAndCheck(strings, expectedOutput);
+	}
+	
+	@Test
+	public void testProcess_escapedNewlineInString() {
+		String[] strings = {"\"Some string with\\\ninside\"\n"};
+		List<String> expectedOutput = new ArrayList<String>(1);
+		expectedOutput.add("\"Some string with inside\"\n");
 		processAndCheck(strings, expectedOutput);
 	}
 	
@@ -215,8 +153,9 @@ public class PythonPreprocessorTest {
 				"\"\"\" Some string with a (\n",
 				"inside\"\"\"\n"
 		};
-		List<String> expectedOutput = new ArrayList<String>(1);
-		expectedOutput.add("\n");
+		List<String> expectedOutput = new ArrayList<String>(2);
+		expectedOutput.add("\"\"\" Some string with a (\n");
+		expectedOutput.add("inside\"\"\"\n");
 		processAndCheck(strings, expectedOutput);
 	}
 	
@@ -224,7 +163,7 @@ public class PythonPreprocessorTest {
 	public void testProcess_stringOnLine() {
 		String[] strings = {"import pytz   pytz.timezone('US/Eastern')\n"};
 		List<String> expectedOutput = new ArrayList<String>(1);
-		expectedOutput.add("import pytz   pytz.timezone()\n");
+		expectedOutput.add("import pytz   pytz.timezone('US/Eastern')\n");
 		processAndCheck(strings, expectedOutput);
 	}
 
