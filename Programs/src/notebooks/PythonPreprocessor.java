@@ -187,8 +187,8 @@ public class PythonPreprocessor {
 		removeStringsAndComments(new String[]{"\"", "'"});
 		removeEscapedNewLines();
 		removeNewlinesInBrackets('(', ')');
-		removeNewlinesInBrackets('[', ']');
-		removeNewlinesInBrackets('{', '}');
+		/*removeNewlinesInBrackets('[', ']');
+		removeNewlinesInBrackets('{', '}');*/
 
 		splitCode();
 		return processed;

@@ -196,36 +196,6 @@ public class PythonPreprocessorTest {
 	}
 	
 	@Test
-	public void testProcess_newLineInSquareBrackets() {
-		String[] strings = {
-				"a = [1, 2,\n",
-				"3, 4\n",
-				", 5, 6]\n",
-				"b = [1, [1, [1], \n",
-				"2],\n",
-				"3]\n"
-		};
-		List<String> expectedOutput = new ArrayList<String>(2);
-		expectedOutput.add("a = [1, 2,3, 4, 5, 6]\n");
-		expectedOutput.add("b = [1, [1, [1], 2],3]\n");
-		processAndCheck(strings, expectedOutput);
-	}
-	
-	@Test
-	public void testProcess_newLineInCurlyBrackets() {
-		String[] strings = {
-				"a = {1: a,\n",
-				"2:\n",
-				"b\n",
-				", 3: c\n",
-				"}\n"
-		};
-		List<String> expectedOutput = new ArrayList<String>(1);
-		expectedOutput.add("a = {1: a,2:b, 3: c}\n");
-		processAndCheck(strings, expectedOutput);
-	}
-	
-	@Test
 	public void testProcess_newLineInDifferentBrackets() {
 		String[] strings = {
 				"function(a,\n",
