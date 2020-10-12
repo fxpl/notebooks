@@ -134,7 +134,7 @@ public class Notebook {
 	 * @return A regular expression matching the list of modules in a Python import statement
 	 */
 	public String moduleList(final String moduleIdentifier) {
-		final String moduleDescr = "" + moduleIdentifier + "\\s*(\\s+as\\s+" + PythonModule.IDENTIFIER + "\\s*)?";
+		final String moduleDescr = moduleIdentifier + "\\s*(\\s+as\\s+" + PythonModule.IDENTIFIER + ")?";
 		return "(" + moduleDescr + "\\s*,\\s*)*" + moduleDescr;
 	}
 
