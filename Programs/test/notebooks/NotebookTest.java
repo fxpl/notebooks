@@ -985,6 +985,61 @@ public class NotebookTest {
 	}
 	
 	/**
+	 * Verify that modules and aliases containing Swedish letters are handled correctly
+	 */
+	@Test
+	public void testImportSwedish() {
+		String dataDir = "test/data/modules";
+		String file = "nb_60.ipynb";
+		PythonModule expectedModule = new PythonModule("äpple", "ö", ImportType.ALIAS);
+		verifyImport(getPath(dataDir, file), expectedModule);
+	}
+	
+	/**
+	 * Verify that modules and aliases containing Chinese letters are handled correctly
+	 */
+	@Test
+	public void testImportChinese() {
+		String dataDir = "test/data/modules";
+		String file = "nb_61.ipynb";
+		PythonModule expectedModule = new PythonModule("模組", "my碼", ImportType.ALIAS);
+		verifyImport(getPath(dataDir, file), expectedModule);
+	}
+	
+	/**
+	 * Verify that modules and aliases containing Cyrillic letters are handled correctly
+	 */
+	@Test
+	public void testImportCyrrilic() {
+		String dataDir = "test/data/modules";
+		String file = "nb_62.ipynb";
+		PythonModule expectedModule = new PythonModule("модуль", "myкод", ImportType.ALIAS);
+		verifyImport(getPath(dataDir, file), expectedModule);
+	}
+	
+	/**
+	 * Verify that modules and aliases containing Greek letters are handled correctly
+	 */
+	@Test
+	public void testImportGreek() {
+		String dataDir = "test/data/modules";
+		String file = "nb_63.ipynb";
+		PythonModule expectedModule = new PythonModule("μονάδα_μέτρησης", "myκώδικας", ImportType.ALIAS);
+		verifyImport(getPath(dataDir, file), expectedModule);
+	}
+	
+	/**
+	 * Verify that modules and aliases containing combining marks are handled correctly
+	 */
+	@Test
+	public void testImportCombining() {
+		String dataDir = "test/data/modules";
+		String file = "nb_64.ipynb";
+		PythonModule expectedModule = new PythonModule("modulé", "àpa", ImportType.ALIAS);
+		verifyImport(getPath(dataDir, file), expectedModule);
+	}
+	
+	/**
 	 * Verify that a "from" import is ignored if the space is after import is
 	 * missing, and there are no parentheses.
 	 */
@@ -1076,5 +1131,9 @@ public class NotebookTest {
 		// Full path
 		notebook = new Notebook(path);
 		assertEquals("Wrong string representation of notebook", name, notebook.toString());
+	}
+	
+	private String getPath(String dir, String file) {
+		return dir + File.separator + file;
 	}
 }

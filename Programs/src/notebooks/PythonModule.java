@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
 
 public class PythonModule {
 	// Name of single module (or function)
-	final static public String IDENTIFIER = "[A-Za-z_][A-Za-z0-9_]*";
+	final static public String IDENTIFIER = "[\\p{L}\\p{Nl}][\\p{L}\\p{Nl}\\p{Nd}\\p{Mn}\\p{Pc}]*";
 	// Module, possibly with submodule(s)
 	final static public String SUB_MODULE_IDENTIFIER = IDENTIFIER + "\\s*(\\.\\s*" + IDENTIFIER + "\\s*)*";
 	
