@@ -59,7 +59,7 @@ public class NotebookTest {
 		
 		// Run
 		for (String nbFile: inFiles) {
-			Notebook nb = new Notebook(dataDir + File.separator + nbFile);
+			Notebook nb = new Notebook(getPath(dataDir, nbFile));
 			nb.dumpCode(outputDir, suffix);
 		}
 		
@@ -95,7 +95,7 @@ public class NotebookTest {
 		
 		// Run
 		for (String nbFile: notebooks) {
-			Notebook nb = new Notebook(dataDir + File.separator + nbFile + ".ipynb");
+			Notebook nb = new Notebook(getPath(dataDir, nbFile + ".ipynb"));
 			nb.dumpCodeAsZipWithSingleFile(outputDir, suffix);
 		}
 		
@@ -147,7 +147,7 @@ public class NotebookTest {
 		
 		// Run
 		for (String nbFile: inFiles) {
-			Notebook nb = new Notebook(dataDir + File.separator + nbFile);
+			Notebook nb = new Notebook(getPath(dataDir, nbFile));
 			nb.dumpCodeAsZip(outputDir, suffix);
 		}
 
@@ -268,7 +268,7 @@ public class NotebookTest {
 		int[][] expectedLOC = {{0, 0}, {0}, {1}, {1, 1}};
 		
 		for (int i=0; i<files.length; i++) {
-			Notebook notebook = new Notebook(dataDir + File.separator + files[i]);
+			Notebook notebook = new Notebook(getPath(dataDir, files[i]));
 			SnippetCode[] snippetCodes = notebook.snippetCodes();
 			for (int j=0; j<expectedHashStrings[i].length; j++) {
 				assertEquals("Wrong hash:", expectedHashStrings[i][j], snippetCodes[j].getHash());
@@ -302,7 +302,7 @@ public class NotebookTest {
 				LangName.UNKNOWN, LangName.UNKNOWN,
 				LangName.UNKNOWN, LangName.PYTHON};
 		for (int i=0; i<files.length; i++) {
-			Notebook notebook = new Notebook(dataDir + File.separator + files[i]);
+			Notebook notebook = new Notebook(getPath(dataDir, files[i]));
 			assertEquals("Wrong language:", languages[i], notebook.language().getName());
 		}
 	}
@@ -327,7 +327,7 @@ public class NotebookTest {
 				LangSpec.METADATA_LANGUAGEINFO_NAME, LangSpec.METADATA_LANGUAGEINFO_NAME,
 				LangSpec.CODE_CELLS, LangSpec.CODE_CELLS};
 		for (int i=0; i<files.length; i++) {
-			Notebook notebook = new Notebook(dataDir + File.separator + files[i]);
+			Notebook notebook = new Notebook(getPath(dataDir, files[i]));
 			assertEquals("Wrong language specification location:", langSpecs[i], notebook.language().getSpec());
 		}
 	}
@@ -421,7 +421,7 @@ public class NotebookTest {
 				"missing_source.ipynb", "two_codeCells_26loc_worksheet.ipynb"};
 		int[] LOC = {0, 6, 6, 13, 2, 3, 2, 23};
 		for (int i=0; i<files.length; i++) {
-			Notebook notebook = new Notebook(dataDir + File.separator + files[i]);
+			Notebook notebook = new Notebook(getPath(dataDir, files[i]));
 			assertEquals("Wrong LOC!", LOC[i], notebook.LOC());
 		}
 	}
@@ -471,7 +471,7 @@ public class NotebookTest {
 				"missing_cell_type.ipynb", "four_cells_and_worksheets.ipynb"};
 		int[] numCodeCells = {0, 1, 2, 3, 3, 0, 0, 2, 4};
 		for (int i=0; i<files.length; i++) {
-			Notebook notebook = new Notebook(dataDir + File.separator + files[i]);
+			Notebook notebook = new Notebook(getPath(dataDir, files[i]));
 			assertEquals("Wrong number of code cells!",
 					numCodeCells[i], notebook.numCodeCells());
 		}
@@ -487,7 +487,7 @@ public class NotebookTest {
 		int[][] expectedNumChars = {{15, 30}, {15, 30}, {14}};
 		String[] files = {"nb1.ipynb", "nb1_str.ipynb", "nb2.ipynb"};
 		for (int i=0; i<files.length; i++) {
-			Notebook notebook = new Notebook(dataDir + File.separator + files[i]);
+			Notebook notebook = new Notebook(getPath(dataDir, files[i]));
 			int[] numChars = notebook.numCodeChars();
 			for (int j=0; j<numChars.length; j++) {
 				assertEquals("Wrong number of code characters returned for " + files[i] + ", snippet " + j + "!", 
@@ -513,7 +513,7 @@ public class NotebookTest {
 		String expectedOutput = "def my_function\n\ta = 2\n\tb = 2\n";
 		
 		// Verify behavior
-		Notebook notebook = new Notebook(dataDir + File.separator + file);
+		Notebook notebook = new Notebook(getPath(dataDir, file));
 		notebook.printSnippet(snippetIndex);
 		assertEquals("Wrong code printed", expectedOutput, output.toString());
 		
@@ -560,7 +560,7 @@ public class NotebookTest {
 		String file = "nb_1.ipynb";
 		PythonModule expectedModule = new PythonModule("kossan_mu", ImportType.ORDINARY);
 		expectedModule.functionUsages.put("function", 2);
-		verifyImport(dataDir + File.separator + file, expectedModule);
+		verifyImport(getPath(dataDir, file), expectedModule);
 	}
 	
 	/**
@@ -573,7 +573,7 @@ public class NotebookTest {
 		String file = "nb_1b.ipynb";
 		PythonModule expectedModule = new PythonModule("kossan_mu", ImportType.ORDINARY);
 		expectedModule.functionUsages.put("function", 2);
-		verifyImport(dataDir + File.separator + file, expectedModule);
+		verifyImport(getPath(dataDir, file), expectedModule);
 	}
 	
 	/**
@@ -584,7 +584,7 @@ public class NotebookTest {
 		String dataDir = "test/data/modules";
 		String file = "nb_2.ipynb";
 		PythonModule expectedModule = new PythonModule("kalv", "naut", ImportType.ALIAS);
-		verifyImport(dataDir + File.separator + file, expectedModule);
+		verifyImport(getPath(dataDir, file), expectedModule);
 	}
 	
 	/**
@@ -597,7 +597,7 @@ public class NotebookTest {
 		String file = "nb_3.ipynb";
 		PythonModule parent = new PythonModule("ko", ImportType.FROM);
 		PythonModule expectedModule = new AllModules(parent);
-		verifyImport(dataDir + File.separator + file, expectedModule);
+		verifyImport(getPath(dataDir, file), expectedModule);
 	}
 	
 	/**
@@ -610,7 +610,7 @@ public class NotebookTest {
 		String file = "nb_50.ipynb";
 		PythonModule parent = new PythonModule("ko", ImportType.FROM);
 		PythonModule expectedModule = new AllModules(parent);
-		verifyImport(dataDir + File.separator + file, expectedModule);
+		verifyImport(getPath(dataDir, file), expectedModule);
 	}
 	
 	/**
@@ -623,7 +623,7 @@ public class NotebookTest {
 		String file = "nb_6.ipynb";
 		PythonModule expectedParent = new PythonModule("ko", ImportType.FROM);
 		PythonModule expectedModule = new PythonModule("mage", ImportType.ORDINARY, expectedParent);
-		verifyImport(dataDir + File.separator + file, expectedModule);
+		verifyImport(getPath(dataDir, file), expectedModule);
 	}
 	
 	/**
@@ -637,7 +637,7 @@ public class NotebookTest {
 		List<PythonModule> expectedModules = new ArrayList<PythonModule>(1);
 		PythonModule expectedParent = new PythonModule("ko", ImportType.FROM);
 		expectedModules.add(new PythonModule("vom", "mage", ImportType.ALIAS, expectedParent));
-		verifyImports(dataDir + File.separator + file, expectedModules);
+		verifyImports(getPath(dataDir, file), expectedModules);
 	}
 	
 	/**
@@ -650,7 +650,7 @@ public class NotebookTest {
 		String file = "nb_8.ipynb";
 		PythonModule expectedParent = new PythonModule("ko", ImportType.FROM);
 		PythonModule expectedModule = new PythonModule("mage", ImportType.ORDINARY, expectedParent);
-		verifyImport(dataDir + File.separator + file, expectedModule);
+		verifyImport(getPath(dataDir, file), expectedModule);
 	}
 	
 	/**
@@ -664,7 +664,7 @@ public class NotebookTest {
 		String file = "nb_9.ipynb";
 		PythonModule expectedParent = new PythonModule("ko", ImportType.FROM);
 		PythonModule expectedModule = new PythonModule("mage", ImportType.ORDINARY, expectedParent);
-		verifyImport(dataDir + File.separator + file, expectedModule);
+		verifyImport(getPath(dataDir, file), expectedModule);
 	}
 	
 	/**
@@ -685,7 +685,7 @@ public class NotebookTest {
 		expectedModules.add(module);
 		module = new PythonModule("module3", "mod3", ImportType.ALIAS);
 		expectedModules.add(module);
-		verifyImports(dataDir + File.separator + file, expectedModules);
+		verifyImports(getPath(dataDir, file), expectedModules);
 	}
 	
 	/**
@@ -700,7 +700,7 @@ public class NotebookTest {
 		expectedModules.add(new PythonModule("module11", "mod", ImportType.ALIAS));
 		expectedModules.add(new PythonModule("module12", ImportType.ORDINARY));
 		expectedModules.add(new PythonModule("module13", "mod13", ImportType.ALIAS));
-		verifyImports(dataDir + File.separator + file, expectedModules);
+		verifyImports(getPath(dataDir, file), expectedModules);
 	}
 	
 	/**
@@ -714,7 +714,7 @@ public class NotebookTest {
 		expectedModules.add(new PythonModule("moduleA", ImportType.ORDINARY));
 		expectedModules.add(new PythonModule("moduleB", ImportType.ORDINARY));
 		expectedModules.add(new PythonModule("moduleC", ImportType.ORDINARY));
-		verifyImports(dataDir + File.separator + file, expectedModules);
+		verifyImports(getPath(dataDir, file), expectedModules);
 	}
 	
 	/**
@@ -728,7 +728,7 @@ public class NotebookTest {
 		expectedModules.add(new PythonModule("moduleA", "a", ImportType.ALIAS));
 		expectedModules.add(new PythonModule("moduleB", "b", ImportType.ALIAS));
 		expectedModules.add(new PythonModule("moduleC", "c", ImportType.ALIAS));
-		verifyImports(dataDir + File.separator + file, expectedModules);
+		verifyImports(getPath(dataDir, file), expectedModules);
 	}
 	
 	/**
@@ -744,7 +744,7 @@ public class NotebookTest {
 		expectedModules.add(new PythonModule("moduleA", ImportType.ORDINARY));
 		expectedModules.add(new PythonModule("moduleB", "b", ImportType.ALIAS));
 		expectedModules.add(new PythonModule("moduleC", ImportType.ORDINARY));
-		verifyImports(dataDir + File.separator + file, expectedModules);
+		verifyImports(getPath(dataDir, file), expectedModules);
 	}
 	
 	/**
@@ -760,7 +760,7 @@ public class NotebookTest {
 		expectedModules.add(new PythonModule("moduleA", ImportType.ORDINARY, expectedParent));
 		expectedModules.add(new PythonModule("moduleB", "b", ImportType.ALIAS, expectedParent));
 		expectedModules.add(new PythonModule("moduleC", ImportType.ORDINARY, expectedParent));
-		verifyImports(dataDir + File.separator + file, expectedModules);
+		verifyImports(getPath(dataDir, file), expectedModules);
 	}
 	
 	/**
@@ -777,7 +777,7 @@ public class NotebookTest {
 		expectedModules.add(new PythonModule("moduleA", ImportType.ORDINARY, expectedParent));
 		expectedModules.add(new PythonModule("moduleB", "b", ImportType.ALIAS, expectedParent));
 		expectedModules.add(new PythonModule("moduleC", ImportType.ORDINARY, expectedParent));
-		verifyImports(dataDir + File.separator + file, expectedModules);
+		verifyImports(getPath(dataDir, file), expectedModules);
 	}
 
 	/**
@@ -791,7 +791,7 @@ public class NotebookTest {
 		PythonModule expectedGrandParent = new PythonModule("A", ImportType.ORDINARY);
 		PythonModule expectedParent = new PythonModule("B", ImportType.ORDINARY, expectedGrandParent);
 		PythonModule expectedModule = new PythonModule("C", ImportType.ORDINARY, expectedParent);
-		verifyImport(dataDir + File.separator + file, expectedModule);
+		verifyImport(getPath(dataDir, file), expectedModule);
 	}
 	
 	/**
@@ -805,7 +805,7 @@ public class NotebookTest {
 		PythonModule expectedGrandParent = new PythonModule("A", ImportType.ORDINARY);
 		PythonModule expectedParent = new PythonModule("B", ImportType.ORDINARY, expectedGrandParent);
 		PythonModule expectedModule = new PythonModule("C", "child", ImportType.ALIAS, expectedParent);
-		verifyImport(dataDir + File.separator + file, expectedModule);
+		verifyImport(getPath(dataDir, file), expectedModule);
 	}
 	
 	/**
@@ -822,7 +822,7 @@ public class NotebookTest {
 		expectedModules.add(new PythonModule("A", "sub", ImportType.ALIAS, expectedParent));
 		expectedModules.add(new PythonModule("B", ImportType.ORDINARY, expectedParent));
 		expectedModules.add(new PythonModule("C", "sub2", ImportType.ALIAS, expectedParent));
-		verifyImports(dataDir + File.separator + file, expectedModules);
+		verifyImports(getPath(dataDir, file), expectedModules);
 	}
 	
 	/**
@@ -835,7 +835,7 @@ public class NotebookTest {
 		String file = "nb_34.ipynb";
 		PythonModule expectedParent = new PythonModule("Base.Sub", ImportType.FROM);
 		PythonModule expectedModule = new PythonModule("A", ImportType.ORDINARY, expectedParent);
-		verifyImport(dataDir + File.separator + file, expectedModule);
+		verifyImport(getPath(dataDir, file), expectedModule);
 	}
 	
 	/**
@@ -855,7 +855,7 @@ public class NotebookTest {
 		expectedParent = new PythonModule("D", ImportType.FROM);
 		expectedModule = new PythonModule("E", "e", ImportType.ALIAS, expectedParent);
 		expectedModules.add(expectedModule);
-		verifyImports(dataDir + File.separator + file, expectedModules);
+		verifyImports(getPath(dataDir, file), expectedModules);
 	}
 	
 	/**
@@ -875,7 +875,7 @@ public class NotebookTest {
 		expectedParent = new PythonModule("D", ImportType.FROM);
 		expectedModule = new PythonModule("E", "e", ImportType.ALIAS, expectedParent);
 		expectedModules.add(expectedModule);
-		verifyImports(dataDir + File.separator + file, expectedModules);
+		verifyImports(getPath(dataDir, file), expectedModules);
 	}
 	
 	/**
@@ -895,7 +895,7 @@ public class NotebookTest {
 		expectedParent = new PythonModule("D", ImportType.FROM);
 		expectedModule = new PythonModule("E", "e", ImportType.ALIAS, expectedParent);
 		expectedModules.add(expectedModule);
-		verifyImports(dataDir + File.separator + file, expectedModules);
+		verifyImports(getPath(dataDir, file), expectedModules);
 	}
 	
 	/**
@@ -907,7 +907,7 @@ public class NotebookTest {
 		String dataDir = "test/data/modules";
 		String file = "nb_42.ipynb";
 		List<PythonModule> expectedModules = new ArrayList<PythonModule>(0);
-		verifyImports(dataDir + File.separator + file, expectedModules);
+		verifyImports(getPath(dataDir, file), expectedModules);
 	}
 	
 	/**
@@ -930,7 +930,7 @@ public class NotebookTest {
 		parentModule = new PythonModule("D", ImportType.FROM);
 		expectedModule = new AllModules(parentModule);
 		expectedModules.add(expectedModule);
-		verifyImports(dataDir + File.separator + file, expectedModules);
+		verifyImports(getPath(dataDir, file), expectedModules);
 	}
 	
 	/**
@@ -955,7 +955,7 @@ public class NotebookTest {
 		expectedModules.add(new PythonModule("function3b", ImportType.ORDINARY, parentModule));
 		parentModule = new PythonModule(".module4", ImportType.FROM);
 		expectedModules.add(new AllModules(parentModule));
-		verifyImports(dataDir + File.separator + file, expectedModules);
+		verifyImports(getPath(dataDir, file), expectedModules);
 	}
 	
 	/**
@@ -968,7 +968,7 @@ public class NotebookTest {
 		String dataDir = "test/data/modules";
 		String file = "nb_52.ipynb";
 		List<PythonModule> expectedModules = new ArrayList<PythonModule>(0);
-		verifyImports(dataDir + File.separator + file, expectedModules);
+		verifyImports(getPath(dataDir, file), expectedModules);
 	}
 	
 	/**
@@ -981,7 +981,7 @@ public class NotebookTest {
 		String file = "nb_53.ipynb";
 		PythonModule parent = new PythonModule("importlib", ImportType.FROM);
 		PythonModule expectedModule = new PythonModule("reload", ImportType.ORDINARY, parent);
-		verifyImport(dataDir + File.separator + file, expectedModule);
+		verifyImport(getPath(dataDir, file), expectedModule);
 	}
 	
 	/**
@@ -1048,7 +1048,7 @@ public class NotebookTest {
 		String dataDir = "test/data/modules";
 		String file = "nb_54.ipynb";
 		List<PythonModule> expectedModules = new ArrayList<PythonModule>(0);
-		verifyImports(dataDir + File.separator + file, expectedModules);
+		verifyImports(getPath(dataDir, file), expectedModules);
 	}
 	
 	/**
@@ -1059,7 +1059,7 @@ public class NotebookTest {
 		String dataDir = "test/data/modules";
 		String file = "nb_100.ipynb";
 		List<PythonModule> expectedModules = new ArrayList<PythonModule>(0);
-		verifyImports(dataDir + File.separator + file, expectedModules);
+		verifyImports(getPath(dataDir, file), expectedModules);
 	}
 	
 	/**
@@ -1070,7 +1070,7 @@ public class NotebookTest {
 		String dataDir = "test/data/modules";
 		String file = "nb_101.ipynb";
 		List<PythonModule> expectedModules = new ArrayList<PythonModule>(0);
-		verifyImports(dataDir + File.separator + file, expectedModules);
+		verifyImports(getPath(dataDir, file), expectedModules);
 	}
 	
 	/**
@@ -1133,6 +1133,11 @@ public class NotebookTest {
 		assertEquals("Wrong string representation of notebook", name, notebook.toString());
 	}
 	
+	/**
+	 * @param dir Name of directory
+	 * @param file Name of file
+	 * @return The path to file, which lives in dir 
+	 */
 	private String getPath(String dir, String file) {
 		return dir + File.separator + file;
 	}
