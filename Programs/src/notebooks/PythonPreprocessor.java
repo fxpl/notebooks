@@ -47,32 +47,6 @@ public class PythonPreprocessor {
 		code = result;
 	}
 	
-	/** TODO: Ta bort!
-	 * Remove all newlines that occur between brackets in the code handled by
-	 * the preprocessor. Different types of brackets can be used. Left and
-	 * right brackets are specified as arguments.
-	 * @param leftBracket Left bracket, e.g. '(' or '['
-	 * @param rightBracket Right bracket, e.g. ')' or ']'
-	 */
-	public void removeNewlinesInBrackets(char leftBracket, char rightBracket) {
-		String result = "";
-		int bracketLevel = 0;
-		int index = 0;
-		// Comments and strings are already removed
-		while (index < code.length()) {
-			if (leftBracket == code.charAt(index)) {
-				bracketLevel++;
-			} else if (rightBracket == code.charAt(index)) {
-				bracketLevel--;
-			} else if ('\n' == code.charAt(index) && 0 < bracketLevel) {
-				index++;
-				continue;
-			}
-			result += code.charAt(index++);
-		}
-		code = result;
-	}
-	
 	/**
 	 * Remove everything that should only be removed when it is not inside a
 	 * string, that is comments (starting with '#') and the newlines that occur
