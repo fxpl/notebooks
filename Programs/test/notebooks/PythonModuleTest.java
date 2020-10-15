@@ -2,7 +2,9 @@ package notebooks;
 
 import static org.junit.Assert.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -453,6 +455,104 @@ public class PythonModuleTest {
 		
 		assertEquals("Function from sub module registered.",
 				expectedFunctionUsages, moduleWithoutSub.functionUsages);
+	}
+	
+	@Test
+	public void testCallsTo_ordinary() {
+		PythonModule module = new PythonModule(name, ImportType.ORDINARY);
+		List<String> expectedCalls = new ArrayList<String>(1);
+		expectedCalls.add(name + ".f(x)");
+		List<String> calls = module.callsTo("f", name + ".f(x)");
+		assertEquals("Wrong call list returned for a simple call to function from ordinary module.",
+				expectedCalls, calls);
+	}
+	
+	@Test
+	public void testCallsTo_alias() {
+		PythonModule module = new PythonModule(name, alias, ImportType.ALIAS);
+		List<String> expectedCalls = new ArrayList<String>(1);
+		expectedCalls.add(alias + ".f(x)");
+		List<String> calls = module.callsTo("f", alias + ".f(x)");
+		assertEquals("Wrong call list returned for a simple call to function from alias module.",
+				expectedCalls, calls);
+	}
+	
+	@Test
+	public void testCallsTo_from() {
+		PythonModule parent = new PythonModule(name, ImportType.FROM);
+		PythonModule module = new PythonModule("f", ImportType.ORDINARY, parent);
+		List<String> expectedCalls = new ArrayList<String>(1);
+		expectedCalls.add("f(x)");
+		List<String> calls = module.callsTo("f", "f(x)");
+		assertEquals("Wrong call list returned for a simple call to function from from module.",
+				expectedCalls, calls);
+	}
+	
+	@Test
+	public void testCallsTo_fromOther() {
+		PythonModule parent = new PythonModule(name, ImportType.FROM);
+		PythonModule module = new PythonModule("f2", ImportType.ORDINARY, parent);
+		List<String> expectedCalls = new ArrayList<String>(0);
+		List<String> calls = module.callsTo("f", "f2(x)");
+		assertEquals("Wrong call list returned for a simple call to function from from module with other name.",
+				expectedCalls, calls);
+		calls = module.callsTo("f", "f(x)");
+		assertEquals("Wrong call list returned for a simple call to function from from module with other name.",
+				expectedCalls, calls);
+	}
+	
+	@Test
+	public void testCallsTo_nested() {
+		PythonModule parent = new PythonModule(name, ImportType.FROM);
+		PythonModule module = new PythonModule("f", ImportType.ORDINARY, parent);
+		List<String> expectedCalls = new ArrayList<String>(2);
+		expectedCalls.add("f(a, f(x), b)");
+		expectedCalls.add("f(x)");
+		List<String> calls = module.callsTo("f", "f(a, f(x), b)");
+		assertEquals("Wrong call list returned for nested function call",
+				expectedCalls, calls);
+	}
+	
+	@Test
+	public void testCallsTo_otherNested() {
+		PythonModule parent = new PythonModule(name, ImportType.FROM);
+		PythonModule module = new PythonModule("f", ImportType.ORDINARY, parent);
+		List<String> expectedCalls = new ArrayList<String>(1);
+		expectedCalls.add("f(a, f2(x), b)");
+		List<String> calls = module.callsTo("f", "f(a, f2(x), b)");
+		assertEquals("Wrong call list returned for call with nested function call",
+				expectedCalls, calls);
+	}
+	
+	@Test
+	public void testCallsTo_nestedInOther() {
+		PythonModule parent = new PythonModule(name, ImportType.FROM);
+		PythonModule module = new PythonModule("f", ImportType.ORDINARY, parent);
+		List<String> expectedCalls = new ArrayList<String>(1);
+		expectedCalls.add("f(x)");
+		List<String> calls = module.callsTo("f", "f2(a, f(x), b)");
+		assertEquals("Wrong call list returned for call nested in another function call",
+				expectedCalls, calls);
+	}
+	
+	@Test
+	public void testCallsTo_bracketsInStrings() {
+		PythonModule module = new PythonModule(name, ImportType.ORDINARY);
+		List<String> expectedCalls = new ArrayList<String>(1);
+		expectedCalls.add(name + ".f(\"(\", ')', '(', \"()\")");
+		List<String> calls = module.callsTo("f", name + ".f(\"(\", ')', '(', \"()\")");
+		assertEquals("Wrong call list returned for call with brackets in strings.",
+				expectedCalls, calls);
+	}
+	
+	@Test
+	public void testCallsTo_escapedQuotes() {
+		PythonModule module = new PythonModule(name, ImportType.ORDINARY);
+		List<String> expectedCalls = new ArrayList<String>(1);
+		expectedCalls.add(name + ".f(\"\\\"(\", '(\\'')");
+		List<String> calls = module.callsTo("f", name + ".f(\"\\\"(\", '(\\'')");
+		assertEquals("Wrong call list returned for call with strings containing both brackets and qoutes.",
+				expectedCalls, calls);
 	}
 	
 	@Test

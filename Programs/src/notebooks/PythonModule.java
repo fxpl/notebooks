@@ -1,6 +1,8 @@
 package notebooks;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
@@ -143,7 +145,7 @@ public class PythonModule {
 	 */
 	public void registerUsage(String line) {
 		// Usages of functions located in an imported module
-		Pattern usagePattern = Pattern.compile(
+		Pattern usagePattern = Pattern.compile(	// TODO: Metod för uttryck?
 				"(?<!\\.)" + this.qualifier() + "\\s*\\.\\s*(" + IDENTIFIER + ")\\s*\\(");
 		Matcher usageMatcher = usagePattern.matcher(line);
 		while (usageMatcher.find()) {
@@ -158,6 +160,66 @@ public class PythonModule {
 				Utils.addOrIncrease(functionUsages, name);
 			}
 		}
+	}
+	
+	/**
+	 * @param functionName Function for which to count calls
+	 * @param line Code line to look for calls in
+	 * @return A list of calls to functionName in line
+	 */
+	public List<String> callsTo(String functionName, String line) {
+		List<String> result = new ArrayList<String>(1);
+		// Usages of functions located in an imported module
+		Pattern usagePattern = Pattern.compile(
+				"(?<!\\.)" + this.qualifier() + "\\s*\\.\\s*(" + functionName + ")\\s*\\(");
+		Matcher usageMatcher = usagePattern.matcher(line);
+		result.addAll(extractFunctionCall(usageMatcher, line));
+		
+		// Usages of imported function (only possible with from imports)
+		if (null != parent && ImportType.FROM == parent.importedWith && functionName.equals(this.qualifier())) {
+			usagePattern = Pattern.compile("(?<!\\.)" + this.qualifier() + "\\s*\\(");
+			usageMatcher = usagePattern.matcher(line);
+			result.addAll(extractFunctionCall(usageMatcher, line));
+		}
+		
+		return result;
+	}
+
+	private List<String> extractFunctionCall(Matcher usageMatcher, String line) {
+		List<String> result = new ArrayList<String>(1);	// Most of the times, there will only be 1 call/line(?)
+		// Comments are removed, but strings may exist
+		while (usageMatcher.find()) {
+			boolean bracketFound = false;
+			boolean escaped = false;
+			int bracketLevel = 0;
+			boolean inDoubleQuoteString = false;
+			boolean inSingleQuoteString = false;
+			int index = usageMatcher.start();
+			String call = "";
+			while (!bracketFound || 0 != bracketLevel) {
+				boolean inString = inDoubleQuoteString || inSingleQuoteString;
+				char currentChar = line.charAt(index);
+				call += currentChar;
+				if (!escaped && '"' == currentChar) {
+					inDoubleQuoteString = !inDoubleQuoteString;
+				} else if (!escaped && '\'' == currentChar) {
+					inSingleQuoteString = !inSingleQuoteString;
+				} else if (!inString && '(' == currentChar) {
+					bracketFound = true;
+					bracketLevel++;
+				} else if (!inString && ')' == currentChar) {
+					bracketLevel--;
+				}
+				if ('\\' == currentChar) {
+					escaped = !escaped;
+				} else {
+					escaped = false;
+				}
+				index++;
+			}
+			result.add(call);
+		}
+		return result;
 	}
 	
 	public void setOldestAncestor(PythonModule ancestor) {
