@@ -635,23 +635,11 @@ public class NotebookAnalyzer extends Analyzer {
 	 * @throws IOException On problems with handling the output file
 	 */
 	List<List<PythonModule>> listModules() throws IOException {
-		List<Callable<Language>> languageTasks
-			= new ArrayList<Callable<Language>>(notebooks.size());
-		for (Notebook notebook: notebooks) {
-			languageTasks.add(new LanguageExtractor(notebook));
-		}
-		List<Future<Language>> languages = ThreadExecutor.getInstance().invokeAll(languageTasks);
-
-		List<Notebook> pythonNotebooks = new ArrayList<Notebook>();
+		List<Notebook> pythonNotebooks = getPythonNotebooks();
 		List<Callable<List<PythonModule>>> moduleTasks
 			= new ArrayList<Callable<List<PythonModule>>>();
-		for (int i=0; i<notebooks.size(); i++) {
-			Notebook notebook = notebooks.get(i);
-			LangName langName = getLanguage(languages.get(i), notebook).getName();
-			if (LangName.PYTHON == langName) {
-				pythonNotebooks.add(notebook);
-				moduleTasks.add(new ModulesIdentifier(notebook));
-			}
+		for (Notebook notebook: pythonNotebooks) {
+			moduleTasks.add(new ModulesIdentifier(notebook));
 		}
 		List<Future<List<PythonModule>>> modules = ThreadExecutor.getInstance().invokeAll(moduleTasks);
 		
@@ -663,6 +651,28 @@ public class NotebookAnalyzer extends Analyzer {
 		}
 		writer.close();
 		return result;
+	}
+	
+	/**
+	 * @return A list of all Python notebooks in the corpus
+	 */
+	private List<Notebook> getPythonNotebooks() {
+		List<Callable<Language>> languageTasks
+			= new ArrayList<Callable<Language>>(notebooks.size());
+		for (Notebook notebook: notebooks) {
+			languageTasks.add(new LanguageExtractor(notebook));
+		}
+		List<Future<Language>> languages = ThreadExecutor.getInstance().invokeAll(languageTasks);
+	
+		List<Notebook> pythonNotebooks = new ArrayList<Notebook>();
+		for (int i=0; i<notebooks.size(); i++) {
+			Notebook notebook = notebooks.get(i);
+			LangName langName = getLanguage(languages.get(i), notebook).getName();
+			if (LangName.PYTHON == langName) {
+				pythonNotebooks.add(notebook);
+			}
+		}
+		return pythonNotebooks;
 	}
 
 	/**
