@@ -985,7 +985,8 @@ public class NotebookTest {
 	}
 	
 	/**
-	 * Verify that modules and aliases containing Swedish letters are handled correctly
+	 * Verify that modules and aliases containing Swedish letters are handled
+	 * correctly
 	 */
 	@Test
 	public void testImportSwedish() {
@@ -996,7 +997,8 @@ public class NotebookTest {
 	}
 	
 	/**
-	 * Verify that modules and aliases containing Chinese letters are handled correctly
+	 * Verify that modules and aliases containing Chinese letters are handled
+	 * correctly
 	 */
 	@Test
 	public void testImportChinese() {
@@ -1007,7 +1009,8 @@ public class NotebookTest {
 	}
 	
 	/**
-	 * Verify that modules and aliases containing Cyrillic letters are handled correctly
+	 * Verify that modules and aliases containing Cyrillic letters are handled
+	 * correctly
 	 */
 	@Test
 	public void testImportCyrrilic() {
@@ -1018,7 +1021,8 @@ public class NotebookTest {
 	}
 	
 	/**
-	 * Verify that modules and aliases containing Greek letters are handled correctly
+	 * Verify that modules and aliases containing Greek letters are handled
+	 * correctly
 	 */
 	@Test
 	public void testImportGreek() {
@@ -1029,13 +1033,26 @@ public class NotebookTest {
 	}
 	
 	/**
-	 * Verify that modules and aliases containing combining marks are handled correctly
+	 * Verify that modules and aliases containing combining marks are handled
+	 * correctly
 	 */
 	@Test
 	public void testImportCombining() {
 		String dataDir = "test/data/modules";
 		String file = "nb_64.ipynb";
 		PythonModule expectedModule = new PythonModule("modulé", "àpa", ImportType.ALIAS);
+		verifyImport(getPath(dataDir, file), expectedModule);
+	}
+	
+	/**
+	 * Verify that modules and aliases whose name start with "_" are handled
+	 * correctly.
+	 */
+	@Test
+	public void testImport_() {
+		String dataDir = "test/data/modules";
+		String file = "nb_65.ipynb";
+		PythonModule expectedModule = new PythonModule("__module__", "__alias__", ImportType.ALIAS);
 		verifyImport(getPath(dataDir, file), expectedModule);
 	}
 	
