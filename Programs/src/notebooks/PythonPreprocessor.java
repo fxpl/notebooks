@@ -30,8 +30,14 @@ public class PythonPreprocessor {
 	public void removeEscapedNewLines() {
 		String result = "";
 		int index = 0;
+		boolean escaped = false;
 		while (index < code.length()-1) {
-			if ('\\' == code.charAt(index) && '\n' == code.charAt(index+1)) {
+			if ('\\' == code.charAt(index)) {
+				escaped = !escaped;
+			} else {
+				escaped = false;
+			}
+			if (escaped && '\n' == code.charAt(index+1)) {
 				index += 2;
 				result += ' ';
 			} else {
@@ -41,7 +47,7 @@ public class PythonPreprocessor {
 		code = result;
 	}
 	
-	/**
+	/** TODO: Ta bort!
 	 * Remove all newlines that occur between brackets in the code handled by
 	 * the preprocessor. Different types of brackets can be used. Left and
 	 * right brackets are specified as arguments.
@@ -94,14 +100,14 @@ public class PythonPreprocessor {
 		int index = 0;
 		int bracketLevel = 0;
 		boolean[] inString = new boolean[numDelimiters];
+		boolean escaped = false;
 		for (int i=0; i<numDelimiters; i++) {
 			inString[i] = false;
 		}
-		char previous = ' ';
 		while (index < code.length()) {
 			char current = code.charAt(index);
 			if (!anyTrue(inString)) { // We are not inside a string. Do clean.
-				if('#' == current && '\\' != previous) {
+				if('#' == current && !escaped) {
 					while ('\n' != code.charAt(++index));
 				} else if ('(' == current) {
 					bracketLevel++;
@@ -114,13 +120,17 @@ public class PythonPreprocessor {
 			}
 			// Keep track of whether we are inside a string
 			for (int i=0; i<numDelimiters; i++) {
-				if (!otherTrue(inString, i) && delimiterPositions.get(i).contains(index) && '\\' != previous) {
+				if (!otherTrue(inString, i) && delimiterPositions.get(i).contains(index) && !escaped) {
 					inString[i] = !inString[i];
 				}
 			}
 			result += code.charAt(index);
+			if ('\\' == current) {
+				escaped = !escaped;
+			} else {
+				escaped = false;
+			}
 			index++;
-			previous = current;
 		}
 		code = result;
 	}

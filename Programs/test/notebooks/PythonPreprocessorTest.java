@@ -101,6 +101,15 @@ public class PythonPreprocessorTest {
 	}
 	
 	@Test
+	public void testProcess_escapedEscapedNewLine() {
+		String[] strings = {"abc\\\\\n", "def\n"};
+		List<String> expectedOutput = new ArrayList<String>(2);
+		expectedOutput.add("abc\\\\\n");
+		expectedOutput.add("def\n");
+		processAndCheck(strings, expectedOutput);
+	}
+	
+	@Test
 	public void testProcess_escapedNewlineInString() {
 		String[] strings = {"\"Some string with\\\ninside\"\n"};
 		List<String> expectedOutput = new ArrayList<String>(1);
@@ -109,7 +118,7 @@ public class PythonPreprocessorTest {
 	}
 	
 	@Test
-	public void testProcess_excapedNewlineInComment() {
+	public void testProcess_escapedNewlineInComment() {
 		String[] strings = {"abc#\\\n", "def\n"};
 		List<String> expectedOutput = new ArrayList<String>(2);
 		expectedOutput.add("abc\n");
@@ -164,6 +173,24 @@ public class PythonPreprocessorTest {
 		String[] strings = {"import pytz   pytz.timezone('US/Eastern')\n"};
 		List<String> expectedOutput = new ArrayList<String>(1);
 		expectedOutput.add("import pytz   pytz.timezone('US/Eastern')\n");
+		processAndCheck(strings, expectedOutput);
+	}
+	
+	@Test
+	public void testProcess_escapedBackslash() {
+		String[] strings = {"sys.path.insert(0, 'D:\\\\\\\\GitHub\\\\\\\\workspace\\\\\\\\A2_ContactAngle\\\\\\\\')\n",
+				"import main # getContactAngle main\n"};
+		List<String> expectedOutput = new ArrayList<String>(2);
+		expectedOutput.add("sys.path.insert(0, 'D:\\\\\\\\GitHub\\\\\\\\workspace\\\\\\\\A2_ContactAngle\\\\\\\\')\n");
+		expectedOutput.add("import main \n");
+		processAndCheck(strings, expectedOutput);
+	}
+	
+	@Test
+	public void testProcess_someThingElseEscaped() {
+		String[] strings = {"abc\\\" #def\n"};
+		List<String> expectedOutput = new ArrayList<String>(1);
+		expectedOutput.add("abc\\\" \n");
 		processAndCheck(strings, expectedOutput);
 	}
 
