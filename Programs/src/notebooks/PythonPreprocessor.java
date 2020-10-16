@@ -54,101 +54,44 @@ public class PythonPreprocessor {
 	 * @param delimiters Existing string delimiters. I a delimiter a is a substring of a delimiter b, b must precede a in the array.
 	 */
 	public void removeOutsideString(String[] delimiters) {
-		// Find positions of delimiters
-		int numDelimiters = delimiters.length;
-		List<List<Integer>> delimiterPositions = new ArrayList<List<Integer>>(numDelimiters);
-		for (int i=0; i<numDelimiters; i++) {
-			delimiterPositions.add(new ArrayList<Integer>());
-		}
-		for (int i=0; i<code.length(); i++) {
-			for (int d=0; d<numDelimiters; d++) {
-				if (charSequenceFound(code, i, delimiters[d])) {
-					delimiterPositions.get(d).add(i);
-					break;
-				}
-			}
-		}
+		CodeState state = new CodeState(code, delimiters);
 		
-		// Do the actual cleaning
 		String result = "";
-		int index = 0;
 		int bracketLevel = 0;
-		boolean[] inString = new boolean[numDelimiters];
-		boolean escaped = false;
-		for (int i=0; i<numDelimiters; i++) {
-			inString[i] = false;
-		}
-		while (index < code.length()) {
-			char current = code.charAt(index);
-			if (!anyTrue(inString)) { // We are not inside a string. Do clean.
-				if('#' == current && !escaped) {
-					while ('\n' != code.charAt(++index));
+		while (state.inCode()) {
+			char current = state.currentChar();
+			if (!state.inString()) { // We are not inside a string. Do clean.
+				if('#' == current && !state.escaped()) {
+					state.stepPast('\n');
 				} else if ('(' == current) {
 					bracketLevel++;
 				} else if (')' == current) {
 					bracketLevel--;
-				} else if ('\n' == code.charAt(index) && 0 < bracketLevel) {
-					index++;
+				} else if ('\n' == current && 0 < bracketLevel) {
+					state.stepPast();
 					continue;
 				}
 			}
-			// Keep track of whether we are inside a string
-			for (int i=0; i<numDelimiters; i++) {
-				if (!otherTrue(inString, i) && delimiterPositions.get(i).contains(index) && !escaped) {
-					inString[i] = !inString[i];
-				}
-			}
-			result += code.charAt(index);
-			if ('\\' == current) {
-				escaped = !escaped;
-			} else {
-				escaped = false;
-			}
-			index++;
+			result += state.currentChar();
+			state.step();
 		}
 		code = result;
 	}
 	
 	/**
-	 * @param str String to check
-	 * @param pos An index in the string
-	 * @param seq Char sequence to look for
-	 * @return true if the specified char sequence can be found at position pos in str
+	 * Remove strings that are enclosed by the specified delimiters from the
+	 * code handled by the preprocessor
 	 */
-	private static boolean charSequenceFound(String str, int pos, String seq) {
-		for (int i=0; i<seq.length(); i++) {
-			if (pos+i >= str.length() || str.charAt(pos+i) != seq.charAt(i)) {
-				return false;
+	public void removeStrings(String[] delimiters) {
+		CodeState state = new CodeState(code, delimiters);
+		String result = "";
+		while (state.inCode()) {
+			if (!state.inString() && !state.atDelimiter()) {
+				result += state.currentChar();
 			}
+			state.step();
 		}
-		return true;
-	}	
-	
-	/**
-	 * @param bools Array of booleans
-	 * @return true if any of the values in the argument is true
-	 */
-	private static boolean anyTrue(boolean[] bools) {
-		for (boolean inside: bools) {
-			if (inside) {
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	/**
-	 * @param bools Array of booleans
-	 * @param current Value to skip
-	 * @return true if any of the values in bool, except bool[current], is true
-	 */
-	private static boolean otherTrue(boolean[] bool, int current) {
-		for (int i=0; i<bool.length; i++) {
-			if (bool[i] && i != current) {
-				return true;
-			}
-		}
-		return false;
+		code = result;
 	}
 	
 	/**
@@ -171,7 +114,8 @@ public class PythonPreprocessor {
 	 * @return A list of sub lines
 	 */
 	public List<String> process() {
-		removeOutsideString(new String[]{"\"\"\"", "'''", "\"", "'"});
+		removeStrings(new String[] {"\"\"\"", "'''"});
+		removeOutsideString(new String[]{"\"", "'"});
 		removeEscapedNewLines();
 		splitCode();
 		return processed;
