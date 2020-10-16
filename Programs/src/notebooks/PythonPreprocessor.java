@@ -56,7 +56,6 @@ public class PythonPreprocessor {
 	public void removeOutsideString(String[] delimiters) {
 		CodeState state = new CodeState(code, delimiters);
 		
-		// Do the actual cleaning
 		String result = "";
 		int bracketLevel = 0;
 		while (state.inCode()) {
@@ -74,6 +73,22 @@ public class PythonPreprocessor {
 				}
 			}
 			result += state.currentChar();
+			state.step();
+		}
+		code = result;
+	}
+	
+	/**
+	 * Remove strings that are enclosed by the specified delimiters from the
+	 * code handled by the preprocessor
+	 */
+	public void removeStrings(String[] delimiters) {
+		CodeState state = new CodeState(code, delimiters);
+		String result = "";
+		while (state.inCode()) {
+			if (!state.inString() && !state.atDelimiter()) {
+				result += state.currentChar();
+			}
 			state.step();
 		}
 		code = result;
@@ -99,7 +114,8 @@ public class PythonPreprocessor {
 	 * @return A list of sub lines
 	 */
 	public List<String> process() {
-		removeOutsideString(new String[]{"\"\"\"", "'''", "\"", "'"});
+		removeStrings(new String[] {"\"\"\"", "'''"});
+		removeOutsideString(new String[]{"\"", "'"});
 		removeEscapedNewLines();
 		splitCode();
 		return processed;

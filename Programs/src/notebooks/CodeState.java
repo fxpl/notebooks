@@ -5,23 +5,38 @@ import java.util.List;
 
 public class CodeState {
 	String code;
-	String[] delimiters;
-	List<List<Integer>> delimiterPositions;
+	String[] stringDelimiters;
+	List<List<Integer>> stringDelimiterPositions;
 	boolean[] inString;
 	boolean escaped;
 	int index;
 	
-	public CodeState(String code, String[] delimiters) {
+	public CodeState(String code, String[] stringDelimiters) {
 		this.code = code;
-		this.delimiters = delimiters;
-		delimiterPositions = delimiterPositions();
+		this.stringDelimiters = stringDelimiters;
+		stringDelimiterPositions = delimiterPositions();
 		
 		escaped = false;
-		inString = new boolean[delimiters.length];
-		for (int i=0; i<delimiters.length; i++) {
+		inString = new boolean[stringDelimiters.length];
+		for (int i=0; i<stringDelimiters.length; i++) {
 			inString[i] = false;
 		}
 		index = 0;
+	}
+	
+	/**
+	 * @return True if the current character is a string delimiter, false otherwise
+	 */
+	public boolean atDelimiter() {
+		for (int i=0; i<stringDelimiterPositions.size(); i++) {
+			int delimiterLength = stringDelimiters[i].length();
+			for (int position: stringDelimiterPositions.get(i)) {
+				if (index >= position && index < position+delimiterLength) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 	
 	/**
@@ -57,8 +72,8 @@ public class CodeState {
 	 */
 	public void step() {
 		// Keep track of whether we are inside a string
-		for (int i=0; i<delimiters.length; i++) {
-			if (!otherTrue(inString, i) && delimiterPositions.get(i).contains(index) && !escaped) {
+		for (int i=0; i<stringDelimiters.length; i++) {
+			if (!otherTrue(inString, i) && stringDelimiterPositions.get(i).contains(index) && !escaped) {
 				inString[i] = !inString[i];
 			}
 		}
@@ -122,14 +137,14 @@ public class CodeState {
 	 * @return
 	 */
 	private List<List<Integer>> delimiterPositions() {
-		int numDelimiters = delimiters.length;
+		int numDelimiters = stringDelimiters.length;
 		List<List<Integer>> result = new ArrayList<List<Integer>>(numDelimiters);
 		for (int i=0; i<numDelimiters; i++) {
 			result.add(new ArrayList<Integer>());
 		}
 		for (int i=0; i<code.length(); i++) {
 			for (int d=0; d<numDelimiters; d++) {
-				if (charSequenceFound(code, i, delimiters[d])) {
+				if (charSequenceFound(code, i, stringDelimiters[d])) {
 					result.get(d).add(i);
 					break;
 				}
