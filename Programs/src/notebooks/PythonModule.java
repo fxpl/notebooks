@@ -187,35 +187,22 @@ public class PythonModule {
 
 	private List<String> extractFunctionCall(Matcher usageMatcher, String line) {
 		List<String> result = new ArrayList<String>(1);	// Most of the times, there will only be 1 call/line(?)
-		// Comments are removed, but strings may exist
 		while (usageMatcher.find()) {
+			CodeState state = new CodeState(line, usageMatcher.start(), new String[]{"\"", "'"});
 			boolean bracketFound = false;
-			boolean escaped = false;
 			int bracketLevel = 0;
-			boolean inDoubleQuoteString = false;
-			boolean inSingleQuoteString = false;
-			int index = usageMatcher.start();
 			String call = "";
 			while (!bracketFound || 0 != bracketLevel) {
-				boolean inString = inDoubleQuoteString || inSingleQuoteString;
-				char currentChar = line.charAt(index);
-				call += currentChar;
-				if (!escaped && '"' == currentChar) {
-					inDoubleQuoteString = !inDoubleQuoteString;
-				} else if (!escaped && '\'' == currentChar) {
-					inSingleQuoteString = !inSingleQuoteString;
-				} else if (!inString && '(' == currentChar) {
+				char currentChar = state.currentChar();
+				// Comments are removed in preprocessing, but strings may still exist
+				if (!state.inString() && '(' == currentChar) {
 					bracketFound = true;
 					bracketLevel++;
-				} else if (!inString && ')' == currentChar) {
+				} else if (!state.inString() && ')' == currentChar) {
 					bracketLevel--;
 				}
-				if ('\\' == currentChar) {
-					escaped = !escaped;
-				} else {
-					escaped = false;
-				}
-				index++;
+				call += currentChar;
+				state.step();
 			}
 			result.add(call);
 		}

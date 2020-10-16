@@ -4,14 +4,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CodeState {
-	String code;
-	String[] stringDelimiters;
-	List<List<Integer>> stringDelimiterPositions;
-	boolean[] inString;
-	boolean escaped;
-	int index;
+	private String code;
+	private String[] stringDelimiters;
+	private List<List<Integer>> stringDelimiterPositions;
+	private boolean[] inString;
+	private boolean escaped;
+	private int index;
 	
 	public CodeState(String code, String[] stringDelimiters) {
+		this(code, 0, stringDelimiters);
+	}
+	
+	public CodeState(String code, int startIndex, String[] stringDelimiters) {
 		this.code = code;
 		this.stringDelimiters = stringDelimiters;
 		stringDelimiterPositions = delimiterPositions();
@@ -21,7 +25,7 @@ public class CodeState {
 		for (int i=0; i<stringDelimiters.length; i++) {
 			inString[i] = false;
 		}
-		index = 0;
+		index = startIndex;
 	}
 	
 	/**
