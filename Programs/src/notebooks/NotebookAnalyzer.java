@@ -647,7 +647,11 @@ public class NotebookAnalyzer extends Analyzer {
 		Writer writer = new FileWriter(outputDir + "/modules" + LocalDateTime.now() + ".csv");
 		writer.write(modulesHeader());
 		for (int i=0; i<modules.size(); i++) {
-			result.add(i, writeModuleLine(modules.get(i), pythonNotebooks.get(i), writer));
+			Notebook notebook = pythonNotebooks.get(i);
+			if (0 == i%10000) {
+				Utils.heartBeat("Identifying modules in " + notebook.getName());
+			}
+			result.add(i, writeModuleLine(modules.get(i), notebook, writer));
 		}
 		writer.close();
 		return result;
