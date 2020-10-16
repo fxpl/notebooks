@@ -143,6 +143,22 @@ public class PythonPreprocessorTest {
 	}
 	
 	@Test
+	public void testProcess_newLinesInBracketAfterCommentAndString() {
+		String[] strings = {
+				"#This is a comment.\n",
+				"a = \"mu\"\n",
+				"function(a, \n",
+				"b, c\n",
+				")\n"
+		};
+		List<String> expectedOutput = new ArrayList<String>(3);
+		expectedOutput.add("\n");
+		expectedOutput.add("a = \"mu\"\n");
+		expectedOutput.add("function(a, b, c)\n");
+		processAndCheck(strings, expectedOutput);
+	}
+	
+	@Test
 	public void testProcess_newLineInDifferentBrackets() {
 		String[] strings = {
 				"function(a,\n",
