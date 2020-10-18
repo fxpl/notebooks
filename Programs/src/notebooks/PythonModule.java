@@ -186,26 +186,26 @@ public class PythonModule {
 		Pattern usagePattern = Pattern.compile(
 				"(?<!\\.)" + this.qualifier() + "\\s*\\.\\s*(" + functionName + ")\\s*\\(");
 		Matcher usageMatcher = usagePattern.matcher(line);
-		result.addAll(extractFunctionCall(usageMatcher, line));
+		result.addAll(extractFunctionCalls(usageMatcher, line));
 		
 		// Usages of imported function (only possible with from imports)
 		if (null != parent && ImportType.FROM == parent.importedWith && functionName.equals(this.qualifier())) {
-			// TODO: Inte heller punkt med blank efter före qualifier
+			// TODO: Inte heller punkt med blank efter punkt, före qualifier
 			usagePattern = Pattern.compile("(?<!\\.)" + this.qualifier() + "\\s*\\(");
 			usageMatcher = usagePattern.matcher(line);
-			result.addAll(extractFunctionCall(usageMatcher, line));
+			result.addAll(extractFunctionCalls(usageMatcher, line));
 		}
 		
 		return result;
 	}
 
-	private static List<String> extractFunctionCall(Matcher usageMatcher, String line) {
+	protected static List<String> extractFunctionCalls(Matcher usageMatcher, String line) {
 		List<String> result = new ArrayList<String>(1);	// Most of the times, there will only be 1 call/line(?)
 		while (usageMatcher.find()) {
 			CodeState state = new CodeState(line, usageMatcher.start(), new String[]{"\"", "'"});
 			boolean bracketFound = false;
 			int bracketLevel = 0;
-			String call = "";
+			String call = "";	// TODO: Trimma!?
 			while (!bracketFound || 0 != bracketLevel) {
 				if (!state.inCode()) {
 					// We have stepped outside the line without finding the expected parantheses.

@@ -4,7 +4,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.Before;
@@ -135,6 +137,30 @@ public class AllModulesTest {
 		
 		assertEquals("Incorrect call to sub module identified as function call.",
 				expectedFunctionUsages, matplotFunctions.functionUsages);
+	}
+	
+	@Test
+	public void testCallsTo() {
+		PythonModule mathModule = new PythonModule("math", ImportType.FROM);
+		PythonModule mathFunctions = new AllModules(mathModule);
+		
+		List<String> expectedCalls = new ArrayList<String>(2);
+		expectedCalls.add(" sin(x)");
+		expectedCalls.add(" sin( y )");
+		
+		List<String> calls = mathFunctions.callsTo("sin", "a = sin(x) + cos(y) - tan(z) + sin( y )");
+		assertEquals("Wrong call list returned!", expectedCalls, calls);
+	}
+	
+	@Test
+	public void testCallsTo_noMatch() {
+		PythonModule mathModule = new PythonModule("math", ImportType.FROM);
+		PythonModule mathFunctions = new AllModules(mathModule);
+		
+		List<String> expectedCalls = new ArrayList<String>(0);
+		
+		List<String> calls = mathFunctions.callsTo("sin", "a = otherModule.sin(2)");
+		assertEquals("Calls returned when abscent.", expectedCalls, calls);
 	}
 	
 	@Test

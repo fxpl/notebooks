@@ -3,7 +3,9 @@ package notebooks;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -48,13 +50,39 @@ public class AllModules extends PythonModule {
 	
 	@Override
 	public void registerUsage(String line) {
+		storeFunctionsIfNotDone();
+		String parentModule = parent.pedigreeString();
+		if (functionsInModules.containsKey(parentModule)) {
+			// Functions stored successfully
+			storeFunctionUsages(line);
+		}
+	}
+	
+	/**
+	 * @param functionName Function for which to count calls
+	 * @param line Code line to look for calls in
+	 * @return A list of calls to functionName in line
+	 */
+	@Override
+	public List<String> callsTo(String functionName, String line) {
+		storeFunctionsIfNotDone();
+		List<String> result = new ArrayList<String>(1);
+		String[] functionsInModule = functionsInModules.get(parent.pedigreeString());
+		for (String function: functionsInModule) {
+			if (function.equals(functionName)) {
+				Pattern usagePattern = Pattern.compile("(?<!\\.)\\s*(" + function + ")\\s*\\(");
+				Matcher usageMatcher = usagePattern.matcher(line);
+				result.addAll(extractFunctionCalls(usageMatcher, line));
+			}
+		}
+		return result;
+	}
+	
+	private void storeFunctionsIfNotDone() {
 		String parentModule = parent.pedigreeString();
 		if (!functionsInModules.containsKey(parentModule)) {
 			String scriptPath = locateFileInClassPath("importscript.py");
 			storeFunctionsFor(parentModule, scriptPath);
-		}
-		if (functionsInModules.containsKey(parentModule)) {
-			storeFunctionUsages(line);
 		}
 	}
 
