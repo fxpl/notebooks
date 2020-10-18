@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class AllModules extends PythonModule {
 	
@@ -70,8 +69,7 @@ public class AllModules extends PythonModule {
 		String[] functionsInModule = functionsInModules.get(parent.pedigreeString());
 		for (String function: functionsInModule) {
 			if (function.equals(functionName)) {
-				Pattern usagePattern = Pattern.compile("(?<!\\.)\\s*(" + function + ")\\s*\\(");
-				Matcher usageMatcher = usagePattern.matcher(line);
+				Matcher usageMatcher = functionCallMatcher(functionName, line);
 				result.addAll(extractFunctionCalls(usageMatcher, line));
 			}
 		}
@@ -98,8 +96,7 @@ public class AllModules extends PythonModule {
 	private void storeFunctionUsages(String line) {
 		String[] functionsInModule = functionsInModules.get(parent.pedigreeString());
 		for (String function: functionsInModule) {
-			Pattern usagePattern = Pattern.compile("(?<!\\.)\\s*(" + function + ")\\s*\\(");
-			Matcher usageMatcher = usagePattern.matcher(line);
+			Matcher usageMatcher = functionCallMatcher(function, line);
 			while (usageMatcher.find()) {
 				Utils.addOrIncrease(functionUsages, usageMatcher.group(1));
 			}

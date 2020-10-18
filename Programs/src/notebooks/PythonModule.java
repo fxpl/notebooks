@@ -158,21 +158,43 @@ public class PythonModule {
 	 */
 	public void registerUsage(String line) {
 		// Usages of functions located in an imported module
-		Pattern usagePattern = Pattern.compile(	// TODO: Metod för uttryck?
-				"(?<!\\.)" + this.qualifier() + "\\s*\\.\\s*(" + IDENTIFIER + ")\\s*\\(");
-		Matcher usageMatcher = usagePattern.matcher(line);
+		Matcher usageMatcher = functionInModuleCallMatcher(IDENTIFIER, line);
 		while (usageMatcher.find()) {
 			Utils.addOrIncrease(functionUsages, usageMatcher.group(1));
 		}
 		
 		// Usages of imported function (only possible with from imports)
 		if (null != parent && ImportType.FROM == parent.importedWith) {
-			usagePattern = Pattern.compile("(?<!\\.)\\s*" + this.qualifier() + "\\s*\\(");
-			usageMatcher = usagePattern.matcher(line);
+			usageMatcher = functionCallMatcher(this.qualifier(), line);
 			while (usageMatcher.find()) {
 				Utils.addOrIncrease(functionUsages, name);
 			}
 		}
+	}
+
+	/**
+	 * Return a matcher for a call to functionName, not preceded with a module
+	 * name, and line.
+	 * @param functionName Name of the function that we want to find calls to
+	 * @param line Line to match against the function call
+	 * @return The matcher described above
+	 */
+	protected Matcher functionCallMatcher(String functionName, String line) {
+		Pattern usagePattern = Pattern.compile("(?<!\\.)(" + functionName + ")\\s*\\(");
+		return usagePattern.matcher(line);
+	}
+	
+	/**
+	 * Return a matcher for a call to functionName, preceded with the qualifier
+	 * of the current module, and line.
+	 * @param functionName Name of the function that we want to find calls to
+	 * @param line Line to match against the function call
+	 * @return The matcher described above
+	 */
+	protected Matcher functionInModuleCallMatcher (String functionName, String line) {
+		Pattern usagePattern = Pattern.compile(
+				"(?<!\\.)" + this.qualifier() + "\\s*\\.\\s*(" + functionName + ")\\s*\\(");
+		return usagePattern.matcher(line);
 	}
 	
 	/**
@@ -183,16 +205,12 @@ public class PythonModule {
 	public List<String> callsTo(String functionName, String line) {
 		List<String> result = new ArrayList<String>(1);
 		// Usages of functions located in an imported module
-		Pattern usagePattern = Pattern.compile(
-				"(?<!\\.)" + this.qualifier() + "\\s*\\.\\s*(" + functionName + ")\\s*\\(");
-		Matcher usageMatcher = usagePattern.matcher(line);
+		Matcher usageMatcher = functionInModuleCallMatcher(functionName, line);
 		result.addAll(extractFunctionCalls(usageMatcher, line));
 		
 		// Usages of imported function (only possible with from imports)
 		if (null != parent && ImportType.FROM == parent.importedWith && functionName.equals(this.qualifier())) {
-			// TODO: Inte heller punkt med blank efter punkt, före qualifier
-			usagePattern = Pattern.compile("(?<!\\.)" + this.qualifier() + "\\s*\\(");
-			usageMatcher = usagePattern.matcher(line);
+			usageMatcher = functionCallMatcher(functionName, line);
 			result.addAll(extractFunctionCalls(usageMatcher, line));
 		}
 		
