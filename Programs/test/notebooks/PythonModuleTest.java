@@ -277,6 +277,36 @@ public class PythonModuleTest {
 	}
 	
 	@Test
+	public void testParentIs_same() {
+		PythonModule parent = new PythonModule(parentModuleName);
+		assertTrue("Parent considered different than corresponding module!", module.parentIs(parent));
+	}
+	
+	@Test
+	public void testParentIs_null() {
+		assertFalse("Non-null parent considered the same as null!", module.parentIs(null));
+	}
+	
+	@Test
+	public void testParentIs_different() {
+		PythonModule other = new PythonModule("otherName");
+		assertFalse("Parent considered the same as one with another name!", module.parentIs(other));
+	}
+	
+	@Test
+	public void testParentIs_nullParentNullOther() {
+		PythonModule module = new PythonModule(name);
+		assertTrue("Null parent considered different than null!", module.parentIs(null));
+	}
+	
+	@Test
+	public void testParentIs_nullParentNonNullOther() {
+		PythonModule module = new PythonModule(name);
+		PythonModule other = new PythonModule("otherName");
+		assertFalse("Null parent considered same as non-null module!", module.parentIs(other));
+	}
+	
+	@Test
 	public void testRegisterUsage_alias() {
 		// import parentModuleName.name as alias
 		module.registerUsage(alias + ".fun0()");
@@ -552,6 +582,15 @@ public class PythonModuleTest {
 		expectedCalls.add(name + ".f(\"\\\"(\", '(\\'')");
 		List<String> calls = module.callsTo("f", name + ".f(\"\\\"(\", '(\\'')");
 		assertEquals("Wrong call list returned for call with strings containing both brackets and qoutes.",
+				expectedCalls, calls);
+	}
+	
+	@Test
+	public void testCallsTo_missingRightParanthesis() {
+		PythonModule module = new PythonModule(name, ImportType.ORDINARY);
+		List<String> expectedCalls = new ArrayList<String>(0);
+		List<String> calls = module.callsTo("f", name + ".f(a, (b)\n");
+		assertEquals("Wrong call list returned for call with missing right bracket.",
 				expectedCalls, calls);
 	}
 	

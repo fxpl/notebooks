@@ -125,6 +125,19 @@ public class PythonModule {
 	}
 	
 	/**
+	 * Tells whether the parent of the module is the same as the module given
+	 * as an argument.
+	 * @return True if parent is the provided module, false otherwise
+	 */
+	public boolean parentIs(PythonModule other) {
+		if (null == parent) {
+			return null == other;
+		} else {
+			return parent.is(other);
+		}
+	}
+	
+	/**
 	 * Create and return a string containing the module name preceded by all
 	 * ancestors' names, in descending order, separated with ".".
 	 * @return The string described above
@@ -154,7 +167,7 @@ public class PythonModule {
 		
 		// Usages of imported function (only possible with from imports)
 		if (null != parent && ImportType.FROM == parent.importedWith) {
-			usagePattern = Pattern.compile("(?<!\\.)" + this.qualifier() + "\\s*\\(");
+			usagePattern = Pattern.compile("(?<!\\.)\\s*" + this.qualifier() + "\\s*\\(");
 			usageMatcher = usagePattern.matcher(line);
 			while (usageMatcher.find()) {
 				Utils.addOrIncrease(functionUsages, name);
@@ -177,6 +190,7 @@ public class PythonModule {
 		
 		// Usages of imported function (only possible with from imports)
 		if (null != parent && ImportType.FROM == parent.importedWith && functionName.equals(this.qualifier())) {
+			// TODO: Inte heller punkt med blank efter före qualifier
 			usagePattern = Pattern.compile("(?<!\\.)" + this.qualifier() + "\\s*\\(");
 			usageMatcher = usagePattern.matcher(line);
 			result.addAll(extractFunctionCall(usageMatcher, line));
@@ -185,7 +199,7 @@ public class PythonModule {
 		return result;
 	}
 
-	private List<String> extractFunctionCall(Matcher usageMatcher, String line) {
+	private static List<String> extractFunctionCall(Matcher usageMatcher, String line) {
 		List<String> result = new ArrayList<String>(1);	// Most of the times, there will only be 1 call/line(?)
 		while (usageMatcher.find()) {
 			CodeState state = new CodeState(line, usageMatcher.start(), new String[]{"\"", "'"});
@@ -193,6 +207,11 @@ public class PythonModule {
 			int bracketLevel = 0;
 			String call = "";
 			while (!bracketFound || 0 != bracketLevel) {
+				if (!state.inCode()) {
+					// We have stepped outside the line without finding the expected parantheses.
+					call = "";
+					break;
+				}
 				char currentChar = state.currentChar();
 				// Comments are removed in preprocessing, but strings may still exist
 				if (!state.inString() && '(' == currentChar) {
@@ -204,7 +223,11 @@ public class PythonModule {
 				call += currentChar;
 				state.step();
 			}
-			result.add(call);
+			if (0 < call.length()) {
+				result.add(call);
+			} else {
+				System.err.println("Couldn't extract function calls from line: " + line);
+			}
 		}
 		return result;
 	}

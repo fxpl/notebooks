@@ -1119,6 +1119,113 @@ public class NotebookTest {
 					expectedModule.functionUsages, actualModule.functionUsages);
 		}
 	}
+	
+	/**
+	 * Verify that the right function call lists are returned for modules
+	 * imported ordinarily and with alias.
+	 */
+	@Test
+	public void testFunctionCalls() {
+		String dataDir = "test/data/modules";
+		String file = "nb_4.ipynb";
+		Notebook notebook = new Notebook(getPath(dataDir, file));
+		
+		// Import type doesn't matter here.
+		PythonModule parent1 = new PythonModule("module1");
+		PythonModule f1 = new PythonModule("fun1", ImportType.ORDINARY, parent1);
+		PythonModule f2 = new PythonModule("fun2", ImportType.ORDINARY, parent1);
+		PythonModule f3 = new PythonModule("fun3", ImportType.ORDINARY, parent1);
+		PythonModule f4 = new PythonModule("fun4", ImportType.ORDINARY, parent1);
+		PythonModule parent2 = new PythonModule("module2");
+		PythonModule f = new PythonModule("f", ImportType.ORDINARY, parent2);
+		PythonModule[] argumentFunctions = {f1, f2, f3, f4, f};
+		
+		Map<PythonModule, List<String>> expectedFunctionCalls = new HashMap<PythonModule, List<String>>(5);
+		List<String> f1Calls = new ArrayList<String>(1);
+		f1Calls.add("module1.fun1(3)");
+		expectedFunctionCalls.put(f1, f1Calls);
+		List<String> f2Calls = new ArrayList<String>(0);
+		expectedFunctionCalls.put(f2, f2Calls);
+		List<String> f3Calls = new ArrayList<String>(1);
+		f3Calls.add("module1.fun3()");
+		expectedFunctionCalls.put(f3, f3Calls);
+		List<String> f4Calls = new ArrayList<String>(0);
+		expectedFunctionCalls.put(f4, f4Calls);
+		List<String> fCalls = new ArrayList<String>(2);
+		fCalls.add("mod2.f(mod2.f(0))");
+		fCalls.add("mod2.f(0)");
+		expectedFunctionCalls.put(f, fCalls);
+		
+		Map<PythonModule, List<String>> functionCalls = notebook.functionCalls(argumentFunctions);
+		assertEquals("Wrong function calls returned!", expectedFunctionCalls, functionCalls);
+	}
+	
+	/**
+	 * Verify that the right function call lists are returned for modules
+	 * imported ordinarily and with a from import.
+	 */
+	@Test
+	public void testFunctionCallsFromImport() {
+		String dataDir = "test/data/modules";
+		String file = "nb_36.ipynb";
+		Notebook notebook = new Notebook(getPath(dataDir, file));
+		
+		// Import type doesn't matter here.
+		PythonModule base = new PythonModule("Base", ImportType.ORDINARY);
+		PythonModule a = new PythonModule("A", ImportType.ORDINARY, base);
+		PythonModule f1 = new PythonModule("fun1", ImportType.ORDINARY, a);
+		PythonModule c = new PythonModule("C");
+		PythonModule d = new PythonModule("D", ImportType.ORDINARY, c);
+		PythonModule f2 = new PythonModule("fun2", ImportType.ORDINARY, d);
+		PythonModule[] argumentFunctions = {f1, f2};
+		
+		Map<PythonModule, List<String>> expectedFunctionCalls = new HashMap<PythonModule, List<String>>(2);
+		List<String> f1Calls = new ArrayList<String>(3);
+		f1Calls.add("A.fun1(15, a=0, b=3)");
+		f1Calls.add("a.fun1(a.fun1(0))");
+		f1Calls.add("a.fun1(0)");
+		expectedFunctionCalls.put(f1, f1Calls);
+		List<String> f2Calls = new ArrayList<String>(1);
+		f2Calls.add("C.D.fun2()");
+		expectedFunctionCalls.put(f2, f2Calls);
+		
+		Map<PythonModule, List<String>> functionCalls = notebook.functionCalls(argumentFunctions);
+		assertEquals("Wrong function calls returned!", expectedFunctionCalls, functionCalls);
+	}
+	
+	/**
+	 * Verify that calls to function imported with from imports are returned
+	 * correctly.
+	 */
+	@Test
+	public void testFunctionCallsFromFunctionImport() {
+		String dataDir = "test/data/modules";
+		String file = "nb_46.ipynb";
+		Notebook notebook = new Notebook(getPath(dataDir, file));
+		
+		PythonModule parent = new PythonModule("math");
+		PythonModule sin = new PythonModule("sin", ImportType.ORDINARY, parent);
+		PythonModule cos = new PythonModule("cos", ImportType.ORDINARY, parent);
+		PythonModule tan = new PythonModule("tan", ImportType.ORDINARY, parent);
+		PythonModule atan = new PythonModule("atan", ImportType.ORDINARY, parent);
+		PythonModule[] argumentFunctions = {sin, cos, tan, atan};
+		
+		Map<PythonModule, List<String>> expectedFunctionCalls = new HashMap<PythonModule, List<String>>(4);
+		List<String> sinCalls = new ArrayList<String>(2);
+		sinCalls.add("sin(s)");
+		sinCalls.add("sin(a)");
+		expectedFunctionCalls.put(sin, sinCalls);
+		List<String> tanCalls = new ArrayList<String>(1);
+		tanCalls.add("tan(a)");
+		expectedFunctionCalls.put(tan, tanCalls);
+		List<String> empty = new ArrayList<String>(0);
+		expectedFunctionCalls.put(cos, empty);
+		expectedFunctionCalls.put(atan, empty);
+		
+		Map<PythonModule, List<String>> functionCalls = notebook.functionCalls(argumentFunctions);
+		assertEquals("Wrong function calls returned when functions are explicitely imported!",
+				expectedFunctionCalls, functionCalls);
+	}
 
 	/**
 	 * Verify that the number of code cells doesn't increase every time we

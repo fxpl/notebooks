@@ -81,6 +81,45 @@ public class Notebook {
 	}
 	
 	/**
+	 * Find all calls to the functions in the argument array
+	 * @param functions Functions to which we want to find calls
+	 * @return Map from each function to a list with all calls for that function
+	 */
+	public Map<PythonModule, List<String>> functionCalls(PythonModule[] functions) {
+		List<PythonModule> modules = new ArrayList<PythonModule>();
+		List<JSONObject> codeCells = getCodeCells();
+		Map<PythonModule, List<String>> result = new HashMap<PythonModule, List<String>>(functions.length);
+		for (PythonModule function: functions) {
+			result.put(function, new ArrayList<String>());
+		}
+		
+		for (JSONObject cell: codeCells) {
+			JSONArray lines = getSource(cell);
+			List<String> splitLines = new PythonPreprocessor(lines).process();
+			for (String line: splitLines) {
+				line = line.trim();
+				if (line.matches("import\\s+.*") || line.matches("from\\s+.*\\s+import.*")) {
+					try {
+						modules.addAll(modulesInImport(line));
+					} catch (NotebookException e) {
+						System.err.println("Could not add imported modules for " + this.path + ": " + e.getMessage());
+					}
+				} else {
+					for (PythonModule function: functions) {
+						for (PythonModule module: modules) {
+							if (function.is(module) || function.parentIs(module)) {
+								List<String> calls = module.callsTo(function.name, line);
+								result.get(function).addAll(calls);
+							}
+						}
+					}
+				}
+			}
+		}
+		return result;
+	}
+	
+	/**
 	 * Identify all module(s) in a Python importStatement.
 	 * @param importStatement Python import statement in which modules will be identified.
 	 * @return A list of all modules found in importStatment
