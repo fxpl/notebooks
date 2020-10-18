@@ -1,5 +1,5 @@
 from sys import argv, modules
-from collections import Callable
+from collections.abc import Callable
 
 """
 List all functions located in the module whose name is given as an argument
