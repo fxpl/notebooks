@@ -145,8 +145,8 @@ public class AllModulesTest {
 		PythonModule mathFunctions = new AllModules(mathModule);
 		
 		List<String> expectedCalls = new ArrayList<String>(2);
-		expectedCalls.add(" sin(x)");
-		expectedCalls.add(" sin( y )");
+		expectedCalls.add("sin(x)");
+		expectedCalls.add("sin( y )");
 		
 		List<String> calls = mathFunctions.callsTo("sin", "a = sin(x) + cos(y) - tan(z) + sin( y )");
 		assertEquals("Wrong call list returned!", expectedCalls, calls);

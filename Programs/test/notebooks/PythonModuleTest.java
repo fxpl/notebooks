@@ -313,8 +313,8 @@ public class PythonModuleTest {
 		module.registerUsage("a = " + alias + ".fun0()");
 		module.registerUsage(alias + ".fun1(3)");
 		module.registerUsage(alias + ".fun3(8, 6, 2)");
-		module.registerUsage(alias + ".fun3( 9 , 3 , 5 )");
-		module.registerUsage(alias + " . fun3(13, 22 , 0)");
+		module.registerUsage(alias + ".	fun3( 9 , 3 , 5 )");
+		module.registerUsage(alias + " . fun3 ( 13, 22 , 0 )");
 		module.registerUsage("otherModule.fun32(" + alias + ".funX().)");
 		module.registerUsage("[1, 2, 3, " + alias + ".funX(), 5]");
 		module.registerUsage(name + ".funY()");	// Should not be registered

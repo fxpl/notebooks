@@ -205,7 +205,7 @@ public class PythonModule {
 			CodeState state = new CodeState(line, usageMatcher.start(), new String[]{"\"", "'"});
 			boolean bracketFound = false;
 			int bracketLevel = 0;
-			String call = "";	// TODO: Trimma!?
+			String call = "";
 			while (!bracketFound || 0 != bracketLevel) {
 				if (!state.inCode()) {
 					// We have stepped outside the line without finding the expected parantheses.
@@ -224,7 +224,7 @@ public class PythonModule {
 				state.step();
 			}
 			if (0 < call.length()) {
-				result.add(call);
+				result.add(call.trim());
 			} else {
 				System.err.println("Couldn't extract function calls from line: " + line);
 			}
