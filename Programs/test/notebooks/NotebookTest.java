@@ -1203,6 +1203,7 @@ public class NotebookTest {
 		String file = "nb_46.ipynb";
 		Notebook notebook = new Notebook(getPath(dataDir, file));
 		
+		// Import type doesn't matter here.
 		PythonModule parent = new PythonModule("math");
 		PythonModule sin = new PythonModule("sin", ImportType.ORDINARY, parent);
 		PythonModule cos = new PythonModule("cos", ImportType.ORDINARY, parent);
@@ -1224,6 +1225,40 @@ public class NotebookTest {
 		
 		Map<PythonModule, List<String>> functionCalls = notebook.functionCalls(argumentFunctions);
 		assertEquals("Wrong function calls returned when functions are explicitely imported!",
+				expectedFunctionCalls, functionCalls);
+	}
+	
+	/**
+	 * Verify that calls to functions imported with * are returned correctly.
+	 */
+	@Test
+	public void testFunctionCallsAllModules() {
+		String dataDir = "test/data/modules";
+		String file = "nb_44.ipynb";
+		Notebook notebook = new Notebook(getPath(dataDir, file));
+		
+		// Import type doesn't matter here.
+		PythonModule parent = new PythonModule("math");
+		PythonModule sin = new PythonModule("sin", ImportType.ORDINARY, parent);
+		PythonModule cos = new PythonModule("cos", ImportType.ORDINARY, parent);
+		PythonModule tan = new PythonModule("tan", ImportType.ORDINARY, parent);
+		PythonModule atan = new PythonModule("atan", ImportType.ORDINARY, parent);
+		PythonModule[] argumentFunctions = {sin, cos, tan, atan};
+		
+		Map<PythonModule, List<String>> expectedFunctionCalls = new HashMap<PythonModule, List<String>>(4);
+		List<String> sinCalls = new ArrayList<String>(2);
+		sinCalls.add("sin(s)");
+		sinCalls.add("sin(a)");
+		expectedFunctionCalls.put(sin, sinCalls);
+		List<String> tanCalls = new ArrayList<String>(1);
+		tanCalls.add("tan(a)");
+		expectedFunctionCalls.put(tan, tanCalls);
+		List<String> empty = new ArrayList<String>(0);
+		expectedFunctionCalls.put(cos, empty);
+		expectedFunctionCalls.put(atan, empty);
+		
+		Map<PythonModule, List<String>> functionCalls = notebook.functionCalls(argumentFunctions);
+		assertEquals("Wrong function calls returned when functions are imported using *!",
 				expectedFunctionCalls, functionCalls);
 	}
 
