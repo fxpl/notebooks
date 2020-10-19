@@ -886,15 +886,13 @@ public class NotebookAnalyzer extends Analyzer {
 	
 	private Map<PythonModule, List<String>> getCallsForNotebook(int notebookIndex,
 			List<Future<Map<PythonModule, List<String>>>> functionCalls) {
-		Map<PythonModule, List<String>> callsInNotebook;
 		try {
-			callsInNotebook = functionCalls.get(notebookIndex).get();
+			return functionCalls.get(notebookIndex).get();
 		} catch (InterruptedException | ExecutionException e) {
 			System.err.println("Could not get function calls from " + notebooks.get(notebookIndex).getName() + ":" + e);
 			e.printStackTrace();
-			callsInNotebook = new HashMap<PythonModule, List<String>>(0);
+			return new HashMap<PythonModule, List<String>>(0);
 		}
-		return callsInNotebook;
 	}
 
 	private void writeFunctionLists(Map<PythonModule, List<String>> calls,
