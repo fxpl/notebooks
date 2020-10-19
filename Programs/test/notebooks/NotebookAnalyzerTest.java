@@ -279,7 +279,7 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 	 */
 	@Test
 	public void testArgumentParsing_functions() throws IOException {
-		String[] arg = {"--functions=test/data/modules/functions_to_list.txt"};
+		String[] arg = {"--functions=test/data/modules/functions_to_list.csv"};
 		String[] expectedFilePrefixes = {"Base.A.fun1-calls", "B.fun1-calls"};
 		analyzer.analyze(arg);
 		verifyExistenceOfAndRemove(expectedFilePrefixes);
@@ -1150,7 +1150,7 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 	@Test
 	public void testListFunctionsCalls() throws IOException {
 		String dataDir = "test/data/modules";
-		String functionsFile = "functions_to_list.txt";
+		String functionsFile = "functions_to_list.csv";
 		String[] notebookFiles = {"nb_36.ipynb", "nb_37.ipynb", "nb_38.ipynb"};
 		
 		String[] expectedALines = {
@@ -1184,7 +1184,7 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 	@Test
 	public void testListFunctionCalls_emptyNb() throws IOException {
 		String dataDir = "test/data/modules";
-		String functionsFile = "functions_to_list.txt";
+		String functionsFile = "functions_to_list.csv";
 		String notebook = "empty.ipynb";
 		
 		String[] expectedLines = new String[0];
