@@ -273,6 +273,14 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 	}
 	
 	/**
+	 * TODO
+	 */
+	@Test
+	public void testArgumentParsing_functions() {
+		// TODO
+	}
+	
+	/**
 	 * Verify that all relevant files are created when several arguments are
 	 * given.
 	 * @throws IOException 
@@ -1128,6 +1136,40 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 		lastOutputFile("modules").delete();
 		checkCsv("math-functions", expectedLines);
 		lastOutputFile("math-functions").delete();
+	}
+	
+	/**
+	 * Verify that function calls are listed correctly by listFunctionCalls.
+	 */
+	@Test
+	public void testListFunctionsCalls() throws IOException {
+		String dataDir = "test/data/modules";
+		String functionsFile = "functions_to_list.txt";
+		String[] notebookFiles = {"nb_36.ipynb", "nb_37.ipynb", "nb_38.ipynb"};
+		
+		String[] expectedALines = {
+				"A.fun1(15, a=0, b=3)",
+				"a.fun1(a.fun1(0))",
+				"a.fun1(0)",
+				"Base.A.fun1()",
+				"Base.A.fun1(9, 0, 3, 6)"
+		};
+		String[] expectedBLines = {
+				"B.fun1(\"apa\")",
+				"B.fun1(\"hej\")",
+				"B.fun1()"
+		};
+		
+		for (String notebook: notebookFiles) {
+			analyzer.initializeNotebooksFrom(dataDir + File.separator + notebook);
+		}
+		
+		analyzer.listFunctionCalls(dataDir + File.separator + functionsFile);
+		checkCsv("Base.A.fun1-calls", expectedALines);
+		lastOutputFile("Base.A.fun1-calls").delete();
+		checkCsv("B.fun1-calls", expectedBLines);
+		lastOutputFile("B.fun1-calls").delete();
+		
 	}
 
 	/**

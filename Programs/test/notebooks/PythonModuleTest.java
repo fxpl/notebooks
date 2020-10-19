@@ -178,6 +178,28 @@ public class PythonModuleTest {
 	}
 	
 	@Test
+	public void testFromPedigreeString() {
+		String grandParentName = "A";
+		PythonModule grandParent = new PythonModule(grandParentName, ImportType.ORDINARY);
+		String parentName = "B";
+		PythonModule parent = new PythonModule(parentName, ImportType.ORDINARY, grandParent);
+		String moduleName = "C";
+		PythonModule expectedModule = new PythonModule(moduleName, ImportType.ORDINARY, parent);
+		String pedigreeString = grandParentName + "." + parentName + "." + moduleName;
+		
+		PythonModule module = PythonModule.fromPedigreeString(pedigreeString);
+		assertEquals("Wrong module created from pedigree string!", expectedModule, module);
+	}
+	
+	@Test
+	public void testFromPedigreeString_singleString() {
+		PythonModule expectedModule = new PythonModule(name);
+		PythonModule module = PythonModule.fromPedigreeString(name);
+		assertEquals("Wrong module created from pedigree string without dots!",
+				expectedModule, module);
+	}
+	
+	@Test
 	public void testHashCode() {
 		int expectedHash = Objects.hash(name, alias) * Objects.hash(parentModuleName, null);
 		assertEquals("Wrong hash code returned!", expectedHash, module.hashCode());

@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -1138,7 +1139,7 @@ public class NotebookTest {
 		PythonModule f4 = new PythonModule("fun4", ImportType.ORDINARY, parent1);
 		PythonModule parent2 = new PythonModule("module2");
 		PythonModule f = new PythonModule("f", ImportType.ORDINARY, parent2);
-		PythonModule[] argumentFunctions = {f1, f2, f3, f4, f};
+		List<PythonModule> argumentFunctions = Arrays.asList(f1, f2, f3, f4, f);
 		
 		Map<PythonModule, List<String>> expectedFunctionCalls = new HashMap<PythonModule, List<String>>(5);
 		List<String> f1Calls = new ArrayList<String>(1);
@@ -1177,7 +1178,7 @@ public class NotebookTest {
 		PythonModule c = new PythonModule("C");
 		PythonModule d = new PythonModule("D", ImportType.ORDINARY, c);
 		PythonModule f2 = new PythonModule("fun2", ImportType.ORDINARY, d);
-		PythonModule[] argumentFunctions = {f1, f2};
+		List<PythonModule> argumentFunctions = Arrays.asList(f1, f2);
 		
 		Map<PythonModule, List<String>> expectedFunctionCalls = new HashMap<PythonModule, List<String>>(2);
 		List<String> f1Calls = new ArrayList<String>(3);
@@ -1209,7 +1210,7 @@ public class NotebookTest {
 		PythonModule cos = new PythonModule("cos", ImportType.ORDINARY, parent);
 		PythonModule tan = new PythonModule("tan", ImportType.ORDINARY, parent);
 		PythonModule atan = new PythonModule("atan", ImportType.ORDINARY, parent);
-		PythonModule[] argumentFunctions = {sin, cos, tan, atan};
+		List<PythonModule> argumentFunctions = Arrays.asList(sin, cos, tan, atan);
 		
 		Map<PythonModule, List<String>> expectedFunctionCalls = new HashMap<PythonModule, List<String>>(4);
 		List<String> sinCalls = new ArrayList<String>(2);
@@ -1243,7 +1244,7 @@ public class NotebookTest {
 		PythonModule cos = new PythonModule("cos", ImportType.ORDINARY, parent);
 		PythonModule tan = new PythonModule("tan", ImportType.ORDINARY, parent);
 		PythonModule atan = new PythonModule("atan", ImportType.ORDINARY, parent);
-		PythonModule[] argumentFunctions = {sin, cos, tan, atan};
+		List<PythonModule> argumentFunctions = Arrays.asList(sin, cos, tan, atan);
 		
 		Map<PythonModule, List<String>> expectedFunctionCalls = new HashMap<PythonModule, List<String>>(4);
 		List<String> sinCalls = new ArrayList<String>(2);

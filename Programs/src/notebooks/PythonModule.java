@@ -51,6 +51,21 @@ public class PythonModule {
 		this.functionUsages = new HashMap<String, Integer>();
 	}
 	
+	/**
+	 * Create a Python module from its pedigree string. Import type will be
+	 * ordinary on all levels.
+	 * @param pedigreeString Pedigree string to create module from
+	 * @return Module according to description above
+	 */
+	public static PythonModule fromPedigreeString(String pedigreeString) {
+		String[] modules = pedigreeString.split("\\.");
+		PythonModule result = null;
+		for (String module: modules) {
+			result = new PythonModule(module, ImportType.ORDINARY, result);
+		}
+		return result;
+	}
+	
 	@Override
 	public boolean equals(Object other) {
 		if (null == other || !(other instanceof PythonModule)) {

@@ -791,7 +791,7 @@ public class NotebookAnalyzer extends Analyzer {
 		}
 	}
 
-	public static PythonModule getModuleFromPedigreeString(String pedigreeString) {
+	private static PythonModule getModuleFromPedigreeString(String pedigreeString) {
 		PythonModule parent = null;
 		PythonModule module;
 		String[] identifierParts = pedigreeString.split("\\.");
@@ -830,6 +830,41 @@ public class NotebookAnalyzer extends Analyzer {
 		}
 		Collections.sort(quantitesSorted, Collections.reverseOrder());
 		return quantitesSorted;
+	}
+	
+	/**
+	 * For each function listed in the file given as argument, create a file
+	 * named function<current-date-time>.csv containing all calls to the
+	 * function, one per line.
+	 */
+	public void listFunctionCalls(String functionsFile) throws IOException {
+		List<PythonModule> functions = new ArrayList<PythonModule>();
+		BufferedReader reader = new BufferedReader(new FileReader(functionsFile));
+		String line = reader.readLine();
+		while (null != line) {
+			functions.add(PythonModule.fromPedigreeString(line));
+			line = reader.readLine();
+		}
+		reader.close();
+		
+		Map<PythonModule, List<String>> calls = new HashMap<PythonModule, List<String>>(functions.size());
+		for (PythonModule function: functions) {
+			calls.put(function, new ArrayList<String>());
+		}
+		// TODO: Parallellisera!
+		for (Notebook nb: notebooks) {
+			Map<PythonModule, List<String>> callsInNotebook = nb.functionCalls(functions);
+			for (PythonModule function: functions) {
+				calls.get(function).addAll(callsInNotebook.get(function));
+			}
+		}
+		for (PythonModule function: functions) {
+			Writer writer = new FileWriter(outputDir + "/" + function.pedigreeString() + "-calls" + LocalDateTime.now() + ".csv");
+			for (String call: calls.get(function)) {
+				writer.write(call + "\n");
+			}
+			writer.close();
+		}
 	}
 
 	/**

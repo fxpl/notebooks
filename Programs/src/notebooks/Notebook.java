@@ -81,8 +81,8 @@ public class Notebook {
 	 * @param functions Functions to which we want to find calls
 	 * @return Map from each function to a list with all calls for that function
 	 */
-	public Map<PythonModule, List<String>> functionCalls(PythonModule[] functions) {
-		Map<PythonModule, List<String>> result = new HashMap<PythonModule, List<String>>(functions.length);
+	public Map<PythonModule, List<String>> functionCalls(List<PythonModule> functions) {
+		Map<PythonModule, List<String>> result = new HashMap<PythonModule, List<String>>(functions.size());
 		for (PythonModule function: functions) {
 			result.put(function, new ArrayList<String>());
 		}
