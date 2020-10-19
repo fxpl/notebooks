@@ -65,11 +65,7 @@ public class Notebook {
 			for (String line: splitLines) {
 				line = line.trim();
 				if (line.matches("import\\s+.*") || line.matches("from\\s+.*\\s+import.*")) {
-					try {
-						modules.addAll(modulesInImport(line));
-					} catch (NotebookException e) {
-						System.err.println("Could not add imported modules for " + this.path + ": " + e.getMessage());
-					}
+					addImportedModules(line, modules);
 				} else {
 					for (PythonModule module: modules) {
 						module.registerUsage(line);
@@ -86,24 +82,20 @@ public class Notebook {
 	 * @return Map from each function to a list with all calls for that function
 	 */
 	public Map<PythonModule, List<String>> functionCalls(PythonModule[] functions) {
-		List<PythonModule> modules = new ArrayList<PythonModule>();
-		List<JSONObject> codeCells = getCodeCells();
 		Map<PythonModule, List<String>> result = new HashMap<PythonModule, List<String>>(functions.length);
 		for (PythonModule function: functions) {
 			result.put(function, new ArrayList<String>());
 		}
 		
+		List<PythonModule> modules = new ArrayList<PythonModule>();
+		List<JSONObject> codeCells = getCodeCells();
 		for (JSONObject cell: codeCells) {
 			JSONArray lines = getSource(cell);
 			List<String> splitLines = new PythonPreprocessor(lines).process();
 			for (String line: splitLines) {
 				line = line.trim();
 				if (line.matches("import\\s+.*") || line.matches("from\\s+.*\\s+import.*")) {
-					try {
-						modules.addAll(modulesInImport(line));
-					} catch (NotebookException e) {
-						System.err.println("Could not add imported modules for " + this.path + ": " + e.getMessage());
-					}
+					addImportedModules(line, modules);
 				} else {
 					for (PythonModule function: functions) {
 						for (PythonModule module: modules) {
@@ -117,6 +109,19 @@ public class Notebook {
 			}
 		}
 		return result;
+	}
+
+	/**
+	 * Add all modules in a Python import statement to a list of modules
+	 * @param importStatement Code line containing import statements
+	 * @param modules List to which modules will be added
+	 */
+	private void addImportedModules(String importStatment, List<PythonModule> modules) {
+		try {
+			modules.addAll(modulesInImport(importStatment));
+		} catch (NotebookException e) {
+			System.err.println("Could not add imported modules for " + this.path + ": " + e.getMessage());
+		}
 	}
 	
 	/**
