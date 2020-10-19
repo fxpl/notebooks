@@ -1145,6 +1145,7 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 	
 	/**
 	 * Verify that function calls are listed correctly by listFunctionCalls.
+	 * @throws IOException on errors handling input files or files to be checked
 	 */
 	@Test
 	public void testListFunctionsCalls() throws IOException {
@@ -1174,7 +1175,26 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 		lastOutputFile("Base.A.fun1-calls").delete();
 		checkCsv("B.fun1-calls", expectedBLines);
 		lastOutputFile("B.fun1-calls").delete();
+	}
+	
+	/**
+	 * Verify that notebooks with format errors are handled.
+	 * @throws IOException on errors handling input files or files to be checked
+	 */
+	@Test
+	public void testListFunctionCalls_emptyNb() throws IOException {
+		String dataDir = "test/data/modules";
+		String functionsFile = "functions_to_list.txt";
+		String notebook = "empty.ipynb";
 		
+		String[] expectedLines = new String[0];
+		analyzer.initializeNotebooksFrom(dataDir + File.separator + notebook);
+		
+		analyzer.listFunctionCalls(dataDir + File.separator + functionsFile);
+		checkCsv("Base.A.fun1-calls", expectedLines);
+		lastOutputFile("Base.A.fun1-calls").delete();
+		checkCsv("B.fun1-calls", expectedLines);
+		lastOutputFile("B.fun1-calls").delete();
 	}
 
 	/**

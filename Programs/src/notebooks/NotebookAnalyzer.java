@@ -876,7 +876,9 @@ public class NotebookAnalyzer extends Analyzer {
 		for (int i=0; i<notebooks.size(); i++) {
 			Map<PythonModule, List<String>> callsInNotebook = getCallsForNotebook(i, functionCalls);
 			for (PythonModule function: functions) {
-				calls.get(function).addAll(callsInNotebook.get(function));
+				if (callsInNotebook.containsKey(function)) {
+					calls.get(function).addAll(callsInNotebook.get(function));
+				}
 			}
 		}
 		return calls;
