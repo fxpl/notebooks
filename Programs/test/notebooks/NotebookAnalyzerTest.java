@@ -273,11 +273,16 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 	}
 	
 	/**
-	 * TODO
+	 * Verify that the function calls output files are created when the argument
+	 * --functions is given
+	 * @throws IOException
 	 */
 	@Test
-	public void testArgumentParsing_functions() {
-		// TODO
+	public void testArgumentParsing_functions() throws IOException {
+		String[] arg = {"--functions=test/data/modules/functions_to_list.txt"};
+		String[] expectedFilePrefixes = {"Base.A.fun1-calls", "B.fun1-calls"};
+		analyzer.analyze(arg);
+		verifyExistenceOfAndRemove(expectedFilePrefixes);
 	}
 	
 	/**

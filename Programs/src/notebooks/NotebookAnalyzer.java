@@ -978,6 +978,7 @@ public class NotebookAnalyzer extends Analyzer {
 				modules = false;
 		String reproFile = null;
 		String nbPath = null;
+		String listFunctionsFile = null;
 		
 		// Read arguments
 		for (int i=0; i<args.length; i++) {
@@ -988,6 +989,8 @@ public class NotebookAnalyzer extends Analyzer {
 				this.outputDir = getValueFromArgument(arg);
 			} else if (arg.startsWith("--repro_file")) {
 				reproFile = getValueFromArgument(arg);
+			} else if (arg.startsWith("--functions")) {
+				listFunctionsFile = getValueFromArgument(arg);
 			} else {
 				switch (arg) {
 				case "--all":
@@ -1063,6 +1066,10 @@ public class NotebookAnalyzer extends Analyzer {
 				List<Quantity> modulesSorted = modules();
 				System.out.println("\nMost common modules:");
 				System.out.print(mostCommonModulesAsString(modulesSorted, 100));
+			}
+			if (null != listFunctionsFile) {
+				this.listFunctionCalls(listFunctionsFile);
+				System.out.println("Function calls listed!");
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
