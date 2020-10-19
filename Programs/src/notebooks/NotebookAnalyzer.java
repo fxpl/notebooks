@@ -838,6 +838,21 @@ public class NotebookAnalyzer extends Analyzer {
 	 * function, one per line.
 	 */
 	public void listFunctionCalls(String functionsFile) throws IOException {
+		List<PythonModule> functions = getListedFunctions(functionsFile);
+		
+		List<Callable<Map<PythonModule, List<String>>>> tasks
+			= new ArrayList<Callable<Map<PythonModule, List<String>>>>(notebooks.size());
+		for (Notebook nb: notebooks) {
+			tasks.add(new FunctionCallsGetter(nb, functions));
+		}
+		List<Future<Map<PythonModule, List<String>>>> functionCalls = ThreadExecutor.getInstance().invokeAll(tasks);
+		
+		Map<PythonModule, List<String>> calls = getFunctionCalls(functions, functionCalls);
+		writeFunctionLists(calls, functions);
+	}
+	
+	private List<PythonModule> getListedFunctions(String functionsFile)
+			throws FileNotFoundException, IOException {
 		List<PythonModule> functions = new ArrayList<PythonModule>();
 		BufferedReader reader = new BufferedReader(new FileReader(functionsFile));
 		String line = reader.readLine();
@@ -846,18 +861,42 @@ public class NotebookAnalyzer extends Analyzer {
 			line = reader.readLine();
 		}
 		reader.close();
-		
+		return functions;
+	}
+
+	private Map<PythonModule, List<String>> getFunctionCalls(List<PythonModule> functions,
+			List<Future<Map<PythonModule, List<String>>>> functionCalls) {
 		Map<PythonModule, List<String>> calls = new HashMap<PythonModule, List<String>>(functions.size());
+		// Put keys
 		for (PythonModule function: functions) {
 			calls.put(function, new ArrayList<String>());
 		}
-		// TODO: Parallellisera!
-		for (Notebook nb: notebooks) {
-			Map<PythonModule, List<String>> callsInNotebook = nb.functionCalls(functions);
+		
+		// Put values
+		for (int i=0; i<notebooks.size(); i++) {
+			Map<PythonModule, List<String>> callsInNotebook = getCallsForNotebook(i, functionCalls);
 			for (PythonModule function: functions) {
 				calls.get(function).addAll(callsInNotebook.get(function));
 			}
 		}
+		return calls;
+	}
+	
+	private Map<PythonModule, List<String>> getCallsForNotebook(int notebookIndex,
+			List<Future<Map<PythonModule, List<String>>>> functionCalls) {
+		Map<PythonModule, List<String>> callsInNotebook;
+		try {
+			callsInNotebook = functionCalls.get(notebookIndex).get();
+		} catch (InterruptedException | ExecutionException e) {
+			System.err.println("Could not get function calls from " + notebooks.get(notebookIndex).getName() + ":" + e);
+			e.printStackTrace();
+			callsInNotebook = new HashMap<PythonModule, List<String>>(0);
+		}
+		return callsInNotebook;
+	}
+
+	private void writeFunctionLists(Map<PythonModule, List<String>> calls,
+			List<PythonModule> functions) throws IOException {
 		for (PythonModule function: functions) {
 			Writer writer = new FileWriter(outputDir + "/" + function.pedigreeString() + "-calls" + LocalDateTime.now() + ".csv");
 			for (String call: calls.get(function)) {
