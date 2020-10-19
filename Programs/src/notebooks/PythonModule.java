@@ -180,7 +180,10 @@ public class PythonModule {
 	 * @return The matcher described above
 	 */
 	protected Matcher functionCallMatcher(String functionName, String line) {
-		Pattern usagePattern = Pattern.compile("(?<!\\.)(" + functionName + ")\\s*\\(");
+		/* We would like the look-behind group to contain \s* instead of \s+,
+		but Java doesn't support arbitrary length in look-behind. The case where
+		there is > 1 space should be very uncommon. */
+		Pattern usagePattern = Pattern.compile("(?<!\\.\\s?)(" + functionName + ")\\s*\\(");
 		return usagePattern.matcher(line);
 	}
 	
@@ -192,8 +195,11 @@ public class PythonModule {
 	 * @return The matcher described above
 	 */
 	protected Matcher functionInModuleCallMatcher (String functionName, String line) {
+		/* We would like the look-behind group to contain \s* instead of \s+,
+		but Java doesn't support arbitrary length in look-behind. The case where
+		there is > 1 space should be very uncommon. */
 		Pattern usagePattern = Pattern.compile(
-				"(?<!\\.)" + this.qualifier() + "\\s*\\.\\s*(" + functionName + ")\\s*\\(");
+				"(?<!\\.\\s?)" + this.qualifier() + "\\s*\\.\\s*(" + functionName + ")\\s*\\(");
 		return usagePattern.matcher(line);
 	}
 	

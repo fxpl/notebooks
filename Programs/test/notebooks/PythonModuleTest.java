@@ -398,7 +398,7 @@ public class PythonModuleTest {
 		
 		module.registerUsage(name + ".fun0()"); // Should be registered
 		module.registerUsage("funX()"); // Should not be registered
-		module.registerUsage(parentModuleName + "." + name + ".funY()"); // Should not be registered
+		module.registerUsage(parentModuleName + ". " + name + ".funY()"); // Should not be registered
 		
 		Map<String, Integer> expectedFunctionUsages = new HashMap<String, Integer>();
 		expectedFunctionUsages.put("fun0", 1);
@@ -418,7 +418,7 @@ public class PythonModuleTest {
 		module.registerUsage("funA()"); // Should not be registered
 		module.registerUsage(subModuleName + ".funB()");	// Should not be registered
 		module.registerUsage(name + "." + subModuleName + ".funC()");	// Should be registered
-		module.registerUsage(parentModuleName + "." + name + "." + subModuleName + ".funD()");	// Should not be registered
+		module.registerUsage(parentModuleName + ". " + name + "." + subModuleName + ".funD()");	// Should not be registered
 		
 		Map<String, Integer> expectedFunctionUsages = new HashMap<String, Integer>();
 		expectedFunctionUsages.put("funC", 1);

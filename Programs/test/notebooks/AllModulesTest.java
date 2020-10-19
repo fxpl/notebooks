@@ -159,7 +159,7 @@ public class AllModulesTest {
 		
 		List<String> expectedCalls = new ArrayList<String>(0);
 		
-		List<String> calls = mathFunctions.callsTo("sin", "a = otherModule.sin(2)");
+		List<String> calls = mathFunctions.callsTo("sin", "a = otherModule. sin(2)");
 		assertEquals("Calls returned when abscent.", expectedCalls, calls);
 	}
 	
