@@ -842,8 +842,10 @@ public class NotebookAnalyzer extends Analyzer {
 		
 		List<Callable<Map<PythonModule, List<String>>>> tasks
 			= new ArrayList<Callable<Map<PythonModule, List<String>>>>(notebooks.size());
-		for (Notebook nb: notebooks) {
-			tasks.add(new FunctionCallsGetter(nb, functions));
+		for (int i=0; i<notebooks.size(); i++) {
+			Notebook nb = notebooks.get(i);
+			boolean heartBeat = 0 == i%10000;
+			tasks.add(new FunctionCallsGetter(nb, functions, heartBeat));
 		}
 		List<Future<Map<PythonModule, List<String>>>> functionCalls = ThreadExecutor.getInstance().invokeAll(tasks);
 		
