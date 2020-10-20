@@ -638,8 +638,10 @@ public class NotebookAnalyzer extends Analyzer {
 		List<Notebook> pythonNotebooks = getPythonNotebooks();
 		List<Callable<List<PythonModule>>> moduleTasks
 			= new ArrayList<Callable<List<PythonModule>>>();
-		for (Notebook notebook: pythonNotebooks) {
-			moduleTasks.add(new ModulesIdentifier(notebook));
+		for (int i=0; i<pythonNotebooks.size(); i++) {
+			Notebook notebook = pythonNotebooks.get(i);
+			boolean heartBeat = 0 == i%10000;
+			moduleTasks.add(new ModulesIdentifier(notebook, heartBeat));
 		}
 		List<Future<List<PythonModule>>> modules = ThreadExecutor.getInstance().invokeAll(moduleTasks);
 		
@@ -648,9 +650,6 @@ public class NotebookAnalyzer extends Analyzer {
 		writer.write(modulesHeader());
 		for (int i=0; i<modules.size(); i++) {
 			Notebook notebook = pythonNotebooks.get(i);
-			if (0 == i%10000) {
-				Utils.heartBeat("Identifying modules in " + notebook.getName());
-			}
 			result.add(i, writeModuleLine(modules.get(i), notebook, writer));
 		}
 		writer.close();
