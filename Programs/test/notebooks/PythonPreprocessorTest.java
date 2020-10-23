@@ -33,10 +33,10 @@ public class PythonPreprocessorTest {
 	public void testProcess_severalStatements() {
 		String[] strings = {"import numpy as np; import pandas as pd\n", "b = np.sin(a)\n", "c = np.cos(b); d = np.tan(c)\n"};
 		List<String> expectedOutput = new ArrayList<String>(5);
-		expectedOutput.add("import numpy as np");
+		expectedOutput.add("import numpy as np\n");
 		expectedOutput.add(" import pandas as pd\n");
 		expectedOutput.add("b = np.sin(a)\n");
-		expectedOutput.add("c = np.cos(b)");
+		expectedOutput.add("c = np.cos(b)\n");
 		expectedOutput.add(" d = np.tan(c)\n");
 		processAndCheck(strings, expectedOutput);
 	}
@@ -110,8 +110,8 @@ public class PythonPreprocessorTest {
 				"'Some string'\n",
 				"e = np.exp(d)\n"};
 		List<String> expectedOutput = new ArrayList<String>(12);
-		expectedOutput.add("import numpy as np");
-		expectedOutput.add(" \"This is a comment string with \\\" and # inside.\"");
+		expectedOutput.add("import numpy as np\n");
+		expectedOutput.add(" \"This is a comment string with \\\" and # inside.\"\n");
 		expectedOutput.add(" import pandas as pd\n");
 		expectedOutput.add("b = np.sin(a)\n");
 		expectedOutput.add("'Some other string '\n");
@@ -253,6 +253,14 @@ public class PythonPreprocessorTest {
 		String[] strings = {"abc\\\" #def\n"};
 		List<String> expectedOutput = new ArrayList<String>(1);
 		expectedOutput.add("abc\\\" \n");
+		processAndCheck(strings, expectedOutput);
+	}
+	
+	@Test
+	public void testProcess_semiColonInString() {
+		String[] strings = {"a = pd.read_csv('file.csv', sep=';')\n"};
+		List<String> expectedOutput = new ArrayList<String>(1);
+		expectedOutput.add("a = pd.read_csv('file.csv', sep=';')\n");
 		processAndCheck(strings, expectedOutput);
 	}
 
