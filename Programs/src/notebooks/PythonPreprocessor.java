@@ -50,7 +50,8 @@ public class PythonPreprocessor {
 	/**
 	 * Remove everything that should only be removed when it is not inside a
 	 * string, that is comments (starting with '#') and the newlines that occur
-	 * between brackets, from the code handled by the preprocessor.
+	 * between brackets, from the code handled by the preprocessor. Also
+	 * replace semi colons that are outside strings with newlines.
 	 * @param delimiters Existing string delimiters. I a delimiter a is a substring of a delimiter b, b must precede a in the array.
 	 */
 	public void removeOutsideString(String[] delimiters) {
@@ -61,13 +62,18 @@ public class PythonPreprocessor {
 		while (state.inCode()) {
 			char current = state.currentChar();
 			if (!state.inString()) { // We are not inside a string. Do clean.
-				if('#' == current && !state.escaped()) {
-					state.stepPast('\n');
-				} else if ('(' == current) {
+				if ('(' == current) {
 					bracketLevel++;
 				} else if (')' == current) {
 					bracketLevel--;
 				} else if ('\n' == current && 0 < bracketLevel) {
+					state.stepPast();
+					continue;
+				} else if('#' == current && !state.escaped()) {
+					state.stepTo('\n');
+					continue;
+				} else if (';' == current) {
+					result += '\n';
 					state.stepPast();
 					continue;
 				}
@@ -95,17 +101,13 @@ public class PythonPreprocessor {
 	}
 	
 	/**
-	 * Split a the code handled by the preprocessor at newlines and semicolons.
-	 * Keep newlines, but not semicolons.
+	 * Split a the code handled by the preprocessor at newlines, but keep the
+	 * newlines.
 	 */
 	private void splitCode() {
 		String[] lines = code.split("\n");
 		for (String line: lines) {
-			line += "\n";
-			String[] statements = line.split(";");
-			for (String statement: statements) {
-				processed.add(statement);
-			}
+			processed.add(line + "\n");
 		}
 	}
 

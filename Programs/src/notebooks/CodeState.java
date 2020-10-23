@@ -98,11 +98,11 @@ public class CodeState {
 	}
 	
 	/**
-	 * Step to the character following the next instance of the specified
-	 * character, without updating the state.
-	 * @param character Character to step past
+	 * Step to the next instance of the specified character, without updating
+	 * the state.
+	 * @param character Character to step to
 	 */
-	public void stepPast(char character) {
+	public void stepTo(char character) {
 		while (character != code.charAt(++index));
 	}
 	
