@@ -838,11 +838,12 @@ public class NotebookAnalyzer extends Analyzer {
 	 */
 	public void listFunctionCalls(String functionsFile) throws IOException {
 		List<PythonModule> functions = getListedFunctions(functionsFile);
+		List<Notebook> pythonNotebooks = getPythonNotebooks();
 		
 		List<Callable<Map<PythonModule, List<String>>>> tasks
-			= new ArrayList<Callable<Map<PythonModule, List<String>>>>(notebooks.size());
-		for (int i=0; i<notebooks.size(); i++) {
-			Notebook nb = notebooks.get(i);
+			= new ArrayList<Callable<Map<PythonModule, List<String>>>>(pythonNotebooks.size());
+		for (int i=0; i<pythonNotebooks.size(); i++) {
+			Notebook nb = pythonNotebooks.get(i);
 			boolean heartBeat = 0 == i%10000;
 			tasks.add(new FunctionCallsGetter(nb, functions, heartBeat));
 		}
@@ -874,7 +875,7 @@ public class NotebookAnalyzer extends Analyzer {
 		}
 		
 		// Put values
-		for (int i=0; i<notebooks.size(); i++) {
+		for (int i=0; i<functionCalls.size(); i++) {
 			Map<PythonModule, List<String>> callsInNotebook = getCallsForNotebook(i, functionCalls);
 			for (PythonModule function: functions) {
 				if (callsInNotebook.containsKey(function)) {

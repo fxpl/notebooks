@@ -1151,7 +1151,7 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 	public void testListFunctionsCalls() throws IOException {
 		String dataDir = "test/data/modules";
 		String functionsFile = "functions_to_list.csv";
-		String[] notebookFiles = {"nb_36.ipynb", "nb_37.ipynb", "nb_38.ipynb"};
+		String[] notebookFiles = {"nb_36.ipynb", "nb_37.ipynb", "nb_38.ipynb", "nb_R.ipynb"};
 		
 		String[] expectedALines = {
 				"A.fun1(15, a=0, b=3)",
