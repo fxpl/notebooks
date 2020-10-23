@@ -217,6 +217,18 @@ public class PythonPreprocessorTest {
 	}
 	
 	@Test
+	public void testProcess_commentsInBrackets() {
+		String[] strings = {
+				"a = f(x=1, \n",
+				"# This is a comment\n",
+				"y=2)\n"
+		};
+		List<String> expectedOutput = new ArrayList<String>(1);
+		expectedOutput.add("a = f(x=1, y=2)\n");
+		processAndCheck(strings, expectedOutput);
+	}
+	
+	@Test
 	public void testProcess_newLineInDifferentBrackets() {
 		String[] strings = {
 				"function(a,\n",

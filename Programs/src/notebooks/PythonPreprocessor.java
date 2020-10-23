@@ -70,7 +70,8 @@ public class PythonPreprocessor {
 					state.stepPast();
 					continue;
 				} else if('#' == current && !state.escaped()) {
-					state.stepPast('\n');
+					state.stepTo('\n');
+					continue;
 				} else if (';' == current) {
 					result += '\n';
 					state.stepPast();
