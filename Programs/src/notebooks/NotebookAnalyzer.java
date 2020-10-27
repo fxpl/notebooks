@@ -620,11 +620,11 @@ public class NotebookAnalyzer extends Analyzer {
 	 * @return @return A list of the all modules used and their count, sorted on count in descending order
 	 * @throws IOException On problems handling the output file
 	 */
-	public List<Quantity> modules() throws IOException {
+	public void modules() throws IOException {
 		List<List<PythonModule>> allModules = this.listModules();
 		List<Quantity> modulesSorted = sortedModules(allModules);
+		createModuleTopList(modulesSorted, 100);
 		this.functionUsages(allModules, modulesSorted, 10);
-		return modulesSorted;
 	}
 	
 	/**
@@ -732,14 +732,15 @@ public class NotebookAnalyzer extends Analyzer {
 	 * @param modules List of list of all imported modules, sorted in descending order
 	 * @param maxNum Maximum number of modules to include in the string
 	 * @return A string containing a list of the most common modules and their count
+	 * @throws IOException On problems with the output file
 	 */
-	static String mostCommonModulesAsString(List<Quantity> modules, int maxNum) {
+	private void createModuleTopList(List<Quantity> modules, int maxNum) throws IOException {
 		final int modulesToPrint = Math.min(maxNum, modules.size());
-		String result ="";
+		Writer writer = new FileWriter(outputDir + "/module_top_list" + LocalDateTime.now() + ".csv");
 		for (int i=0; i<modulesToPrint; i++) {
-			result += (i+1) + ". " + modules.get(i) + "\n";
+			writer.write(modules.get(i).toCsvString() + "\n");
 		}
-		return result;
+		writer.close();
 	}
 	
 	/**
@@ -985,9 +986,8 @@ public class NotebookAnalyzer extends Analyzer {
 				System.out.println("File with all language values created!");
 			}
 			if (modules) {
-				List<Quantity> modulesSorted = modules();
-				System.out.println("\nMost common modules:");
-				System.out.print(mostCommonModulesAsString(modulesSorted, 100));
+				modules();
+				System.out.println("Modules listed!:");
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
