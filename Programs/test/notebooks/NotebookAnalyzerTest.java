@@ -267,9 +267,9 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 	@Test
 	public void testArgumentParsing_modules() throws IOException {
 		String[] arg = {"--modules"};
-		String[] expectedFilePrefix = {"modules"};
+		String[] expectedFilePrefixes = {"modules", "module_top_list"};
 		analyzer.analyze(arg);
-		verifyExistenceOfAndRemove(expectedFilePrefix);
+		verifyExistenceOfAndRemove(expectedFilePrefixes);
 	}
 	
 	/**
@@ -890,48 +890,7 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 
 		lastOutputFile("loc").delete();
 	}
-	
-	/**
-	 * Verify that the correct modules are found in notebooks.
-	 */
-	@Test
-	public void testModules() throws IOException {
-		String dataDir = "test/data/modules";
-		String[] files = {"nb_1.ipynb", "nb_2.ipynb", "nb_R.ipynb",
-				"nb_3.ipynb", "nb_4.ipynb", "nb_5.ipynb"};
-		String[] pythonFiles = {"nb_1.ipynb", "nb_2.ipynb", "nb_3.ipynb",
-				"nb_4.ipynb", "nb_5.ipynb"};
-		List<List<PythonModule>> expectedModules = new ArrayList<List<PythonModule>>(files.length);
-		for (int i=0; i<files.length; i++) {
-			expectedModules.add(i, new ArrayList<PythonModule>());
-		}
-		expectedModules.get(0).add(0, new PythonModule("kossan_mu", ImportType.ORDINARY));
-		expectedModules.get(1).add(0, new PythonModule("kalv", "naut", ImportType.ALIAS));
-		expectedModules.get(2).add(0, new AllModules(new PythonModule("ko", ImportType.FROM)));
-		expectedModules.get(3).add(0, new PythonModule("module1", ImportType.ORDINARY));
-		expectedModules.get(3).add(1, new PythonModule("module2", "mod2", ImportType.ALIAS));
-		expectedModules.get(3).add(2, new PythonModule("module3", "mod3", ImportType.ALIAS));
-		expectedModules.get(4).add(0, new PythonModule("module10", ImportType.ORDINARY));
-		expectedModules.get(4).add(1, new PythonModule("module11", "mod", ImportType.ALIAS));
-		expectedModules.get(4).add(2, new PythonModule("module12", ImportType.ORDINARY));
-		expectedModules.get(4).add(3, new PythonModule("module13", "mod13", ImportType.ALIAS));
-		
-		for (String file: files) {
-			analyzer.initializeNotebooksFrom(dataDir + File.separator + file);
-		}
-		List<List<PythonModule>> modules = analyzer.listModules();
-		for (int i=0; i<pythonFiles.length; i++) {
-			assertEquals("Wrong modules returned for " + pythonFiles[i] + "!",
-					expectedModules.get(i), modules.get(i));
-			for (int j=0; j<expectedModules.get(i).size(); j++) {
-				assertEquals("Incorrect import type stored for notebook " + i + ", " + j + "!",
-						expectedModules.get(i).get(j).importedWith(),
-						modules.get(i).get(j).importedWith());
-			}
-		}
-		lastOutputFile("modules").delete();
-	}
-	
+
 	/**
 	 * Verify that the output file modules<current-date-time>.csv is created
 	 * and filled correctly when the modules are identified.
@@ -950,17 +909,19 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 			"nb_4.ipynb, module1(module1), module2(mod2), module3(mod3)",
 			"nb_5.ipynb, module10(module10), module11(mod), module12(module12), module13(mod13)"
 		};
+		String[] functionFileNamePrefixes = {"kossan_mu", "kalv", "ko",
+				"module1", "module2", "module3",
+				"module10", "module11", "module12", "module13"};
 		for (String file: files) {
 			analyzer.initializeNotebooksFrom(dataDir + File.separator + file);
 		}
-		List<Quantity> modulesSorted = analyzer.modules();
+		analyzer.modules();
 		checkCsv("modules", expectedLines);
 		
 		lastOutputFile("modules").delete();
-		int numFunctionFiles = Math.min(modulesSorted.size(), 10);
-		for (int i=0; i<numFunctionFiles; i++) {
-			String fileNamePrefix = modulesSorted.get(i).getIdentifier() + "-functions";
-			lastOutputFile(fileNamePrefix).delete();
+		lastOutputFile("module_top_list").delete();
+		for (String fileNamePrefix: functionFileNamePrefixes) {
+			lastOutputFile(fileNamePrefix + "-functions").delete();
 		}
 	}
 	
@@ -972,17 +933,42 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 	public void testModules_invalidFile() throws IOException {
 		String dataDir = "test/data/modules";
 		String file = "empty.ipynb";
-		List<Quantity> expectedModules = new ArrayList<>(0);
-		String[] expectedModulesLines = {
-			modulesHeader()
+		String[] expectedLines = {
+				modulesHeader()
 		};
 		analyzer.initializeNotebooksFrom(dataDir + File.separator + file);
-		List<Quantity> modules = analyzer.modules();
-		
-		assertEquals("Wrong modules returned for invalid file!",
-				expectedModules, modules);
-		checkCsv("modules", expectedModulesLines);
+		analyzer.modules();
+		lastOutputFile("module_top_list").delete();
+		checkCsv("modules", expectedLines);
 		lastOutputFile("modules").delete();
+	}
+	
+	/**
+	 * Verify that the module top list file is written correctly when modules
+	 * is called.
+	 * @throws IOException on errors when handling input/output file(s)
+	 */
+	@Test
+	public void testModuleTopList() throws IOException {
+		String dataDir = "test/data/modules";
+		String[] files = {"nb_36.ipynb", "nb_37.ipynb", "nb_38.ipynb"};
+		String[] expectedLines = {
+				"Base.A, 4",
+				"B, 3",
+				"C.D, 2",
+				"E, 1"
+		};
+		String[] functionFileNamePrefixes = {"Base.A", "B", "C.D", "E"};
+		for (String file: files) {
+			analyzer.initializeNotebooksFrom(dataDir + File.separator + file);
+		}
+		analyzer.modules();
+		lastOutputFile("modules").delete();
+		for (String fileNamePrefix: functionFileNamePrefixes) {
+			lastOutputFile(fileNamePrefix + "-functions").delete();
+		}
+		checkCsv("module_top_list", expectedLines);
+		lastOutputFile("module_top_list").delete();
 	}
 	
 	/**
@@ -1017,48 +1003,22 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 	 * is created.
 	 */
 	@Test
-	public void testSortedModules_diffParents() throws IOException {
+	public void testModuleTopList_diffParents() throws IOException {
 		String dataDir = "test/data/modules";
 		String[] files = {"nb_30.ipynb", "nb_31.ipynb", "nb_35.ipynb"};
+		String[] expectedLines = {
+				"A.B.C, 2",
+				"B.C, 1"
+		};
 		for (String file: files) {
 			analyzer.initializeNotebooksFrom(dataDir + File.separator + file);
 		}
-		
-		List<Quantity> expectedModulesSorted = new ArrayList<Quantity>(2);
-		expectedModulesSorted.add(0, new Quantity("A.B.C", 2));
-		expectedModulesSorted.add(1, new Quantity("B.C", 1));
-		List<Quantity> modulesSorted = analyzer.modules();
-		assertEquals("Wrong module quantities stored when name is same but ancestors differ.",
-				expectedModulesSorted, modulesSorted);
+		analyzer.modules();
+		lastOutputFile("modules").delete();
 		lastOutputFile("A.B.C-functions").delete();
 		lastOutputFile("B.C-functions").delete();
-	}
-	
-	/**
-	 * Verify that the string representation of the most commonly imported
-	 * modules is created correctly.
-	 * @throws IOException on errors handling the input files
-	 */
-	@Test
-	public void testMostCommonModulesAsString() throws IOException {
-		List<Quantity> modulesSorted = new ArrayList<Quantity>();
-		modulesSorted.add(0, new Quantity("moduleZ", 4));
-		modulesSorted.add(1, new Quantity("moduleY", 3));
-		modulesSorted.add(2, new Quantity("moduleW", 2));
-		modulesSorted.add(3, new Quantity("parentModule.moduleX", 1));
-		
-		// All modules
-		String expectedModulesString = "1. moduleZ: 4\n"
-				+ "2. moduleY: 3\n"
-				+ "3. moduleW: 2\n"
-				+ "4. parentModule.moduleX: 1\n";
-		String modulesString = NotebookAnalyzer.mostCommonModulesAsString(modulesSorted, Integer.MAX_VALUE);
-		assertEquals("Wrong top modules reported!", expectedModulesString, modulesString);
-		// Limited number of modules
-		expectedModulesString = "1. moduleZ: 4\n";
-		modulesString = NotebookAnalyzer.mostCommonModulesAsString(modulesSorted, 1);
-		assertEquals("Wrong top modules reported!", expectedModulesString, modulesString);
-		lastOutputFile("modules").delete();
+		checkCsv("module_top_list", expectedLines);
+		lastOutputFile("module_top_list").delete();
 	}
 	
 	/**
@@ -1139,6 +1099,7 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 		}
 		analyzer.modules();	// Will call functionUsages, and the preparation steps.
 		lastOutputFile("modules").delete();
+		lastOutputFile("module_top_list").delete();
 		checkCsv("math-functions", expectedLines);
 		lastOutputFile("math-functions").delete();
 	}
