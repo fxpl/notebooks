@@ -11,7 +11,7 @@ Argument:
    [<directory>/]<module>.<function_name>-<any string>, where <module> is the
    name of the module where the function can be found and <function_name> is
    the name of the function that is called.
-TODO: Outputdirectory
+2: The path to the directory where the output will be stored
 
 Output:
 * A file named <function_name>_executable.csv containing all calls that are
@@ -28,13 +28,13 @@ import numpy
 import matplotlib.pyplot
 
 
-def find_risky_pairs(input_path, module, function_name):
+def find_risky_pairs(input_path, output_dir, module, function_name):
 	# TODO input
 	"""
 		List executable calls and and risky arguments according to description
 		above.
 	"""
-	executable_calls_path = function_name + "_executable.csv"
+	executable_calls_path = output_dir + "/" + function_name + "_executable.csv"
 	with open(input_path) as input_file, open(executable_calls_path, "w") as output_file:
 		lines = input_file.readlines()
 		for line in lines:
@@ -50,7 +50,7 @@ def find_risky_pairs(input_path, module, function_name):
 				# If we reach this point, the statement is executable (with literals)
 				risky_pairs = eval(function_call)
 				for pair in risky_pairs:
-					pair_file_path = pair + ".csv"
+					pair_file_path = output_dir + "/" + pair + ".csv"
 					with open(pair_file_path, "a") as pair_file:
 						pair_file.write(function_call)
 			except:
@@ -88,10 +88,19 @@ def zeros(shape, dtype=DEFAULT, order=DEFAULT):
 	return pairs
 
 
+if len(sys.argv) < 2 or len(sys.argv) > 3:
+	print("One or two arguments expected: path to input file and (optionally) output directory!")
+	quit()
+
 input_path = sys.argv[1]
+if len(sys.argv) > 2:
+	output_dir = sys.argv[2]
+else:
+	output_dir = "."
+	
 input_file_name = input_path.split("/")[-1]
 function_identifier = input_file_name.split("-")[0]
 identifier_substrings = function_identifier.split(".") 
 module = ".".join(identifier_substrings[0:-1])
 function_name = identifier_substrings[-1]
-find_risky_pairs(input_path, module, function_name)
+find_risky_pairs(input_path, output_dir, module, function_name)
