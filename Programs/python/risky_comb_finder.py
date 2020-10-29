@@ -91,6 +91,28 @@ Currently supported functions:
 def show(block=DEFAULT):
 	return []	# There are no risky combinations, since there is only 1 parameter.
 
+def arange(start=DEFAULT, stop=DEFAULT, step=DEFAULT, dtype=DEFAULT):
+	if DEFAULT == stop:
+		# Only 1 parameter is given. It should be interpreted as stop instead of start.
+		# (We know it's an executable call!)
+		stop = start
+		start = DEFAULT
+	#  If step is specified as a position argument, start must also be given.
+	start_value = start
+	stop_value = stop # Always specified
+	step_value = step
+	if DEFAULT == start_value:
+		start_value = 0
+	if DEFAULT == step_value:
+		step_value = 1
+	
+	pairs = []
+	interval = stop_value-start_value
+	if (interval > 0 and step_value < 0) or (interval<0 and step_value > 0):
+		pairs.append("arange.start-stop-step")
+	return pairs
+
+
 def zeros(shape, dtype=DEFAULT, order=DEFAULT):
 	dtype_value = dtype
 	order_value = order
