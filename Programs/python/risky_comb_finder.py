@@ -24,12 +24,12 @@ Output:
 DEFAULT = "kossaapaabcdefghijklmnopqrstuvwxypzåäööäåzpyxwvutsrqponmlkjihgfedcbaapakossa"
 
 import sys
+import re
 import numpy
 import matplotlib.pyplot
 
 
 def find_risky_pairs(input_path, output_dir, module, function_name):
-	# TODO input
 	"""
 	List executable calls and and risky arguments according to description
 	above.
@@ -38,15 +38,16 @@ def find_risky_pairs(input_path, output_dir, module, function_name):
 	with open(input_path) as input_file, open(executable_calls_path, "w") as output_file:
 		lines = input_file.readlines()
 		for line in lines:
-			function_call = _get_function_call(line)
-			try:
-				eval(module + "." + function_call)
-				output_file.write(function_call)
-				# If we reach this point, the statement is executable (with literals)
-				_report_risky_pairs(function_call)
-			except:
-				# We want to skip calls that don't work
-				pass
+			if None == re.search("input\s*\(", line):
+				function_call = _get_function_call(line)
+				try:
+					eval(module + "." + function_call)
+					output_file.write(function_call)
+					# If we reach this point, the statement is executable (with literals)
+					_report_risky_pairs(function_call)
+				except:
+					# We want to skip calls that don't work
+					pass
 
 
 def _get_function_call(statement):
