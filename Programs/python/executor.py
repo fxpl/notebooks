@@ -31,31 +31,48 @@ import matplotlib.pyplot
 def find_risky_pairs(input_path, output_dir, module, function_name):
 	# TODO input
 	"""
-		List executable calls and and risky arguments according to description
-		above.
+	List executable calls and and risky arguments according to description
+	above.
 	"""
 	executable_calls_path = output_dir + "/" + function_name + "_executable.csv"
 	with open(input_path) as input_file, open(executable_calls_path, "w") as output_file:
 		lines = input_file.readlines()
 		for line in lines:
-			substrings = line.split("(")
-			if "." in substrings[0]:
-				start_index = substrings[0].rindex(".") + 1
-			else:
-				start_index = 0
-			function_call=line[start_index:]
+			function_call = _get_function_call(line)
 			try:
 				eval(module + "." + function_call)
 				output_file.write(function_call)
 				# If we reach this point, the statement is executable (with literals)
-				risky_pairs = eval(function_call)
-				for pair in risky_pairs:
-					pair_file_path = output_dir + "/" + pair + ".csv"
-					with open(pair_file_path, "a") as pair_file:
-						pair_file.write(function_call)
+				_report_risky_pairs(function_call)
 			except:
-				# We don't want to write calls that don't work
-				pass	
+				# We want to skip calls that don't work
+				pass
+
+
+def _get_function_call(statement):
+	"""
+	Extract and return the function call, without preceding module names, from
+	a statement.
+	"""
+	substrings = statement.split("(")
+	if "." in substrings[0]:
+		start_index = substrings[0].rindex(".") + 1
+	else:
+		start_index = 0
+	return statement[start_index:]
+
+
+def _report_risky_pairs(function_call):
+	"""
+	Report all risky argument combinations in the provided function call to
+	files. The function_call shall not contain the module of the function.
+	"""
+	risky_pairs = eval(function_call)
+	for pair in risky_pairs:
+		pair_file_path = output_dir + "/" + pair + ".csv"
+		with open(pair_file_path, "a") as pair_file:
+			pair_file.write(function_call)
+
 
 """
 Each of the functions below check for risky argument combinations in a call to
