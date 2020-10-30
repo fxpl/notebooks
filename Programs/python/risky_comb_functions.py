@@ -2,8 +2,7 @@ import re
 import numpy
 import matplotlib.pyplot
 
-_DEFAULT = "kossaapaabcdefghijklmnopqrstuvwxypzåäööäåzpyxwvutsrqponmlkjihgfedcbaapakossa"
-# TODO: Använd bara _DEFAULT där det är nödvändigt!
+_UNSPECIFIED = "kossaapaabcdefghijklmnopqrstuvwxypzåäööäåzpyxwvutsrqponmlkjihgfedcbaapakossa"
 
 def find_risky_pairs(input_path, output_dir, module, function_name):
 	"""
@@ -77,17 +76,17 @@ def _report_risky_pairs(function_call, output_dir):
 
 def _get_value(param, default_value):
 	"""
-	Return the value of param unless this value is _DEFAULT. Then return
+	Return the value of param unless this value is _UNSPECIFIED. Then return
 	default_value instead.
 	"""
-	if _is_defined(param):
+	if _is_specified(param):
 		return param
 	else:
 		return default_value
 
 
-def _is_defined(param):
-	return _DEFAULT != param
+def _is_specified(param):
+	return _UNSPECIFIED != param
 
 
 """
@@ -105,16 +104,16 @@ Currently supported functions:
 - numpy.zeros
 """
 
-def show(block=_DEFAULT):
+def show(block=None):
 	return []	# There are no risky combinations, since there is only 1 parameter.
 
 
-def arange(start=_DEFAULT, stop=_DEFAULT, step=_DEFAULT, dtype=_DEFAULT):
-	if not _is_defined(stop):
+def arange(start=0, stop=_UNSPECIFIED, step=1, dtype=None):
+	if not _is_specified(stop):
 		# Only 1 parameter is given. It should be interpreted as stop instead of start.
 		# (We know it's an executable call!)
 		stop = start
-		start = _DEFAULT
+		start = _UNSPECIFIED
 	#  If step is specified as a position argument, start must also be given.
 	start = int(_get_value(start, 0))
 	step = int(_get_value(step, 1))
@@ -127,14 +126,9 @@ def arange(start=_DEFAULT, stop=_DEFAULT, step=_DEFAULT, dtype=_DEFAULT):
 	return pairs
 
 
-def array(obj, dtype=_DEFAULT, *, copy=_DEFAULT, order=_DEFAULT, subok=_DEFAULT, ndmin=_DEFAULT):
-	# TODO: Datatyper!
-	order_set = _is_defined(order)
-	dtype = _get_value(dtype, None)
-	copy = _get_value(copy, True)
+def array(obj, dtype=None, *, copy=True, order=_UNSPECIFIED, subok=False, ndmin=0):
+	order_set = _is_specified(order)
 	order = _get_value(order, "K")
-	subok = _get_value(subok, False)
-	ndmin = _get_value(ndmin, 0)
 	
 	pairs = []
 	array = numpy.array(obj, dtype=dtype, copy=copy, order=order, subok=subok, ndmin=ndmin)
@@ -147,9 +141,8 @@ def array(obj, dtype=_DEFAULT, *, copy=_DEFAULT, order=_DEFAULT, subok=_DEFAULT,
 	return pairs
 
 
-def zeros(shape, dtype=_DEFAULT, order=_DEFAULT):
-	order_set = _is_defined(order)
-	dtype = _get_value(dtype, float)
+def zeros(shape, dtype=float, order=_UNSPECIFIED):
+	order_set = _is_specified(order)
 	order = _get_value(order, "C")
 	
 	pairs = []
