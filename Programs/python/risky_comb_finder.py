@@ -92,42 +92,46 @@ def show(block=DEFAULT):
 	return []	# There are no risky combinations, since there is only 1 parameter.
 
 def arange(start=DEFAULT, stop=DEFAULT, step=DEFAULT, dtype=DEFAULT):
-	if DEFAULT == stop:
+	if _is_defined(stop):
 		# Only 1 parameter is given. It should be interpreted as stop instead of start.
 		# (We know it's an executable call!)
 		stop = start
 		start = DEFAULT
 	#  If step is specified as a position argument, start must also be given.
-	start_value = start
-	stop_value = stop # Always specified
-	step_value = step
-	if DEFAULT == start_value:
-		start_value = 0
-	if DEFAULT == step_value:
-		step_value = 1
+	start = _get_value(start, 0)
+	step = _get_value(step, 1)
+	# stop is always specified
 	
 	pairs = []
-	interval = stop_value-start_value
-	if (interval > 0 and step_value < 0) or (interval<0 and step_value > 0):
+	interval = stop-start
+	if (interval > 0 and step < 0) or (interval<0 and step > 0):
 		pairs.append("arange.start-stop-step")
 	return pairs
 
-
 def zeros(shape, dtype=DEFAULT, order=DEFAULT):
-	dtype_value = dtype
-	order_value = order
-	if DEFAULT == dtype_value:
-		dtype_value = float
-	if DEFAULT == order_value:
-		order_value = "C"
+	order_set = _is_defined(order)
+	dtype = _get_value(dtype, float)
+	order = _get_value(order, "C")
+	
 	pairs = []
-	array = numpy.zeros(shape, dtype=dtype_value, order=order_value)
-	if 1 == len(numpy.shape(array)) and DEFAULT != order:
+	array = numpy.zeros(shape, dtype=dtype, order=order)
+	if 1 == len(numpy.shape(array)) and order_set:
 		# The user has specified order for a 1D array
 		pairs.append("zeros.shape-order")
 	return pairs
 
 
+def _get_value(param, default_value):
+	if DEFAULT == param:
+		return default_value
+	else:
+		return param
+
+def _is_defined(param):
+	return DEFAULT != param
+
+
+""" MAIN """
 if len(sys.argv) < 2 or len(sys.argv) > 3:
 	print("One or two arguments expected: path to input file and (optionally) output directory!")
 	quit()
