@@ -139,7 +139,7 @@ def array(obj, dtype=DEFAULT, *, copy=DEFAULT, order=DEFAULT, subok=DEFAULT, ndm
 	array = numpy.array(obj, dtype=dtype, copy=copy, order=order, subok=subok, ndmin=ndmin)
 	if 1 == len(numpy.shape(array)) and order_set:
 		# The user has specified order for a 1D array
-		pairs.append("array.shape-order")
+		pairs.append("array.object-order")
 	
 	if False == copy and not numpy.shares_memory(array, obj):
 		pairs.append("array.copy")
