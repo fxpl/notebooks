@@ -75,6 +75,17 @@ def _report_risky_pairs(function_call):
 			pair_file.write(function_call)
 
 
+def _get_value(param, default_value):
+	if DEFAULT == param:
+		return default_value
+	else:
+		return param
+
+
+def _is_defined(param):
+	return DEFAULT != param
+
+
 """
 Each of the functions below check for risky argument combinations in a call to
 the function (one of those listed in this comment) that has the same name. The
@@ -85,11 +96,14 @@ format <function_name>.<parameter1>-<parameter2>.csv
 
 Currently supported functions:
 - matplotlib.pyplot.show
+- numpy.arange
+- numpy.array
 - numpy.zeros
 """
 
 def show(block=DEFAULT):
 	return []	# There are no risky combinations, since there is only 1 parameter.
+
 
 def arange(start=DEFAULT, stop=DEFAULT, step=DEFAULT, dtype=DEFAULT):
 	if _is_defined(stop):
@@ -108,17 +122,6 @@ def arange(start=DEFAULT, stop=DEFAULT, step=DEFAULT, dtype=DEFAULT):
 		pairs.append("arange.start-stop-step")
 	return pairs
 
-def zeros(shape, dtype=DEFAULT, order=DEFAULT):
-	order_set = _is_defined(order)
-	dtype = _get_value(dtype, float)
-	order = _get_value(order, "C")
-	
-	pairs = []
-	array = numpy.zeros(shape, dtype=dtype, order=order)
-	if 1 == len(numpy.shape(array)) and order_set:
-		# The user has specified order for a 1D array
-		pairs.append("zeros.shape-order")
-	return pairs
 
 def array(obj, dtype=DEFAULT, *, copy=DEFAULT, order=DEFAULT, subok=DEFAULT, ndmin=DEFAULT):
 	order_set = _is_defined(order)
@@ -139,14 +142,18 @@ def array(obj, dtype=DEFAULT, *, copy=DEFAULT, order=DEFAULT, subok=DEFAULT, ndm
 	return pairs
 
 
-def _get_value(param, default_value):
-	if DEFAULT == param:
-		return default_value
-	else:
-		return param
+def zeros(shape, dtype=DEFAULT, order=DEFAULT):
+	order_set = _is_defined(order)
+	dtype = _get_value(dtype, float)
+	order = _get_value(order, "C")
+	
+	pairs = []
+	array = numpy.zeros(shape, dtype=dtype, order=order)
+	if 1 == len(numpy.shape(array)) and order_set:
+		# The user has specified order for a 1D array
+		pairs.append("zeros.shape-order")
+	return pairs
 
-def _is_defined(param):
-	return DEFAULT != param
 
 
 """ MAIN """
