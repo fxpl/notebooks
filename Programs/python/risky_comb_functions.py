@@ -4,6 +4,7 @@ import matplotlib.pyplot
 
 DEFAULT = "kossaapaabcdefghijklmnopqrstuvwxypzåäööäåzpyxwvutsrqponmlkjihgfedcbaapakossa"
 # TODO: Använd bara DEFAULT där det är nödvändigt!
+# TODO: Gör DEFAULT privat
 
 def find_risky_pairs(input_path, output_dir, module, function_name):
 	"""
@@ -110,14 +111,14 @@ def show(block=DEFAULT):
 
 
 def arange(start=DEFAULT, stop=DEFAULT, step=DEFAULT, dtype=DEFAULT):
-	if _is_defined(stop):
+	if not _is_defined(stop):
 		# Only 1 parameter is given. It should be interpreted as stop instead of start.
 		# (We know it's an executable call!)
 		stop = start
 		start = DEFAULT
 	#  If step is specified as a position argument, start must also be given.
-	start = _get_value(start, 0)
-	step = _get_value(step, 1)
+	start = int(_get_value(start, 0))
+	step = int(_get_value(step, 1))
 	# stop is always specified
 	
 	pairs = []
@@ -128,6 +129,7 @@ def arange(start=DEFAULT, stop=DEFAULT, step=DEFAULT, dtype=DEFAULT):
 
 
 def array(obj, dtype=DEFAULT, *, copy=DEFAULT, order=DEFAULT, subok=DEFAULT, ndmin=DEFAULT):
+	# TODO: Datatyper!
 	order_set = _is_defined(order)
 	dtype = _get_value(dtype, None)
 	copy = _get_value(copy, True)

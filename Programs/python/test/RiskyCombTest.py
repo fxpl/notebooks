@@ -1,11 +1,5 @@
 """
 TO TEST:
-- arange:
-	1 parameter (OK/inte OK)
-	2 parametrar (OK/inte OK)
-	3 parametrar (OK/inte OK)
-	Namngivna parametrar
-
 - find_risky_pairs
 	Läs testfil med både giltiga och ogiltiga anrop. Kolla att de giltiga (och bara de) listas i outputfilen.
 	Några anrop med risky pairs. Kolla att dessa listas i korrekt namngivna outputfiler.
@@ -22,6 +16,25 @@ class RiskyCombTest(unittest.TestCase):
 		result = show()
 		self.assertEqual([], result, "Non-empty list returned by show!")
 	
+	def test_arange_valid(self):
+		result = arange(2)
+		self.assertEqual([], result, "Non-empty list returned by correct call to arange!")
+		result = arange(1, 1)
+		self.assertEqual([], result, "Non-empty list returned by correct call to arange!")
+		result = arange(0, 5, 0.5)
+		self.assertEqual([], result, "Non-empty list returned by correct call to arange!")
+		result = arange(step=0.5, start=2, stop=5)
+		self.assertEqual([], result, "Non-empty list returned by correct call to arange!")
+	
+	def test_arange_wrong_step(self):
+		expected = ["arange.start-stop-step"]
+		result = arange(-5)
+		self.assertEqual(expected, result, "Wrong list returned by arange when span is negative and step positive.")
+		result = arange(10, 5)
+		self.assertEqual(expected, result, "Wrong list returned by arange when span is negative and step positive.")
+		result = arange(20, 25, -1)
+		self.assertEqual(expected, result, "Wrong list returned by arange when span is positive and step negative.")
+	
 	def test_array_valid(self):
 		result = array([1, 2, 3])
 		self.assertEqual([], result, "Non-empty list returned by correct call to array (default values)!")
@@ -33,7 +46,7 @@ class RiskyCombTest(unittest.TestCase):
 	def test_array_order_for_1D(self):
 		result = array([1, 2, 3], order="F")
 		expected = ["array.object-order"]
-		self.assertEqual(expected, result, "Wrong result when calling array with order for 1D restul!")
+		self.assertEqual(expected, result, "Wrong result when calling array with order for 1D result!")
 	
 	def test_array_copy_false(self):
 		result = array([1, 2, 3], copy=False)
