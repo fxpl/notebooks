@@ -2,9 +2,8 @@ import re
 import numpy
 import matplotlib.pyplot
 
-DEFAULT = "kossaapaabcdefghijklmnopqrstuvwxypzåäööäåzpyxwvutsrqponmlkjihgfedcbaapakossa"
-# TODO: Använd bara DEFAULT där det är nödvändigt!
-# TODO: Gör DEFAULT privat
+_DEFAULT = "kossaapaabcdefghijklmnopqrstuvwxypzåäööäåzpyxwvutsrqponmlkjihgfedcbaapakossa"
+# TODO: Använd bara _DEFAULT där det är nödvändigt!
 
 def find_risky_pairs(input_path, output_dir, module, function_name):
 	"""
@@ -78,7 +77,7 @@ def _report_risky_pairs(function_call, output_dir):
 
 def _get_value(param, default_value):
 	"""
-	Return the value of param unless this value is DEFAULT. Then return
+	Return the value of param unless this value is _DEFAULT. Then return
 	default_value instead.
 	"""
 	if _is_defined(param):
@@ -88,7 +87,7 @@ def _get_value(param, default_value):
 
 
 def _is_defined(param):
-	return DEFAULT != param
+	return _DEFAULT != param
 
 
 """
@@ -106,16 +105,16 @@ Currently supported functions:
 - numpy.zeros
 """
 
-def show(block=DEFAULT):
+def show(block=_DEFAULT):
 	return []	# There are no risky combinations, since there is only 1 parameter.
 
 
-def arange(start=DEFAULT, stop=DEFAULT, step=DEFAULT, dtype=DEFAULT):
+def arange(start=_DEFAULT, stop=_DEFAULT, step=_DEFAULT, dtype=_DEFAULT):
 	if not _is_defined(stop):
 		# Only 1 parameter is given. It should be interpreted as stop instead of start.
 		# (We know it's an executable call!)
 		stop = start
-		start = DEFAULT
+		start = _DEFAULT
 	#  If step is specified as a position argument, start must also be given.
 	start = int(_get_value(start, 0))
 	step = int(_get_value(step, 1))
@@ -128,7 +127,7 @@ def arange(start=DEFAULT, stop=DEFAULT, step=DEFAULT, dtype=DEFAULT):
 	return pairs
 
 
-def array(obj, dtype=DEFAULT, *, copy=DEFAULT, order=DEFAULT, subok=DEFAULT, ndmin=DEFAULT):
+def array(obj, dtype=_DEFAULT, *, copy=_DEFAULT, order=_DEFAULT, subok=_DEFAULT, ndmin=_DEFAULT):
 	# TODO: Datatyper!
 	order_set = _is_defined(order)
 	dtype = _get_value(dtype, None)
@@ -148,7 +147,7 @@ def array(obj, dtype=DEFAULT, *, copy=DEFAULT, order=DEFAULT, subok=DEFAULT, ndm
 	return pairs
 
 
-def zeros(shape, dtype=DEFAULT, order=DEFAULT):
+def zeros(shape, dtype=_DEFAULT, order=_DEFAULT):
 	order_set = _is_defined(order)
 	dtype = _get_value(dtype, float)
 	order = _get_value(order, "C")
