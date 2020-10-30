@@ -120,6 +120,24 @@ def zeros(shape, dtype=DEFAULT, order=DEFAULT):
 		pairs.append("zeros.shape-order")
 	return pairs
 
+def array(obj, dtype=DEFAULT, *, copy=DEFAULT, order=DEFAULT, subok=DEFAULT, ndmin=DEFAULT):
+	order_set = _is_defined(order)
+	dtype = _get_value(dtype, None)
+	copy = _get_value(copy, True)
+	order = _get_value(order, "K")
+	subok = _get_value(subok, False)
+	ndmin = _get_value(ndmin, 0)
+	
+	pairs = []
+	array = numpy.array(obj, dtype=dtype, copy=copy, order=order, subok=subok, ndmin=ndmin)
+	if 1 == len(numpy.shape(array)) and order_set:
+		# The user has specified order for a 1D array
+		pairs.append("array.shape-order")
+	
+	if False == copy and not numpy.shares_memory(array, obj):
+		pairs.append("array.copy")
+	return pairs
+
 
 def _get_value(param, default_value):
 	if DEFAULT == param:
