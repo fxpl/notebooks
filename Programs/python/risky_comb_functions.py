@@ -98,11 +98,142 @@ function returns a list of strings representing the risky argument combinations
 format <function_name>.<parameter1>-<parameter2>.csv
 
 Currently supported functions:
+- matplotlib.pyplot.plot
 - matplotlib.pyplot.show
 - numpy.arange
 - numpy.array
 - numpy.zeros
 """
+
+def plot(*args,
+		scalex=_UNSPECIFIED,
+		scaley=_UNSPECIFIED,
+		data=_UNSPECIFIED,
+		agg_filter=_UNSPECIFIED,
+		alpha=_UNSPECIFIED,
+		animated=_UNSPECIFIED,
+		anitaliased=_UNSPECIFIED,
+		clip_box=_UNSPECIFIED,
+		clip_on=_UNSPECIFIED,
+		clip_path=_UNSPECIFIED,
+		color=_UNSPECIFIED,
+		contains=_UNSPECIFIED,
+		dash_capstyle=_UNSPECIFIED,
+		dash_joinstyle=_UNSPECIFIED,
+		dashes=_UNSPECIFIED,
+		drawstyle=_UNSPECIFIED,
+		figure=_UNSPECIFIED,
+		fillstyle=_UNSPECIFIED,
+		gid=_UNSPECIFIED,
+		in_layout=_UNSPECIFIED,
+		label=_UNSPECIFIED,
+		linestyle=_UNSPECIFIED,
+		linewidth=_UNSPECIFIED,
+		marker=_UNSPECIFIED,
+		markeredgecolor=_UNSPECIFIED,
+		markeredgewidth=_UNSPECIFIED,
+		markerfacecolor=_UNSPECIFIED,
+		markerfacecoloralt=_UNSPECIFIED,
+		markersize=_UNSPECIFIED,
+		markevery=_UNSPECIFIED,
+		path_effects=_UNSPECIFIED,
+		picker=_UNSPECIFIED,
+		pickradius=_UNSPECIFIED,
+		rasterized=_UNSPECIFIED,
+		sketch_params=_UNSPECIFIED,
+		snap=_UNSPECIFIED,
+		solid_capstyle=_UNSPECIFIED,
+		solid_joinstyle=_UNSPECIFIED,
+		transform=_UNSPECIFIED,
+		url=_UNSPECIFIED,
+		visible=_UNSPECIFIED,
+		xdata=_UNSPECIFIED,
+		ydata=_UNSPECIFIED):
+	result = []
+	
+	# Check content of fmt string
+	fmt_markers = ['.', ',', 'o', 'v', '^', '<', '>', '1', '2', '3', '4', 's', 'p', '*', 'h', 'H', '+', 'x', 'D', 'd', '|', '_']
+	fmt_linestyles = ['-', '--', '-.'':']
+	fmt_colors = ['r', 'g', 'b', 'c', 'm',' y', 'k', 'w']
+	fmt_marker_specified = False
+	fmt_linestyle_specified = False
+	fmt_linestyle_solid = False
+	fmt_color_specified = False
+	for arg in args:
+		if isinstance(arg, str):
+			for fmt_marker in fmt_markers:
+				if fmt_marker in arg:
+					fmt_marker_specified = True
+			for fmt_linestyle in fmt_linestyles:
+				if fmt_linestyle in arg:
+					fmt_linestyle_specified = True
+					if fmt_linestyle == "-" and not "--" in arg and not "-." in arg:
+						fmt_linestyle_solid = True
+			for fmt_color in fmt_colors:
+				if fmt_color in arg:
+					fmt_color_specified = True
+			if "#" in arg:	# Color specified with hex code
+				fmt_color_specified=True
+	# fmt in combination with marker, linestyle and color
+	if fmt_marker_specified and _is_specified(marker):
+		result.append("plot.fmt-marker")
+	if fmt_linestyle_specified and _is_specified(linestyle):
+		result.append("plot.fmt-linestyle")
+	if fmt_color_specified and _is_specified(color):
+		result.append("plot.fmt-color")
+	
+	# linestyle and dashes
+	if _is_specified(linestyle) and _is_specified(dashes):
+		result.append("plot.linestyle-dashes")
+	
+	# dash_*style for solid line och solid_*style for dashed line
+	solid = False
+	if not (fmt_linestyle_specified or _is_specified(linestyle) or _is_specified(dashes)):
+		# Default (solid line) used
+		solid = True
+	if fmt_linestyle_solid or "-" == linestyle:
+		solid = True
+	if _is_specified(dashes):
+		solid = True
+		for i in numpy.arange(1, len(dashes), 2):
+			if 0 != dashes[i]: # There is a space between dashes
+				solid = False
+	
+	if solid:
+		if _is_specified(dash_capstyle):
+			result.append("plot.fmt-dash_capstyle")
+		if _is_specified(dash_joinstyle):
+			result.append("plot.fmt-dash_joinstyle")
+	else:
+		if _is_specified(solid_capstyle):
+			result.append("plot.fmt-solid_capstyle")
+		if _is_specified(solid_joinstyle):
+			result.append("plot.fmt-solid_joinstyle")
+	
+	# Marker properties set for non-marker
+	if (not _is_specified(marker) or None==marker or ""==marker) and not fmt_marker_specified:
+		# There is a marker
+		if _is_specified(fillstyle):
+			result.append("plot.marker-fillstyle")
+		if _is_specified(markeredgecolor):
+			result.append("plot.marker-markeredgecolor")
+		if _is_specified(markeredgewidth):
+			result.append("plot.marker-markeredgewidth")
+		if _is_specified(markerfacecolor):
+			result.append("plot.marker-markerfacecolor")
+		if _is_specified(markerfacecoloralt):
+			result.append("plot.marker-markerfacecoloralt")
+		if _is_specified(markersize):
+			result.append("plot.marker-markersize")
+		if _is_specified(markevery):
+			result.append("plot.marker-markevery")
+	
+	# pickradius without picker
+	if _is_specified(pickradius):
+		if not _is_specified(picker) or None==picker or False==picker:
+			result.append("plot.picker-pickradius")
+	
+	return result
 
 def show(block=None):
 	return []	# There are no risky combinations, since there is only 1 parameter.
