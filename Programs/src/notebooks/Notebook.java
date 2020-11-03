@@ -100,8 +100,13 @@ public class Notebook {
 					for (PythonModule function: functions) {
 						for (PythonModule module: modules) {
 							if (function.is(module) || function.parentIs(module)) {
-								List<String> calls = module.callsTo(function.name, line);
-								result.get(function).addAll(calls);
+								try {
+									List<String> calls = module.callsTo(function.name, line);
+									result.get(function).addAll(calls);
+								} catch (NotebookException e) {
+									System.err.println("Could not extract function calls for "
+											+ this.path + ": " + e.getMessage());
+								}
 							}
 						}
 					}

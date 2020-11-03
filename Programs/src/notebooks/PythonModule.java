@@ -222,8 +222,9 @@ public class PythonModule {
 	 * @param functionName Function for which to count calls
 	 * @param line Code line to look for calls in
 	 * @return A list of calls to functionName in line
+	 * @throws NotbookException when line contains incorrect function call
 	 */
-	public List<String> callsTo(String functionName, String line) {
+	public List<String> callsTo(String functionName, String line) throws NotebookException {
 		List<String> result = new ArrayList<String>(1);
 		// Usages of functions located in an imported module
 		Matcher usageMatcher = functionInModuleCallMatcher(functionName, line);
@@ -238,7 +239,7 @@ public class PythonModule {
 		return result;
 	}
 
-	protected static List<String> extractFunctionCalls(Matcher usageMatcher, String line) {
+	protected static List<String> extractFunctionCalls(Matcher usageMatcher, String line) throws NotebookException {
 		List<String> result = new ArrayList<String>(1);	// Most of the times, there will only be 1 call/line(?)
 		while (usageMatcher.find()) {
 			CodeState state = new CodeState(line, usageMatcher.start(), new String[]{"\"", "'"});
@@ -247,9 +248,8 @@ public class PythonModule {
 			String call = "";
 			while (!bracketFound || 0 != bracketLevel) {
 				if (!state.inCode()) {
-					// We have stepped outside the line without finding the expected parantheses.
-					call = "";
-					break;
+					// We have stepped outside the line without finding the expected parentheses.
+					throw new NotebookException("Invalid line: " + line);
 				}
 				char currentChar = state.currentChar();
 				// Comments are removed in preprocessing, but strings may still exist
@@ -262,11 +262,7 @@ public class PythonModule {
 				call += currentChar;
 				state.step();
 			}
-			if (0 < call.length()) {
-				result.add(call.trim());
-			} else {
-				System.err.println("Couldn't extract function calls from line: " + line);
-			}
+			result.add(call.trim());
 		}
 		return result;
 	}

@@ -63,7 +63,7 @@ public class AllModules extends PythonModule {
 	 * @return A list of calls to functionName in line
 	 */
 	@Override
-	public List<String> callsTo(String functionName, String line) {
+	public List<String> callsTo(String functionName, String line) throws NotebookException {
 		storeFunctionsIfNotDone();
 		List<String> result = new ArrayList<String>(1);
 		String[] functionsInModule = functionsInModules.get(parent.pedigreeString());

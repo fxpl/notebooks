@@ -140,7 +140,7 @@ public class AllModulesTest {
 	}
 	
 	@Test
-	public void testCallsTo() {
+	public void testCallsTo() throws NotebookException {
 		PythonModule mathModule = new PythonModule("math", ImportType.FROM);
 		PythonModule mathFunctions = new AllModules(mathModule);
 		
@@ -153,7 +153,7 @@ public class AllModulesTest {
 	}
 	
 	@Test
-	public void testCallsTo_noMatch() {
+	public void testCallsTo_noMatch() throws NotebookException {
 		PythonModule mathModule = new PythonModule("math", ImportType.FROM);
 		PythonModule mathFunctions = new AllModules(mathModule);
 		

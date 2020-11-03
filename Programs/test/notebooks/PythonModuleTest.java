@@ -510,7 +510,7 @@ public class PythonModuleTest {
 	}
 	
 	@Test
-	public void testCallsTo_ordinary() {
+	public void testCallsTo_ordinary() throws NotebookException {
 		PythonModule module = new PythonModule(name, ImportType.ORDINARY);
 		List<String> expectedCalls = new ArrayList<String>(1);
 		expectedCalls.add(name + ".f(x)");
@@ -520,7 +520,7 @@ public class PythonModuleTest {
 	}
 	
 	@Test
-	public void testCallsTo_alias() {
+	public void testCallsTo_alias() throws NotebookException {
 		PythonModule module = new PythonModule(name, alias, ImportType.ALIAS);
 		List<String> expectedCalls = new ArrayList<String>(1);
 		expectedCalls.add(alias + ".f(x)");
@@ -530,7 +530,7 @@ public class PythonModuleTest {
 	}
 	
 	@Test
-	public void testCallsTo_from() {
+	public void testCallsTo_from() throws NotebookException {
 		PythonModule parent = new PythonModule(name, ImportType.FROM);
 		PythonModule module = new PythonModule("f", ImportType.ORDINARY, parent);
 		List<String> expectedCalls = new ArrayList<String>(1);
@@ -541,7 +541,7 @@ public class PythonModuleTest {
 	}
 	
 	@Test
-	public void testCallsTo_fromOther() {
+	public void testCallsTo_fromOther() throws NotebookException  {
 		PythonModule parent = new PythonModule(name, ImportType.FROM);
 		PythonModule module = new PythonModule("f2", ImportType.ORDINARY, parent);
 		List<String> expectedCalls = new ArrayList<String>(0);
@@ -554,7 +554,7 @@ public class PythonModuleTest {
 	}
 	
 	@Test
-	public void testCallsTo_nested() {
+	public void testCallsTo_nested() throws NotebookException {
 		PythonModule parent = new PythonModule(name, ImportType.FROM);
 		PythonModule module = new PythonModule("f", ImportType.ORDINARY, parent);
 		List<String> expectedCalls = new ArrayList<String>(2);
@@ -566,7 +566,7 @@ public class PythonModuleTest {
 	}
 	
 	@Test
-	public void testCallsTo_otherNested() {
+	public void testCallsTo_otherNested() throws NotebookException {
 		PythonModule parent = new PythonModule(name, ImportType.FROM);
 		PythonModule module = new PythonModule("f", ImportType.ORDINARY, parent);
 		List<String> expectedCalls = new ArrayList<String>(1);
@@ -577,7 +577,7 @@ public class PythonModuleTest {
 	}
 	
 	@Test
-	public void testCallsTo_nestedInOther() {
+	public void testCallsTo_nestedInOther() throws NotebookException {
 		PythonModule parent = new PythonModule(name, ImportType.FROM);
 		PythonModule module = new PythonModule("f", ImportType.ORDINARY, parent);
 		List<String> expectedCalls = new ArrayList<String>(1);
@@ -588,7 +588,7 @@ public class PythonModuleTest {
 	}
 	
 	@Test
-	public void testCallsTo_bracketsInStrings() {
+	public void testCallsTo_bracketsInStrings() throws NotebookException {
 		PythonModule module = new PythonModule(name, ImportType.ORDINARY);
 		List<String> expectedCalls = new ArrayList<String>(1);
 		expectedCalls.add(name + ".f(\"(\", ')', '(', \"()\")");
@@ -598,7 +598,7 @@ public class PythonModuleTest {
 	}
 	
 	@Test
-	public void testCallsTo_escapedQuotes() {
+	public void testCallsTo_escapedQuotes() throws NotebookException {
 		PythonModule module = new PythonModule(name, ImportType.ORDINARY);
 		List<String> expectedCalls = new ArrayList<String>(1);
 		expectedCalls.add(name + ".f(\"\\\"(\", '(\\'')");
@@ -607,13 +607,10 @@ public class PythonModuleTest {
 				expectedCalls, calls);
 	}
 	
-	@Test
-	public void testCallsTo_missingRightParanthesis() {
+	@Test (expected=NotebookException.class)
+	public void testCallsTo_missingRightParanthesis() throws NotebookException {
 		PythonModule module = new PythonModule(name, ImportType.ORDINARY);
-		List<String> expectedCalls = new ArrayList<String>(0);
-		List<String> calls = module.callsTo("f", name + ".f(a, (b)\n");
-		assertEquals("Wrong call list returned for call with missing right bracket.",
-				expectedCalls, calls);
+		module.callsTo("f", name + ".f(a, (b)\n");
 	}
 	
 	@Test
