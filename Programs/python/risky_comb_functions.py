@@ -1,6 +1,12 @@
 import re
-import numpy
-import matplotlib.pyplot
+import numpy as np
+import matplotlib.pyplot as plt
+
+aliases = {
+	"matplotlib.pyplot": "plt",
+	"numpy": "np",
+	"pandas": "pd"
+}
 
 _UNSPECIFIED = "kossaapaabcdefghijklmnopqrstuvwxypzåäööäåzpyxwvutsrqponmlkjihgfedcbaapakossa"
 
@@ -31,7 +37,7 @@ def find_risky_combs(input_path, output_dir, module, function_name):
 	module : str
 		Name of the module where the function to be checked resides
 	function_name : str
-		Name of function called in the statements in the input file 
+		Name of function called in the statements in the input file
 	"""
 	executable_calls_path = output_dir + "/" + function_name + "_executable.csv"
 	with open(input_path) as input_file, open(executable_calls_path, "w") as output_file:
@@ -40,7 +46,7 @@ def find_risky_combs(input_path, output_dir, module, function_name):
 			if None == re.search("input\s*\(", line):
 				function_call = _get_function_call(line)
 				try:
-					eval(module + "." + function_call)
+					eval(aliases[module] + "." + function_call)
 					output_file.write(function_call)
 					# If we reach this point, the statement is executable (with literals)
 					_report_risky_combs(function_call, output_dir)
@@ -195,7 +201,7 @@ def plot(*args,
 		solid = True
 	if _is_specified(dashes):
 		solid = True
-		for i in numpy.arange(1, len(dashes), 2):
+		for i in np.arange(1, len(dashes), 2):
 			if 0 != dashes[i]: # There is a space between dashes
 				solid = False
 	
@@ -262,12 +268,12 @@ def array(obj, dtype=None, *, copy=True, order=_UNSPECIFIED, subok=False, ndmin=
 	order = _get_value(order, "K")
 	
 	result = []
-	array = numpy.array(obj, dtype=dtype, copy=copy, order=order, subok=subok, ndmin=ndmin)
-	if 1 == len(numpy.shape(array)) and order_set:
+	array = np.array(obj, dtype=dtype, copy=copy, order=order, subok=subok, ndmin=ndmin)
+	if 1 == len(np.shape(array)) and order_set:
 		# The user has specified order for a 1D array
 		result.append("array.object-order")
 	
-	if False == copy and not numpy.shares_memory(array, obj):
+	if False == copy and not np.shares_memory(array, obj):
 		result.append("array.copy")
 	return result
 
@@ -277,8 +283,8 @@ def zeros(shape, dtype=float, order=_UNSPECIFIED):
 	order = _get_value(order, "C")
 	
 	result = []
-	array = numpy.zeros(shape, dtype=dtype, order=order)
-	if 1 == len(numpy.shape(array)) and order_set:
+	array = np.zeros(shape, dtype=dtype, order=order)
+	if 1 == len(np.shape(array)) and order_set:
 		# The user has specified order for a 1D array
 		result.append("zeros.shape-order")
 	return result

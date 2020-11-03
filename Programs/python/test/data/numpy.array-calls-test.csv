@@ -1,4 +1,5 @@
 np.array(my_array)
+np.array(np.array([1, 2, 3]))
 np.array([7, 8, 9])
 np.array([1, 2, 3], order='F')
 np.array()

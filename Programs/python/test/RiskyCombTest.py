@@ -12,6 +12,7 @@ class RiskyCombTest(unittest.TestCase):
 		output_dir = "."
 		rcf.find_risky_combs(input_path, output_dir, "numpy", "array")
 		expected_executable_lines = [
+			"array(np.array([1, 2, 3]))\n",
 			"array([7, 8, 9])\n",
 			"array([1, 2, 3], order='F')\n",
 			"array([1, 3, 5])\n"]
