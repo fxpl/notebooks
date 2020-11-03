@@ -10,7 +10,7 @@ class RiskyCombTest(unittest.TestCase):
 	def test_find_risky_pairs(self):
 		input_path = "data/numpy.array-calls-test.csv"
 		output_dir = "."
-		rcf.find_risky_pairs(input_path, output_dir, "numpy", "array")
+		rcf.find_risky_combs(input_path, output_dir, "numpy", "array")
 		expected_executable_lines = [
 			"array([7, 8, 9])\n",
 			"array([1, 2, 3], order='F')\n",
@@ -78,7 +78,7 @@ class RiskyCombTest(unittest.TestCase):
 		result = rcf.plot(self.x, self.y, dash_joinstyle="round")
 		self.assertEqual(["plot.fmt-dash_joinstyle"], result, "Wrong result returned when dash_joinstyle is defined for a solid line!")
 		
-		 # fmt
+		# fmt
 		result = rcf.plot(self.x, self.y, "-.", dash_joinstyle="round")
 		self.assertEqual([], result, "Non-empty list returned by correct call to plot!")
 		result = rcf.plot(self.x, self.y, "-", dash_joinstyle="round")
@@ -99,13 +99,13 @@ class RiskyCombTest(unittest.TestCase):
 	def test_plot_solid_capstyle(self):
 		# Default = solid line
 		result = rcf.plot(self.x, self.y, solid_capstyle="round")
+		self.assertEqual([], result, "Non-empty list returned by correct call to plot!")
 		
 		# fmt
 		result = rcf.plot(self.x, self.y, "-", solid_capstyle="round")
 		self.assertEqual([], result, "Non-empty list returned by correct call to plot!")
 		result = rcf.plot(self.x, self.y, "--", solid_capstyle="round")
 		self.assertEqual(["plot.fmt-solid_capstyle"], result, "Wrong result returned when solid_capstyle is defined for a dashed line!")
-		# TODO: Rimliga värden på capstyle och joinstyle!
 		
 		# linestyle
 		result = rcf.plot(self.x, self.y, linestyle="-", solid_capstyle="round")
@@ -124,7 +124,7 @@ class RiskyCombTest(unittest.TestCase):
 		result = rcf.plot(self.x, self.y, solid_joinstyle="round")
 		self.assertEqual([], result, "Non-empty list returned by correct call to plot!")
 		
-		 # fmt
+		# fmt
 		result = rcf.plot(self.x, self.y, "-", solid_joinstyle="round")
 		self.assertEqual([], result, "Non-empty list returned by correct call to plot!")
 		result = rcf.plot(self.x, self.y, "--", solid_joinstyle="round")

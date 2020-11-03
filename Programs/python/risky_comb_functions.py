@@ -4,7 +4,7 @@ import matplotlib.pyplot
 
 _UNSPECIFIED = "kossaapaabcdefghijklmnopqrstuvwxypzåäööäåzpyxwvutsrqponmlkjihgfedcbaapakossa"
 
-def find_risky_pairs(input_path, output_dir, module, function_name):
+def find_risky_combs(input_path, output_dir, module, function_name):
 	"""
 	List statements (function_calls) in the file stored at input_path that are
 	executable in isolation. Among the arguments of these calls, find risky
@@ -13,9 +13,9 @@ def find_risky_pairs(input_path, output_dir, module, function_name):
 	
 	* A file named <function_name>_executable.csv containing all calls that are
   	  executable in isolation.
-	* One file per risky pair for which the risky values are found. The files
-	  contain lists of all risky function calls. Each file is named
-	  <function_name>.<risky_pair>.csv.
+	* One file per risky parameter combination for which the risky arguments
+	  are found. The files contain lists of all risky function calls. Each
+	  file is named <function_name>.<risky_combination>.csv.
 	
 	Arguments:
 	input : str
@@ -43,7 +43,7 @@ def find_risky_pairs(input_path, output_dir, module, function_name):
 					eval(module + "." + function_call)
 					output_file.write(function_call)
 					# If we reach this point, the statement is executable (with literals)
-					_report_risky_pairs(function_call, output_dir)
+					_report_risky_combs(function_call, output_dir)
 				except:
 					# We want to skip calls that don't work
 					pass
@@ -62,16 +62,16 @@ def _get_function_call(statement):
 	return statement[start_index:]
 
 
-def _report_risky_pairs(function_call, output_dir):
+def _report_risky_combs(function_call, output_dir):
 	"""
 	Report all risky argument combinations in the provided function call to
 	files. The function_call shall not contain the module of the function.
 	"""
-	risky_pairs = eval(function_call)
-	for pair in risky_pairs:
-		pair_file_path = output_dir + "/" + pair + ".csv"
-		with open(pair_file_path, "a") as pair_file:
-			pair_file.write(function_call)
+	risky_combs = eval(function_call)
+	for comb in risky_combs:
+		comb_file_path = output_dir + "/" + comb + ".csv"
+		with open(comb_file_path, "a") as comb_file:
+			comb_file.write(function_call)
 
 
 def _get_value(param, default_value):
@@ -250,35 +250,35 @@ def arange(start=0, stop=_UNSPECIFIED, step=1, dtype=None):
 	step = int(_get_value(step, 1))
 	# stop is always specified
 	
-	pairs = []
+	result = []
 	interval = stop-start
 	if (interval > 0 and step < 0) or (interval<0 and step > 0):
-		pairs.append("arange.start-stop-step")
-	return pairs
+		result.append("arange.start-stop-step")
+	return result
 
 
 def array(obj, dtype=None, *, copy=True, order=_UNSPECIFIED, subok=False, ndmin=0):
 	order_set = _is_specified(order)
 	order = _get_value(order, "K")
 	
-	pairs = []
+	result = []
 	array = numpy.array(obj, dtype=dtype, copy=copy, order=order, subok=subok, ndmin=ndmin)
 	if 1 == len(numpy.shape(array)) and order_set:
 		# The user has specified order for a 1D array
-		pairs.append("array.object-order")
+		result.append("array.object-order")
 	
 	if False == copy and not numpy.shares_memory(array, obj):
-		pairs.append("array.copy")
-	return pairs
+		result.append("array.copy")
+	return result
 
 
 def zeros(shape, dtype=float, order=_UNSPECIFIED):
 	order_set = _is_specified(order)
 	order = _get_value(order, "C")
 	
-	pairs = []
+	result = []
 	array = numpy.zeros(shape, dtype=dtype, order=order)
 	if 1 == len(numpy.shape(array)) and order_set:
 		# The user has specified order for a 1D array
-		pairs.append("zeros.shape-order")
-	return pairs
+		result.append("zeros.shape-order")
+	return result

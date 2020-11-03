@@ -16,13 +16,13 @@ Arguments:
 Output:
 * A file named <function_name>_executable.csv containing all calls that are
   executable in isolation.
-* One file per risky pair for which the risky values are found. The files
-  contain lists of all risky function calls. Each file is named
-  <function_name>.<risky_pair>.csv.
+* One file per risky parameter combination for which the risky arguments
+  are found. The files contain lists of all risky function calls. Each file is
+  named <function_name>.<risky_combination>.csv.
 """
 
 import sys
-from risky_comb_functions import find_risky_pairs
+from risky_comb_functions import find_risky_combs
 
 
 if len(sys.argv) < 2 or len(sys.argv) > 3:
@@ -40,4 +40,4 @@ function_identifier = input_file_name.split("-")[0]
 identifier_substrings = function_identifier.split(".") 
 module = ".".join(identifier_substrings[0:-1])
 function_name = identifier_substrings[-1]
-find_risky_pairs(input_path, output_dir, module, function_name)
+find_risky_combs(input_path, output_dir, module, function_name)
