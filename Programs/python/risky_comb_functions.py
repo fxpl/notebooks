@@ -1,6 +1,7 @@
 import re
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
 
 aliases = {
 	"matplotlib.pyplot": "plt",
@@ -109,6 +110,7 @@ Currently supported functions:
 - numpy.arange
 - numpy.array
 - numpy.zeros
+- pandas.DataFrame
 """
 
 def plot(*args,
@@ -287,4 +289,35 @@ def zeros(shape, dtype=float, order=_UNSPECIFIED):
 	if 1 == len(np.shape(array)) and order_set:
 		# The user has specified order for a 1D array
 		result.append("zeros.shape-order")
+	return result
+
+def DataFrame(data=_UNSPECIFIED,
+			index=None,
+			columns=None,	# We are only interested in it if it is specified AND not None
+			dtype=None,		# We are only interested in it if it is specified AND not None
+			copy=_UNSPECIFIED):
+	result = []
+	
+	if _is_specified(copy):
+		is2DnumpyArray = isinstance(data, np.ndarray) and 2 == len(data.shape)
+		if not isinstance(data, (pd.DataFrame)) and not is2DnumpyArray:
+			result.append("DataFrame.data-copy")
+	else:
+		copy = False
+	
+	if isinstance(data, dict) and None!=columns:
+		result.append("DataFrame.data-columns")
+	
+	df = pd.DataFrame(data=data, index=index, columns=columns, dtype=dtype, copy=copy)
+	if None != dtype:
+		rightType = True
+		for key, value in df.items():
+			for index, elem in value.items():
+				if type(elem) != dtype:
+					result.append("DataFrame.data-dtype")
+					rightType = False
+					break
+			if not rightType:
+				break
+	
 	return result

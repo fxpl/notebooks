@@ -1,6 +1,7 @@
 import unittest
 import os
 import numpy
+import pandas
 import risky_comb_functions as rcf
 
 class RiskyCombTest(unittest.TestCase):
@@ -20,14 +21,14 @@ class RiskyCombTest(unittest.TestCase):
 		with open(executable_path) as calls:
 			lines = calls.readlines()
 			self.assertEqual(expected_executable_lines, lines, "Wrong executable statements stored!")
-		os.remove(executable_path)
+		os.remove(executable_path)	# TODO: Bör tas bort oavsett!
 		
 		expected_risky_lines = ["array([1, 2, 3], order='F')\n"]
 		risky_path = "array.object-order.csv"
 		with open(risky_path) as risky:
 			lines = risky.readlines()
 			self.assertEqual(expected_risky_lines, lines, "Wrong risky pair calls stored!")
-		os.remove(risky_path)
+		os.remove(risky_path)	# TODO: Bör tas bort oavsett!
 	
 	def test_plot_fmt(self):
 		result = rcf.plot(self.x, self.y, "go--")
@@ -258,5 +259,54 @@ class RiskyCombTest(unittest.TestCase):
 		result = rcf.zeros(3, order="F")
 		expected = ["zeros.shape-order"]
 		self.assertEqual(expected, result, "Wrong result when calling zero with order for 1D result!")
-
+	
+	def test_DataFrame_data_copy(self):
+		df = pandas.DataFrame([1, 2, 3])
+		result = rcf.DataFrame(data=df, copy=False)
+		self.assertEqual([], result, "Non-empty list returned by correct call to DataFrame!")
+		result = rcf.DataFrame(numpy.array([5, 7, 8]))
+		self.assertEqual([], result, "Non-empty list returned by correct call to DataFrame!")
+		
+		arr = numpy.array([[5, 7, 8], [13, 16, 19]])
+		result = rcf.DataFrame(data=arr, copy=False)
+		self.assertEqual([], result, "Non-empty list returned by correct call to DataFrame!")
+		
+		result = rcf.DataFrame([1, 3, 5], copy=False)
+		self.assertEqual(["DataFrame.data-copy"], result, "Wrong result when calling DataFrame for a list with copy specified!")
+		result = rcf.DataFrame(((1, 3, 5), (9, 0, 1)), copy=False)
+		self.assertEqual(["DataFrame.data-copy"], result, "Wrong result when calling DataFrame for a tuple with copy specified!")
+		arr = numpy.array([5, 7, 8])
+		result = rcf.DataFrame(data=arr, copy=False)
+		self.assertEqual(["DataFrame.data-copy"], result, "Wrong result when calling DataFrame for a 1D numpy array with copy specified!")
+	
+	def test_DataFrame_data_columns(self):
+		data = {"Malin": [86, 93, 5], "Tor": [95, 2, 14], "Anna": [97, 4, 16]}
+		result = rcf.DataFrame(data)
+		self.assertEqual([], result, "Non-empty list returned by correct call to DataFrame!")
+		result = rcf.DataFrame(data, columns=None)
+		self.assertEqual([], result, "Non-empty list returned by correct call to DataFrame!")
+		
+		result = rcf.DataFrame(data, columns=["birth", "school", "graduation"])
+		self.assertEqual(["DataFrame.data-columns"], result, "Wrong result when calling DataFrame with dict data and columns specified!")
+	
+	def test_DataFrame_data_dtype(self):
+		data = {"Malin": ["Järnåkra", "Katte", "UU"],
+			"Jonas": ["Freinet", "Polhem", "Chalmers"],
+			"Anna": ["LMG", "Katte", "LTH"]}
+		result = rcf.DataFrame(data, dtype=str)
+		self.assertEqual([], result, "Non-empty list returned by correct call to DataFrame!")
+		result = rcf.DataFrame(data, dtype=None)
+		self.assertEqual([], result, "Non-empty list returned by correct call to DataFrame!")
+		
+		result = rcf.DataFrame(data, dtype=int)
+		self.assertEqual(["DataFrame.data-dtype"], result, "Wrong result when calling string DataFrame with dtype=int!")
+		data = {"Age": [34, 29, 22],
+			"City": ["Uppsala", "Göteborg", "Lund"]}
+		result = rcf.DataFrame(data, dtype=int)
+		self.assertEqual(["DataFrame.data-dtype"], result, "Wrong result when calling DataFrame with one string column and dtype=int!")
+		
+		data = {0: [1, "a", float("NaN")], 1: [float("NaN"), "b", 7.2]}
+		result = rcf.DataFrame(data, dtype=int)
+		self.assertEqual(["DataFrame.data-dtype"], result, "Wrong result when calling DataFrame with mixed type columns and dtype=int!")
+		
 		
