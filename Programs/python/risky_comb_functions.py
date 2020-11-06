@@ -1,4 +1,5 @@
 import re
+import csv
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -111,6 +112,7 @@ Currently supported functions:
 - numpy.array
 - numpy.zeros
 - pandas.DataFrame
+- pandas.read_csv
 """
 
 def plot(*args,
@@ -319,5 +321,134 @@ def DataFrame(data=_UNSPECIFIED,
 					break
 			if not rightType:
 				break
+	
+	return result
+
+def read_csv(filepath_or_buffer,
+			sep=_UNSPECIFIED,
+			delimiter=_UNSPECIFIED,
+			header=_UNSPECIFIED,
+			names=_UNSPECIFIED,
+			index_col=_UNSPECIFIED,
+			usecols=_UNSPECIFIED,
+			squeeze=_UNSPECIFIED,
+			prefix=_UNSPECIFIED,
+			mangle_dupe_cols=_UNSPECIFIED,
+			dtype=_UNSPECIFIED,
+			engine=_UNSPECIFIED,
+			converters=_UNSPECIFIED,
+			true_values=_UNSPECIFIED,
+			false_values=_UNSPECIFIED,
+			skipinitialspace=_UNSPECIFIED,
+			skiprows=_UNSPECIFIED,
+			skipfooter=_UNSPECIFIED,
+			nrows=_UNSPECIFIED,
+			na_values=_UNSPECIFIED,
+			keep_default_na=_UNSPECIFIED,
+			na_filter=_UNSPECIFIED,
+			verbose=_UNSPECIFIED,
+			skip_blank_lines=_UNSPECIFIED,
+			parse_dates=_UNSPECIFIED,
+			infer_datetime_format=_UNSPECIFIED,
+			keep_date_col=_UNSPECIFIED,
+			date_parser=_UNSPECIFIED,
+			dayfirst=_UNSPECIFIED,
+			cache_dates=_UNSPECIFIED,
+			iterator=_UNSPECIFIED,
+			chunksize=_UNSPECIFIED,
+			compression=_UNSPECIFIED,
+			thousands=_UNSPECIFIED,
+			decimal=_UNSPECIFIED,
+			lineterminator=_UNSPECIFIED,
+			quotechar=_UNSPECIFIED,
+			quoting=_UNSPECIFIED,
+			doublequote=_UNSPECIFIED,
+			escapechar=_UNSPECIFIED,
+			comment=_UNSPECIFIED,
+			encoding=_UNSPECIFIED,
+			dialect=_UNSPECIFIED,
+			error_bad_lines=_UNSPECIFIED,
+			warn_bad_lines=_UNSPECIFIED,
+			delim_whitespace=False,	# We are only interested in if it is set to True
+			low_memory=_UNSPECIFIED,
+			memory_map=_UNSPECIFIED,
+			float_precision=_UNSPECIFIED
+	):
+	result = []
+	if delim_whitespace:
+		if _is_specified(sep):
+			result.append("read_csv.delim_whitespace-sep")
+		if _is_specified(delimiter):
+			# TODO: Borde man acceptera delimiters som är whitespaces?
+			result.append("read_csv.delim_whitespace-delimiter")
+	if _is_specified(sep) and _is_specified(delimiter):
+		result.append("read_csv.sep-delimiter")
+	
+	if _is_specified(names):
+		if _is_specified(prefix):
+			result.append("read_csv.names-prefix")
+		if _is_specified(header):
+			result.append("read_csv.names-header")
+	if None!=header or not _is_specified(header):
+		if _is_specified(prefix):
+			result.append("read_csv.header-prefix")
+	
+	dupl_ignored = ["lineterminator","escapechar", "delimiter",
+		"sep", "comment", "thousands", "decimal", "quotechar", "na_values", "true_values", "false_values"]
+	
+	num_dupl_ignored_values = 8
+	num_dupl_ignored_arrays = 3
+	num_dupl_ignored_total = num_dupl_ignored_values + num_dupl_ignored_arrays
+	for i in range(0, num_dupl_ignored_values):
+		ival = eval(dupl_ignored[i])
+		for j in range(i+1, num_dupl_ignored_values):
+			if "delimiter" == dupl_ignored[i] and "sep" == dupl_ignored[j]:
+				continue
+			jval = eval(dupl_ignored[j])
+			if _is_specified(ival) and _is_specified(jval) and ival == jval:
+				result.append("read_csv." + dupl_ignored[i] + "-" + dupl_ignored[j])
+		for j in range(num_dupl_ignored_values, num_dupl_ignored_total):
+			jval = eval(dupl_ignored[j])
+			if _is_specified(ival) and _is_specified(jval) and ival in jval:
+				result.append("read_csv." + dupl_ignored[i] + "-" + dupl_ignored[j])
+	for i in range(num_dupl_ignored_values, num_dupl_ignored_total):
+		ival = eval(dupl_ignored[i])
+		for j in range(i+1, num_dupl_ignored_total):
+			jval = eval(dupl_ignored[j])
+			if _is_specified(ival) and _is_specified(jval):
+				for value in ival:
+					if value in jval:
+						result.append("read_csv." + dupl_ignored[i] + "-" + dupl_ignored[j])
+						break
+	
+	if False == na_filter:	# Default is True, so True and undefined are OK
+		if _is_specified(na_values):
+			result.append("read_csv.na_filter-na_values")
+		if _is_specified(keep_default_na):
+			result.append("read_csv.na_filter-keep_default_na")
+	
+	if not _is_specified(parse_dates) or False==parse_dates:
+		if _is_specified(infer_datetime_format):
+			result.append("read_csv.parse_dates-infer_datetime_format")
+		if _is_specified(keep_date_col):
+			result.append("read_csv.parse_dates-keep_date_col")
+		if _is_specified(date_parser):
+			result.append("read_csv.parse_dates-date_parser")
+		if _is_specified(dayfirst):
+			result.append("read_csv.parse_dates-dayfirst")
+		if _is_specified(cache_dates):
+			result.append("read_csv.parse_dates-cache_dates")
+	
+	if _is_specified(warn_bad_lines):
+		if error_bad_lines and warn_bad_lines:
+			result.append("read_csv.error_bad_lines-warn_bad_lines")
+	
+	if csv.QUOTE_NONE == quoting:
+		if _is_specified(doublequote):
+			result.append("read_csv.quoting-doublequote")
+	
+	if _is_specified(usecols) and _is_specified(names):
+		if len(usecols) != len(names):
+			result.append("read_csv.usecols-names")
 	
 	return result
