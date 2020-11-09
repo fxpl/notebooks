@@ -182,8 +182,10 @@ def plot(*args,
 			for fmt_color in fmt_colors:
 				if fmt_color in arg:
 					fmt_color_specified = True
-			if "#" in arg:	# Color specified with hex code
-				fmt_color_specified=True
+			if not fmt_marker_specified and not fmt_linestyle_specified:
+				# fmt is specified but doesn't contain marker or line style.
+				# Hence, it must be a color (since only executable calls are passed here)
+				fmt_color_specified = True
 	# fmt in combination with marker, linestyle and color
 	if fmt_marker_specified and _is_specified(marker):
 		result.append("plot.fmt-marker")
@@ -387,7 +389,7 @@ def read_csv(filepath_or_buffer,
 	if _is_specified(names):
 		if _is_specified(prefix):
 			result.append("read_csv.names-prefix")
-		if _is_specified(header):
+		if _is_specified(header):	# TODO: Eventuellt är det här rimligt om header=None (=> ta inte bort headerrader)"
 			result.append("read_csv.names-header")
 	if None!=header or not _is_specified(header):
 		if _is_specified(prefix):
