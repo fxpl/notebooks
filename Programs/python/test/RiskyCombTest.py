@@ -1,39 +1,56 @@
 import unittest
 import os
+import shutil
 import csv
 import datetime
 import numpy
 import pandas
 import risky_comb_functions as rcf
 
+from shutil import rmtree
+from pathlib import Path
+
+
 class RiskyCombTest(unittest.TestCase):
 	x = [1,2]
 	y = [3,4]
+	output_dir = "risky_comb_unittest_tmp_dir"
+	
+	@classmethod
+	def setUpClass(cls):
+		os.makedirs(RiskyCombTest.output_dir, exist_ok=True)
+	
+	@classmethod
+	def tearDownClass(cls):
+		rmtree(RiskyCombTest.output_dir)
 	
 	def test_find_risky_pairs(self):	# TODO: Även för pyplot och pandas!
 		input_path = "data/numpy.array-calls-test.csv"
-		output_dir = "."
-		rcf.find_risky_combs(input_path, output_dir, "numpy", "array")
+		rcf.find_risky_combs(input_path, RiskyCombTest.output_dir, "numpy", "array")
 		expected_executable_lines = [
 			"array(np.array([1, 2, 3]))\n",
 			"array([7, 8, 9])\n",
 			"array([1, 2, 3], order='F')\n",
 			"array([1, 3, 5])\n"]
-		executable_path = "array_executable.csv"
+		executable_path = Path(RiskyCombTest.output_dir + "/array_executable.csv")
 		with open(executable_path) as calls:
 			lines = calls.readlines()
 			self.assertEqual(expected_executable_lines, lines, "Wrong executable statements stored!")
-		os.remove(executable_path)	# TODO: Bör tas bort oavsett!
+		os.remove(executable_path)
 		
 		expected_risky_lines = ["array([1, 2, 3], order='F')\n"]
-		risky_path = "array.object-order.csv"
+		risky_path = Path(RiskyCombTest.output_dir + "/array.object-order.csv")
 		with open(risky_path) as risky:
 			lines = risky.readlines()
 			self.assertEqual(expected_risky_lines, lines, "Wrong risky pair calls stored!")
-		os.remove(risky_path)	# TODO: Bör tas bort oavsett!
+		os.remove(risky_path)
 	
 	def test_plot_fmt(self):
 		result = rcf.plot(self.x, self.y, "go--")
+		self.assertEqual([], result, "Non-empty list returned by correct call to plot!")
+		result = rcf.plot(self.x, self.y, "0xA8329E")
+		self.assertEqual([], result, "Non-empty list returned by correct call to plot!")
+		result = rcf.plot(self.x, self.y, "olive")
 		self.assertEqual([], result, "Non-empty list returned by correct call to plot!")
 		result = rcf.plot(self.x, self.y, "go--", marker="D")
 		self.assertEqual(["plot.fmt-marker"], result, "Wrong list returned  by call to plot!")
