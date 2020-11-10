@@ -1,20 +1,33 @@
 import unittest
 import os
-import shutil
 import csv
 import datetime
+import glob
 import numpy
 import pandas
 import risky_comb_functions as rcf
 
 from shutil import rmtree
-from pathlib import Path
 
 
 class RiskyCombTest(unittest.TestCase):
 	x = [1,2]
 	y = [3,4]
 	output_dir = "risky_comb_unittest_tmp_dir"
+	
+	@staticmethod
+	def _get_last_csv_path(prefix):
+		"""
+		Get the path to the last csv file placed in output_dir and whose name
+		starts with prefix. Last in this case means lexigraphically largest
+		(and should be the file with the last timestamp).
+		"""
+		paths = glob.glob(RiskyCombTest.output_dir + "/" + prefix + "*.csv")
+		result = paths[0]
+		for i in range(1, len(paths)):
+			if paths[i] > result:
+				result = paths[i]
+		return result
 	
 	@classmethod
 	def setUpClass(cls):
@@ -35,18 +48,16 @@ class RiskyCombTest(unittest.TestCase):
 			"array([7, 8, 9])\n",
 			"array([1, 2, 3], order='F')\n",
 			"array([1, 3, 5])\n"]
-		executable_path = Path(RiskyCombTest.output_dir + "/array_executable.csv")
+		executable_path = RiskyCombTest._get_last_csv_path("array_executable")
 		with open(executable_path) as calls:
 			lines = calls.readlines()
 			self.assertEqual(expected_executable_lines, lines, "Wrong executable statements stored!")
-		os.remove(executable_path)
 		
 		expected_risky_lines = ["array([1, 2, 3], order='F')\n"]
-		risky_path = Path(RiskyCombTest.output_dir + "/array.object-order.csv")
+		risky_path = RiskyCombTest._get_last_csv_path("array.object-order")
 		with open(risky_path) as risky:
 			lines = risky.readlines()
 			self.assertEqual(expected_risky_lines, lines, "Wrong risky pair calls stored!")
-		os.remove(risky_path)
 	
 	def test_find_risky_pairs_pandas_DataFrame(self):
 		pass # TODO

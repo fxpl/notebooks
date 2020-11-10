@@ -4,6 +4,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
+from datetime import datetime
+
 aliases = {
 	"matplotlib.pyplot": "plt",
 	"numpy": "np",
@@ -41,7 +43,7 @@ def find_risky_combs(input_path, output_dir, module, function_name):
 	function_name : str
 		Name of function called in the statements in the input file
 	"""
-	executable_calls_path = output_dir + "/" + function_name + "_executable.csv"
+	executable_calls_path = output_dir + "/" + function_name + "_executable" + _now_string() + ".csv"
 	with open(input_path) as input_file, open(executable_calls_path, "w") as output_file:
 		lines = input_file.readlines()
 		for line in lines:
@@ -70,6 +72,13 @@ def _get_function_call(statement):
 	return statement[start_index:]
 
 
+def _now_string():
+	"""
+	Return the current time as a string
+	"""
+	return datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f")
+
+
 def _report_risky_combs(function_call, output_dir):
 	"""
 	Report all risky argument combinations in the provided function call to
@@ -77,7 +86,7 @@ def _report_risky_combs(function_call, output_dir):
 	"""
 	risky_combs = eval(function_call)
 	for comb in risky_combs:
-		comb_file_path = output_dir + "/" + comb + ".csv"
+		comb_file_path = output_dir + "/" + comb + _now_string() + ".csv"
 		with open(comb_file_path, "a") as comb_file:
 			comb_file.write(function_call)
 
