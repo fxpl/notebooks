@@ -309,8 +309,11 @@ def DataFrame(data=_UNSPECIFIED,
 	else:
 		copy = False
 	
-	if isinstance(data, dict) and None!=columns:
-		result.append("DataFrame.data-columns")
+	if isinstance(data, dict) and None != columns:
+		for column in columns:
+			if not column in data.keys():
+				result.append("DataFrame.data-columns")
+				break
 	
 	df = pd.DataFrame(data=data, index=index, columns=columns, dtype=dtype, copy=copy)
 	if None != dtype:

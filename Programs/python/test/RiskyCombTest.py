@@ -24,7 +24,10 @@ class RiskyCombTest(unittest.TestCase):
 	def tearDownClass(cls):
 		rmtree(RiskyCombTest.output_dir)
 	
-	def test_find_risky_pairs(self):	# TODO: Även för pyplot och pandas!
+	def test_find_risky_pairs_matplotlib_plot(self):
+		pass # TODO
+	
+	def test_find_risky_pairs_numpy_array(self):
 		input_path = "data/numpy.array-calls-test.csv"
 		rcf.find_risky_combs(input_path, RiskyCombTest.output_dir, "numpy", "array")
 		expected_executable_lines = [
@@ -44,6 +47,9 @@ class RiskyCombTest(unittest.TestCase):
 			lines = risky.readlines()
 			self.assertEqual(expected_risky_lines, lines, "Wrong risky pair calls stored!")
 		os.remove(risky_path)
+	
+	def test_find_risky_pairs_pandas_DataFrame(self):
+		pass # TODO
 	
 	def test_plot_fmt(self):
 		result = rcf.plot(self.x, self.y, "go--")
@@ -304,9 +310,13 @@ class RiskyCombTest(unittest.TestCase):
 		self.assertEqual([], result, "Non-empty list returned by correct call to DataFrame!")
 		result = rcf.DataFrame(data, columns=None)
 		self.assertEqual([], result, "Non-empty list returned by correct call to DataFrame!")
+		result = rcf.DataFrame(data, columns=["Tor", "Anna"])
+		self.assertEqual([], result, "Non-empty list returned by correct call to DataFrame!")
 		
 		result = rcf.DataFrame(data, columns=["birth", "school", "graduation"])
-		self.assertEqual(["DataFrame.data-columns"], result, "Wrong result when calling DataFrame with dict data and columns specified!")
+		self.assertEqual(["DataFrame.data-columns"], result, "Wrong result when calling DataFrame with dict data and other columns specified!")
+		result = rcf.DataFrame(data, columns=["Jonas", "Tor", "Anna"])
+		self.assertEqual(["DataFrame.data-columns"], result, "Wrong result when calling DataFrame with dict data and other column specified!")
 	
 	def test_DataFrame_data_dtype(self):
 		data = {"Malin": ["Järnåkra", "Katte", "UU"],
