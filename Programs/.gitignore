@@ -1,6 +1,7 @@
 # Eclipse files
 .classpath
 .project
+.pydevproject
 .settings
 
 # Understand file
