@@ -64,12 +64,14 @@ def _get_function_call(statement):
 	Extract and return the function call, without preceding module names, from
 	a statement.
 	"""
-	substrings = statement.split("(")
+	substrings = statement.split(":")
+	call = substrings[1][1:]
+	substrings = call.split("(")
 	if "." in substrings[0]:
 		start_index = substrings[0].rindex(".") + 1
 	else:
 		start_index = 0
-	return statement[start_index:]
+	return call[start_index:]
 
 
 def _now_string():
