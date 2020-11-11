@@ -38,7 +38,22 @@ class RiskyCombTest(unittest.TestCase):
 		rmtree(RiskyCombTest.output_dir)
 	
 	def test_find_risky_pairs_matplotlib_plot(self):
-		pass # TODO
+		input_path = "data/matplotlib.pyplot.plot-calls-test.csv"
+		rcf.find_risky_combs(input_path, RiskyCombTest.output_dir, "matplotlib.pyplot", "plot")
+		expected_executable_lines = [
+			"plot([0, 1], [0, 1])\n",
+			"plot([0, 1], [0, 1], 'k--', linestyle='-')\n"
+			]
+		executable_path = RiskyCombTest._get_last_csv_path("plot_executable")
+		with open(executable_path) as calls:
+			lines = calls.readlines()
+			self.assertEqual(expected_executable_lines, lines, "Wrong executable statements stored!")
+		
+		expected_risky_lines = ["plot([0, 1], [0, 1], 'k--', linestyle='-')\n"]
+		risky_path = RiskyCombTest._get_last_csv_path("plot.fmt-linestyle")
+		with open(risky_path) as risky:
+			lines = risky.readlines()
+			self.assertEqual(expected_risky_lines, lines, "Wrong risky pair calls stored!")
 	
 	def test_find_risky_pairs_numpy_array(self):
 		input_path = "data/numpy.array-calls-test.csv"
@@ -60,7 +75,22 @@ class RiskyCombTest(unittest.TestCase):
 			self.assertEqual(expected_risky_lines, lines, "Wrong risky pair calls stored!")
 	
 	def test_find_risky_pairs_pandas_DataFrame(self):
-		pass # TODO
+		input_path = "data/pandas.DataFrame-calls-test.csv"
+		rcf.find_risky_combs(input_path, RiskyCombTest.output_dir, "pandas", "DataFrame")
+		expected_executable_lines = [
+			"DataFrame()\n",
+			"DataFrame(np.arange(16).reshape(4,4),                    index=[['a','a','b','b'],[1,2,1,2]],                    columns=[['NY','NY','LA','SF'],['cold','hot','hot','cold']])\n",
+			"DataFrame({'Col1':['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'],                   'Col2':[1, 3, 5, 7, 9, 11, 13, 15]}, columns=['Col1', 'Col3'])\n"]
+		executable_path = RiskyCombTest._get_last_csv_path("DataFrame_executable")
+		with open(executable_path) as calls:
+			lines = calls.readlines()
+			self.assertEqual(expected_executable_lines, lines, "Wrong executable statements stored!")
+		
+		expected_risky_lines = ["DataFrame({'Col1':['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'],                   'Col2':[1, 3, 5, 7, 9, 11, 13, 15]}, columns=['Col1', 'Col3'])\n"]
+		risky_path = RiskyCombTest._get_last_csv_path("DataFrame.data-columns")
+		with open(risky_path) as risky:
+			lines = risky.readlines()
+			self.assertEqual(expected_risky_lines, lines, "Wrong risky pair calls stored!")
 	
 	def test_plot_fmt(self):
 		result = rcf.plot(self.x, self.y, "go--")

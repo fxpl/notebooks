@@ -65,7 +65,7 @@ def _get_function_call(statement):
 	a statement.
 	"""
 	substrings = statement.split(":")
-	call = substrings[1][1:]
+	call = ":".join(substrings[1:])[1:]
 	substrings = call.split("(")
 	if "." in substrings[0]:
 		start_index = substrings[0].rindex(".") + 1
