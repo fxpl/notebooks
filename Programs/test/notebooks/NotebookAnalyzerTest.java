@@ -1115,16 +1115,16 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 		String[] notebookFiles = {"nb_36.ipynb", "nb_37.ipynb", "nb_38.ipynb", "nb_R.ipynb"};
 		
 		String[] expectedALines = {
-				"A.fun1(15, a=0, b=3)",
-				"a.fun1(a.fun1(0))",
-				"a.fun1(0)",
-				"Base.A.fun1()",
-				"Base.A.fun1(9, 0, 3, 6)"
+				"nb_36.ipynb: A.fun1(15, a=0, b=3)",
+				"nb_36.ipynb: a.fun1(a.fun1(0))",
+				"nb_36.ipynb: a.fun1(0)",
+				"nb_37.ipynb: Base.A.fun1()",
+				"nb_38.ipynb: Base.A.fun1(9, 0, 3, 6)"
 		};
 		String[] expectedBLines = {
-				"B.fun1(\"apa\")",
-				"B.fun1(\"hej\")",
-				"B.fun1()"
+				"nb_36.ipynb: B.fun1(\"apa\")",
+				"nb_37.ipynb: B.fun1(\"hej\")",
+				"nb_38.ipynb: B.fun1()"
 		};
 		
 		for (String notebook: notebookFiles) {
