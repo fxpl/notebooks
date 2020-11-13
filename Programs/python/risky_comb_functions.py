@@ -182,14 +182,14 @@ def plot(*args,
 	fmt_color_specified = False
 	for arg in args:
 		if isinstance(arg, str):
-			for fmt_marker in fmt_markers:
-				if fmt_marker in arg:
-					fmt_marker_specified = True
 			for fmt_linestyle in fmt_linestyles:
 				if fmt_linestyle in arg:
 					fmt_linestyle_specified = True
 					if fmt_linestyle == "-" and not "--" in arg and not "-." in arg:
 						fmt_linestyle_solid = True
+			for fmt_marker in fmt_markers:
+				if fmt_marker in arg and (fmt_linestyle_specified or len(arg)<3):
+					fmt_marker_specified = True
 			for fmt_color in fmt_colors:
 				if fmt_color in arg:
 					fmt_color_specified = True
@@ -395,7 +395,6 @@ def read_csv(filepath_or_buffer,
 		if _is_specified(sep):
 			result.append("read_csv.delim_whitespace-sep")
 		if _is_specified(delimiter):
-			# TODO: Borde man acceptera delimiters som är whitespaces?
 			result.append("read_csv.delim_whitespace-delimiter")
 	if _is_specified(sep) and _is_specified(delimiter):
 		result.append("read_csv.sep-delimiter")
