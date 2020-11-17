@@ -62,7 +62,7 @@ def find_risky_combs(input_path, output_dir, module, function_name):
 def _get_function_call(statement):
 	"""
 	Extract and return the function call, without preceding module names, from
-	a statement.
+	a statement preceded by a string ending with ":".
 	"""
 	substrings = statement.split(":")
 	call = ":".join(substrings[1:])[1:]
