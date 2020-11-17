@@ -13,6 +13,7 @@ from shutil import rmtree
 class RiskyCombTest(unittest.TestCase):
 	x = [1,2]
 	y = [3,4]
+	testdata = "data/data.csv"
 	output_dir = "risky_comb_unittest_tmp_dir"
 	
 	@staticmethod
@@ -386,128 +387,173 @@ class RiskyCombTest(unittest.TestCase):
 		self.assertEqual(["DataFrame.data-dtype"], result, "Wrong result when calling DataFrame with mixed type columns and dtype=int!")
 	
 	def test_read_csv_delims(self):
-		result = rcf.read_csv("dummy", sep=",")
+		result = rcf.read_csv(self.testdata, sep=",")
 		self.assertEqual([], result, "Non-empty list returned by correct call to read_csv!")
-		result = rcf.read_csv("dummy", delimiter=",")
+		result = rcf.read_csv(self.testdata, delimiter=",")
 		self.assertEqual([], result, "Non-empty list returned by correct call to read_csv!")
-		result = rcf.read_csv("dummy", delim_whitespace=True)
+		result = rcf.read_csv(self.testdata, delim_whitespace=True)
 		self.assertEqual([], result, "Non-empty list returned by correct call to read_csv!")
-		result = rcf.read_csv("dummy", delim_whitespace=False, sep='.')
+		result = rcf.read_csv(self.testdata, delim_whitespace=False, sep='.')
 		self.assertEqual([], result, "Non-empty list returned by correct call to read_csv!")
 		
-		result = rcf.read_csv("dummy", delim_whitespace=True, sep='.')
+		result = rcf.read_csv(self.testdata, delim_whitespace=True, sep='.')
 		self.assertEqual(["read_csv.delim_whitespace-sep"], result, "Wrong result when calling read_csv with delim_whitespace=True and sep defined!")
-		result = rcf.read_csv("dummy", delim_whitespace=True, delimiter=':')
+		result = rcf.read_csv(self.testdata, delim_whitespace=True, delimiter=':')
 		self.assertEqual(["read_csv.delim_whitespace-delimiter"], result, "Wrong result when calling read_csv with delim_whitespace=True and delimiter defined!")
-		result = rcf.read_csv("dummy", sep=" ", delimiter=':')
+		result = rcf.read_csv(self.testdata, sep=" ", delimiter=':')
 		self.assertEqual(["read_csv.sep-delimiter"], result, "Wrong result when calling read_csv with both sep and delimiter defined!")
-		result = rcf.read_csv("dummy", sep=" ", delimiter=':', delim_whitespace=True)
+		result = rcf.read_csv(self.testdata, sep=" ", delimiter=':', delim_whitespace=True)
 		self.assertEqual(["read_csv.delim_whitespace-sep", "read_csv.delim_whitespace-delimiter", "read_csv.sep-delimiter"], result, "Wrong result when calling read_csv with both sep and delimiter defined!")
 	
 	def test_read_csv_header(self):
-		result = rcf.read_csv("dummy", header=1)
+		result = rcf.read_csv(self.testdata, header=1)
 		self.assertEqual([], result, "Non-empty list returned by correct call to read_csv!")
-		result = rcf.read_csv("dummy", prefix="X", header=None)
+		result = rcf.read_csv(self.testdata, prefix="X", header=None)
 		self.assertEqual([], result, "Non-empty list returned by correct call to read_csv!")
-		result = rcf.read_csv("dummy", names=["A", "B", "C"])
+		result = rcf.read_csv(self.testdata, names=["A", "B", "C"])
 		self.assertEqual([], result, "Non-empty list returned by correct call to read_csv!")
 		
-		result = rcf.read_csv("dummy", names=["A", "B", "C"], header=None, prefix="X")
+		result = rcf.read_csv(self.testdata, names=["A", "B", "C"], header=None, prefix="X")
 		self.assertEqual(["read_csv.names-prefix", "read_csv.names-header"], result, "Wrong result when calling read_csv with both names and prefix, and None-header!")
-		result = rcf.read_csv("dummy", names=["A", "B", "C"], header=1)
+		result = rcf.read_csv(self.testdata, names=["A", "B", "C"], header=1)
 		self.assertEqual(["read_csv.names-header"], result, "Wrong result when calling read_csv with both names and header!")
-		result = rcf.read_csv("dummy", prefix="X")
+		result = rcf.read_csv(self.testdata, prefix="X")
 		self.assertEqual(["read_csv.header-prefix"], result, "Wrong result when calling read_csv with both prefix without setting header=None!")
-		result = rcf.read_csv("dummy", header=0, prefix="X")
+		result = rcf.read_csv(self.testdata, header=0, prefix="X")
 		self.assertEqual(["read_csv.header-prefix"], result, "Wrong result when calling read_csv with both non-None header and prefix!")
-		result = rcf.read_csv("dummy", names=["A", "B", "C"], header=0, prefix="X")
+		result = rcf.read_csv(self.testdata, names=["A", "B", "C"], header=0, prefix="X")
 		expectedResult = ["read_csv.names-prefix", "read_csv.names-header", "read_csv.header-prefix"]
 		self.assertEqual(expectedResult, result, "Wrong result when read_csv is called with both names, prefix and non-None header!")
 	
 	def test_read_csv_duplicated_value_ignored(self):
-		result = rcf.read_csv("dummy")
+		result = rcf.read_csv(self.testdata)
 		self.assertEqual([], result, "Non-empty list returned by correct call to read_csv!")
-		result = rcf.read_csv("dummy", lineterminator='\n', escapechar='\\', delimiter=',', comment='#', thousands=' ', decimal='.', quotechar='\'', na_values=["NaN", "nan"], true_values=[True, 1], false_values=[False, 0])
+		result = rcf.read_csv(self.testdata, lineterminator='\n', escapechar='\\', delimiter=',', comment='#', thousands=' ', decimal='.', quotechar='\'', na_values=["NaN", "nan"], true_values=[True, 1], false_values=[False, 0])
 		self.assertEqual([], result, "Non-empty list returned by correct call to read_csv!")
 		
-		result = rcf.read_csv("dummy", lineterminator=',', sep=',')
+		result = rcf.read_csv(self.testdata, lineterminator=',', sep=',')
 		self.assertEqual(["read_csv.lineterminator-sep"], result, "Wrong result when calling read_csv with lineterminator=sep!")
-		result = rcf.read_csv("dummy", delimiter=',', thousands=',')
+		result = rcf.read_csv(self.testdata, delimiter=',', thousands=',')
 		self.assertEqual(["read_csv.delimiter-thousands"], result, "Wrong result when calling read_csv with delimiter=thousands!")
-		result = rcf.read_csv("dummy", true_values=[1, "true"], false_values=[1, "false"])
+		result = rcf.read_csv(self.testdata, true_values=[1, "true"], false_values=[1, "false"])
 		self.assertEqual(["read_csv.true_values-false_values"], result, "Wrong result when calling read_csv with same value in true_values and false_values!")
-		result = rcf.read_csv("dummy", quotechar="#", na_values=["NA", "#", "NaN"])
+		result = rcf.read_csv(self.testdata, quotechar="#", na_values=["NA", "#", "NaN"])
 		self.assertEqual(["read_csv.quotechar-na_values"], result, "Wrong result when calling read_csv with quotechar value in na_values!")
 		
-		result = rcf.read_csv("dummy", sep=',', delimiter=',')	# Should only contain sep-delimiter once
+		result = rcf.read_csv(self.testdata, sep=',', delimiter=',')	# Should only contain sep-delimiter once
 		self.assertEqual(["read_csv.sep-delimiter"], result, "Wrong result when calling read_csv with sep and delimiter set to same value!")
 	
 	def test_read_csv_na(self):
-		result = rcf.read_csv("dummy", na_values=["NaN", "Nan"], keep_default_na=True)
+		result = rcf.read_csv(self.testdata, na_values=["NaN", "Nan"], keep_default_na=True)
 		self.assertEqual([], result, "Non-empty list returned by correct call to read_csv!")
-		result = rcf.read_csv("dummy", na_filter=False, na_values=["NaN", "Nan"])
+		result = rcf.read_csv(self.testdata, na_filter=False, na_values=["NaN", "Nan"])
 		self.assertEqual(["read_csv.na_filter-na_values"], result, "Wrong result when calling read_csv with na_value specified, but na_filter=False!")
-		result = rcf.read_csv("dummy", na_filter=False, keep_default_na=True)
+		result = rcf.read_csv(self.testdata, na_filter=False, keep_default_na=True)
 		self.assertEqual(["read_csv.na_filter-keep_default_na"], result, "Wrong result when calling read_csv with keep_default_na specified, but na_filter=False!")
 	
 	def test_read_csv_parse_dates(self):
 		def f(Y, m, d):
 			return datetime.date(Y, m, d)
-		result = rcf.read_csv("dummy", parse_dates=True, infer_datetime_format=True, keep_date_col=False, date_parser=f, dayfirst=True, cache_dates=True)
+		result = rcf.read_csv("data/date_data.csv", parse_dates=[0], infer_datetime_format=True, keep_date_col=False, date_parser=f, dayfirst=True, cache_dates=True)
 		self.assertEqual([], result, "Non-empty list returned by correct call to read_csv!")
-		result = rcf.read_csv("dummy", infer_datetime_format=True)
+		result = rcf.read_csv(self.testdata, infer_datetime_format=True)
 		self.assertEqual(["read_csv.parse_dates-infer_datetime_format"], result, "Wrong result returned when infer_datetime_format is specified but not parse_dates!")
-		result = rcf.read_csv("dummy", parse_dates=False, infer_datetime_format=True)
+		result = rcf.read_csv(self.testdata, parse_dates=False, infer_datetime_format=True)
 		self.assertEqual(["read_csv.parse_dates-infer_datetime_format"], result, "Wrong result returned when infer_datetime_format is specified but parse_dates is False!")
-		result = rcf.read_csv("dummy", keep_date_col=True)
+		result = rcf.read_csv(self.testdata, keep_date_col=True)
 		self.assertEqual(["read_csv.parse_dates-keep_date_col"], result, "Wrong result returned when keep_date_col is specified but not parse_dates!")
-		result = rcf.read_csv("dummy", date_parser=f)
+		result = rcf.read_csv(self.testdata, date_parser=f)
 		self.assertEqual(["read_csv.parse_dates-date_parser"], result, "Wrong result returned when date_parser is specified but not parse_dates!")
-		result = rcf.read_csv("dummy", dayfirst=True)
+		result = rcf.read_csv(self.testdata, dayfirst=True)
 		self.assertEqual(["read_csv.parse_dates-dayfirst"], result, "Wrong result returned when dayfirst is specified but not parse_dates!")
-		result = rcf.read_csv("dummy", cache_dates=True)
+		result = rcf.read_csv(self.testdata, cache_dates=True)
 		self.assertEqual(["read_csv.parse_dates-cache_dates"], result, "Wrong result returned when cache_dates is specified but not parse_dates!")
 	
 	def test_read_csv_bad_lines(self):
-		result = rcf.read_csv("dummy")
+		result = rcf.read_csv(self.testdata)
 		self.assertEqual([], result, "Non-empty list returned by correct call to read_csv!")
-		result = rcf.read_csv("dummy", warn_bad_lines=False, error_bad_lines=False)
+		result = rcf.read_csv(self.testdata, warn_bad_lines=False, error_bad_lines=False)
 		self.assertEqual([], result, "Non-empty list returned by correct call to read_csv!")
-		result = rcf.read_csv("dummy", error_bad_lines=True)
+		result = rcf.read_csv(self.testdata, error_bad_lines=True)
 		self.assertEqual([], result, "Non-empty list returned by correct call to read_csv!")
-		result = rcf.read_csv("dummy", warn_bad_lines=False, error_bad_lines=True)
+		result = rcf.read_csv(self.testdata, warn_bad_lines=False, error_bad_lines=True)
 		self.assertEqual([], result, "Non-empty list returned by correct call to read_csv!")
-		result = rcf.read_csv("dummy", warn_bad_lines=True)
+		result = rcf.read_csv(self.testdata, warn_bad_lines=True)
 		self.assertEqual(["read_csv.error_bad_lines-warn_bad_lines"], result, "Wrong result when read_csv is called with warn_bad_lines=True without setting error_bad_lines to False!")
-		result = rcf.read_csv("dummy", warn_bad_lines=True, error_bad_lines=True)
+		result = rcf.read_csv(self.testdata, warn_bad_lines=True, error_bad_lines=True)
 		self.assertEqual(["read_csv.error_bad_lines-warn_bad_lines"], result, "Wrong result when read_csv is called with both error_bad_lines and warn_bad_lines explicitly set to True!")
 	
-	""" TODO: Vad innebär det egentligen att "quotechar is specified". Hur gör man för att den inte ska vara det?
 	def test_read_csv_quoting_doublequote(self):
-		result = rcf.read_csv("dummy", doublequote=True)
+		result = rcf.read_csv(self.testdata, doublequote=True)
 		self.assertEqual([], result, "Non-empty list returned by correct call to read_csv!")
-		result = rcf.read_csv("dummy", quoting=csv.QUOTE_ALL, doublequote=True)
+		result = rcf.read_csv(self.testdata, quoting=csv.QUOTE_ALL, doublequote=True)
 		self.assertEqual([], result, "Non-empty list returned by correct call to read_csv!")
-		result = rcf.read_csv("dummy", quoting=csv.QUOTE_NONE, doublequote=True)
-		self.assertEqual(["read_csv.quoting-doublequote"], result, "Wrong result when quoting is QUOTE_NONE and doublequote is set!")
-		result = rcf.read_csv("dummy", quoting=csv.QUOTE_NONE, doublequote=False)
-		self.assertEqual(["read_csv.quoting-doublequote"], result, "Wrong result when quoting is QUOTE_NONE and doublequote is set!")
-	"""
+		result = rcf.read_csv(self.testdata, quoting=csv.QUOTE_NONE, doublequote=True)
+		self.assertEqual(["read_csv.quoting-doublequote"], result, "Wrong result when quoting is QUOTE_NONE and doublequote is set to True!")
+		result = rcf.read_csv(self.testdata, quoting=csv.QUOTE_NONE, quotechar="", doublequote=True)
+		self.assertEqual(["read_csv.quoting-doublequote"], result, "Wrong result when quoting is QUOTE_NONE, quotechar is empty and doublequote is set to True!")
+		result = rcf.read_csv(self.testdata, quoting=csv.QUOTE_NONE, quotechar="", doublequote=False)
+		self.assertEqual(["read_csv.quoting-doublequote"], result, "Wrong result when quoting is QUOTE_NONE, quotechar is empty and doublequote is set to False!")
+		result = rcf.read_csv(self.testdata, quoting=csv.QUOTE_NONE, doublequote=False)
+		self.assertEqual(["read_csv.quoting-doublequote"], result, "Wrong result when quoting is QUOTE_NONE and doublequote is set to False!")
 	
 	def test_read_csv_quotechar_doublequote(self):
-		result = rcf.read_csv("dummy", doublequote=True)
+		result = rcf.read_csv(self.testdata, doublequote=True)
 		self.assertEqual([], result, "Non-empty list returned by correct call to read_csv!")
-		result = rcf.read_csv("dummy", doublequote=False)
+		result = rcf.read_csv(self.testdata, doublequote=False)
 		self.assertEqual([], result, "Non-empty list returned by correct call to read_csv!")
-		result = rcf.read_csv("dummy", quoting=csv.QUOTE_NONE, doublequote=True)
+		result = rcf.read_csv(self.testdata, quoting=csv.QUOTE_NONE, doublequote=True)
 		self.assertEqual(["read_csv.quoting-doublequote"], result, "Wrong result when doublequote specified despite quoting being QOUTE_NONE!")
-		result = rcf.read_csv("dummy", quoting=csv.QUOTE_NONE, doublequote=False)
+		result = rcf.read_csv(self.testdata, quoting=csv.QUOTE_NONE, doublequote=False)
 		self.assertEqual(["read_csv.quoting-doublequote"], result, "Wrong result when doublequote specified despite quoting being QOUTE_NONE!")
 	
-	def test_read_csv_usecols_names(self):
-		result = rcf.read_csv("dummy", usecols=[0, 1], names=["A", "B"])
+	def test_read_csv_filepath_names(self):
+		result = rcf.read_csv(self.testdata, names=["D", "E", "F"])
 		self.assertEqual([], result, "Non-empty list returned by correct call to read_csv!")
-		result = rcf.read_csv("dummy", usecols=[0, 1], names=["A"])
-		self.assertEqual(["read_csv.usecols-names"], result, "Wrong result when length of names < length of usecols!")
-		result = rcf.read_csv("dummy", usecols=[0, 1], names=["A", "B", "C"])
-		self.assertEqual(["read_csv.usecols-names"], result, "Wrong result when length of names > length of usecols!")
+		result = rcf.read_csv(self.testdata, names=["D", "E"])
+		self.assertEqual(["read_csv.filepath-names"], result, "Wrong result when names has too few elements!")
+		result = rcf.read_csv(self.testdata, names=["D", "E", "F", "G"])
+		self.assertEqual(["read_csv.filepath-names"], result, "Wrong result when names has too many elements!")
+	
+	def test_read_csv_filepath_dtype(self):
+		result = rcf.read_csv(self.testdata, dtype={0:str, 1:int, 2:float})
+		self.assertEqual([], result, "Non-empty list returned by correct call to read_csv!")
+		result = rcf.read_csv(self.testdata, dtype={"A":str, "B":int, "C":float})
+		self.assertEqual([], result, "Non-empty list returned by correct call to read_csv!")
+		result = rcf.read_csv(self.testdata, dtype={0:str, 4:int})
+		self.assertEqual(["read_csv.filepath-dtype"], result, "Wrong result when dtype contains too high index!")
+		result = rcf.read_csv(self.testdata, dtype={"B":str, "Q":int})
+		self.assertEqual(["read_csv.filepath-dtype"], result, "Wrong result when dtype contains non-existing key!")
+	
+	def test_read_csv_filepath_skipfooter(self):
+		result = rcf.read_csv(self.testdata, skipfooter=2)
+		self.assertEqual([], result, "Non-empty list returned by correct call to read_csv!")
+		result = rcf.read_csv(self.testdata, header=None, skipfooter=5)
+		self.assertEqual([], result, "Non-empty list returned by correct call to read_csv!")
+		result = rcf.read_csv(self.testdata, skipfooter=5)
+		self.assertEqual(["read_csv.filepath-skipfooter"], result, "Wrong result returned when skipfooter > number of rows!")
+		result = rcf.read_csv(self.testdata, header=None, skipfooter=6)
+		self.assertEqual(["read_csv.filepath-skipfooter"], result, "Wrong result returned when skipfooter > number of rows!")
+	
+	def test_read_csv_filepath_skiprows_skipfooter(self):
+		result = rcf.read_csv(self.testdata, skiprows=2, skipfooter=2)
+		self.assertEqual([], result, "Non-empty list returned by correct call to read_csv!")
+		result = rcf.read_csv(self.testdata, skiprows=3, skipfooter=4)
+		self.assertEqual(["read_csv.filepath-skiprows-skipfooter"], result, "Wrong result returned when skiprows + skipfooter > number of rows!")
+	
+	def test_read_csv_filepath_parse_dates(self):
+		result = rcf.read_csv("data/date_data.csv", index_col=0, parse_dates=True)
+		self.assertEqual([], result, "Non-empty list returned by correct call to read_csv!")
+		result = rcf.read_csv("data/date_data.csv", parse_dates=[0])
+		self.assertEqual([], result, "Non-empty list returned by correct call to read_csv!")
+		result = rcf.read_csv("data/date_data.csv", parse_dates=["A"])
+		self.assertEqual([], result, "Non-empty list returned by correct call to read_csv!")
+		result = rcf.read_csv("data/date_data.csv", parse_dates=[[2,3,4]])
+		self.assertEqual([], result, "Non-empty list returned by correct call to read_csv!")
+		result = rcf.read_csv("data/date_data.csv", parse_dates=True)
+		self.assertEqual(["read_csv.filepath-parse_dates"], result, "Wrong result returned with parse_dates=True for non-date index!")
+		result = rcf.read_csv("data/date_data.csv", parse_dates=[1])
+		self.assertEqual(["read_csv.filepath-parse_dates"], result, "Wrong result returned when parse_dates points at non-date column!")
+		result = rcf.read_csv("data/date_data.csv", parse_dates=[[0,3,4]])
+		self.assertEqual(["read_csv.filepath-parse_dates"], result, "Wrong result returned when parse_dates points at columns that cannot be combined as a date!")
+		

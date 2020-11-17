@@ -209,7 +209,7 @@ def plot(*args,
 	if _is_specified(linestyle) and _is_specified(dashes):
 		result.append("plot.linestyle-dashes")
 	
-	# dash_*style for solid line och solid_*style for dashed line
+	# dash_*style for solid line and solid_*style for dashed line
 	solid = False
 	if not (fmt_linestyle_specified or _is_specified(linestyle) or _is_specified(dashes)):
 		# Default (solid line) used
@@ -235,7 +235,7 @@ def plot(*args,
 	
 	# Marker properties set for non-marker
 	if (not _is_specified(marker) or None==marker or ""==marker) and not fmt_marker_specified:
-		# There is a marker
+		# There is no marker
 		if _is_specified(fillstyle):
 			result.append("plot.marker-fillstyle")
 		if _is_specified(markeredgecolor):
@@ -402,7 +402,7 @@ def read_csv(filepath_or_buffer,
 	if _is_specified(names):
 		if _is_specified(prefix):
 			result.append("read_csv.names-prefix")
-		if _is_specified(header):	# TODO: Eventuellt är det här rimligt om header=None (=> ta inte bort headerrader)"
+		if _is_specified(header):
 			result.append("read_csv.names-header")
 	if None!=header or not _is_specified(header):
 		if _is_specified(prefix):
@@ -462,8 +462,53 @@ def read_csv(filepath_or_buffer,
 		if _is_specified(doublequote):
 			result.append("read_csv.quoting-doublequote")
 	
-	if _is_specified(usecols) and _is_specified(names):
-		if len(usecols) != len(names):
-			result.append("read_csv.usecols-names")
+	if _is_specified(header):
+		raw_data = pd.read_csv(filepath_or_buffer, header=header)
+	else:
+		raw_data = pd.read_csv(filepath_or_buffer)
+	
+	if not _is_specified(usecols) or None == usecols:
+		if _is_specified(names):
+			if len(raw_data.columns) != len(names):
+				result.append("read_csv.filepath-names")
+		if isinstance(dtype, dict):
+			for key in dtype.keys():
+				if isinstance(key, int):
+					if key >= len(raw_data.columns):
+						result.append("read_csv.filepath-dtype")
+						break
+				elif isinstance(key, str):
+					if not key in raw_data.columns:
+						result.append("read_csv.filepath-dtype")
+						break
+	
+	if _is_specified(skipfooter):
+		if skipfooter > len(raw_data.index):
+			result.append("read_csv.filepath-skipfooter")
+		if _is_specified(skiprows):
+			if skiprows + skipfooter > len(raw_data.index):
+				result.append("read_csv.filepath-skiprows-skipfooter")
+	
+	if _is_specified(parse_dates):
+		if _is_specified(index_col):
+			date_data = pd.read_csv(filepath_or_buffer, index_col=index_col, parse_dates=parse_dates)
+		else:
+			date_data = pd.read_csv(filepath_or_buffer, parse_dates=parse_dates)
+		if isinstance(parse_dates, bool) and parse_dates:
+			if type(date_data.index) != pd.core.indexes.datetimes.DatetimeIndex:
+				result.append("read_csv.filepath-parse_dates")
+		elif isinstance(parse_dates, list):
+			for col in parse_dates:
+				if isinstance(col, str):
+					col_vals = date_data[col]
+				elif isinstance(col, int):
+					col_vals = date_data[raw_data.columns[col]]
+				elif isinstance(col, list):
+					col_name = raw_data.columns[col[0]]
+					for c in col[1:]:
+						col_name += "_" + raw_data.columns[c]
+					col_vals = date_data[col_name]
+				if col_vals.dtype == object:
+					result.append("read_csv.filepath-parse_dates")
 	
 	return result
