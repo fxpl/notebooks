@@ -1,0 +1,4 @@
+nb_0.ipynb: plt.plot(data)
+nb_1.ipynb: plot(data)
+nb_2.ipynb: plt.plot([0, 1], [0, 1])
+nb_3.ipynb: plt.plot([0, 1], [0, 1], 'k--', linestyle='-')
