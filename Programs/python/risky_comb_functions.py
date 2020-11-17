@@ -329,12 +329,23 @@ def DataFrame(data=_UNSPECIFIED,
 	df = pd.DataFrame(data=data, index=index, columns=columns, dtype=dtype, copy=copy)
 	if None != dtype:
 		rightType = True
+		if isinstance(dtype, str):
+			try:
+				dtype = eval(dtype)
+			except NameError:
+				pass	# Could not be evaluated, continue with dtype string
 		for key, value in df.items():
-			for index, elem in value.items():
-				if type(elem) != dtype:
-					result.append("DataFrame.data-dtype")
-					rightType = False
-					break
+			for i in range(0, len(value)):
+				try:
+					if not isinstance(value[i], dtype):
+						rightType = False
+				except TypeError:
+					if type(value[i]) != dtype:
+						rightType = False
+				finally:
+					if not rightType:
+						result.append("DataFrame.data-dtype")
+						break
 			if not rightType:
 				break
 	

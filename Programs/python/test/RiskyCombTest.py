@@ -6,6 +6,7 @@ import glob
 import numpy
 import pandas
 import risky_comb_functions as rcf
+import numpy as np
 
 from shutil import rmtree
 
@@ -372,11 +373,18 @@ class RiskyCombTest(unittest.TestCase):
 			"Anna": ["LMG", "Katte", "LTH"]}
 		result = rcf.DataFrame(data, dtype=str)
 		self.assertEqual([], result, "Non-empty list returned by correct call to DataFrame!")
+		result = rcf.DataFrame(data, dtype="str")
+		self.assertEqual([], result, "Non-empty list returned by correct call to DataFrame!")
 		result = rcf.DataFrame(data, dtype=None)
+		self.assertEqual([], result, "Non-empty list returned by correct call to DataFrame!")
+		result = rcf.DataFrame([1,2,3,4,5,6,7,8,9,0], dtype= np.intc)
 		self.assertEqual([], result, "Non-empty list returned by correct call to DataFrame!")
 		
 		result = rcf.DataFrame(data, dtype=int)
 		self.assertEqual(["DataFrame.data-dtype"], result, "Wrong result when calling string DataFrame with dtype=int!")
+		result = rcf.DataFrame(data, dtype="int32")
+		self.assertEqual(["DataFrame.data-dtype"], result, "Wrong result when calling string DataFrame with unknown dtype!")
+		
 		data = {"Age": [34, 29, 22],
 			"City": ["Uppsala", "Göteborg", "Lund"]}
 		result = rcf.DataFrame(data, dtype=int)
