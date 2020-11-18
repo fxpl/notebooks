@@ -168,7 +168,7 @@ def plot(*args,
 	
 	# Check content of fmt string
 	fmt_markers = ['.', ',', 'o', 'v', '^', '<', '>', '1', '2', '3', '4', 's', 'p', '*', 'h', 'H', '+', 'x', 'D', 'd', '|', '_']
-	fmt_linestyles = ['-', '--', '-.'':']
+	fmt_linestyles = ['-', '--', '-.', ':']
 	fmt_colors = ['r', 'g', 'b', 'c', 'm',' y', 'k', 'w']
 	fmt_marker_specified = False
 	fmt_linestyle_specified = False
@@ -177,7 +177,7 @@ def plot(*args,
 	for arg in args:
 		if isinstance(arg, str):
 			for fmt_linestyle in fmt_linestyles:
-				if fmt_linestyle in arg:
+				if fmt_linestyle in arg and len(arg)<5:
 					fmt_linestyle_specified = True
 					if fmt_linestyle == "-" and not "--" in arg and not "-." in arg:
 						fmt_linestyle_solid = True

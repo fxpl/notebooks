@@ -266,6 +266,10 @@ class RiskyCombTest(unittest.TestCase):
 		result = rcf.plot(self.x, self.y, marker="", markersize=7)
 		self.assertEqual(markersize_result, result, "Wrong list returned for plot call that specifies markersize but marker is empty string!")
 	
+	def test_plot_marker_missing_comma_bug(self):
+		result = rcf.plot(self.x, self.y, 'r:+', markersize=15)
+		self.assertEqual([], result, "Non-empty list returned by correct call to plot!")
+	
 	def test_plot_picker_pickradius(self):
 		result = rcf.plot(self.x, self.y, picker=True, pickradius=1);
 		self.assertEqual([], result, "Non-empty list returned by correct call to plot!")
