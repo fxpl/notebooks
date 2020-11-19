@@ -408,13 +408,13 @@ class RiskyCombTest(unittest.TestCase):
 		result = rcf.read_csv(self.testdata, delim_whitespace=False, sep='.')
 		self.assertEqual([], result, "Non-empty list returned by correct call to read_csv!")
 		
-		result = rcf.read_csv(self.testdata, delim_whitespace=True, sep='.')
+		result = rcf.read_csv(self.testdata, delim_whitespace=True, sep=',')
 		self.assertEqual(["read_csv.delim_whitespace-sep"], result, "Wrong result when calling read_csv with delim_whitespace=True and sep defined!")
-		result = rcf.read_csv(self.testdata, delim_whitespace=True, delimiter=':')
+		result = rcf.read_csv(self.testdata, delim_whitespace=True, delimiter=',')
 		self.assertEqual(["read_csv.delim_whitespace-delimiter"], result, "Wrong result when calling read_csv with delim_whitespace=True and delimiter defined!")
 		result = rcf.read_csv(self.testdata, sep=" ", delimiter=':')
 		self.assertEqual(["read_csv.sep-delimiter"], result, "Wrong result when calling read_csv with both sep and delimiter defined!")
-		result = rcf.read_csv(self.testdata, sep=" ", delimiter=':', delim_whitespace=True)
+		result = rcf.read_csv(self.testdata, sep=" ", delimiter=',', delim_whitespace=True)
 		self.assertEqual(["read_csv.delim_whitespace-sep", "read_csv.delim_whitespace-delimiter", "read_csv.sep-delimiter"], result, "Wrong result when calling read_csv with both sep and delimiter defined!")
 	
 	def test_read_csv_header(self):
@@ -440,14 +440,14 @@ class RiskyCombTest(unittest.TestCase):
 	def test_read_csv_duplicated_value_ignored(self):
 		result = rcf.read_csv(self.testdata)
 		self.assertEqual([], result, "Non-empty list returned by correct call to read_csv!")
-		result = rcf.read_csv(self.testdata, lineterminator='\n', escapechar='\\', delimiter=',', comment='#', thousands=' ', decimal='.', quotechar='\'', na_values=["NaN", "nan"], true_values=[True, 1], false_values=[False, 0])
+		result = rcf.read_csv(self.testdata, lineterminator='\n', escapechar='\\', delimiter=',', comment='#', thousands=' ', decimal='.', quotechar='\'', na_values=["NaN", "nan"], true_values=["True", "1"], false_values=["False", "0"])
 		self.assertEqual([], result, "Non-empty list returned by correct call to read_csv!")
 		
 		result = rcf.read_csv(self.testdata, lineterminator=',', sep=',')
 		self.assertEqual(["read_csv.lineterminator-sep"], result, "Wrong result when calling read_csv with lineterminator=sep!")
 		result = rcf.read_csv(self.testdata, delimiter=',', thousands=',')
 		self.assertEqual(["read_csv.delimiter-thousands"], result, "Wrong result when calling read_csv with delimiter=thousands!")
-		result = rcf.read_csv(self.testdata, true_values=[1, "true"], false_values=[1, "false"])
+		result = rcf.read_csv(self.testdata, true_values=["1", "true"], false_values=["1", "false"])
 		self.assertEqual(["read_csv.true_values-false_values"], result, "Wrong result when calling read_csv with same value in true_values and false_values!")
 		result = rcf.read_csv(self.testdata, quotechar="#", na_values=["NA", "#", "NaN"])
 		self.assertEqual(["read_csv.quotechar-na_values"], result, "Wrong result when calling read_csv with quotechar value in na_values!")
@@ -464,8 +464,10 @@ class RiskyCombTest(unittest.TestCase):
 		self.assertEqual(["read_csv.na_filter-keep_default_na"], result, "Wrong result when calling read_csv with keep_default_na specified, but na_filter=False!")
 	
 	def test_read_csv_parse_dates(self):
-		def f(Y, m, d):
-			return datetime.date(Y, m, d)
+		def f(d):
+			""" Create date from string on format YYYY-mm-dd """
+			date_parts = d.split("-")
+			return datetime.date(int(date_parts[0]), int(date_parts[1]), int(date_parts[2]))
 		result = rcf.read_csv("data/date_data.csv", parse_dates=[0], infer_datetime_format=True, keep_date_col=False, date_parser=f, dayfirst=True, cache_dates=True)
 		self.assertEqual([], result, "Non-empty list returned by correct call to read_csv!")
 		result = rcf.read_csv(self.testdata, infer_datetime_format=True)
@@ -521,6 +523,8 @@ class RiskyCombTest(unittest.TestCase):
 	
 	def test_read_csv_filepath_names(self):
 		result = rcf.read_csv(self.testdata, names=["D", "E", "F"])
+		self.assertEqual([], result, "Non-empty list returned by correct call to read_csv!")
+		result = rcf.read_csv("data/data_tabbed.csv", sep="\t", names=["D", "E", "F"])
 		self.assertEqual([], result, "Non-empty list returned by correct call to read_csv!")
 		result = rcf.read_csv(self.testdata, names=["D", "E"])
 		self.assertEqual(["read_csv.filepath-names"], result, "Wrong result when names has too few elements!")

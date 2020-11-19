@@ -320,7 +320,7 @@ def DataFrame(data=_UNSPECIFIED,
 				result.append("DataFrame.data-columns")
 				break
 	
-	df = pd.DataFrame(data=data, index=index, columns=columns, dtype=dtype, copy=copy)
+	df = pd.DataFrame(data=data, index=index, columns=columns, dtype=dtype, copy=copy)	# TODO: copy-värde
 	if None != dtype:
 		rightType = True
 		if isinstance(dtype, str):
@@ -345,7 +345,7 @@ def DataFrame(data=_UNSPECIFIED,
 	
 	return result
 
-def read_csv(filepath_or_buffer,
+def pd_read_csv(filepath_or_buffer,
 			sep=_UNSPECIFIED,
 			delimiter=_UNSPECIFIED,
 			header=_UNSPECIFIED,
@@ -395,8 +395,122 @@ def read_csv(filepath_or_buffer,
 			memory_map=_UNSPECIFIED,
 			float_precision=_UNSPECIFIED
 	):
+	return pd.read_csv(filepath_or_buffer,
+					sep=_get_value(sep, ","),
+					delimiter=_get_value(delimiter, None),
+					header=_get_value(header, "infer"),
+					names=_get_value(names, None),
+					index_col=_get_value(index_col, None),
+					usecols=_get_value(usecols, None),
+					squeeze=_get_value(squeeze, False),
+					prefix=_get_value(prefix, None),
+					mangle_dupe_cols=_get_value(mangle_dupe_cols, True),
+					dtype=_get_value(dtype, None),
+					engine=_get_value(engine, None),
+					converters=_get_value(converters, None),
+					true_values=_get_value(true_values, None),
+					false_values=_get_value(false_values, None),
+					skipinitialspace=_get_value(skipinitialspace, False),
+					skiprows=_get_value(skiprows, None),
+					skipfooter=_get_value(skipfooter, 0),
+					nrows=_get_value(nrows, None),
+					na_values=_get_value(na_values, None),
+					keep_default_na=_get_value(keep_default_na, True),
+					na_filter=_get_value(na_filter, True),
+					verbose=_get_value(verbose, False),
+					skip_blank_lines=_get_value(skip_blank_lines, True),
+					parse_dates=_get_value(parse_dates, False),
+					infer_datetime_format=_get_value(infer_datetime_format, False),
+					keep_date_col=_get_value(keep_date_col, False),
+					date_parser=_get_value(date_parser, None),
+					dayfirst=_get_value(dayfirst, False),
+					cache_dates=_get_value(cache_dates, True),
+					iterator=_get_value(iterator, False),
+					chunksize=_get_value(chunksize, None),
+					compression=_get_value(compression, "infer"),
+					thousands=_get_value(thousands, None),
+					decimal=_get_value(decimal, "."),
+					lineterminator=_get_value(lineterminator, None),
+					quotechar=_get_value(quotechar,'"'),
+					quoting=_get_value(quoting, 0),
+					doublequote=_get_value(doublequote, True),
+					escapechar=_get_value(escapechar, None),
+					comment=_get_value(comment, None),
+					encoding=_get_value(encoding, None),
+					dialect=_get_value(dialect, None),
+					error_bad_lines=_get_value(error_bad_lines, True),
+					warn_bad_lines=_get_value(warn_bad_lines, True),
+					delim_whitespace=_get_value(delim_whitespace, False),
+					low_memory=_get_value(low_memory, True),
+					memory_map=_get_value(memory_map, False),
+					float_precision=_get_value(float_precision, None)
+			)
+
+def read_csv(filepath_or_buffer,
+			sep=_UNSPECIFIED,
+			delimiter=_UNSPECIFIED,
+			header=_UNSPECIFIED,
+			names=_UNSPECIFIED,
+			index_col=_UNSPECIFIED,
+			usecols=_UNSPECIFIED,
+			squeeze=_UNSPECIFIED,
+			prefix=_UNSPECIFIED,
+			mangle_dupe_cols=_UNSPECIFIED,
+			dtype=_UNSPECIFIED,
+			engine=_UNSPECIFIED,
+			converters=_UNSPECIFIED,
+			true_values=_UNSPECIFIED,
+			false_values=_UNSPECIFIED,
+			skipinitialspace=_UNSPECIFIED,
+			skiprows=_UNSPECIFIED,
+			skipfooter=_UNSPECIFIED,
+			nrows=_UNSPECIFIED,
+			na_values=_UNSPECIFIED,
+			keep_default_na=_UNSPECIFIED,
+			na_filter=_UNSPECIFIED,
+			verbose=_UNSPECIFIED,
+			skip_blank_lines=_UNSPECIFIED,
+			parse_dates=_UNSPECIFIED,
+			infer_datetime_format=_UNSPECIFIED,
+			keep_date_col=_UNSPECIFIED,
+			date_parser=_UNSPECIFIED,
+			dayfirst=_UNSPECIFIED,
+			cache_dates=_UNSPECIFIED,
+			iterator=_UNSPECIFIED,
+			chunksize=_UNSPECIFIED,
+			compression=_UNSPECIFIED,
+			thousands=_UNSPECIFIED,
+			decimal=_UNSPECIFIED,
+			lineterminator=_UNSPECIFIED,
+			quotechar=_UNSPECIFIED,
+			quoting=_UNSPECIFIED,
+			doublequote=_UNSPECIFIED,
+			escapechar=_UNSPECIFIED,
+			comment=_UNSPECIFIED,
+			encoding=_UNSPECIFIED,
+			dialect=_UNSPECIFIED,
+			error_bad_lines=_UNSPECIFIED,
+			warn_bad_lines=_UNSPECIFIED,
+			delim_whitespace=_UNSPECIFIED,
+			low_memory=_UNSPECIFIED,
+			memory_map=_UNSPECIFIED,
+			float_precision=_UNSPECIFIED
+	):
 	result = []
-	if delim_whitespace:
+	
+	all_data = pd_read_csv(filepath_or_buffer, sep=sep, delimiter=delimiter, header=header, index_col=index_col,
+					prefix=prefix, mangle_dupe_cols=mangle_dupe_cols, dtype=dtype, engine=engine, converters=converters,
+					true_values=true_values, false_values=false_values, skipinitialspace=skipinitialspace, na_values=na_values,
+					keep_default_na=keep_default_na, na_filter=na_filter, skip_blank_lines=skip_blank_lines,
+					parse_dates=parse_dates, infer_datetime_format=infer_datetime_format, keep_date_col=keep_date_col,
+					date_parser=date_parser, dayfirst=dayfirst, cache_dates=cache_dates, iterator=iterator,
+					chunksize=chunksize, compression=compression, thousands=thousands, decimal=decimal,
+					lineterminator=lineterminator, quotechar=quotechar, quoting=quoting, doublequote=doublequote,
+					escapechar=escapechar, comment=comment, encoding=encoding, dialect=dialect,
+					error_bad_lines=error_bad_lines, warn_bad_lines=warn_bad_lines, delim_whitespace=delim_whitespace,
+					low_memory=low_memory, memory_map=memory_map, float_precision=float_precision)
+	
+	if _is_specified(delim_whitespace) and delim_whitespace:
 		if _is_specified(sep):
 			result.append("read_csv.delim_whitespace-sep")
 		if _is_specified(delimiter):
@@ -467,52 +581,53 @@ def read_csv(filepath_or_buffer,
 		if _is_specified(doublequote):
 			result.append("read_csv.quoting-doublequote")
 	
-	if _is_specified(header):
-		raw_data = pd.read_csv(filepath_or_buffer, header=header)
-	else:
-		raw_data = pd.read_csv(filepath_or_buffer)
-	
 	if not _is_specified(usecols) or None == usecols:
 		if _is_specified(names):
-			if len(raw_data.columns) != len(names):
+			if len(all_data.columns) != len(names):
 				result.append("read_csv.filepath-names")
 		if isinstance(dtype, dict):
 			for key in dtype.keys():
 				if isinstance(key, int):
-					if key >= len(raw_data.columns):
+					if key >= len(all_data.columns):
 						result.append("read_csv.filepath-dtype")
 						break
 				elif isinstance(key, str):
-					if not key in raw_data.columns:
+					if not key in all_data.columns:
 						result.append("read_csv.filepath-dtype")
 						break
 	
 	if _is_specified(skipfooter):
-		if skipfooter > len(raw_data.index):
+		if skipfooter > len(all_data.index):
 			result.append("read_csv.filepath-skipfooter")
 		if _is_specified(skiprows):
-			if skiprows + skipfooter > len(raw_data.index):
+			if skiprows + skipfooter > len(all_data.index):
 				result.append("read_csv.filepath-skiprows-skipfooter")
 	
 	if _is_specified(parse_dates):
-		if _is_specified(index_col):
-			date_data = pd.read_csv(filepath_or_buffer, index_col=index_col, parse_dates=parse_dates)
-		else:
-			date_data = pd.read_csv(filepath_or_buffer, parse_dates=parse_dates)
+		date_unparsed_data = pd_read_csv(filepath_or_buffer, sep=sep, delimiter=delimiter, header=header, index_col=index_col,
+					usecols=usecols, squeeze=squeeze, prefix=prefix, mangle_dupe_cols=mangle_dupe_cols,	dtype=dtype,
+					engine=engine, converters=converters, true_values=true_values, false_values=false_values,
+					skipinitialspace=skipinitialspace, skiprows=None, skipfooter=0, nrows=1, na_values=na_values,
+					keep_default_na=keep_default_na, na_filter=na_filter, verbose=verbose, skip_blank_lines=skip_blank_lines,
+					parse_dates=False, iterator=iterator, chunksize=chunksize, compression=compression, thousands=thousands,
+					decimal=decimal, lineterminator=lineterminator, quotechar=quotechar, quoting=quoting,
+					doublequote=doublequote, escapechar=escapechar, comment=comment, encoding=encoding, dialect=dialect,
+					error_bad_lines=error_bad_lines, warn_bad_lines=warn_bad_lines, delim_whitespace=delim_whitespace,
+					low_memory=low_memory, memory_map=memory_map, float_precision=float_precision)
 		if isinstance(parse_dates, bool) and parse_dates:
-			if type(date_data.index) != pd.core.indexes.datetimes.DatetimeIndex:
+			if type(all_data.index) != pd.core.indexes.datetimes.DatetimeIndex:
 				result.append("read_csv.filepath-parse_dates")
 		elif isinstance(parse_dates, list):
 			for col in parse_dates:
 				if isinstance(col, str):
-					col_vals = date_data[col]
+					col_vals = all_data[col]
 				elif isinstance(col, int):
-					col_vals = date_data[raw_data.columns[col]]
+					col_vals = all_data[date_unparsed_data.columns[col]]
 				elif isinstance(col, list):
-					col_name = raw_data.columns[col[0]]
+					col_name = date_unparsed_data.columns[col[0]]
 					for c in col[1:]:
-						col_name += "_" + raw_data.columns[c]
-					col_vals = date_data[col_name]
+						col_name += "_" + date_unparsed_data.columns[c]
+					col_vals = all_data[col_name]
 				if col_vals.dtype == object:
 					result.append("read_csv.filepath-parse_dates")
 	
