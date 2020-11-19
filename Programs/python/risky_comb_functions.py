@@ -275,12 +275,9 @@ def arange(start=0, stop=_UNSPECIFIED, step=1, dtype=None):
 
 
 def array(obj, dtype=None, *, copy=True, order=_UNSPECIFIED, subok=False, ndmin=0):
-	order_set = _is_specified(order)
-	order = _get_value(order, "K")
-	
 	result = []
-	array = np.array(obj, dtype=dtype, copy=copy, order=order, subok=subok, ndmin=ndmin)
-	if 1 == len(np.shape(array)) and order_set:
+	array = np.array(obj, dtype=dtype, copy=copy, order=_get_value(order, "K"), subok=subok, ndmin=ndmin)
+	if 1 == len(np.shape(array)) and _is_specified(order):
 		# The user has specified order for a 1D array
 		result.append("array.object-order")
 	
@@ -290,12 +287,9 @@ def array(obj, dtype=None, *, copy=True, order=_UNSPECIFIED, subok=False, ndmin=
 
 
 def zeros(shape, dtype=float, order=_UNSPECIFIED):
-	order_set = _is_specified(order)
-	order = _get_value(order, "C")
-	
 	result = []
-	array = np.zeros(shape, dtype=dtype, order=order)
-	if 1 == len(np.shape(array)) and order_set:
+	array = np.zeros(shape, dtype=dtype, order=_get_value(order, "C"))
+	if 1 == len(np.shape(array)) and _is_specified(order):
 		# The user has specified order for a 1D array
 		result.append("zeros.shape-order")
 	return result
@@ -311,8 +305,6 @@ def DataFrame(data=_UNSPECIFIED,
 		is2DnumpyArray = isinstance(data, np.ndarray) and 2 == len(data.shape)
 		if not isinstance(data, (pd.DataFrame)) and not is2DnumpyArray:
 			result.append("DataFrame.data-copy")
-	else:
-		copy = False
 	
 	if isinstance(data, dict) and None != columns:
 		for column in columns:
@@ -320,7 +312,7 @@ def DataFrame(data=_UNSPECIFIED,
 				result.append("DataFrame.data-columns")
 				break
 	
-	df = pd.DataFrame(data=data, index=index, columns=columns, dtype=dtype, copy=copy)	# TODO: copy-värde
+	df = pd.DataFrame(data=data, index=index, columns=columns, dtype=dtype, copy=_get_value(copy, False))
 	if None != dtype:
 		rightType = True
 		if isinstance(dtype, str):
