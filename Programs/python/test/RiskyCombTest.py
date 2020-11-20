@@ -542,19 +542,19 @@ class RiskyCombTest(unittest.TestCase):
 		self.assertEqual(["read_csv.filepath-dtype"], result, "Wrong result when dtype contains non-existing key!")
 	
 	def test_read_csv_filepath_skipfooter(self):
-		result = rcf.read_csv(self.testdata, skipfooter=2)
+		result = rcf.read_csv(self.testdata, skipfooter=2, engine="python")
 		self.assertEqual([], result, "Non-empty list returned by correct call to read_csv!")
-		result = rcf.read_csv(self.testdata, header=None, skipfooter=5)
+		result = rcf.read_csv(self.testdata, header=None, skipfooter=5, engine="python")
 		self.assertEqual([], result, "Non-empty list returned by correct call to read_csv!")
-		result = rcf.read_csv(self.testdata, skipfooter=5)
+		result = rcf.read_csv(self.testdata, skipfooter=5, engine="python")
 		self.assertEqual(["read_csv.filepath-skipfooter"], result, "Wrong result returned when skipfooter > number of rows!")
-		result = rcf.read_csv(self.testdata, header=None, skipfooter=6)
+		result = rcf.read_csv(self.testdata, header=None, skipfooter=6, engine="python")
 		self.assertEqual(["read_csv.filepath-skipfooter"], result, "Wrong result returned when skipfooter > number of rows!")
 	
 	def test_read_csv_filepath_skiprows_skipfooter(self):
-		result = rcf.read_csv(self.testdata, skiprows=2, skipfooter=2)
+		result = rcf.read_csv(self.testdata, skiprows=2, skipfooter=2, engine="python")
 		self.assertEqual([], result, "Non-empty list returned by correct call to read_csv!")
-		result = rcf.read_csv(self.testdata, skiprows=3, skipfooter=4)
+		result = rcf.read_csv(self.testdata, skiprows=3, skipfooter=4, engine="python")
 		self.assertEqual(["read_csv.filepath-skiprows-skipfooter"], result, "Wrong result returned when skiprows + skipfooter > number of rows!")
 	
 	def test_read_csv_filepath_parse_dates(self):
