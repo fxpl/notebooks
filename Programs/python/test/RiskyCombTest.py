@@ -530,6 +530,8 @@ class RiskyCombTest(unittest.TestCase):
 		self.assertEqual(["read_csv.filepath-names"], result, "Wrong result when names has too few elements!")
 		result = rcf.read_csv(self.testdata, names=["D", "E", "F", "G"])
 		self.assertEqual(["read_csv.filepath-names"], result, "Wrong result when names has too many elements!")
+		result = rcf.read_csv(self.testdata, names = "str")
+		self.assertEqual(["read_csv.filepath-names"], result, "Wrong result when names is a string!")
 	
 	def test_read_csv_filepath_dtype(self):
 		result = rcf.read_csv(self.testdata, dtype={0:str, 1:int, 2:float})
