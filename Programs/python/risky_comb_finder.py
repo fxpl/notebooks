@@ -3,7 +3,7 @@ Extract module and function name from the first argument, list statements from
 this file that are executable in isolation. Among thesee statements, find risky
 combinations of values.
 
-Arguments:
+Arguments: TODO: Inputfil innehåller nb-namn
 1: The path to the input file, containing function calls to be checked, one per
    line. Every function call shall target the same function. The statements may
    start with names/aliases for the module. These will be ignored. The name of
@@ -40,4 +40,4 @@ function_identifier = input_file_name.split("-")[0]
 identifier_substrings = function_identifier.split(".") 
 module = ".".join(identifier_substrings[0:-1])
 function_name = identifier_substrings[-1]
-find_risky_combs(input_path, output_dir, module, function_name)
+find_risky_combs(input_path, output_dir, function_name, module)

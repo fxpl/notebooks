@@ -41,7 +41,7 @@ class RiskyCombTest(unittest.TestCase):
 	
 	def test_find_risky_pairs_matplotlib_plot(self):
 		input_path = "data/matplotlib.pyplot.plot-calls-test.csv"
-		rcf.find_risky_combs(input_path, RiskyCombTest.output_dir, "matplotlib.pyplot", "plot")
+		rcf.find_risky_combs(input_path, RiskyCombTest.output_dir, "plot", "matplotlib.pyplot")
 		expected_executable_lines = [
 			"plot([0, 1], [0, 1])\n",
 			"plot([0, 1], [0, 1], 'k--', linestyle='-')\n"
@@ -59,7 +59,7 @@ class RiskyCombTest(unittest.TestCase):
 	
 	def test_find_risky_pairs_numpy_array(self):
 		input_path = "data/numpy.array-calls-test.csv"
-		rcf.find_risky_combs(input_path, RiskyCombTest.output_dir, "numpy", "array")
+		rcf.find_risky_combs(input_path, RiskyCombTest.output_dir, "array", "numpy")
 		expected_executable_lines = [
 			"array(np.array([1, 2, 3]))\n",
 			"array([7, 8, 9])\n",
@@ -78,7 +78,7 @@ class RiskyCombTest(unittest.TestCase):
 	
 	def test_find_risky_pairs_pandas_DataFrame(self):
 		input_path = "data/pandas.DataFrame-calls-test.csv"
-		rcf.find_risky_combs(input_path, RiskyCombTest.output_dir, "pandas", "DataFrame")
+		rcf.find_risky_combs(input_path, RiskyCombTest.output_dir, "DataFrame", "pandas")
 		expected_executable_lines = [
 			"DataFrame()\n",
 			"DataFrame(np.arange(16).reshape(4,4),                    index=[['a','a','b','b'],[1,2,1,2]],                    columns=[['NY','NY','LA','SF'],['cold','hot','hot','cold']])\n",

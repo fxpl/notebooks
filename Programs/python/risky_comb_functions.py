@@ -1,5 +1,6 @@
 import re
 import csv
+import multiprocessing
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -16,7 +17,7 @@ aliases = {
 
 _UNSPECIFIED = "kossaapaabcdefghijklmnopqrstuvwxypzåäööäåzpyxwvutsrqponmlkjihgfedcbaapakossa"
 
-def find_risky_combs(input_path, output_dir, module, function_name):
+def find_risky_combs(input_path, output_dir, function_name, module):
 	"""
 	List statements (function_calls) in the file stored at input_path that are
 	executable in isolation. Among the arguments of these calls, find risky
@@ -28,9 +29,10 @@ def find_risky_combs(input_path, output_dir, module, function_name):
 	* One file per risky parameter combination for which the risky arguments
 	  are found. The files contain lists of all risky function calls. Each
 	  file is named <function_name>.<risky_combination>.csv.
+	* TODO: timeout-fil
 	
 	Arguments:
-	input : str
+	input : str TODO: nb-namn i inputfil
 		The path to the input file, containing function calls to be checked,
 		one per line. Every function call shall target the same function. The
 		statements may start with names/aliases for the module. These will be
@@ -40,26 +42,72 @@ def find_risky_combs(input_path, output_dir, module, function_name):
 		<function_name> is the name of the function that is called.
 	output_dir : str
 		The path to the directory where the output will be stored
-	module : str
-		Name of the module where the function to be checked resides
 	function_name : str
 		Name of function called in the statements in the input file
+	module : str
+		Name of the module where the function to be checked resides
 	"""
 	executable_calls_path = output_dir + "/" + function_name + "_executable" + tstamp + ".csv"
-	with open(input_path) as input_file, open(executable_calls_path, "w") as output_file:
+	timed_out_path = output_dir + "/" + function_name + "_timed_out" + tstamp + ".csv"
+	with open(input_path) as input_file, open(executable_calls_path, "w") as executable_calls_file:
 		lines = input_file.readlines()
 		for line in lines:
 			if None == re.search("input\s*\(", line):
 				function_call = _get_function_call(line)
-				try:
-					eval(aliases[module] + "." + function_call)
-					output_file.write(function_call)
-					# If we reach this point, the statement is executable (with literals)
-					_report_risky_combs(function_call, output_dir)
-				except:
-					# We want to skip calls that don't work
-					pass
+				time_limit = 90
+				finished = _eval_and_report_timeout(function_call, time_limit, module=module, executable_calls_file=executable_calls_file, output_dir=output_dir)
+				if not finished:
+					with open(timed_out_path, "a") as timed_out_file:
+						timed_out_file.write("Function call timed out: " + function_call)
 
+
+def _eval_and_report_timeout(call, t, **kwargs):	# TODO: Vill jag ha kwargs?
+	"""
+	If call is executable in isolation, in less time than the one provided as t,
+	write it to the executable calls file and report risky pairs for it.
+	
+	Arguments:
+	call : str
+		String containing the function call to evaluate. (Will be evaluated
+		using eval.)
+	t: int
+		Number of seconds to wait before killing the process
+	kwargs:
+		Arguments for eval_and_report
+	
+	Return value: boolean
+		True if the process finished within the specified period
+		False if the process was killed
+	"""
+	proc = multiprocessing.Process(target=_eval_and_report, args=(call, kwargs))
+	proc.start()
+	proc.join(t)
+	if proc.is_alive():
+		proc.terminate()
+		return False
+	
+	return True
+
+def _eval_and_report(call, args):
+	"""
+	If call is executable in isolation, write it to the executable calls file
+	and report risky pairs for it.
+	
+	Arguments: TODO
+	"""
+	module = args["module"]
+	executable_calls_file = args["executable_calls_file"]
+	output_dir = args["output_dir"]
+	mod_call = aliases[module] + "." + call
+	try:
+		eval(mod_call)
+		executable_calls_file.write(call)
+		executable_calls_file.flush()
+		# If we reach this point, the statement is executable (with literals)
+		_report_risky_combs(call, output_dir)
+	except:
+		# We want to skip calls that don't work
+		pass
 
 def _get_function_call(statement):
 	"""
@@ -85,7 +133,6 @@ def _report_risky_combs(function_call, output_dir):
 		comb_file_path = output_dir + "/" + comb + tstamp + ".csv"
 		with open(comb_file_path, "a") as comb_file:
 			comb_file.write(function_call)
-
 
 def _get_value(param, default_value):
 	"""
