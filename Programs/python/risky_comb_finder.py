@@ -3,19 +3,21 @@ Extract module and function name from the first argument, list statements from
 this file that are executable in isolation. Among thesee statements, find risky
 combinations of values.
 
-Arguments: TODO: Inputfil innehåller nb-namn
+Arguments:
 1: The path to the input file, containing function calls to be checked, one per
-   line. Every function call shall target the same function. The statements may
-   start with names/aliases for the module. These will be ignored. The name of
-   the file should be on the format
-   [<directory>/]<module>.<function_name>-<any string>, where <module> is the
-   name of the module where the function can be found and <function_name> is
-   the name of the function that is called.
+   line, preceded by the notebook name and ':'. Every function call shall
+   target the same function. The statements may start with names/aliases for
+   the module. These will be ignored. The name of the file should be on the
+   format [<directory>/]<module>.<function_name>-<any string>, where <module>
+   is the name of the module where the function can be found and
+   <function_name> is the name of the function that is called.
 2: (Optional) The path to the directory where the output will be stored
 
 Output:
-* A file named <function_name>_executable.csv containing all calls that are
-  executable in isolation.
+* A file named <function_name>_executable<timestamp>.csv containing all
+  calls that are executable in isolation (in < 90 seconds).
+* A file named <function_name>_timed_out<timestamp>.csv containing all
+  calls that took > 90 seconds and therefore were interrupted.
 * One file per risky parameter combination for which the risky arguments
   are found. The files contain lists of all risky function calls. Each file is
   named <function_name>.<risky_combination>.csv.

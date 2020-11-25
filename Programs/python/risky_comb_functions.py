@@ -24,19 +24,21 @@ def find_risky_combs(input_path, output_dir, function_name, module):
 	combinations of values. The following output files are created in
 	output_dir:
 	
-	* A file named <function_name>_executable.csv containing all calls that are
-  	  executable in isolation.
+	* A file named <function_name>_executable<timestamp>.csv containing all
+	  calls that are executable in isolation (in < 90 seconds).
+	* A file named <function_name>_timed_out<timestamp>.csv containing all
+	  calls that took > 90 seconds and therefore were interrupted.
 	* One file per risky parameter combination for which the risky arguments
 	  are found. The files contain lists of all risky function calls. Each
-	  file is named <function_name>.<risky_combination>.csv.
-	* TODO: timeout-fil
+	  file is named <function_name>.<risky_combination><timestamp>.csv.
 	
 	Arguments:
-	input : str TODO: nb-namn i inputfil
+	input : str
 		The path to the input file, containing function calls to be checked,
-		one per line. Every function call shall target the same function. The
-		statements may start with names/aliases for the module. These will be
-		ignored. The name of the file should be on the format
+		one per line, preceded by the notebook name and ':'. Every function
+		call shall target the same function. The statements may start with
+		names/aliases for the module. These will be ignored. The name of the
+		file should be on the format
 		[<directory>/]<module>.<function_name>-<any string>, where <module> is
 		the name of the module where the function can be found and
 		<function_name> is the name of the function that is called.
