@@ -223,8 +223,6 @@ def plot(*args,
 		visible=_UNSPECIFIED,
 		xdata=_UNSPECIFIED,
 		ydata=_UNSPECIFIED):
-	result = []
-	
 	# Check content of fmt string
 	fmt_markers = ['.', ',', 'o', 'v', '^', '<', '>', '1', '2', '3', '4', 's', 'p', '*', 'h', 'H', '+', 'x', 'D', 'd', '|', '_']
 	fmt_linestyles = ['-', '--', '-.', ':']
@@ -250,17 +248,10 @@ def plot(*args,
 				# fmt is specified but doesn't contain marker or line style.
 				# Hence, it must be a color (since only executable calls are passed here)
 				fmt_color_specified = True
-	# fmt in combination with marker, linestyle and color
-	if fmt_marker_specified and _is_specified(marker):
-		result.append("plot.fmt-marker")
-	if fmt_linestyle_specified and _is_specified(linestyle):
-		result.append("plot.fmt-linestyle")
-	if fmt_color_specified and _is_specified(color):
-		result.append("plot.fmt-color")
-	
-	# linestyle and dashes
-	if _is_specified(linestyle) and _is_specified(dashes):
-		result.append("plot.linestyle-dashes")
+
+	result = []
+	result.extend(_plot_risky_fmt_combs(fmt_marker_specified, marker, fmt_linestyle_specified, linestyle, fmt_color_specified, color))
+	result.extend(_plot_risky_linestyle_combs(linestyle, dashes))
 	
 	# dash_*style for solid line and solid_*style for dashed line
 	solid = False
@@ -274,19 +265,66 @@ def plot(*args,
 		for i in np.arange(1, len(dashes), 2):
 			if 0 != dashes[i]: # There is a space between dashes
 				solid = False
-	
+	result.extend(_plot_risky_dash_style_combs(solid, dash_capstyle, dash_joinstyle))
+	result.extend(_plot_risky_solid_style_combs(solid, solid_capstyle, solid_joinstyle))
+	result.extend(_plot_risky_marker_combs(marker, fmt_marker_specified, fillstyle, markeredgecolor, markeredgewidth, markerfacecolor, markerfacecoloralt, markersize, markevery))
+	result.extend(_plot_risky_picker_combs(picker, pickradius))
+	return result
+
+def _plot_risky_fmt_combs(fmt_marker_specified, marker, fmt_linestyle_specified, linestyle, fmt_color_specified, color):
+	"""
+	Identify fmt related fisky combinations for plot.
+	"""
+	result = []
+	# fmt in combination with marker, linestyle and color
+	if fmt_marker_specified and _is_specified(marker):
+		result.append("plot.fmt-marker")
+	if fmt_linestyle_specified and _is_specified(linestyle):
+		result.append("plot.fmt-linestyle")
+	if fmt_color_specified and _is_specified(color):
+		result.append("plot.fmt-color")
+	return result
+
+def _plot_risky_linestyle_combs(linestyle, dashes):
+	"""
+	Identify general linestyle related risky argument combinations for plot.
+	"""
+	# linestyle and dashes
+	if _is_specified(linestyle) and _is_specified(dashes):
+		return ["plot.linestyle-dashes"]
+	return []
+
+def _plot_risky_dash_style_combs(solid, dash_capstyle, dash_joinstyle):
+	"""
+	Identify dashed line style related risky argument combinations for plot.
+	"""
+	result = []
 	if solid:
 		if _is_specified(dash_capstyle):
 			result.append("plot.fmt-dash_capstyle")
 		if _is_specified(dash_joinstyle):
 			result.append("plot.fmt-dash_joinstyle")
-	else:
+	return result
+
+def _plot_risky_solid_style_combs(solid, solid_capstyle, solid_joinstyle):
+	"""
+	Identify solid line style related risky argument combinations for plot.
+	"""
+	result = []
+	if not solid:
 		if _is_specified(solid_capstyle):
 			result.append("plot.fmt-solid_capstyle")
 		if _is_specified(solid_joinstyle):
 			result.append("plot.fmt-solid_joinstyle")
-	
+	return result
+
+# TODO: Radbrytningar!
+def _plot_risky_marker_combs(marker, fmt_marker_specified, fillstyle, markeredgecolor, markeredgewidth, markerfacecolor, markerfacecoloralt, markersize, markevery):
+	"""
+	Identify marker related risky argument combinations for plot.
+	"""
 	# Marker properties set for non-marker
+	result = []
 	if (not _is_specified(marker) or None==marker or ""==marker) and not fmt_marker_specified:
 		# There is no marker
 		if _is_specified(fillstyle):
@@ -303,17 +341,20 @@ def plot(*args,
 			result.append("plot.marker-markersize")
 		if _is_specified(markevery):
 			result.append("plot.marker-markevery")
-	
+	return result
+
+def _plot_risky_picker_combs(picker, pickradius):
+	"""
+	Identify picker related risky argument combinations for plot.
+	"""
 	# pickradius without picker
 	if _is_specified(pickradius):
 		if not _is_specified(picker) or None==picker or False==picker:
-			result.append("plot.picker-pickradius")
-	
-	return result
+			return ["plot.picker-pickradius"]
+	return []
 
 def show(block=None):
 	return []	# There are no risky combinations, since there is only 1 parameter.
-
 
 def arange(start=0, stop=_UNSPECIFIED, step=1, dtype=None):
 	if not _is_specified(stop):
@@ -358,20 +399,38 @@ def DataFrame(data=_UNSPECIFIED,
 			columns=None,	# We are only interested in it if it is specified AND not None
 			dtype=None,		# We are only interested in it if it is specified AND not None
 			copy=_UNSPECIFIED):
-	result = []
+	df = pd.DataFrame(data=data, index=index, columns=columns, dtype=dtype, copy=_get_value(copy, False))
 	
+	result = []
+	result.extend(_df_risky_copy_combs(data, copy))
+	result.extend(_df_risky_df_column_combs(data, columns))
+	result.extend(_df_risky_dtype_combs(dtype, df))
+	return result
+
+def _df_risky_copy_combs(data, copy):
+	"""
+	Identify copy related risky argument combinations for DataFrame.
+	"""
 	if _is_specified(copy):
 		is2DnumpyArray = isinstance(data, np.ndarray) and 2 == len(data.shape)
 		if not isinstance(data, (pd.DataFrame)) and not is2DnumpyArray:
-			result.append("DataFrame.data-copy")
-	
+			return ["DataFrame.data-copy"]
+	return []
+
+def _df_risky_df_column_combs(data, columns):
+	"""
+	Identify column name related risky argumen combinations for DataFrame.
+	"""
 	if isinstance(data, dict) and None != columns:
 		for column in columns:
 			if not column in data.keys():
-				result.append("DataFrame.data-columns")
-				break
-	
-	df = pd.DataFrame(data=data, index=index, columns=columns, dtype=dtype, copy=_get_value(copy, False))
+				return ["DataFrame.data-columns"]
+	return []
+
+def _df_risky_dtype_combs(dtype, df):
+	"""
+	Identify dtype related risky argument combinations for DataFrame.
+	"""
 	if None != dtype:
 		rightType = True
 		if isinstance(dtype, str):
@@ -389,12 +448,8 @@ def DataFrame(data=_UNSPECIFIED,
 						rightType = False
 				finally:
 					if not rightType:
-						result.append("DataFrame.data-dtype")
-						break
-			if not rightType:
-				break
-	
-	return result
+						return ["DataFrame.data-dtype"]
+	return []
 
 def pd_read_csv(filepath_or_buffer,
 			sep=_UNSPECIFIED,
@@ -441,7 +496,7 @@ def pd_read_csv(filepath_or_buffer,
 			dialect=_UNSPECIFIED,
 			error_bad_lines=_UNSPECIFIED,
 			warn_bad_lines=_UNSPECIFIED,
-			delim_whitespace=False,	# We are only interested in if it is set to True
+			delim_whitespace=_UNSPECIFIED,
 			low_memory=_UNSPECIFIED,
 			memory_map=_UNSPECIFIED,
 			float_precision=_UNSPECIFIED
@@ -547,8 +602,6 @@ def read_csv(filepath_or_buffer,
 			memory_map=_UNSPECIFIED,
 			float_precision=_UNSPECIFIED
 	):
-	result = []
-	
 	all_data = pd_read_csv(filepath_or_buffer, sep=sep, delimiter=delimiter, header=header, index_col=index_col,
 					prefix=prefix, mangle_dupe_cols=mangle_dupe_cols, dtype=dtype, engine=engine, converters=converters,
 					true_values=true_values, false_values=false_values, skipinitialspace=skipinitialspace, na_values=na_values,
@@ -574,6 +627,41 @@ def read_csv(filepath_or_buffer,
 					error_bad_lines=error_bad_lines, warn_bad_lines=warn_bad_lines, delim_whitespace=delim_whitespace,
 					low_memory=low_memory, memory_map=memory_map, float_precision=float_precision)
 	
+	if _is_specified(parse_dates):
+		date_unparsed_data = pd_read_csv(filepath_or_buffer, sep=sep, delimiter=delimiter, header=header, names=names,
+					index_col=index_col, usecols=usecols, prefix=prefix, mangle_dupe_cols=mangle_dupe_cols, dtype=dtype,
+					engine=engine, converters=converters, true_values=true_values, false_values=false_values,
+					skipinitialspace=skipinitialspace, skiprows=skiprows, skipfooter=skipfooter, nrows=nrows,
+					na_values=na_values, keep_default_na=keep_default_na, na_filter=na_filter,
+					skip_blank_lines=skip_blank_lines, parse_dates=False, iterator=iterator, chunksize=chunksize,
+					compression=compression, thousands=thousands, decimal=decimal, lineterminator=lineterminator,
+					quotechar=quotechar, quoting=quoting, doublequote=doublequote, escapechar=escapechar, comment=comment,
+					encoding=encoding, dialect=dialect, error_bad_lines=error_bad_lines, warn_bad_lines=warn_bad_lines,
+					delim_whitespace=delim_whitespace, low_memory=low_memory, memory_map=memory_map,
+					float_precision=float_precision)
+	else:
+		date_unparsed_data = pd.DataFrame()
+	
+	result = []
+	result.extend(_rcsv_risky_delim_combs(sep, delimiter, delim_whitespace))
+	result.extend(_rcsv_risky_header_combs(names, header, prefix))
+	result.extend(_rcsv_dupl_val_ignored(lineterminator, escapechar, delimiter, sep, comment, thousands, decimal, quotechar, na_values, true_values, false_values))
+	result.extend(_rcsv_risky_na_combs(na_filter, na_values, keep_default_na))
+	result.extend(_rcsv_risky_date_combs_ignored(parse_dates, infer_datetime_format, keep_date_col, date_parser, dayfirst, cache_dates))
+	result.extend(_rcsv_risky_date_combs_format(parse_dates, data, date_unparsed_data))
+	result.extend(_rcsv_risky_warn_combs(warn_bad_lines, error_bad_lines))
+	result.extend(_rcsv_risky_quote_combs(quoting, doublequote))
+	result.extend(_rcsv_risky_name_length(usecols, names, all_data))
+	result.extend(_rcsv_risky_dtype_combs(dtype, all_data))
+	result.extend(_rcsv_risky_skip_combs(skiprows, skipfooter, all_data))
+	return result
+
+def _rcsv_risky_delim_combs(sep, delimiter, delim_whitespace):
+	"""
+	Identify risky argument combinations containing delimiter specifiers for
+	read_csv.
+	"""
+	result = []
 	if _is_specified(delim_whitespace) and delim_whitespace:
 		if _is_specified(sep):
 			result.append("read_csv.delim_whitespace-sep")
@@ -581,7 +669,14 @@ def read_csv(filepath_or_buffer,
 			result.append("read_csv.delim_whitespace-delimiter")
 	if _is_specified(sep) and _is_specified(delimiter):
 		result.append("read_csv.sep-delimiter")
-	
+	return result
+
+def _rcsv_risky_header_combs(names, header, prefix):
+	"""
+	Identify risky argument combinations that specify column names in different
+	ways for read_csv.
+	"""
+	result = []
 	if _is_specified(names):
 		if _is_specified(prefix):
 			result.append("read_csv.names-prefix")
@@ -590,9 +685,16 @@ def read_csv(filepath_or_buffer,
 	if None!=header or not _is_specified(header):
 		if _is_specified(prefix):
 			result.append("read_csv.header-prefix")
-	
-	dupl_ignored = ["lineterminator","escapechar", "delimiter",
-		"sep", "comment", "thousands", "decimal", "quotechar", "na_values", "true_values", "false_values"]
+	return result
+
+def _rcsv_dupl_val_ignored(lineterminator, escapechar, delimiter, sep, comment, thousands, decimal, quotechar, na_values, true_values, false_values):
+	"""
+	Identify risky argument combinations in category 2 (duplicated value
+	ignored) for read_csv.
+	"""
+	result = []
+	dupl_ignored = ["lineterminator","escapechar", "delimiter", "sep", "comment",
+				"thousands", "decimal", "quotechar", "na_values", "true_values", "false_values"]
 	
 	num_dupl_ignored_values = 8
 	num_dupl_ignored_arrays = 3
@@ -618,13 +720,27 @@ def read_csv(filepath_or_buffer,
 					if value in jval:
 						result.append("read_csv." + dupl_ignored[i] + "-" + dupl_ignored[j])
 						break
-	
+	return result
+
+def _rcsv_risky_na_combs(na_filter, na_values, keep_default_na):
+	"""
+	Identify risky argument combinations containing na related arguments for
+	read_csv.
+	"""
+	result = []
 	if False == na_filter:	# Default is True, so True and undefined are OK
 		if _is_specified(na_values):
 			result.append("read_csv.na_filter-na_values")
 		if _is_specified(keep_default_na):
 			result.append("read_csv.na_filter-keep_default_na")
-	
+	return result
+
+def _rcsv_risky_date_combs_ignored(parse_dates, infer_datetime_format, keep_date_col, date_parser, dayfirst, cache_dates):
+	"""
+	Identify risky argument combinations in category 3 (dependent parameter
+	ignored) for date related arguments.
+	"""
+	result = []
 	if not _is_specified(parse_dates) or False==parse_dates:
 		if _is_specified(infer_datetime_format):
 			result.append("read_csv.parse_dates-infer_datetime_format")
@@ -636,52 +752,17 @@ def read_csv(filepath_or_buffer,
 			result.append("read_csv.parse_dates-dayfirst")
 		if _is_specified(cache_dates):
 			result.append("read_csv.parse_dates-cache_dates")
-	
-	if _is_specified(warn_bad_lines):
-		if error_bad_lines and warn_bad_lines:
-			result.append("read_csv.error_bad_lines-warn_bad_lines")
-	
-	if csv.QUOTE_NONE == quoting:
-		if _is_specified(doublequote):
-			result.append("read_csv.quoting-doublequote")
-	
-	if not _is_specified(usecols) or None == usecols:
-		if _is_specified(names):
-			if len(all_data.columns) != len(names):
-				result.append("read_csv.filepath-names")
-	if isinstance(dtype, dict):
-		for key in dtype.keys():
-			if isinstance(key, int):
-				if key >= len(all_data.columns):
-					result.append("read_csv.filepath-dtype")
-					break
-			elif isinstance(key, str):
-				if not key in all_data.columns:
-					result.append("read_csv.filepath-dtype")
-					break
+	return result
 
-	if _is_specified(skipfooter):
-		if skipfooter > len(all_data.index):
-			result.append("read_csv.filepath-skipfooter")
-		if _is_specified(skiprows):
-			if skiprows + skipfooter > len(all_data.index):
-				result.append("read_csv.filepath-skiprows-skipfooter")
-	
+def _rcsv_risky_date_combs_format(parse_dates, data, date_unparsed_data):
+	"""
+	Identify risky argument combinations that have to do with date format of
+	input for read_csv.
+	"""
 	if _is_specified(parse_dates):
-		date_unparsed_data = pd_read_csv(filepath_or_buffer, sep=sep, delimiter=delimiter, header=header, names=names,
-					index_col=index_col, usecols=usecols, prefix=prefix, mangle_dupe_cols=mangle_dupe_cols, dtype=dtype,
-					engine=engine, converters=converters, true_values=true_values, false_values=false_values,
-					skipinitialspace=skipinitialspace, skiprows=skiprows, skipfooter=skipfooter, nrows=nrows,
-					na_values=na_values, keep_default_na=keep_default_na, na_filter=na_filter,
-					skip_blank_lines=skip_blank_lines, parse_dates=False, iterator=iterator, chunksize=chunksize,
-					compression=compression, thousands=thousands, decimal=decimal, lineterminator=lineterminator,
-					quotechar=quotechar, quoting=quoting, doublequote=doublequote, escapechar=escapechar, comment=comment,
-					encoding=encoding, dialect=dialect, error_bad_lines=error_bad_lines, warn_bad_lines=warn_bad_lines,
-					delim_whitespace=delim_whitespace, low_memory=low_memory, memory_map=memory_map,
-					float_precision=float_precision)
 		if isinstance(parse_dates, bool) and parse_dates:
 			if type(data.index) != pd.core.indexes.datetimes.DatetimeIndex:
-				result.append("read_csv.filepath-parse_dates")
+				return ["read_csv.filepath-parse_dates"]
 		elif isinstance(parse_dates, list):
 			for col in parse_dates:
 				if isinstance(col, str):
@@ -694,6 +775,64 @@ def read_csv(filepath_or_buffer,
 						col_name += "_" + date_unparsed_data.columns[c]
 					col_vals = data[col_name]
 				if col_vals.dtype == object:
-					result.append("read_csv.filepath-parse_dates")
+					return ["read_csv.filepath-parse_dates"]
+	return []
+
+def _rcsv_risky_warn_combs(warn_bad_lines, error_bad_lines):
+	"""
+	Identify risky argument combinations containing warning/error related
+	arguments for read_csv.
+	"""
+	if _is_specified(warn_bad_lines):
+		if error_bad_lines and warn_bad_lines:
+			return["read_csv.error_bad_lines-warn_bad_lines"]
+	return []
+
+def _rcsv_risky_quote_combs(quoting, doublequote):
+	"""
+	Identify risky argument combinations containing quote related arguments for
+	read_csv.
+	"""
+	if csv.QUOTE_NONE == quoting:
+		if _is_specified(doublequote):
+			return["read_csv.quoting-doublequote"]
+	return []
+
+def _rcsv_risky_name_length(usecols, names, all_data):
+	"""
+	Identify risky argument combinations that have to do with the number of
+	column names in read_csv.
+	"""
+	if not _is_specified(usecols) or None == usecols:
+		if _is_specified(names):
+			if len(all_data.columns) != len(names):
+				return["read_csv.filepath-names"]
+	return []
+
+def _rcsv_risky_dtype_combs(dtype, all_data):
+	"""
+	Identify dtype related risky argument combinations for read_csv.
+	"""
+	if isinstance(dtype, dict):
+		for key in dtype.keys():
+			if isinstance(key, int):
+				if key >= len(all_data.columns):
+					return ["read_csv.filepath-dtype"]
+			elif isinstance(key, str):
+				if not key in all_data.columns:
+					return ["read_csv.filepath-dtype"]
+	return []
 	
+def _rcsv_risky_skip_combs(skiprows, skipfooter, all_data):
+	"""
+	Identify risky argument combinations containing specifiers of number of
+	rows to read/skip in read_csv.
+	"""
+	result = []
+	if _is_specified(skipfooter):
+		if skipfooter > len(all_data.index):
+			result.append("read_csv.filepath-skipfooter")
+		if _is_specified(skiprows):
+			if skiprows + skipfooter > len(all_data.index):
+				result.append("read_csv.filepath-skiprows-skipfooter")
 	return result
