@@ -55,31 +55,35 @@ def find_risky_combs(input_path, output_dir, function_name, module):
 			if None == re.search("input\s*\(", line):
 				function_call = _get_function_call(line)
 				time_limit = 90
-				finished = _eval_and_report_timeout(function_call, time_limit, module=module, executable_calls_file=executable_calls_file, output_dir=output_dir)
+				finished = _eval_and_report_timeout(call=function_call, t=time_limit, module=module, executable_calls_file=executable_calls_file, output_dir=output_dir)
 				if not finished:
 					with open(timed_out_path, "a") as timed_out_file:
 						timed_out_file.write("Function call timed out: " + function_call)
 
 
-def _eval_and_report_timeout(call, t, **kwargs):	# TODO: Vill jag ha kwargs?
+def _eval_and_report_timeout(call, t, module, executable_calls_file, output_dir):
 	"""
 	If call is executable in isolation, in less time than the one provided as t,
 	write it to the executable calls file and report risky pairs for it.
 	
 	Arguments:
 	call : str
-		String containing the function call to evaluate. (Will be evaluated
-		using eval.)
+		String containing the function call to evaluate, without module. (Will
+		be evaluated using eval.)
 	t: int
 		Number of seconds to wait before killing the process
-	kwargs:
-		Arguments for eval_and_report
+	module: str
+		Name of the module where the function call resides
+	executable_calls_file: file
+		File to which calls that are executable in isolation are written
+	output_dir:
+		Directory where risky combination reports will be stored
 	
 	Return value: boolean
 		True if the process finished within the specified period
 		False if the process was killed
 	"""
-	proc = multiprocessing.Process(target=_eval_and_report, args=(call, kwargs))
+	proc = multiprocessing.Process(target=_eval_and_report, args=(call, module, executable_calls_file, output_dir))
 	proc.start()
 	proc.join(t)
 	if proc.is_alive():
@@ -88,16 +92,22 @@ def _eval_and_report_timeout(call, t, **kwargs):	# TODO: Vill jag ha kwargs?
 	
 	return True
 
-def _eval_and_report(call, args):
+def _eval_and_report(call, module, executable_calls_file, output_dir):
 	"""
 	If call is executable in isolation, write it to the executable calls file
 	and report risky pairs for it.
 	
-	Arguments: TODO
+	Arguments:
+	call : str
+		String containing the function call to evaluate, without module. (Will
+		be evaluated using eval.)
+	module: str
+		Name of the module where the function call resides
+	executable_calls_file: file
+		File to which calls that are executable in isolation are written
+	output_dir:
+		Directory where risky combination reports will be stored
 	"""
-	module = args["module"]
-	executable_calls_file = args["executable_calls_file"]
-	output_dir = args["output_dir"]
 	mod_call = aliases[module] + "." + call
 	try:
 		eval(mod_call)
