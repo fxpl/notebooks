@@ -57,7 +57,8 @@ def find_risky_combs(input_path, output_dir, function_name, module):
 			if None == re.search("input\s*\(", line):
 				function_call = _get_function_call(line)
 				time_limit = 90
-				finished = _eval_and_report_timeout(call=function_call, t=time_limit, module=module, executable_calls_file=executable_calls_file, output_dir=output_dir)
+				finished = _eval_and_report_timeout(call=function_call, t=time_limit, module=module,
+												executable_calls_file=executable_calls_file, output_dir=output_dir)
 				if not finished:
 					with open(timed_out_path, "a") as timed_out_file:
 						timed_out_file.write("Function call timed out: " + function_call)
@@ -85,7 +86,7 @@ def _eval_and_report_timeout(call, t, module, executable_calls_file, output_dir)
 		True if the process finished within the specified period
 		False if the process was killed
 	"""
-	proc = multiprocessing.Process(target=_eval_and_report, args=(call, module, executable_calls_file, output_dir))
+	proc = multiprocessing.Process(target=_eval_and_report,	args=(call, module, executable_calls_file, output_dir))
 	proc.start()
 	proc.join(t)
 	if proc.is_alive():
@@ -250,7 +251,8 @@ def plot(*args,
 				fmt_color_specified = True
 
 	result = []
-	result.extend(_plot_risky_fmt_combs(fmt_marker_specified, marker, fmt_linestyle_specified, linestyle, fmt_color_specified, color))
+	result.extend(_plot_risky_fmt_combs(fmt_marker_specified, marker, fmt_linestyle_specified, linestyle,
+									fmt_color_specified, color))
 	result.extend(_plot_risky_linestyle_combs(linestyle, dashes))
 	
 	# dash_*style for solid line and solid_*style for dashed line
@@ -267,7 +269,8 @@ def plot(*args,
 				solid = False
 	result.extend(_plot_risky_dash_style_combs(solid, dash_capstyle, dash_joinstyle))
 	result.extend(_plot_risky_solid_style_combs(solid, solid_capstyle, solid_joinstyle))
-	result.extend(_plot_risky_marker_combs(marker, fmt_marker_specified, fillstyle, markeredgecolor, markeredgewidth, markerfacecolor, markerfacecoloralt, markersize, markevery))
+	result.extend(_plot_risky_marker_combs(marker, fmt_marker_specified, fillstyle, markeredgecolor, markeredgewidth,
+										markerfacecolor, markerfacecoloralt, markersize, markevery))
 	result.extend(_plot_risky_picker_combs(picker, pickradius))
 	return result
 
@@ -318,8 +321,9 @@ def _plot_risky_solid_style_combs(solid, solid_capstyle, solid_joinstyle):
 			result.append("plot.fmt-solid_joinstyle")
 	return result
 
-# TODO: Radbrytningar!
-def _plot_risky_marker_combs(marker, fmt_marker_specified, fillstyle, markeredgecolor, markeredgewidth, markerfacecolor, markerfacecoloralt, markersize, markevery):
+
+def _plot_risky_marker_combs(marker, fmt_marker_specified, fillstyle, markeredgecolor, markeredgewidth, markerfacecolor,
+							markerfacecoloralt, markersize, markevery):
 	"""
 	Identify marker related risky argument combinations for plot.
 	"""
@@ -687,7 +691,8 @@ def _rcsv_risky_header_combs(names, header, prefix):
 			result.append("read_csv.header-prefix")
 	return result
 
-def _rcsv_dupl_val_ignored(lineterminator, escapechar, delimiter, sep, comment, thousands, decimal, quotechar, na_values, true_values, false_values):
+def _rcsv_dupl_val_ignored(lineterminator, escapechar, delimiter, sep, comment, thousands, decimal, quotechar, na_values,
+						true_values, false_values):
 	"""
 	Identify risky argument combinations in category 2 (duplicated value
 	ignored) for read_csv.
