@@ -61,7 +61,7 @@ def find_risky_combs(input_path, output_dir, function_name, module):
 												executable_calls_file=executable_calls_file, output_dir=output_dir)
 				if not finished:
 					with open(timed_out_path, "a") as timed_out_file:
-						timed_out_file.write("Function call timed out: " + function_call)
+						timed_out_file.write(function_call)
 
 
 def _eval_and_report_timeout(call, t, module, executable_calls_file, output_dir):
