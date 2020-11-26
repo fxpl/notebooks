@@ -15,9 +15,9 @@ Arguments:
 
 Output:
 * A file named <function_name>_executable<timestamp>.csv containing all
-  calls that are executable in isolation (in < 90 seconds).
+  calls that are executable in isolation (in < 30 minutes).
 * A file named <function_name>_timed_out<timestamp>.csv containing all
-  calls that took > 90 seconds and therefore were interrupted.
+  calls that took > 30 minutes and therefore were interrupted.
 * One file per risky parameter combination for which the risky arguments
   are found. The files contain lists of all risky function calls. Each file is
   named <function_name>.<risky_combination>.csv.
