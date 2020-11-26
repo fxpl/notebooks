@@ -51,7 +51,7 @@ public class PythonPreprocessor {
 	 * Remove everything that should only be removed when it is not inside a
 	 * string, that is comments (starting with '#') and the newlines that occur
 	 * between brackets, from the code handled by the preprocessor. Also
-	 * replace semi colons that are outside strings with newlines.
+	 * replace semicolons that are outside strings with newlines.
 	 * @param delimiters Existing string delimiters. I a delimiter a is a substring of a delimiter b, b must precede a in the array.
 	 */
 	public void removeOutsideString(String[] delimiters) {
