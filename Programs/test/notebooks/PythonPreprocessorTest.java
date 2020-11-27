@@ -275,6 +275,22 @@ public class PythonPreprocessorTest {
 		expectedOutput.add("a = pd.read_csv('file.csv', sep=';')\n");
 		processAndCheck(strings, expectedOutput);
 	}
+	
+	@Test
+	public void testProcess_noNewLine() {	// Last character should no be removed by removeEscapedNewLines...
+		String[] strings = {"abc"};
+		List<String> expectedOutput = new ArrayList<String>(1);
+		expectedOutput.add("abc\n");
+		processAndCheck(strings, expectedOutput);
+	}
+	
+	@Test
+	public void testProcess_onlyEscapedNewline() {	// ...unless it is an escaped newline
+		String[] strings = {"abc\\\n"};
+		List<String> expectedOutput = new ArrayList<String>(1);
+		expectedOutput.add("abc \n");
+		processAndCheck(strings, expectedOutput);
+	}
 
 	private void processAndCheck(String[] inputStrings, List<String> expectedResult) {
 		JSONArray input = new JSONArray();

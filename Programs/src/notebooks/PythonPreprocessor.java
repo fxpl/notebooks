@@ -44,6 +44,10 @@ public class PythonPreprocessor {
 				result += code.charAt(index++);
 			}
 		}
+		if (index < code.length()) {
+			// code did not end with an escaped newline
+			result += code.charAt(index);
+		}
 		code = result;
 	}
 	
