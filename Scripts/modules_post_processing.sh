@@ -7,6 +7,15 @@ modulesFile=`./get_last_output.sh "modules"`
 moduleTopListFile=`./get_last_output.sh "module_top_list"`
 extendedModuleTopListFile=`echo $moduleTopListFile | sed -E "s/module_top_list/extended_module_top_list/"`
 
+# Print total and mean number of imports for all notebooks
+moduleLines=`wc -l $modulesFile | cut -d' ' -f1`
+numNotebooks=$((moduleLines-1))
+numImports=`sed -n "2,$ p" $modulesFile | grep -o ',' | wc -l`
+meanNumImports=`echo "$numImports/$numNotebooks" | bc -l`
+echo "Number of notebooks: $numNotebooks"
+echo "Number of imports: $numImports"
+echo "Mean number of imports per notebook: $meanNumImports"
+
 # Create functions top list
 functionNames=$outputDir/functions.txt
 numbers=$outputDir/numbers.txt
