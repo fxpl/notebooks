@@ -526,6 +526,8 @@ class RiskyCombTest(unittest.TestCase):
 		self.assertEqual([], result, "Non-empty list returned by correct call to read_csv!")
 		result = rcf.read_csv("data/data_tabbed.csv", sep="\t", names=["D", "E", "F"])
 		self.assertEqual([], result, "Non-empty list returned by correct call to read_csv!")
+		result = rcf.read_csv("data/data_plus.csv", skiprows=[0], names=['Alpha', 'Beta', 'Gamma'])
+		self.assertEqual([], result, "Non-empty list returned by correct call to read_csv!")
 		result = rcf.read_csv(self.testdata, names=["D", "E"])
 		self.assertEqual(["read_csv.filepath-names"], result, "Wrong result when names has too few elements!")
 		result = rcf.read_csv(self.testdata, names=["D", "E", "F", "G"])
