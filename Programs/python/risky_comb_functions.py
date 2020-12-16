@@ -606,17 +606,18 @@ def read_csv(filepath_or_buffer,
 			memory_map=_UNSPECIFIED,
 			float_precision=_UNSPECIFIED
 	):
-	all_data = pd_read_csv(filepath_or_buffer, sep=sep, delimiter=delimiter, header=header, index_col=index_col,
-					prefix=prefix, mangle_dupe_cols=mangle_dupe_cols, dtype=dtype, engine=engine, converters=converters,
-					true_values=true_values, false_values=false_values, skipinitialspace=skipinitialspace, na_values=na_values,
-					keep_default_na=keep_default_na, na_filter=na_filter, skip_blank_lines=skip_blank_lines,
-					parse_dates=parse_dates, infer_datetime_format=infer_datetime_format, keep_date_col=keep_date_col,
-					date_parser=date_parser, dayfirst=dayfirst, cache_dates=cache_dates, iterator=iterator,
-					chunksize=chunksize, compression=compression, thousands=thousands, decimal=decimal,
-					lineterminator=lineterminator, quotechar=quotechar, quoting=quoting, doublequote=doublequote,
-					escapechar=escapechar, comment=comment, encoding=encoding, dialect=dialect,
-					error_bad_lines=error_bad_lines, warn_bad_lines=warn_bad_lines, delim_whitespace=delim_whitespace,
-					low_memory=low_memory, memory_map=memory_map, float_precision=float_precision)
+	all_rows = pd_read_csv(filepath_or_buffer, sep=sep, delimiter=delimiter, header=header, names=names, index_col=index_col,
+					usecols=usecols, prefix=prefix, mangle_dupe_cols=mangle_dupe_cols, dtype=dtype, engine=engine,
+					converters=converters, true_values=true_values, false_values=false_values,
+					skipinitialspace=skipinitialspace, na_values=na_values, keep_default_na=keep_default_na,
+					na_filter=na_filter, skip_blank_lines=skip_blank_lines, parse_dates=parse_dates,
+					infer_datetime_format=infer_datetime_format, keep_date_col=keep_date_col, date_parser=date_parser,
+					dayfirst=dayfirst, cache_dates=cache_dates, iterator=iterator, chunksize=chunksize,
+					compression=compression, thousands=thousands, decimal=decimal, lineterminator=lineterminator,
+					quotechar=quotechar, quoting=quoting, doublequote=doublequote, escapechar=escapechar, comment=comment,
+					encoding=encoding, dialect=dialect, error_bad_lines=error_bad_lines, warn_bad_lines=warn_bad_lines,
+					delim_whitespace=delim_whitespace, low_memory=low_memory, memory_map=memory_map,
+					float_precision=float_precision)
 	
 	all_columns = pd_read_csv(filepath_or_buffer, sep=sep, delimiter=delimiter, header=header, index_col=index_col,
 					prefix=prefix, mangle_dupe_cols=mangle_dupe_cols, dtype=dtype, engine=engine, converters=converters,
@@ -669,8 +670,8 @@ def read_csv(filepath_or_buffer,
 	result.extend(_rcsv_risky_warn_combs(warn_bad_lines, error_bad_lines))
 	result.extend(_rcsv_risky_quote_combs(quoting, doublequote))
 	result.extend(_rcsv_risky_name_length(usecols, names, all_columns))
-	result.extend(_rcsv_risky_dtype_combs(dtype, all_data))	# TODO
-	result.extend(_rcsv_risky_skip_combs(skiprows, skipfooter, all_data))	# TODO
+	result.extend(_rcsv_risky_dtype_combs(dtype, data))
+	result.extend(_rcsv_risky_skip_combs(skiprows, skipfooter, all_rows))
 	return result
 
 def _rcsv_risky_delim_combs(sep, delimiter, delim_whitespace):
@@ -816,41 +817,41 @@ def _rcsv_risky_quote_combs(quoting, doublequote):
 			return["read_csv.quoting-doublequote"]
 	return []
 
-def _rcsv_risky_name_length(usecols, names, all_data):
+def _rcsv_risky_name_length(usecols, names, data):
 	"""
 	Identify risky argument combinations that have to do with the number of
 	column names in read_csv.
 	"""
 	if not _is_specified(usecols) or None == usecols:
 		if _is_specified(names):
-			if len(all_data.columns) != len(names):
+			if len(data.columns) != len(names):
 				return["read_csv.filepath-names"]
 	return []
 
-def _rcsv_risky_dtype_combs(dtype, all_data):
+def _rcsv_risky_dtype_combs(dtype, data):
 	"""
 	Identify dtype related risky argument combinations for read_csv.
 	"""
 	if isinstance(dtype, dict):
 		for key in dtype.keys():
 			if isinstance(key, int):
-				if key >= len(all_data.columns):
+				if key >= len(data.columns):
 					return ["read_csv.filepath-dtype"]
 			elif isinstance(key, str):
-				if not key in all_data.columns:
+				if not key in data.columns:
 					return ["read_csv.filepath-dtype"]
 	return []
 	
-def _rcsv_risky_skip_combs(skiprows, skipfooter, all_data):
+def _rcsv_risky_skip_combs(skiprows, skipfooter, data):
 	"""
 	Identify risky argument combinations containing specifiers of number of
 	rows to read/skip in read_csv.
 	"""
 	result = []
 	if _is_specified(skipfooter):
-		if skipfooter > len(all_data.index):
+		if skipfooter > len(data.index):
 			result.append("read_csv.filepath-skipfooter")
 		if _is_specified(skiprows):
-			if skiprows + skipfooter > len(all_data.index):
+			if skiprows + skipfooter > len(data.index):
 				result.append("read_csv.filepath-skiprows-skipfooter")
 	return result

@@ -540,6 +540,8 @@ class RiskyCombTest(unittest.TestCase):
 		self.assertEqual([], result, "Non-empty list returned by correct call to read_csv!")
 		result = rcf.read_csv(self.testdata, dtype={"A":str, "B":int, "C":float})
 		self.assertEqual([], result, "Non-empty list returned by correct call to read_csv!")
+		result = rcf.read_csv("data/data_noHeader.csv", names=["Alpha", "Beta", "Gamma"], dtype={"Alpha":str, "Beta":int, "Gamma":float})
+		self.assertEqual([], result, "Non-empty list returned by correct call to read_csv!")
 		result = rcf.read_csv(self.testdata, dtype={0:str, 4:int})
 		self.assertEqual(["read_csv.filepath-dtype"], result, "Wrong result when dtype contains too high index!")
 		result = rcf.read_csv(self.testdata, dtype={"B":str, "Q":int})
