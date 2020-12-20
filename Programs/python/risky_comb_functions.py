@@ -826,7 +826,8 @@ def _rcsv_risky_name_length(usecols, names, data):
 	"""
 	if not _is_specified(usecols) or None == usecols:
 		if _is_specified(names):
-			if len(data.columns) != len(names):
+			num_col = len(data.columns)
+			if not num_col-1 <= len(names) <= num_col:
 				return["read_csv.filepath-names"]
 	return []
 
