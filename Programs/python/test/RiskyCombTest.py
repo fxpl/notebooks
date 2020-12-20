@@ -383,6 +383,10 @@ class RiskyCombTest(unittest.TestCase):
 		self.assertEqual([], result, "Non-empty list returned by correct call to DataFrame!")
 		result = rcf.DataFrame([1,2,3,4,5,6,7,8,9,0], dtype= np.intc)
 		self.assertEqual([], result, "Non-empty list returned by correct call to DataFrame!")
+		result = rcf.DataFrame({'a': [1,0,1], 'b' : [0,1,1] }, dtype=bool)
+		self.assertEqual([], result, "Non-empty list returned by correct call to DataFrame!")
+		result = rcf.DataFrame({'car':np.random.choice(['BMW', 'Mini', 'Mercedes','Ferrari'], size=2)}, dtype='category')
+		self.assertEqual([], result, "Non-empty list returned by correct call to DataFrame!")
 		
 		result = rcf.DataFrame(data, dtype=int)
 		self.assertEqual(["DataFrame.data-dtype"], result, "Wrong result when calling string DataFrame with dtype=int!")

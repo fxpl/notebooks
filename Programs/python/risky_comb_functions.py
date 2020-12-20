@@ -442,13 +442,15 @@ def _df_risky_dtype_combs(dtype, df):
 				dtype = eval(dtype)
 			except NameError:
 				pass	# Could not be evaluated, continue with dtype string
-		for key, value in df.items():
-			for i in range(0, len(value)):
+		for key, col in df.items():
+			if dtype == col.dtype:
+				continue
+			for i in range(0, len(col)):
 				try:
-					if not isinstance(value[i], dtype):
+					if not isinstance(col[i], dtype):
 						rightType = False
 				except TypeError:
-					if type(value[i]) != dtype:
+					if type(col[i]) != dtype:
 						rightType = False
 				finally:
 					if not rightType:
