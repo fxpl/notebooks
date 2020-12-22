@@ -485,17 +485,21 @@ public class PythonModuleTest {
 	@Test
 	public void testRegisterUsage_function_from() {
 		// from parentModule import function
+		String fName = "f";
 		PythonModule parent = new PythonModule(parentModuleName, ImportType.FROM);
-		PythonModule module = new PythonModule(name, ImportType.ORDINARY, parent);
+		PythonModule module = new PythonModule(fName, ImportType.ORDINARY, parent);
 		
-		module.registerUsage(name + "(x, y=z)");
-		module.registerUsage("[1, 5, 0, " + name + "(x, y=z), 3, " + name + "(\"apa\")]");
+		module.registerUsage(fName + "(x, y=z)");
+		module.registerUsage("[1, 5, 0, " + fName + "(x, y=z), 3, " + fName + "(\"apa\")]");
 		
+		Map<String, Integer> empty = new HashMap<String, Integer>();
 		Map<String, Integer> expectedFunctionUsages = new HashMap<String, Integer>();
-		expectedFunctionUsages.put(name, 3);
+		expectedFunctionUsages.put(fName, 3);
 		
+		assertEquals("Function usages stored under function when function is imported.",
+				empty, module.functionUsages);
 		assertEquals("Wrong function usages stored when function is imported.",
-				expectedFunctionUsages, module.functionUsages);
+				expectedFunctionUsages, parent.functionUsages);
 	}
 	
 	@Test
@@ -507,6 +511,19 @@ public class PythonModuleTest {
 		
 		assertEquals("Function from sub module registered.",
 				expectedFunctionUsages, moduleWithoutSub.functionUsages);
+	}
+	
+	@Test
+	public void testRegisterUsage_fromWithQualifier() throws NotebookException {
+		PythonModule parent = new PythonModule(parentModuleName, ImportType.FROM);
+		PythonModule function = new PythonModule("f", ImportType.ORDINARY, parent);
+		function.registerUsage("f.f()");
+		
+		Map<String, Integer> expectedFunctionUsages = new HashMap<String, Integer>(1);
+		expectedFunctionUsages.put("f", 1);
+		
+		assertEquals("Function from from import with predeeding module registered.",
+				expectedFunctionUsages, function.functionUsages);
 	}
 	
 	@Test

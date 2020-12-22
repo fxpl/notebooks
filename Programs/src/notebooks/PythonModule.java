@@ -182,7 +182,7 @@ public class PythonModule {
 		if (null != parent && ImportType.FROM == parent.importedWith) {
 			usageMatcher = functionCallMatcher(this.qualifier(), line);
 			while (usageMatcher.find()) {
-				Utils.addOrIncrease(functionUsages, name);
+				Utils.addOrIncrease(parent.functionUsages, name);
 			}
 		}
 	}
