@@ -926,6 +926,29 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 	}
 	
 	/**
+	 * Verify that the output file modules<current-date-time>.csv is created
+	 * and filled correctly (non-imported parents are not included) when there
+	 * are function call registered at a parent module.
+	 * @throws IOException on errors when handling input/output file(s)
+	 */
+	@Test
+	public void testModules_registerAtParent() throws IOException {
+		String dataDir = "test/data/modules";
+		String file = "nb_70.ipynb";
+		String[] expectedModulesLines = {
+				modulesHeader(),
+				"nb_70.ipynb, kossan_mu.function(function), kossan_mu(kossan_mu)"
+		};
+		analyzer.initializeNotebooksFrom(dataDir + File.separator + file);
+		analyzer.modules();
+		checkCsv("modules", expectedModulesLines);
+		
+		lastOutputFile("modules").delete();
+		lastOutputFile("module_top_list").delete();
+		lastOutputFile("kossan_mu-functions").delete();
+	}
+	
+	/**
 	 * Verify the behavior of modules for an invalid JSON file.
 	 * @throws IOException on errors handling the input file
 	 */
@@ -1076,6 +1099,30 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 		lastOutputFile("B-functions").delete();
 		verifyAbsenceOf("C.D-functions");
 		verifyAbsenceOf("E-functions");
+	}
+	
+	/**
+	 * Verify that function calls registered at parent are included in the
+	 * functions call count.
+	 * @throws IOException on errors handling input files or files to be checked
+	 */
+	@Test
+	public void testFunctionUsages_registerAtParent() throws IOException {
+		String dataDir = "test/data/modules";
+		String file = "nb_70.ipynb";
+		String[] expectedLines = {
+				functionUsagesHeader(),
+				"function, 2",
+				"otherFunction, 1"
+		};
+		analyzer.initializeNotebooksFrom(dataDir + File.separator + file);
+		List<List<PythonModule>> modules = analyzer.listModules();
+		lastOutputFile("modules").delete();	// Side effect of modules call
+		List<Quantity> modulesSorted = NotebookAnalyzer.sortedModules(modules);
+		
+		analyzer.functionUsages(modules, modulesSorted, Integer.MAX_VALUE);
+		checkCsv("kossan_mu-functions", expectedLines);
+		lastOutputFile("kossan_mu.functions").delete();
 	}
 	
 	/**

@@ -22,6 +22,10 @@ public class ModulesMerger extends Worker<Void> {
 				if (moduleFromCorpus.is(module)) {
 					module.merge(moduleFromCorpus);
 				}
+				// We may have registered calls at the parent as well
+				if (moduleFromCorpus.parentIs(module)) {
+					module.merge(moduleFromCorpus.parent);
+				}
 			}
 		}
 		counter.countDown();
