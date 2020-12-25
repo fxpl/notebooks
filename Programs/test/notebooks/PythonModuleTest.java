@@ -526,6 +526,30 @@ public class PythonModuleTest {
 				expectedFunctionUsages, function.functionUsages);
 	}
 	
+	
+	@Test
+	public void testRegisterUsage_sameEndingModule() throws NotebookException {
+		module = new PythonModule(name, ImportType.ORDINARY);
+		String otherName = "not2" + name;
+		module.registerUsage(otherName + ".f(x)");
+		
+		Map<String, Integer> expectedFunctionUsages = new HashMap<String, Integer>(0);
+		assertEquals("Function usages for other module that ends with this module's name stored.",
+				expectedFunctionUsages, module.functionUsages);
+	}
+	
+	@Test
+	public void testRegisterUsage_sameEndingFunction() throws NotebookException {
+		PythonModule parent = new PythonModule(parentModuleName, ImportType.FROM);
+		String functionName = "fcn";
+		PythonModule module = new PythonModule (functionName, ImportType.ORDINARY, parent);
+		module.registerUsage("r2d2fcn(5)");
+		
+		Map<String, Integer> expectedFunctionUsages = new HashMap<String, Integer>(0);
+		assertEquals("Function usages for other function that ends with this functions's name stored.",
+				expectedFunctionUsages, module.parent.functionUsages);
+	}
+	
 	@Test
 	public void testRegisterCalls_ordinary() throws NotebookException {
 		PythonModule module = new PythonModule(name, ImportType.ORDINARY);
@@ -632,6 +656,34 @@ public class PythonModuleTest {
 		module.registerCalls("f", name + ".f(\"\\\"(\", '(\\'')");
 		List<String> calls = module.popFunctionCalls();
 		assertEquals("Wrong call list returned for call with strings containing both brackets and qoutes.",
+				expectedCalls, calls);
+	}
+	
+	@Test
+	public void testRegisterCalls_sameEndingModule() throws NotebookException {
+		module = new PythonModule(name, ImportType.ORDINARY);
+		String otherName = "not" + name;
+		List<String> expectedCalls = new ArrayList<String>(0);
+		
+		module.registerCalls("f", otherName + ".f(x)");
+		List<String> calls = module.popFunctionCalls();
+		
+		assertEquals("Function calls for other module that ends with this module's name stored.",
+				expectedCalls, calls);
+	}
+	
+	@Test
+	public void testRegisterCalls_sameEndingFunction() throws NotebookException {
+		PythonModule parent = new PythonModule(parentModuleName, ImportType.FROM);
+		String functionName = "fcn";
+		PythonModule module = new PythonModule (functionName, ImportType.ORDINARY, parent);
+		
+		List<String> expectedCalls = new ArrayList<String>(0);
+		
+		module.registerCalls(functionName, "äöfcn(5)");
+		List<String> calls = module.popParentsCalls();
+		
+		assertEquals("Function calls for other function that ends with this function's name stored.",
 				expectedCalls, calls);
 	}
 	

@@ -140,6 +140,18 @@ public class AllModulesTest {
 	}
 	
 	@Test
+	public void testRegisterUsages_sameEndingModule() throws NotebookException {
+		PythonModule numpyModule = new PythonModule("numpy", ImportType.FROM);
+		PythonModule numpyFunctions = new AllModules(numpyModule);
+		
+		numpyFunctions.registerUsage("123sin(0)");
+		
+		Map<String, Integer> expectedFunctionUsages = new HashMap<String, Integer>(0);
+		assertEquals("Function usages for other module that ends with this module's name stored.",
+				expectedFunctionUsages, numpyFunctions.functionUsages);
+	}
+	
+	@Test
 	public void testRegisterCalls() throws NotebookException {
 		PythonModule mathModule = new PythonModule("math", ImportType.FROM);
 		PythonModule mathFunctions = new AllModules(mathModule);
@@ -164,6 +176,19 @@ public class AllModulesTest {
 		mathFunctions.registerCalls("sin", "a = otherModule. sin(2)");
 		List<String> calls = mathFunctions.popParentsCalls();
 		assertEquals("Calls returned when abscent.", expectedCalls, calls);
+	}
+	
+	@Test
+	public void testRegisterCalls_sameEndingModule() throws NotebookException {
+		PythonModule numpyModule = new PythonModule("numpy", ImportType.FROM);
+		PythonModule numpyFunctions = new AllModules(numpyModule);
+		
+		numpyFunctions.registerCalls("sin", "notsin(0)");
+		List<String> calls = numpyFunctions.popFunctionCalls();
+		
+		List<String> expectedCalls = new ArrayList<String>(0);
+		assertEquals("Function calls for other module that ends with this module's name stored.",
+				expectedCalls, calls);
 	}
 	
 	@Test

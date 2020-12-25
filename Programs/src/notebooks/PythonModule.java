@@ -11,7 +11,8 @@ import java.util.regex.Pattern;
 
 public class PythonModule {
 	// Name of single module (or function)
-	final static public String IDENTIFIER = "[\\p{L}\\p{Nl}_][\\p{L}\\p{Nl}\\p{Nd}\\p{Mn}\\p{Pc}]*";
+	final static private String IDENTIFIER_CHAR = "[\\p{L}\\p{Nl}\\p{Nd}\\p{Mn}\\p{Pc}]";
+	final static public String IDENTIFIER = "[\\p{L}\\p{Nl}_]" + IDENTIFIER_CHAR + "*";
 	// Module, possibly with submodule(s)
 	final static public String SUB_MODULE_IDENTIFIER = IDENTIFIER + "\\s*(\\.\\s*" + IDENTIFIER + "\\s*)*";
 	
@@ -200,7 +201,7 @@ public class PythonModule {
 		/* We would like the look-behind group to contain \s* instead of \s+,
 		but Java doesn't support arbitrary length in look-behind. The case where
 		there is > 1 space should be very uncommon. */
-		Pattern usagePattern = Pattern.compile("(?<!\\.\\s?)(" + functionName + ")\\s*\\(");
+		Pattern usagePattern = Pattern.compile("(?<!\\.\\s?)(?<!" + IDENTIFIER_CHAR + ")(" + functionName + ")\\s*\\(");
 		return usagePattern.matcher(line);
 	}
 	
@@ -216,7 +217,7 @@ public class PythonModule {
 		but Java doesn't support arbitrary length in look-behind. The case where
 		there is > 1 space should be very uncommon. */
 		Pattern usagePattern = Pattern.compile(
-				"(?<!\\.\\s?)" + this.qualifier() + "\\s*\\.\\s*(" + functionName + ")\\s*\\(");
+				"(?<!\\.\\s?)(?<!" + IDENTIFIER_CHAR + ")" + this.qualifier() + "\\s*\\.\\s*(" + functionName + ")\\s*\\(");
 		return usagePattern.matcher(line);
 	}
 	
