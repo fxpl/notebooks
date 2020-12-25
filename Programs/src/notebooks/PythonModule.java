@@ -20,6 +20,7 @@ public class PythonModule {
 	protected final String alias;
 	protected PythonModule parent;
 	protected final Map<String, Integer> functionUsages;
+	protected final List<String> functionCalls;
 	
 	public PythonModule(String name) {
 		this(name, null, ImportType.ORDINARY, null);
@@ -49,6 +50,7 @@ public class PythonModule {
 		this.importedWith = importedWith;
 		this.parent = parent;
 		this.functionUsages = new HashMap<String, Integer>();
+		this.functionCalls = new ArrayList<String>();
 	}
 	
 	/**
@@ -224,19 +226,16 @@ public class PythonModule {
 	 * @return A list of calls to functionName in line
 	 * @throws NotbookException when line contains incorrect function call
 	 */
-	public List<String> callsTo(String functionName, String line) throws NotebookException {
-		List<String> result = new ArrayList<String>(1);
+	public void registerCalls(String functionName, String line) throws NotebookException {
 		// Usages of functions located in an imported module
 		Matcher usageMatcher = functionInModuleCallMatcher(functionName, line);
-		result.addAll(extractFunctionCalls(usageMatcher, line));
+		functionCalls.addAll(extractFunctionCalls(usageMatcher, line));
 		
 		// Usages of imported function (only possible with from imports)
 		if (null != parent && ImportType.FROM == parent.importedWith && functionName.equals(this.qualifier())) {
 			usageMatcher = functionCallMatcher(functionName, line);
-			result.addAll(extractFunctionCalls(usageMatcher, line));
+			parent.functionCalls.addAll(extractFunctionCalls(usageMatcher, line));
 		}
-		
-		return result;
 	}
 
 	protected static List<String> extractFunctionCalls(Matcher usageMatcher, String line) throws NotebookException {
@@ -263,6 +262,22 @@ public class PythonModule {
 				state.step();
 			}
 			result.add(call.trim());
+		}
+		return result;
+	}
+	
+	public List<String> popFunctionCalls() {
+		List<String> result = new ArrayList<String>(functionCalls.size());
+		result.addAll(functionCalls);
+		functionCalls.clear();
+		return result;
+	}
+	
+	public List<String> popParentsCalls() {
+		List<String> result = new ArrayList<String>(functionCalls.size());
+		if (null != parent) {
+			result.addAll(parent.functionCalls);
+			parent.functionCalls.clear();
 		}
 		return result;
 	}

@@ -527,107 +527,135 @@ public class PythonModuleTest {
 	}
 	
 	@Test
-	public void testCallsTo_ordinary() throws NotebookException {
+	public void testRegisterCalls_ordinary() throws NotebookException {
 		PythonModule module = new PythonModule(name, ImportType.ORDINARY);
 		List<String> expectedCalls = new ArrayList<String>(1);
 		expectedCalls.add(name + ".f(x)");
-		List<String> calls = module.callsTo("f", name + ".f(x)");
+		module.registerCalls("f", name + ".f(x)");
+		List<String> calls = module.popFunctionCalls();
 		assertEquals("Wrong call list returned for a simple call to function from ordinary module.",
 				expectedCalls, calls);
 	}
 	
 	@Test
-	public void testCallsTo_alias() throws NotebookException {
+	public void testRegisterCalls_alias() throws NotebookException {
 		PythonModule module = new PythonModule(name, alias, ImportType.ALIAS);
 		List<String> expectedCalls = new ArrayList<String>(1);
 		expectedCalls.add(alias + ".f(x)");
-		List<String> calls = module.callsTo("f", alias + ".f(x)");
+		module.registerCalls("f", alias + ".f(x)");
+		List<String> calls = module.popFunctionCalls();
 		assertEquals("Wrong call list returned for a simple call to function from alias module.",
 				expectedCalls, calls);
 	}
 	
 	@Test
-	public void testCallsTo_from() throws NotebookException {
+	public void testRegisterCalls_from() throws NotebookException {
 		PythonModule parent = new PythonModule(name, ImportType.FROM);
 		PythonModule module = new PythonModule("f", ImportType.ORDINARY, parent);
 		List<String> expectedCalls = new ArrayList<String>(1);
 		expectedCalls.add("f(x)");
-		List<String> calls = module.callsTo("f", "f(x)");
+		module.registerCalls("f", "f(x)");
+		assertEquals("Modules from parent registered at child.", 0, module.popFunctionCalls().size());
+		List<String> calls = parent.popFunctionCalls();
 		assertEquals("Wrong call list returned for a simple call to function from from module.",
 				expectedCalls, calls);
 	}
 	
 	@Test
-	public void testCallsTo_fromOther() throws NotebookException  {
+	public void testRegisterCalls_fromOther() throws NotebookException  {
 		PythonModule parent = new PythonModule(name, ImportType.FROM);
 		PythonModule module = new PythonModule("f2", ImportType.ORDINARY, parent);
 		List<String> expectedCalls = new ArrayList<String>(0);
-		List<String> calls = module.callsTo("f", "f2(x)");
-		assertEquals("Wrong call list returned for a simple call to function from from module with other name.",
+		module.registerCalls("f", "f2(x)");
+		List<String> calls = parent.popFunctionCalls();
+		assertEquals("Wrong call list returned for a simple call to function with other name than the imported (from from module).",
 				expectedCalls, calls);
-		calls = module.callsTo("f", "f(x)");
-		assertEquals("Wrong call list returned for a simple call to function from from module with other name.",
+		module.registerCalls("f", "f(x)");
+		calls = parent.popFunctionCalls();
+		assertEquals("Wrong call list returned for a simple call to function from from module.",
 				expectedCalls, calls);
 	}
 	
 	@Test
-	public void testCallsTo_nested() throws NotebookException {
+	public void testRegisterCalls_nested() throws NotebookException {
 		PythonModule parent = new PythonModule(name, ImportType.FROM);
 		PythonModule module = new PythonModule("f", ImportType.ORDINARY, parent);
 		List<String> expectedCalls = new ArrayList<String>(2);
 		expectedCalls.add("f(a, f(x), b)");
 		expectedCalls.add("f(x)");
-		List<String> calls = module.callsTo("f", "f(a, f(x), b)");
+		module.registerCalls("f", "f(a, f(x), b)");
+		List<String> calls = parent.popFunctionCalls();
 		assertEquals("Wrong call list returned for nested function call",
 				expectedCalls, calls);
 	}
 	
 	@Test
-	public void testCallsTo_otherNested() throws NotebookException {
+	public void testRegisterCalls_otherNested() throws NotebookException {
 		PythonModule parent = new PythonModule(name, ImportType.FROM);
 		PythonModule module = new PythonModule("f", ImportType.ORDINARY, parent);
 		List<String> expectedCalls = new ArrayList<String>(1);
 		expectedCalls.add("f(a, f2(x), b)");
-		List<String> calls = module.callsTo("f", "f(a, f2(x), b)");
+		module.registerCalls("f", "f(a, f2(x), b)");
+		List<String> calls = parent.popFunctionCalls();
 		assertEquals("Wrong call list returned for call with nested function call",
 				expectedCalls, calls);
 	}
 	
 	@Test
-	public void testCallsTo_nestedInOther() throws NotebookException {
+	public void testRegisterCalls_nestedInOther() throws NotebookException {
 		PythonModule parent = new PythonModule(name, ImportType.FROM);
 		PythonModule module = new PythonModule("f", ImportType.ORDINARY, parent);
 		List<String> expectedCalls = new ArrayList<String>(1);
 		expectedCalls.add("f(x)");
-		List<String> calls = module.callsTo("f", "f2(a, f(x), b)");
+		module.registerCalls("f", "f2(a, f(x), b)");
+		List<String> calls = parent.popFunctionCalls();
 		assertEquals("Wrong call list returned for call nested in another function call",
 				expectedCalls, calls);
 	}
 	
-	@Test
-	public void testCallsTo_bracketsInStrings() throws NotebookException {
+	@Test //
+	public void testRegisterCalls_bracketsInStrings() throws NotebookException {
 		PythonModule module = new PythonModule(name, ImportType.ORDINARY);
 		List<String> expectedCalls = new ArrayList<String>(1);
 		expectedCalls.add(name + ".f(\"(\", ')', '(', \"()\")");
-		List<String> calls = module.callsTo("f", name + ".f(\"(\", ')', '(', \"()\")");
+		module.registerCalls("f", name + ".f(\"(\", ')', '(', \"()\")");
+		List<String> calls = module.popFunctionCalls();
 		assertEquals("Wrong call list returned for call with brackets in strings.",
 				expectedCalls, calls);
 	}
 	
 	@Test
-	public void testCallsTo_escapedQuotes() throws NotebookException {
+	public void testRegisterCalls_escapedQuotes() throws NotebookException {
 		PythonModule module = new PythonModule(name, ImportType.ORDINARY);
 		List<String> expectedCalls = new ArrayList<String>(1);
 		expectedCalls.add(name + ".f(\"\\\"(\", '(\\'')");
-		List<String> calls = module.callsTo("f", name + ".f(\"\\\"(\", '(\\'')");
+		module.registerCalls("f", name + ".f(\"\\\"(\", '(\\'')");
+		List<String> calls = module.popFunctionCalls();
 		assertEquals("Wrong call list returned for call with strings containing both brackets and qoutes.",
 				expectedCalls, calls);
 	}
 	
 	@Test (expected=NotebookException.class)
-	public void testCallsTo_missingRightParanthesis() throws NotebookException {
+	public void testRegisterCalls_missingRightParanthesis() throws NotebookException {
 		PythonModule module = new PythonModule(name, ImportType.ORDINARY);
-		module.callsTo("f", name + ".f(a, (b)\n");
+		module.registerCalls("f", name + ".f(a, (b)\n");
+	}
+	
+	@Test
+	public void testPopParentsCalls() throws NotebookException {
+		PythonModule parent = new PythonModule(name, ImportType.FROM);
+		PythonModule module = new PythonModule("f", ImportType.ORDINARY, parent);
+		List<String> expectedCalls = new ArrayList<String>(1);
+		expectedCalls.add("f(x)");
+		module.registerCalls("f", "f(x)");
+		assertEquals("Wrong functions popped for parent.", expectedCalls, module.popParentsCalls());
+	}
+	
+	@Test
+	public void testPopParentsCalls_noParent() {
+		module = new PythonModule(name, ImportType.ORDINARY);
+		List<String> expectedCalls = new ArrayList<String>(0);
+		assertEquals("Calls popped for null parent.", expectedCalls, module.popParentsCalls());
 	}
 	
 	@Test

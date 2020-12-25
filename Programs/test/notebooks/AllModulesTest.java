@@ -140,7 +140,7 @@ public class AllModulesTest {
 	}
 	
 	@Test
-	public void testCallsTo() throws NotebookException {
+	public void testRegisterCalls() throws NotebookException {
 		PythonModule mathModule = new PythonModule("math", ImportType.FROM);
 		PythonModule mathFunctions = new AllModules(mathModule);
 		
@@ -148,18 +148,21 @@ public class AllModulesTest {
 		expectedCalls.add("sin(x)");
 		expectedCalls.add("sin( y )");
 		
-		List<String> calls = mathFunctions.callsTo("sin", "a = sin(x) + cos(y) - tan(z) + sin( y )");
+		mathFunctions.registerCalls("sin", "a = sin(x) + cos(y) - tan(z) + sin( y )");
+		List<String> calls = mathFunctions.popFunctionCalls();
 		assertEquals("Wrong call list returned!", expectedCalls, calls);
+		assertEquals("Calls returned from parent of AllModules object.", 0, mathFunctions.popParentsCalls().size());
 	}
 	
 	@Test
-	public void testCallsTo_noMatch() throws NotebookException {
+	public void testRegisterCalls_noMatch() throws NotebookException {
 		PythonModule mathModule = new PythonModule("math", ImportType.FROM);
 		PythonModule mathFunctions = new AllModules(mathModule);
 		
 		List<String> expectedCalls = new ArrayList<String>(0);
 		
-		List<String> calls = mathFunctions.callsTo("sin", "a = otherModule. sin(2)");
+		mathFunctions.registerCalls("sin", "a = otherModule. sin(2)");
+		List<String> calls = mathFunctions.popParentsCalls();
 		assertEquals("Calls returned when abscent.", expectedCalls, calls);
 	}
 	

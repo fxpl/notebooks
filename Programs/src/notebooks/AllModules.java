@@ -3,9 +3,7 @@ package notebooks;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 
@@ -63,17 +61,15 @@ public class AllModules extends PythonModule {
 	 * @return A list of calls to functionName in line
 	 */
 	@Override
-	public List<String> callsTo(String functionName, String line) throws NotebookException {
+	public void registerCalls(String functionName, String line) throws NotebookException {
 		storeFunctionsIfNotDone();
-		List<String> result = new ArrayList<String>(1);
 		String[] functionsInModule = functionsInModules.get(parent.pedigreeString());
 		for (String function: functionsInModule) {
 			if (function.equals(functionName)) {
 				Matcher usageMatcher = functionCallMatcher(functionName, line);
-				result.addAll(extractFunctionCalls(usageMatcher, line));
+				functionCalls.addAll(extractFunctionCalls(usageMatcher, line));
 			}
 		}
-		return result;
 	}
 	
 	private void storeFunctionsIfNotDone() {

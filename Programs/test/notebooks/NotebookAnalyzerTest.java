@@ -946,6 +946,7 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 		lastOutputFile("modules").delete();
 		lastOutputFile("module_top_list").delete();
 		lastOutputFile("kossan_mu-functions").delete();
+		lastOutputFile("kossan_mu.function-functions").delete();
 	}
 	
 	/**
@@ -1115,6 +1116,9 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 				"function, 2",
 				"otherFunction, 1"
 		};
+		String[] onlyHeader = {
+				functionUsagesHeader()
+		};
 		analyzer.initializeNotebooksFrom(dataDir + File.separator + file);
 		List<List<PythonModule>> modules = analyzer.listModules();
 		lastOutputFile("modules").delete();	// Side effect of modules call
@@ -1122,7 +1126,9 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 		
 		analyzer.functionUsages(modules, modulesSorted, Integer.MAX_VALUE);
 		checkCsv("kossan_mu-functions", expectedLines);
-		lastOutputFile("kossan_mu.functions").delete();
+		lastOutputFile("kossan_mu-functions").delete();
+		checkCsv("kossan_mu.function-functions", onlyHeader);
+		lastOutputFile("kossan_mu.function-functions").delete();
 	}
 	
 	/**

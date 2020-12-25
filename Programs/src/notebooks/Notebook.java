@@ -99,14 +99,17 @@ public class Notebook {
 				} else {
 					for (PythonModule function: functions) {
 						for (PythonModule module: modules) {
-							if (function.is(module) || function.parentIs(module)) {
-								try {
-									List<String> calls = module.callsTo(function.name, line);
-									result.get(function).addAll(calls);
-								} catch (NotebookException e) {
-									System.err.println("Could not extract function calls for "
-											+ this.path + ": " + e.getMessage());
+							try {
+								if (function.is(module)) {
+									module.registerCalls(function.name, line);
+									result.get(function).addAll(module.popParentsCalls());
+								} else if (function.parentIs(module)) {
+									module.registerCalls(function.name, line);
+									result.get(function).addAll(module.popFunctionCalls());
 								}
+							} catch (NotebookException e) {
+								System.err.println("Could not extract function calls for "
+										+ this.path + ": " + e.getMessage());
 							}
 						}
 					}
