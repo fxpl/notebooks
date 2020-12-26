@@ -64,8 +64,8 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 		String[] expectedConnectionsLines = {connectionsHeader(),
 				notebookFile + ", 0, 0.0000, 0, 0.0000, 0, 0, 0.0000, 0.0000"};
 		
-		analyzer.initializeNotebooksFrom(testDir + File.separator + notebookFile);
-		analyzer.initializeReproInfo(testDir + File.separator + reproFile);
+		analyzer.initializeNotebooksFrom(TestUtils.getPath(testDir, notebookFile));
+		analyzer.initializeReproInfo(TestUtils.getPath(testDir, reproFile));
 		analyzer.allAnalyzes();
 		
 		checkCsv("code_cells", expectedCodeCellsLines);
@@ -107,7 +107,7 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 		String[] expectedConnectionsLines = {connectionsHeader(),
 				notebookFile + ", 0, 0.0000, 0, 0.0000, 0, 0, 0.0000, 0.0000"};
 		
-		analyzer.initializeNotebooksFrom(testDir + File.separator + notebookFile);
+		analyzer.initializeNotebooksFrom(TestUtils.getPath(testDir, notebookFile));
 		analyzer.allAnalyzes();
 		
 		checkCsv("code_cells", expectedCodeCellsLines);
@@ -143,7 +143,7 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 		};
 		
 		for (String file: files) {
-			analyzer.initializeNotebooksFrom(dataDir + File.separator + file);
+			analyzer.initializeNotebooksFrom(TestUtils.getPath(dataDir, file));
 		}
 		analyzer.allLanguageValues();
 		checkCsv("all_languages", expectedLines);
@@ -166,7 +166,7 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 				+ ", " + LangSpec.CODE_CELLS,	// header
 				file + ", " + LangName.UNKNOWN + ", " + LangName.UNKNOWN + ", "	+ LangName.UNKNOWN + ", " + LangName.UNKNOWN + ", " + LangName.UNKNOWN
 		};
-		analyzer.initializeNotebooksFrom(dataDir + File.separator + file);
+		analyzer.initializeNotebooksFrom(TestUtils.getPath(dataDir, file));
 		analyzer.allLanguageValues();
 		checkCsv("all_languages", expectedLInes);
 		lastOutputFile("all_languages").delete();
@@ -492,9 +492,9 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 		
 		// Actual values
 		for (String file: files) {
-			analyzer.initializeNotebooksFrom(dataDir + File.separator + file);
+			analyzer.initializeNotebooksFrom(TestUtils.getPath(dataDir, file));
 		}
-		analyzer.initializeReproInfo(dataDir + File.separator + reproFile);
+		analyzer.initializeReproInfo(TestUtils.getPath(dataDir, reproFile));
 		Map<SnippetCode, List<Snippet>> clones = analyzer.clones();
 		
 		// Check values
@@ -535,8 +535,8 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 		};
 		
 		// Actual values
-		analyzer.initializeNotebooksFrom(dataDir + File.separator + notebookFile);
-		analyzer.initializeReproInfo(dataDir + File.separator + reproMapName);
+		analyzer.initializeNotebooksFrom(TestUtils.getPath(dataDir, notebookFile));
+		analyzer.initializeReproInfo(TestUtils.getPath(dataDir, reproMapName));
 		analyzer.clones();
 		
 		checkCsv("file2hashesA", expectedSnippetLines);
@@ -576,8 +576,8 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 		};
 		
 		// Actual values
-		analyzer.initializeNotebooksFrom(dataDir + File.separator + notebookFile);
-		analyzer.initializeReproInfo(dataDir + File.separator + reproFile);
+		analyzer.initializeNotebooksFrom(TestUtils.getPath(dataDir, notebookFile));
+		analyzer.initializeReproInfo(TestUtils.getPath(dataDir, reproFile));
 		analyzer.clones();
 		
 		checkCsv("file2hashesA", expectedSnippetLines);
@@ -617,8 +617,8 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 		};
 		
 		// Actual values
-		analyzer.initializeNotebooksFrom(dataDir + File.separator + notebookFile);
-		analyzer.initializeReproInfo(dataDir + File.separator + reproFile);
+		analyzer.initializeNotebooksFrom(TestUtils.getPath(dataDir, notebookFile));
+		analyzer.initializeReproInfo(TestUtils.getPath(dataDir, reproFile));
 		analyzer.clones();
 		
 		checkCsv("file2hashesA", expectedFile2HashesLines);
@@ -657,8 +657,8 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 			notebookFile + ", 2, 0.6667, 2, 0.6667, 2, 2, 0.0000, 0.0000"
 		};
 		
-		analyzer.initializeNotebooksFrom(dataDir + File.separator + notebookFile);
-		analyzer.initializeReproInfo(dataDir + File.separator + reproFile);
+		analyzer.initializeNotebooksFrom(TestUtils.getPath(dataDir, notebookFile));
+		analyzer.initializeReproInfo(TestUtils.getPath(dataDir, reproFile));
 		analyzer.clones();
 		
 		checkCsv("file2hashesA", expectedFile2HashesLines);
@@ -706,7 +706,7 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 		
 		for (String notebookFile: notebookFiles) {
 			System.out.println("Initializing from " + notebookFile);
-			analyzer.initializeNotebooksFrom(dataDir + File.separator + notebookFile);
+			analyzer.initializeNotebooksFrom(TestUtils.getPath(dataDir, notebookFile));
 		}
 		analyzer.initializeReproInfo(reproFile);
 		analyzer.clones();
@@ -734,9 +734,9 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 		};
 		
 		for (String file: files) {
-			analyzer.initializeNotebooksFrom(dataDir + File.separator + file);
+			analyzer.initializeNotebooksFrom(TestUtils.getPath(dataDir, file));
 		}
-		analyzer.initializeReproInfo(dataDir + File.separator + reproFile);
+		analyzer.initializeReproInfo(TestUtils.getPath(dataDir, reproFile));
 		analyzer.clones();
 
 		checkCsv_matches("hash2filesA", expectedLines);
@@ -759,9 +759,9 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 		};
 		
 		for (String file: files) {
-			analyzer.initializeNotebooksFrom(dataDir + File.separator + file);
+			analyzer.initializeNotebooksFrom(TestUtils.getPath(dataDir, file));
 		}
-		analyzer.initializeReproInfo(dataDir + File.separator + reproFile);
+		analyzer.initializeReproInfo(TestUtils.getPath(dataDir, reproFile));
 		analyzer.clones();
 		
 		checkCsv_matches("hash2filesA", expectedLines);
@@ -797,7 +797,7 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 		};
 		
 		analyzer.initializeNotebooksFrom(dataDir);
-		analyzer.initializeReproInfo(dataDir + File.separator + reproFile);
+		analyzer.initializeReproInfo(TestUtils.getPath(dataDir, reproFile));
 		analyzer.clones();
 		
 		checkCsv_anyOrder("connections", expectedLines);
@@ -842,7 +842,7 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 		}
 		
 		for (String file: files) {
-			analyzer.initializeNotebooksFrom(dataDir + File.separator + file);
+			analyzer.initializeNotebooksFrom(TestUtils.getPath(dataDir, file));
 		}
 		analyzer.languages();
 		
@@ -882,7 +882,7 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 		}
 		
 		for (String file: files) {
-			analyzer.initializeNotebooksFrom(dataDir + File.separator + file);
+			analyzer.initializeNotebooksFrom(TestUtils.getPath(dataDir, file));
 		}
 		analyzer.LOC();
 		
@@ -913,7 +913,7 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 				"module1", "module2", "module3",
 				"module10", "module11", "module12", "module13"};
 		for (String file: files) {
-			analyzer.initializeNotebooksFrom(dataDir + File.separator + file);
+			analyzer.initializeNotebooksFrom(TestUtils.getPath(dataDir, file));
 		}
 		analyzer.modules();
 		checkCsv("modules", expectedLines);
@@ -939,7 +939,7 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 				modulesHeader(),
 				"nb_70.ipynb, kossan_mu.function(function), kossan_mu(kossan_mu)"
 		};
-		analyzer.initializeNotebooksFrom(dataDir + File.separator + file);
+		analyzer.initializeNotebooksFrom(TestUtils.getPath(dataDir, file));
 		analyzer.modules();
 		checkCsv("modules", expectedModulesLines);
 		
@@ -964,7 +964,7 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 				"cos, 1"
 		};
 		
-		analyzer.initializeNotebooksFrom(dataDir + File.separator + file);
+		analyzer.initializeNotebooksFrom(TestUtils.getPath(dataDir, file));
 		analyzer.modules();
 		
 		lastOutputFile("modules").delete();
@@ -984,7 +984,7 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 		String[] expectedLines = {
 				modulesHeader()
 		};
-		analyzer.initializeNotebooksFrom(dataDir + File.separator + file);
+		analyzer.initializeNotebooksFrom(TestUtils.getPath(dataDir, file));
 		analyzer.modules();
 		lastOutputFile("module_top_list").delete();
 		checkCsv("modules", expectedLines);
@@ -1008,7 +1008,7 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 		};
 		String[] functionFileNamePrefixes = {"Base.A", "B", "C.D", "E"};
 		for (String file: files) {
-			analyzer.initializeNotebooksFrom(dataDir + File.separator + file);
+			analyzer.initializeNotebooksFrom(TestUtils.getPath(dataDir, file));
 		}
 		analyzer.modules();
 		lastOutputFile("modules").delete();
@@ -1029,7 +1029,7 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 		String[] files = {"nb_10.ipynb", "nb_R.ipynb", "nb_11.ipynb",
 				"nb_12.ipynb", "nb_13.ipynb"};
 		for (String file: files) {
-			analyzer.initializeNotebooksFrom(dataDir + File.separator + file);
+			analyzer.initializeNotebooksFrom(TestUtils.getPath(dataDir, file));
 		}
 		
 		List<Quantity> expectedModulesSorted = new ArrayList<Quantity>();
@@ -1059,7 +1059,7 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 				"B.C, 1"
 		};
 		for (String file: files) {
-			analyzer.initializeNotebooksFrom(dataDir + File.separator + file);
+			analyzer.initializeNotebooksFrom(TestUtils.getPath(dataDir, file));
 		}
 		analyzer.modules();
 		lastOutputFile("modules").delete();
@@ -1099,7 +1099,7 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 		
 		// Create module lists
 		for (String file: files) {
-			analyzer.initializeNotebooksFrom(dataDir + File.separator + file);
+			analyzer.initializeNotebooksFrom(TestUtils.getPath(dataDir, file));
 		}
 		List<List<PythonModule>> modules = analyzer.listModules();
 		lastOutputFile("modules").delete();	// Side effect of modules call
@@ -1143,7 +1143,7 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 		String[] onlyHeader = {
 				functionUsagesHeader()
 		};
-		analyzer.initializeNotebooksFrom(dataDir + File.separator + file);
+		analyzer.initializeNotebooksFrom(TestUtils.getPath(dataDir, file));
 		List<List<PythonModule>> modules = analyzer.listModules();
 		lastOutputFile("modules").delete();	// Side effect of modules call
 		List<Quantity> modulesSorted = NotebookAnalyzer.sortedModules(modules);
@@ -1172,7 +1172,7 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 		};
 		
 		for (String file: files) {
-			analyzer.initializeNotebooksFrom(dataDir + File.separator + file);
+			analyzer.initializeNotebooksFrom(TestUtils.getPath(dataDir, file));
 		}
 		analyzer.modules();	// Will call functionUsages, and the preparation steps.
 		lastOutputFile("modules").delete();
@@ -1205,9 +1205,9 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 		};
 		
 		for (String notebook: notebookFiles) {
-			analyzer.initializeNotebooksFrom(dataDir + File.separator + notebook);
+			analyzer.initializeNotebooksFrom(TestUtils.getPath(dataDir, notebook));
 		}
-		analyzer.listFunctionCalls(dataDir + File.separator + functionsFile);
+		analyzer.listFunctionCalls(TestUtils.getPath(dataDir, functionsFile));
 		
 		checkCsv("Base.A.fun1-calls", expectedALines);
 		lastOutputFile("Base.A.fun1-calls").delete();
@@ -1226,9 +1226,9 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 		String notebook = "empty.ipynb";
 		
 		String[] expectedLines = new String[0];
-		analyzer.initializeNotebooksFrom(dataDir + File.separator + notebook);
+		analyzer.initializeNotebooksFrom(TestUtils.getPath(dataDir, notebook));
 		
-		analyzer.listFunctionCalls(dataDir + File.separator + functionsFile);
+		analyzer.listFunctionCalls(TestUtils.getPath(dataDir, functionsFile));
 		checkCsv("Base.A.fun1-calls", expectedLines);
 		lastOutputFile("Base.A.fun1-calls").delete();
 		checkCsv("B.fun1-calls", expectedLines);
@@ -1255,9 +1255,9 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 				"nb_71.ipynb: numpy.cos(3.14)"
 		};
 		
-		analyzer.initializeNotebooksFrom(dataDir + File.separator + file);
+		analyzer.initializeNotebooksFrom(TestUtils.getPath(dataDir, file));
 		
-		analyzer.listFunctionCalls(dataDir + File.separator + functionsFile);
+		analyzer.listFunctionCalls(TestUtils.getPath(dataDir, functionsFile));
 		checkCsv("numpy.sin-calls", expectedSinLines);
 		lastOutputFile("numpy.sin-calls").delete();
 		checkCsv("numpy.cos-calls", expectedCosLines);
@@ -1293,7 +1293,7 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 		}
 		
 		for (String file: files) {
-			analyzer.initializeNotebooksFrom(dataDir + File.separator + file);
+			analyzer.initializeNotebooksFrom(TestUtils.getPath(dataDir, file));
 		}
 		analyzer.numCodeCells();
 		

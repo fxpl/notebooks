@@ -109,6 +109,15 @@ public class TestUtils {
 	}
 	
 	/**
+	 * @param dir Name of directory
+	 * @param file Name of file
+	 * @return The path to file, which lives in dir
+	 */
+	public static String getPath(String dir, String file) {
+		return dir + File.separator + file;
+	}
+	
+	/**
 	 * Verify that all files prefixed in expectedFiles exist in the specified
 	 * directory, and remove them.
 	 * @param dir Directory to look for files in
