@@ -58,6 +58,7 @@ public class Notebook {
 	 */
 	public List<PythonModule> modules() {
 		List<PythonModule> modules = new ArrayList<PythonModule>();
+		Set<PythonModule> moduleSet = new HashSet<PythonModule>(modules);
 		List<JSONObject> codeCells = getCodeCells();
 		for (JSONObject cell: codeCells) {
 			JSONArray lines = getSource(cell);
@@ -66,8 +67,9 @@ public class Notebook {
 				line = line.trim();
 				if (line.matches("import\\s+.*") || line.matches("from\\s+.*\\s+import.*")) {
 					addImportedModules(line, modules);
+					moduleSet.addAll(modules);
 				} else {
-					for (PythonModule module: modules) {
+					for (PythonModule module: moduleSet) {
 						module.registerUsage(line);
 					}
 				}
@@ -88,6 +90,7 @@ public class Notebook {
 		}
 		
 		List<PythonModule> modules = new ArrayList<PythonModule>();
+		Set<PythonModule> moduleSet = new HashSet<PythonModule>();
 		List<JSONObject> codeCells = getCodeCells();
 		for (JSONObject cell: codeCells) {
 			JSONArray lines = getSource(cell);
@@ -96,9 +99,10 @@ public class Notebook {
 				line = line.trim();
 				if (line.matches("import\\s+.*") || line.matches("from\\s+.*\\s+import.*")) {
 					addImportedModules(line, modules);
+					moduleSet.addAll(modules);
 				} else {
 					for (PythonModule function: functions) {
-						for (PythonModule module: modules) {
+						for (PythonModule module: moduleSet) {
 							try {
 								if (function.is(module)) {
 									module.registerCalls(function.name, line);

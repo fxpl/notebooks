@@ -950,6 +950,30 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 	}
 	
 	/**
+	 * Verify that function calls are counted once also when a module is
+	 * imported twice.
+	 * @throws IOException on errors handling input files or files to be checked
+	 */
+	@Test
+	public void testModules_doubleImport() throws IOException {
+		String dataDir = "test/data/modules";
+		String file = "nb_71.ipynb";
+		String[] expectedNumpyLines = {
+				functionUsagesHeader(),
+				"sin, 3",
+				"cos, 1"
+		};
+		
+		analyzer.initializeNotebooksFrom(dataDir + File.separator + file);
+		analyzer.modules();
+		
+		lastOutputFile("modules").delete();
+		lastOutputFile("module_top_list").delete();
+		checkCsv("numpy-functions", expectedNumpyLines);
+		lastOutputFile("numpy-functions").delete();
+	}
+	
+	/**
 	 * Verify the behavior of modules for an invalid JSON file.
 	 * @throws IOException on errors handling the input file
 	 */
@@ -1183,8 +1207,8 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 		for (String notebook: notebookFiles) {
 			analyzer.initializeNotebooksFrom(dataDir + File.separator + notebook);
 		}
-		
 		analyzer.listFunctionCalls(dataDir + File.separator + functionsFile);
+		
 		checkCsv("Base.A.fun1-calls", expectedALines);
 		lastOutputFile("Base.A.fun1-calls").delete();
 		checkCsv("B.fun1-calls", expectedBLines);
@@ -1209,6 +1233,35 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 		lastOutputFile("Base.A.fun1-calls").delete();
 		checkCsv("B.fun1-calls", expectedLines);
 		lastOutputFile("B.fun1-calls").delete();
+	}
+	
+	/**
+	 * Verify that function calls are listed correctly by listFunctionCalls
+	 * when a module is imported twice.
+	 * @throws IOException on errors handling input files or files to be checked
+	 */
+	@Test
+	public void testFunctionCalls_doubleImport() throws IOException {
+		String dataDir = "test/data/modules";
+		String functionsFile = "np_functions_to_list.csv";
+		String file = "nb_71.ipynb";
+		
+		String[] expectedSinLines = {
+				"nb_71.ipynb: numpy.sin(1.57)",
+				"nb_71.ipynb: numpy.sin(numpy.cos(3.14))",
+				"nb_71.ipynb: np.sin(3.14)"
+		};
+		String[] expectedCosLines = {
+				"nb_71.ipynb: numpy.cos(3.14)"
+		};
+		
+		analyzer.initializeNotebooksFrom(dataDir + File.separator + file);
+		
+		analyzer.listFunctionCalls(dataDir + File.separator + functionsFile);
+		checkCsv("numpy.sin-calls", expectedSinLines);
+		lastOutputFile("numpy.sin-calls").delete();
+		checkCsv("numpy.cos-calls", expectedCosLines);
+		lastOutputFile("numpy.cos-calls").delete();
 	}
 
 	/**
