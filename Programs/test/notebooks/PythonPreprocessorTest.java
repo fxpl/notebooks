@@ -82,6 +82,20 @@ public class PythonPreprocessorTest {
 	}
 	
 	@Test
+	public void testProcess_commentedMultiLineStringDelimiter() {
+		String[] strings = {"#'''\n",
+				"someFunction()\n",
+				"# comment \"\"\"\n",
+				"someOtherFunction()\n"};
+		List<String> expectedOutput = new ArrayList<String>(4);
+		expectedOutput.add("\n");
+		expectedOutput.add("someFunction()\n");
+		expectedOutput.add("\n");
+		expectedOutput.add("someOtherFunction()\n");
+		processAndCheck(strings, expectedOutput);
+	}
+	
+	@Test
 	public void testProcess_delimitersInMultiLineString() {
 		String[] strings = {"import numpy as np\n",
 				"'''This is a string with \"\"\" inside.'''\n",

@@ -9,6 +9,7 @@ public class CodeState {
 	private List<List<Integer>> stringDelimiterPositions;
 	private boolean[] inString;
 	private boolean escaped;
+	private boolean inComment;
 	private int index;
 	
 	public CodeState(String code, String[] stringDelimiters) {
@@ -77,9 +78,16 @@ public class CodeState {
 	public void step() {
 		// Keep track of whether we are inside a string
 		for (int i=0; i<stringDelimiters.length; i++) {
-			if (!otherTrue(inString, i) && stringDelimiterPositions.get(i).contains(index) && !escaped) {
+			if (!otherTrue(inString, i) && stringDelimiterPositions.get(i).contains(index) && !escaped && !inComment) {
 				inString[i] = !inString[i];
 			}
+		}
+		
+		if (!inString() && !escaped && '#' == code.charAt(index)) {
+			inComment = true;
+		}
+		if ('\n' == code.charAt(index)) {
+			inComment = false;
 		}
 		
 		if ('\\' == code.charAt(index)) {
