@@ -608,6 +608,7 @@ def read_csv(filepath_or_buffer,
 			memory_map=_UNSPECIFIED,
 			float_precision=_UNSPECIFIED
 	):
+	# No skiprows, skipfooter or nrows
 	all_rows = pd_read_csv(filepath_or_buffer, sep=sep, delimiter=delimiter, header=header, names=names, index_col=index_col,
 					usecols=usecols, prefix=prefix, mangle_dupe_cols=mangle_dupe_cols, dtype=dtype, engine=engine,
 					converters=converters, true_values=true_values, false_values=false_values,
@@ -621,6 +622,7 @@ def read_csv(filepath_or_buffer,
 					delim_whitespace=delim_whitespace, low_memory=low_memory, memory_map=memory_map,
 					float_precision=float_precision)
 	
+	# No names or usecols
 	all_columns = pd_read_csv(filepath_or_buffer, sep=sep, delimiter=delimiter, header=header, index_col=index_col,
 					prefix=prefix, mangle_dupe_cols=mangle_dupe_cols, dtype=dtype, engine=engine, converters=converters,
 					true_values=true_values, false_values=false_values, skipinitialspace=skipinitialspace, skiprows=skiprows,
@@ -648,8 +650,9 @@ def read_csv(filepath_or_buffer,
 					low_memory=low_memory, memory_map=memory_map, float_precision=float_precision)
 	
 	if _is_specified(parse_dates):
+		# parse_dates=False, no index_col, infer_datetime_format, keep_date_col, date_parser, dayfirst or cache_dates
 		date_unparsed_data = pd_read_csv(filepath_or_buffer, sep=sep, delimiter=delimiter, header=header, names=names,
-					index_col=index_col, usecols=usecols, prefix=prefix, mangle_dupe_cols=mangle_dupe_cols, dtype=dtype,
+					usecols=usecols, prefix=prefix, mangle_dupe_cols=mangle_dupe_cols, dtype=dtype,
 					engine=engine, converters=converters, true_values=true_values, false_values=false_values,
 					skipinitialspace=skipinitialspace, skiprows=skiprows, skipfooter=skipfooter, nrows=nrows,
 					na_values=na_values, keep_default_na=keep_default_na, na_filter=na_filter,
@@ -797,6 +800,7 @@ def _rcsv_risky_date_combs_format(parse_dates, data, date_unparsed_data):
 					col_vals = data[col_name]
 				if col_vals.dtype == object:
 					return ["read_csv.filepath-parse_dates"]
+		# TODO elif isinstance(parse_dates, dict):
 	return []
 
 def _rcsv_risky_warn_combs(warn_bad_lines, error_bad_lines):

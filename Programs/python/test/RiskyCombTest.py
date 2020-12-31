@@ -578,6 +578,8 @@ class RiskyCombTest(unittest.TestCase):
 		self.assertEqual([], result, "Non-empty list returned by correct call to read_csv!")
 		result = rcf.read_csv("data/date_data.csv", parse_dates=[[2,3,4]])
 		self.assertEqual([], result, "Non-empty list returned by correct call to read_csv!")
+		result = rcf.read_csv("data/date_data.csv", parse_dates=[[2,3,4]], index_col=1)
+		self.assertEqual([], result, "Non-empty list returned by correct call to read_csv!")
 		result = rcf.read_csv("data/date_data.csv", parse_dates=True)
 		self.assertEqual(["read_csv.filepath-parse_dates"], result, "Wrong result returned with parse_dates=True for non-date index!")
 		result = rcf.read_csv("data/date_data.csv", parse_dates=[1])
