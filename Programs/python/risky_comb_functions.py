@@ -800,7 +800,10 @@ def _rcsv_risky_date_combs_format(parse_dates, data, date_unparsed_data):
 					col_vals = data[col_name]
 				if col_vals.dtype == object:
 					return ["read_csv.filepath-parse_dates"]
-		# TODO elif isinstance(parse_dates, dict):
+		elif isinstance(parse_dates, dict):
+			for key in parse_dates:
+				if data[key].dtype == object:
+					return ["read_csv.filepath-parse_dates"]
 	return []
 
 def _rcsv_risky_warn_combs(warn_bad_lines, error_bad_lines):
