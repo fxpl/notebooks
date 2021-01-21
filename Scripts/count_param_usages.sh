@@ -1,3 +1,22 @@
+#!/bin/bash
+
+################################################################################
+# List the number of occurrences of arguments that could be expected to be
+# listed with keywords for matplotlib.pyplot.plot, numpy.array, pandas.read_csv
+# and pandas.DataFrame. Before the execution of this script, NotebookAnalyzer is
+# supposed to be run with the "--functions" argument, and the resulting files
+# must be stored in ../Output.
+################################################################################
+
+
+################################################################################
+# List the number of occurrences (with keyword) of the specified arguments in
+# calls listed in the specified file.
+#
+# Arguments:
+# 1. File with listed calls
+# 2. Array with arguments to count occurrences of
+################################################################################
 count() {
 	file=$1
 	args=$2
@@ -8,6 +27,7 @@ count() {
 		echo "$numCalls $arg"
 	done
 }
+
 
 echo "PLOT:"
 file=`./get_last_output.sh "matplotlib.pyplot.plot-calls"`

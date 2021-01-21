@@ -8,7 +8,7 @@
 
 LC_NUMERIC="en_US.UTF-8"
 
-# Langugaes
+# Languages
 languages=( PYTHON JULIA R SCALA OTHER UNKNOWN )
 file=`./get_last_output.sh "languages"`
 total=`sed -n "2,$ p" $file | wc -l`
