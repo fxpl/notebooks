@@ -90,12 +90,12 @@ public class NotebookAnalyzer extends Analyzer {
 	 * all defined ones respectively) and clones.
 	 * @throws IOException On problems handling the output file
 	 */
-	public void allAnalyzes() throws IOException {
-		List<Callable<AllResults>> tasks = new ArrayList<>(notebooks.size());
+	public void allCccAnalyzes() throws IOException {
+		List<Callable<AllCccResults>> tasks = new ArrayList<>(notebooks.size());
 		for (Notebook notebook: this.notebooks) {
-			tasks.add(new AllAnalyzer(notebook));
+			tasks.add(new AllCccAnalyzer(notebook));
 		}
-		List<Future<AllResults>> result = ThreadExecutor.getInstance().invokeAll(tasks);
+		List<Future<AllCccResults>> result = ThreadExecutor.getInstance().invokeAll(tasks);
 		
 		Writer codeCellsWriter = new FileWriter(outputDir + "/code_cells" + LocalDateTime.now() + ".csv");
 		codeCellsWriter.write(numCodeCellsHeader());
@@ -109,15 +109,15 @@ public class NotebookAnalyzer extends Analyzer {
 		
 		for (int i=0; i<notebooks.size(); i++) {
 			Notebook notebook = notebooks.get(i);
-			AllResults results;
+			AllCccResults results;
 			try {
 				results = result.get(i).get();
 			} catch (InterruptedException | ExecutionException e) {
 				/* This should only happen when a thread gets interrupted
-				   Other exceptions are handled in AllAnalyzer. */
+				   Other exceptions are handled in AllCccAnalyzer. */
 				System.err.println("Could not get results for " + notebook.getName() + ": " + e);
 				e.printStackTrace();
-				results = new AllResults();
+				results = new AllCccResults();
 			}
 			writeCodeCellsLine(results.getNumCodeCells(), notebook, codeCellsWriter);
 			writeLocLine(results.getTotalLOC(), results.getNonBlankLOC(), results.getBlankLOC(), notebook, LOCWriter);
@@ -972,7 +972,7 @@ public class NotebookAnalyzer extends Analyzer {
 	 * Parse command line arguments and perform actions accordingly.
 	 */
 	void analyze(String[] args) {
-		boolean all = false,
+		boolean ccc = false,
 				count = false,
 				lang = false,
 				loc = false,
@@ -996,8 +996,8 @@ public class NotebookAnalyzer extends Analyzer {
 				listFunctionsFile = getValueFromArgument(arg);
 			} else {
 				switch (arg) {
-				case "--all":
-					all = true;
+				case "--ccc":
+					ccc = true;
 					break;
 				case "--count":
 					count = true;
@@ -1036,15 +1036,15 @@ public class NotebookAnalyzer extends Analyzer {
 				System.err.println("I/O error when initializing repro info: " + e.getMessage());
 				System.err.println("Repro information not initialized!");
 			}
-		} else if (all || clones) {
+		} else if (ccc || clones) {
 			System.err.println("Warning! Clone analysis run without repro information!");
 		}
 			
 		// Perform analyzes
 		try {
-			if (all) {
-				this.allAnalyzes();
-				System.out.println("All analyzes made for " + this.numNotebooks() + " notebooks.");
+			if (ccc) {
+				this.allCccAnalyzes();
+				System.out.println("All characteristics and code clone analyzes made for " + this.numNotebooks() + " notebooks.");
 			}
 			if (count) {
 				System.out.println("Notebooks parsed: " + this.numNotebooks());

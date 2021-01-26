@@ -70,8 +70,9 @@ https://export.uppmax.uu.se/snic2020-6-136/notebooks.zip.
 ### Execution
 
 Below is a description of how to execute the Java programs. Examples of commands
-for running each program can be found in the scripts `run_notebookAnalyzer.sh`,
-`run_pythonDumper.sh` and `run_sccOutputAnalyzer.sh` respectively.
+for running each program can be found in the scripts `run_notebookAnalyzer_ccc.sh`,
+`run_notebookAnalyzer_mod.sh`, `run_pythonDumper.sh` and `run_sccOutputAnalyzer.sh`
+respectively.
 
 #### Notebook Analyzer
 When running notebook analyzer, `org.json` must be in the class path. A jar file
@@ -100,7 +101,7 @@ functionality, also Programs/python must be in the class path.
  * `--loc` if the program should count the number of lines of code of the
    notebooks
  * `--clones` if the program should run the clone analysis
- * `--all` if all analyzes listed above should be run. (The number of notebooks
+ * `--ccc` if all analyzes listed above should be run. (The number of notebooks
    will not be presented explicitly, but is easily found by a line count of the
    output files.)
 The arguments can be given in any order, and several analyses can be run in the
@@ -232,8 +233,8 @@ The following scripts are intended to be used for post processing:
  * language_inconsistencies.sh
  * list_duplicated_notebooks.sh
  * print_most_common_snippets.sh
- * statistics_paperIII_nba.R (with create_sym_links_nba.sh as preprocessing)
- * statistics_paperIII_scc.R (with create_sym_links_scc.sh as preprocessing)
+ * statistics_ccc_nba.R (with create_sym_links_nba.sh as preprocessing)
+ * statistics_ccc_scc.R (with create_sym_links_scc.sh as preprocessing)
 
 Before running post processing scripts whose names contain `scc`, you need to
 create a symbolic link called `Output` in the root directory of this repository
@@ -248,24 +249,26 @@ After having executed the R scripts, you may want to run
 `reduce_large_images.sh`.
 
 An example of how to run the post processing can be found in
-`run_post_processing.sh` which is located in the root directory of this
+`run_post_processing_ccc.sh` which is located in the root directory of this
 repository.
 
 Scripts whose name start with `move_` were used to move notebooks that we
 didn't want to include in our analyses. You will not be able to run these; they
 are only included for transparency.
 
-The scripts not mentioned in  this section are helper scripts for the post
+The scripts not mentioned in this section are helper scripts for the post
 processing scripts.
 
 
 ## Repeating our results
+
+### Jupyter Notebooks on GitHub: Characteristics and Code Clones
 If you want to repeat the results of "Jupyter Notebooks on Github:
 Characteristics and Code Clones" by Källén, Sigvardsson and Wrigstad" you need
 to do the following:
 1. Download all notebooks and the notebook-repository mapping file from https://export.uppmax.uu.se/snic2020-6-136/notebooks.zip.
 2. Change the paths in `paths.sh` according to the inline comments.
-3. Execute `run_notebookAnalyzer.sh`.
+3. Execute `run_notebookAnalyzer_ccc.sh`.
 4. Execute `run_pythonDumper.sh`.
 5. Do the clone analysis with SourcererCC
    (https://github.com/Mondego/SourcererCC) according to their instructions,
@@ -273,7 +276,7 @@ to do the following:
 6. Zip `results.pairs`. Place the zip file and the file stats file in the
    directory that you have provided in `paths.sh`.
 7. Execute `run_sccOutputAnalyzer.sh`.
-8. Execute `run_post_processing.sh`. This must not be done before completion
+8. Execute `run_post_processing_ccc.sh`. This must not be done before completion
    of step 3 and 7. Check `OutputNBA` and `OutputSCC` for output.
 
 Step 3 can be done in parallel with steps 4-7.

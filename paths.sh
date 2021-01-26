@@ -7,7 +7,7 @@ tmpDir=/huge/soa_tmp_dir
 
 # File with paths to all notebooks (relative to the location of the file)
 notebookPathsFile=/huge/notebook_paths.txt
-# File with mapping from notebook number to repro
+# File with mapping from notebook number to repo
 reproFile=/huge/notebook-number_repo.csv
 
 # Directory for output data from NotebookAnalyzer

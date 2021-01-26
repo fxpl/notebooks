@@ -1,8 +1,9 @@
 #!/bin/bash
 
 ################################################################################
-# Run all relevant post processing scripts on the output of NotebookAnalyzer and
-# SccOutputAnalyzer.
+# Run all relevant post processing scripts for "Jupyter Notebooks on GitHub:
+# Characteristics and Code Clones", that is scripts for processing output of
+# NotebookAnalyzer run with the flag "--ccc", and output of  SccOutputAnalyzer.
 ################################################################################
 
 source paths.sh
@@ -42,7 +43,7 @@ rm $sccNotebooks
 
 #Statistics for SccOutputAnanlyzer results
 ./create_sym_links_scc.sh
-Rscript statistics_paperIII_scc.R > ../Output/output_statistics.txt
+Rscript statistics_ccc_scc.R > ../Output/output_statistics.txt
 # Pack plots
 ./reduce_large_images.sh
 cd ../Output
@@ -66,7 +67,7 @@ cd Scripts
 # Statistics for NotebookAnalyzer results
 ./create_sym_links_nba.sh
 ./get_notebook_sizes.sh
-Rscript statistics_paperIII_nba.R > ../Output/output_statistics.txt
+Rscript statistics_ccc_nba.R > ../Output/output_statistics.txt
 # Pack plots
 ./reduce_large_images.sh
 cd ../Output

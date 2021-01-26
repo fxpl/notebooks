@@ -2,14 +2,14 @@ package notebooks;
 
 import java.util.Map;
 
-public class AllResults {
+public class AllCccResults {
 	private int numCodeCells;
 	private int totalLOC, nonBlankLOC, blankLOC;
 	private Language language;
 	private Map<LangSpec, LangName> allLanguages;
 	SnippetCode[] hashes;
 	
-	public AllResults() {
+	public AllCccResults() {
 		this.setNumCodeCells(0);
 		this.setLOC(0, 0, 0);
 		this.setLanguage(new Language());
@@ -17,7 +17,7 @@ public class AllResults {
 		this.setHashes(new SnippetCode[0]);
 	}
 	
-	public AllResults(int numCodeCells,
+	public AllCccResults(int numCodeCells,
 			int totalLOC,
 			int nonBlankLOC,
 			int blankLOC,

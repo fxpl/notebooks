@@ -2,7 +2,7 @@ package notebooks;
 
 import java.util.Map;
 
-class AllAnalyzer extends Worker<AllResults> {
+class AllCccAnalyzer extends Worker<AllCccResults> {
 	private int numCodeCells;
 	private int totalLOC;
 	private int nonBlankLOC;
@@ -11,18 +11,18 @@ class AllAnalyzer extends Worker<AllResults> {
 	private Map<LangSpec, LangName> allLanguages;
 	private SnippetCode[] hashes;
 	
-	public AllAnalyzer(Notebook notebook) {
+	public AllCccAnalyzer(Notebook notebook) {
 		super(notebook);
 	}	
 
 	@Override
-	public AllResults call() throws Exception {
+	public AllCccResults call() throws Exception {
 		callNumCodeCells();
 		callLOC();
 		callLanguage();
 		callAllLanguageValues();
 		callSnippetCodes();
-		return new AllResults(numCodeCells, totalLOC, nonBlankLOC, blankLOC, language, allLanguages, hashes);
+		return new AllCccResults(numCodeCells, totalLOC, nonBlankLOC, blankLOC, language, allLanguages, hashes);
 	}
 	
 	private void callNumCodeCells() {

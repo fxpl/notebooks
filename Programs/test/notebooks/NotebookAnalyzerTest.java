@@ -39,8 +39,8 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 	}
 	
 	@Test
-	public void testAllAnalyzes() throws IOException { 
-		String testDir = "test/data/all";
+	public void testAllCccAnalyzes() throws IOException {
+		String testDir = "test/data/ccc";
 		String notebookFile = "nb_1.ipynb";
 		String reproFile = "repros.csv";
 		String snippetHash = "33BE8D72467938FBB23EF42CF8C9E85F";
@@ -66,7 +66,7 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 		
 		analyzer.initializeNotebooksFrom(TestUtils.getPath(testDir, notebookFile));
 		analyzer.initializeReproInfo(TestUtils.getPath(testDir, reproFile));
-		analyzer.allAnalyzes();
+		analyzer.allCccAnalyzes();
 		
 		checkCsv("code_cells", expectedCodeCellsLines);
 		checkCsv("loc", expectedLOCLines);
@@ -85,8 +85,8 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 	}
 	
 	@Test
-	public void testAllAnalyzes_error() throws IOException {
-		String testDir = "test/data/all";
+	public void testAllCccAnalyzes_error() throws IOException {
+		String testDir = "test/data/ccc";
 		String notebookFile = "empty.ipynb";
 		String[] expectedCodeCellsLines = {codeCellsHeader(),
 				notebookFile + ", 0"};
@@ -108,7 +108,7 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 				notebookFile + ", 0, 0.0000, 0, 0.0000, 0, 0, 0.0000, 0.0000"};
 		
 		analyzer.initializeNotebooksFrom(TestUtils.getPath(testDir, notebookFile));
-		analyzer.allAnalyzes();
+		analyzer.allCccAnalyzes();
 		
 		checkCsv("code_cells", expectedCodeCellsLines);
 		checkCsv("loc", expectedLOCLines);
@@ -175,12 +175,12 @@ public class NotebookAnalyzerTest extends AnalyzerTest {
 	/**
 	 * Verify that the output files for number of code cells, loc, languages,
 	 * all language values, and clone output files are created when the
-	 * argument "-all" is given.
+	 * argument "-ccc" is given.
 	 * @throws IOException
 	 */
 	@Test
-	public void testArgumentParsing_allAnalyses() throws IOException {
-		String[] arg = {"--all"};
+	public void testArgumentParsing_allCccAnalyses() throws IOException {
+		String[] arg = {"--ccc"};
 		String[] expectedFilePrefixes = {
 				"code_cells",
 				"loc",
