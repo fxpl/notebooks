@@ -1,6 +1,6 @@
 """
 Extract module and function name from the first argument, list statements from
-this file that are executable in isolation. Among thesee statements, find risky
+this file that are executable in isolation. Among these statements, find smelly
 combinations of values.
 
 Arguments:
