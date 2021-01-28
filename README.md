@@ -4,6 +4,7 @@ This repository contains the code and scripts used for analyzing notebooks as
 presented in the following papers:
  * "Jupyter Notebooks on GitHub: Characteristics and Code Clones" by Källén, Sigvardsson and Wrigstad.
  * "To Err or Not to Err?" by Källén and Wrigstad
+
 The Java code (dumpers and analyzers) can be found in the directory `Programs`
 while post processing scripts are located in `Scripts`. Python scripts are found
 in `Programs/python`.
@@ -27,7 +28,7 @@ To build the Java code, enter the directory `Programs` and type:
 
 	ant build
 
-If you also want to run the tests, type:
+If you also want to run the tests, instead (or additionally) type:
 
 	ant test
 
@@ -73,11 +74,18 @@ clone analysis.
 The repository mapping file should be an CSV file containing one line per
 notebook. Each line is supposed to contain two values: the notebook number and
 the repository, for example:
+
 ```3197563,https://github.com/someUser/someRepro```
 
 If you want to use our input data (approximately 1 TB notebooks and
 the accopanying notebook-repository mapping file), it can be downloaded from
-https://export.uppmax.uu.se/snic2020-6-136/notebooks.zip.
+https://export.uppmax.uu.se/snic2020-6-136/notebooks.zip. The data set contains
+a large number of groups of notebooks where all notebooks in a certain group
+contain an identical sequence of code cells (where a code cell is considered
+identical to its CMW clones). If you want to exclude all notebooks but one from
+each of these groups, you can also download
+https://export.uppmax.uu.se/snic2020-6-136/notebook_clones.csv and exclude all
+notebooks listed in this file from the analysis.
 
 ### Execution
 
@@ -87,17 +95,18 @@ for running each program can be found in the scripts `run_notebookAnalyzer_ccc.s
 respectively.
 
 #### Notebook Analyzer
-When running notebook analyzer, `org.json` must be in the class path. A jar file
-is provided in `Programs/external`. If you want to use the modules functionality
-or function listing, i.e. if you provide any of the arguments `--modules` and
-`functions=<FILE>`, also Programs/python must be in the class path.
+When the notebook analyzer is run, `org.json` must be in the class path. A jar
+file is provided in `Programs/external`. If you want to use the modules
+functionality or function listing, i.e. if you provide any of the arguments
+`--modules` and `functions=<FILE>`, also Programs/python must be in the class
+path.
 
 `NotebookAnalyzer` takes the following arguments:
  * `--nb_path=NB_PATH`, where `NB_PATH` is the path to a directory containing
     the notebook files to be analyzed. You may also set `NB_PATH` to the path
 	to a notebook if you only want to analyze that notebook. If `NB_PATH`
 	is a directory, all files that end with `.ipynb` in `NB_PATH` and all sub
-	directories will be analyzed
+	directories will be analyzed.
  * `--output_dir=OUTPUT_DIR`, where `OUTPUT_DIR` is the directory where the
    output of the program will be put. This directory must exist! If this
    argument is not specified, all output files are placed in the current
@@ -223,14 +232,14 @@ The following files are produced by each analysis respectively:
 	  where normalized means that the metric is divided by the total number of
 	  code cells in the notebook.
  * The module listing creates 12 CSV files:
-	* `modules<timestamp>.csv`, with all imported modules listed for each notebook.
-	* `module_top_list<timestamp>.csv` which lists the 100 most frequently imported
-	  modules and the number of times each module is imported.
-	  Each of these files list all functions
-	* 10 files with names on the format <module>-functions<timestamp>.csv, one
-	  for each of 10 most frequently imported modules and the number of times each
-	  function is called. The list of functions is sorted on the number of calls to
-	  each function, in descending order.
+    * `modules<timestamp>.csv`, with all imported modules listed for each notebook.
+    * `module_top_list<timestamp>.csv` which lists the 100 most frequently imported
+      modules and the number of times each module is imported.
+    * 10 files with names on the format `<module>-functions<timestamp>.csv`, one
+      for each of 10 most frequently imported modules. Each of these files lists
+      all functions in the module that are called in a notebook in the corpus,
+      and the number of times each function is called. The list of functions is
+      sorted on the number of calls to each function, in descending order.
  * The function calls listing creates one file per function listed in the file
    pointed out by `--functions`. The file names are on the format
    `<module>.<function>-calls<timestamp>.csv`. Each file lists all calls to the
@@ -242,13 +251,13 @@ Characteristics and Code Clones" by Källén, Sigvardsson and Wrigstad and
 "To Err or Not to Err?" by Källén and Wrigstad.
 
 #### SccOutputAnalyzer
-Just as for the notebook analyzer, the output from `SccOutputAnalyzer`
+Just as the output from the notebook analyzer, that of `SccOutputAnalyzer`
 is stored on CSV format. The following files are created:
- * cloneLoc<timestamp>.csv has no header and contains the line count
+ * `cloneLoc<timestamp>.csv` has no header and contains the line count
    for each snippet that has at least one clone.
- * cloneFrequency<timestamp>.csv contains information about clone frequencies
+ * `cloneFrequency<timestamp>.csv`contains information about clone frequencies
    as described for `NotebookAnalyzer`.
- * connections<timestamp>.csv contains information about connections as
+ * `connections<timestamp>.csv` contains information about connections as
    described for `NotebookAnalyzer`.
 
 
@@ -299,15 +308,17 @@ An example of how to run the post processing of data produced when
 repository.
 
 Scripts whose name start with `move_` were used to move notebooks that we
-didn't want to include in our analyses. You will not be able to run these; they
-are only included for transparency.
+didn't include in our analyses. You will not be able to run these; they are
+only included for transparency. Notebooks that were moved by these scripts,
+except `move_cloned_notebooks.sh`, are not included in the data set that we have
+made available.
 
 The scripts not mentioned in this section are helper scripts for the post
 processing scripts.
 
 
 ## Repeating our results
-Before performing the steps listed above, you need to build the Java code, see
+Before performing the steps listed below, you need to build the Java code, see
 description above.
 
 ### Jupyter Notebooks on GitHub: Characteristics and Code Clones
@@ -322,11 +333,13 @@ to do the following:
 5. Do the clone analysis with SourcererCC
    (https://github.com/Mondego/SourcererCC) according to their instructions,
    including concatenation of output files.
-6. Zip `results.pairs`. Place the zip file and the file stats file in the
-   directory that you have provided in `paths.sh`.
+6. Zip `results.pairs` and save the zip file with the name `clone.pairs.zip`.
+   Concatenate the files in the directory `files_stats` into one file named
+   `files.stats`. Place `clone.pairs.zip` and `files.stats` in the directory
+   that you have provided in `paths.sh`.
 7. Execute `run_sccOutputAnalyzer.sh`.
 8. Execute `run_post_processing_ccc.sh`. This must not be done before completion
-   of step 3 and 7. Check `OutputNBA` and `OutputSOA` for output.
+   of step 3 and 7. Check `outputNBA` and `outputSOA` for output.
 
 Step 3 can be done in parallel with steps 4-7.
 
@@ -341,26 +354,28 @@ Wrigstad, you need to do the following:
  3. Update `nbPath` and `outputNBA` in `paths.sh` according to the instructions
     in the file.
  4. Make sure that all Python modules that are expected to be frequently
-    imported in the courpus (e.g. `matplotlib`, `pandas` and `numpy`) are
-    installed on your system.
+    imported in the courpus are installed on your system. See the paper for a
+    list of frequently imported modules.
  5. Execute `run_notebookAnalyzer_mod.sh`: `./run_notebookAnalyzer_mod.sh`.
+
     If you get many output lines saying: "Module <name> is not available. Some
     function calls for this module will not be identified." for certain values
-    of <name>, you might want to interrupt the execution and install these
+    of `<name>`, you might want to interrupt the execution and install these
     Python modules.
  6. Create a symbolic link to your output directory (`outputNBA` in `paths.sh`)
     The link must be named `Output` and placed in the same directory as the
-    directory `Scripts`: `ln -s <name-of-your-output-directory> Output`.
+    directory `Scripts` (i.e. the root directory of this repository):
+	`ln -s <name-of-your-output-directory> Output`.
  7. Enter the scripts directory and execute `modules_post_processing.sh`:
     `cd Scripts`
     `./modules_post_processing.sh`
  8. If you also want to list the keywords used as module names (see Appendix C),
     execute `find_keywords.sh`: `./find_keywords.sh`.
- 9. Step back to the directory where the run scripts are located: `cd ..`.
+ 9. Step back to the root directory of the repository: `cd ..`.
 10. In `run_notebookAnalyzer_mod.sh`, replace `--modules` with
     `--functions=$outputDir/functions_to_list.csv`.
 11. Execute `run_notebookAnalyzer_mod.sh` again.
-12. For each file $f named <module>.<function>-calls<timestamp>.csv, run:
+12. For each file $f named `<module>.<function>-calls<timestamp>.csv`, run:
     `python3 Programs/python/risky_comb_finder.py Output/$f Output`.
 13. Remove the symbolic link created in step 4: `rm Output`.
 
