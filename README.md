@@ -88,7 +88,6 @@ https://export.uppmax.uu.se/snic2020-6-136/notebook_clones.csv and exclude all
 notebooks listed in this file from the analysis.
 
 ### Execution
-
 Below is a description of how to execute the Java programs. Examples of commands
 for running each program can be found in the scripts `run_notebookAnalyzer_ccc.sh`,
 `run_notebookAnalyzer_mod.sh`, `run_pythonDumper.sh` and `run_sccOutputAnalyzer.sh`
@@ -104,9 +103,9 @@ path.
 `NotebookAnalyzer` takes the following arguments:
  * `--nb_path=NB_PATH`, where `NB_PATH` is the path to a directory containing
     the notebook files to be analyzed. You may also set `NB_PATH` to the path
-	to a notebook if you only want to analyze that notebook. If `NB_PATH`
-	is a directory, all files that end with `.ipynb` in `NB_PATH` and all sub
-	directories will be analyzed.
+    to a notebook if you only want to analyze that notebook. If `NB_PATH`
+    is a directory, all files that end with `.ipynb` in `NB_PATH` and all sub
+    directories will be analyzed.
  * `--output_dir=OUTPUT_DIR`, where `OUTPUT_DIR` is the directory where the
    output of the program will be put. This directory must exist! If this
    argument is not specified, all output files are placed in the current
@@ -136,7 +135,6 @@ The arguments can be given in any order, and several analyses can be run in the
 same execution (i.e. you may combine the arguments `--count`, `--lang`,
 `--lang-all`, `--loc`, `--clones`, `--modules` and/or `--functions`).
 
-
 #### PythonDumper and PythonZipDumper
 When running the dumper programs, `org.json` must be in the class path. A jar
 file is provided in `Programs/external`.
@@ -148,7 +146,6 @@ For a description of the two directories, see the description of `NB_PATH` and
 `OUTPUT_DIR` in the description of the arguments to `NotebookAnalyzer`. However,
 note that the paths should not be preceeded by `--nb_path=` or `--output_dir`
 respectively when the dumpers are run.
-
 
 #### SccOutputAnalyzer
 `SccOutputAnalyzer` takes the following arguments:
@@ -168,7 +165,6 @@ respectively when the dumpers are run.
  * `--tmp-dir=TMP_DIR`, where `TMP_DIR` is the path to a directory where
    temporary data can be stored. Note that the temporory data may be very large
    (~100GB for our corpus of 2.5 million Python noteooks).
-
 
 ### Output data
 
@@ -196,41 +192,41 @@ The following files are produced by each analysis respectively:
    total source line count, the number of non-empty lines of code and the number
    of empty lines in the code cells respectively.
  * The clone analysis produces four CSV files:
- 	* file2hashesA<timestamp>.csv contains a list of the MD5 hash of
-	  each code cell in each notebook.
-	* hash2filesA<timestamp>.csv contains one line per unique code snippet.
-	  The line contains the MD5 hash and line count of the snippet, followed by
-	  a list of all places where this code snippet can be found, on the format
-	  `notebook_name1, cell_index1, notebook_name2, cell_index2, ...`.
-	  The value 0 of a cell index means the first code cell in the
-	  notebook, 1 means the second code cell in the notebook and so on.
-	* cloneFrequency<timestamp>.csv contains the clone frequency of each
-	  notebook. Several metrics are presented, namely:
-	  * total number of unique code cells in the notebook
-	  * total number of cloned code cells in the notebook
-	  * number of code cells without code
-	  * fraction of the snippets that are clones, all snippets included
-	  * fraction of the snippets that are clones, empty snippets excluded
-	  * fraction of the snippets that are intra notebook clones, all snippets
-	    included
-	  * fraction of the snippets that are intra notebook clones, empty snippets
-	    excluded
-	* connections<timestamp>.csv contains information about connections from
-	  each notebook. For a definition of connection, see "Jupyter Notebooks on
-	  Github: Characteristics and Code Clones" by Källén, Sigvardsson and
-	  Wrigstad. The following metrics are presented:
-	  	* total number of connections
-		* total number of connections, normalized
-	  	* total number of connections, empty snippets excluded
-		* total number of connections, empty snippets excluded, normalized
-		* number of intra repro connections
-		* number of intra repro connections, normalized
-		* mean number of inter repro connections per code cell
-		* mean number of inter repro connections per code cell, empty snippets
-		  excluded
+    * file2hashesA<timestamp>.csv contains a list of the MD5 hash of
+      each code cell in each notebook.
+    * hash2filesA<timestamp>.csv contains one line per unique code snippet.
+      The line contains the MD5 hash and line count of the snippet, followed by
+      a list of all places where this code snippet can be found, on the format
+      `notebook_name1, cell_index1, notebook_name2, cell_index2, ...`.
+      The value 0 of a cell index means the first code cell in the
+      notebook, 1 means the second code cell in the notebook and so on.
+    * cloneFrequency<timestamp>.csv contains the clone frequency of each
+      notebook. Several metrics are presented, namely:
+      * total number of unique code cells in the notebook
+      * total number of cloned code cells in the notebook
+      * number of code cells without code
+      * fraction of the snippets that are clones, all snippets included
+      * fraction of the snippets that are clones, empty snippets excluded
+      * fraction of the snippets that are intra notebook clones, all snippets
+        included
+      * fraction of the snippets that are intra notebook clones, empty snippets
+        excluded
+    * connections<timestamp>.csv contains information about connections from
+      each notebook. For a definition of connection, see "Jupyter Notebooks on
+      Github: Characteristics and Code Clones" by Källén, Sigvardsson and
+      Wrigstad. The following metrics are presented:
+        * total number of connections
+        * total number of connections, normalized
+        * total number of connections, empty snippets excluded
+        * total number of connections, empty snippets excluded, normalized
+        * number of intra repro connections
+        * number of intra repro connections, normalized
+        * mean number of inter repro connections per code cell
+        * mean number of inter repro connections per code cell, empty snippets
+          excluded
 
-	  where normalized means that the metric is divided by the total number of
-	  code cells in the notebook.
+      where normalized means that the metric is divided by the total number of
+      code cells in the notebook.
  * The module listing creates 12 CSV files:
     * `modules<timestamp>.csv`, with all imported modules listed for each notebook.
     * `module_top_list<timestamp>.csv` which lists the 100 most frequently imported
@@ -365,7 +361,7 @@ Wrigstad, you need to do the following:
  6. Create a symbolic link to your output directory (`outputNBA` in `paths.sh`)
     The link must be named `Output` and placed in the same directory as the
     directory `Scripts` (i.e. the root directory of this repository):
-	`ln -s <name-of-your-output-directory> Output`.
+    `ln -s <name-of-your-output-directory> Output`.
  7. Enter the scripts directory and execute `modules_post_processing.sh`:
     `cd Scripts`
     `./modules_post_processing.sh`
