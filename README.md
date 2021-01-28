@@ -59,7 +59,7 @@ in all sub directories.
 When function calls are to be listed (i.e. when the flag `--functions=<FILE>`
 is provided), the file pointed out by the `--functions` flag should contain the
 functions to which calls should be listed, one per line, on the format:
-```<module_name>.<function_name>`.
+```<module_name>.<function_name>```.
 
 `SccOutputAnalyzer` takes the output of a run of SourcererCC as input. More
 specifically, it needs the pair file produced by the clone detector on zipped
@@ -314,7 +314,8 @@ description above.
 If you want to repeat the results of "Jupyter Notebooks on Github:
 Characteristics and Code Clones" by Källén, Sigvardsson and Wrigstad" you need
 to do the following:
-1. Download all notebooks and the notebook-repository mapping file from https://export.uppmax.uu.se/snic2020-6-136/notebooks.zip.
+1. Download all notebooks and the notebook-repository mapping file from
+   https://export.uppmax.uu.se/snic2020-6-136/notebooks.zip and unzip the file.
 2. Change the paths in `paths.sh` according to the inline comments.
 3. Execute `run_notebookAnalyzer_ccc.sh`.
 4. Execute `run_pythonDumper.sh`.
@@ -332,28 +333,36 @@ Step 3 can be done in parallel with steps 4-7.
 ### To Err or Not to Err?
 If you want to repeat the results of "To Err or Not to Err?" by Källén and
 Wrigstad, you need to do the following:
- 1. Download TODO
- 2. Update `nbPath` and `outputNBA` in `paths.sh` according to the instructions
+ 1. Download all notebooks from
+    https://export.uppmax.uu.se/snic2020-6-136/notebooks.zip and unzip the file.
+ 2. Download https://export.uppmax.uu.se/snic2020-6-136/notebook_clones.csv and
+    remove all notebooks listed in this file from the dataset, or move them to a
+    separate directory.
+ 3. Update `nbPath` and `outputNBA` in `paths.sh` according to the instructions
     in the file.
- 3. Make sure that all Python modules that are expected to be frequently
+ 4. Make sure that all Python modules that are expected to be frequently
     imported in the courpus (e.g. `matplotlib`, `pandas` and `numpy`) are
-	installed on your system.
- 4. Execute `run_notebookAnalyzer_mod.sh`: `./run_notebookAnalyzer_mod.sh`
- 5. Create a symbolic link to your output directory (`outputNBA` in `paths.sh`)
+    installed on your system.
+ 5. Execute `run_notebookAnalyzer_mod.sh`: `./run_notebookAnalyzer_mod.sh`.
+    If you get many output lines saying: "Module <name> is not available. Some
+    function calls for this module will not be identified." for certain values
+    of <name>, you might want to interrupt the execution and install these
+    Python modules.
+ 6. Create a symbolic link to your output directory (`outputNBA` in `paths.sh`)
     The link must be named `Output` and placed in the same directory as the
     directory `Scripts`: `ln -s <name-of-your-output-directory> Output`.
- 6. Enter the scripts directory and execute `modules_post_processing.sh`:
+ 7. Enter the scripts directory and execute `modules_post_processing.sh`:
     `cd Scripts`
-	`./modules_post_processing.sh`
- 7. If you also want to list the keywords used as module names (see Appendix C),
+    `./modules_post_processing.sh`
+ 8. If you also want to list the keywords used as module names (see Appendix C),
     execute `find_keywords.sh`: `./find_keywords.sh`.
- 8. Step back to the directory where the run scripts are located: `cd ..`.
- 9. In `run_notebookAnalyzer_mod.sh`, replace `--modules` with
+ 9. Step back to the directory where the run scripts are located: `cd ..`.
+10. In `run_notebookAnalyzer_mod.sh`, replace `--modules` with
     `--functions=$outputDir/functions_to_list.csv`.
-10. Execute `run_notebookAnalyzer_mod.sh` again.
-11. For each file $f named <module>.<function>-calls<timestamp>.csv, run:
+11. Execute `run_notebookAnalyzer_mod.sh` again.
+12. For each file $f named <module>.<function>-calls<timestamp>.csv, run:
     `python3 Programs/python/risky_comb_finder.py Output/$f Output`.
-12. Remove the symbolic link created in step 4: `rm Output`.
+13. Remove the symbolic link created in step 4: `rm Output`.
 
 If the files $f list calls to `numpy.array`, `pandas.read_csv`,
 `pandas.DataFrame`, `matplotlib.pyplot.plot`, `matplotlib.pyplot.show`,
