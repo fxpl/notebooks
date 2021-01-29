@@ -12,15 +12,15 @@ in `Programs/python`.
  
 ## Execution environment
 As can be seen, most scripts are written in bash and require bash in order to
-be run. It may be possible to run the Java code in other environments, but it is
+run. It may be possible to run the Java code in other environments, but it is
 only tested on Linux.
 
 Note that some of the scripts are written in R. Accordingly, if you want to
 run all post processing scripts, R must be installed.
 
-If you want to use `NotebookAnalyzer` (see below) to list imported modules and
-frequently called functions, you also need Python 3, including the modules that
-can be expected to be most common.
+If you want to use `NotebookAnalyzer` to list imported modules and frequently
+called functions (see below), you also need Python 3, including the modules that
+can be expected to be commonly used.
 
 
 ## Building and testing the Java code
@@ -65,7 +65,7 @@ functions to which calls should be listed, one per line, on the format:
 `SccOutputAnalyzer` takes the output of a run of SourcererCC as input. More
 specifically, it needs the pair file produced by the clone detector on zipped
 format, named `clone.pairs.zip`, and the contents of `files_stats` produced by
-the tokenizer, saved in one file named `files.stats`.
+the tokenizer, concatenated in one file named `files.stats`.
 
 Additionally, `SccOutputAnalyzer` needs a file with a mapping from each
 notebook number (`<num>` from the file name) to a repository, stored in a
@@ -80,10 +80,10 @@ the repository, for example:
 If you want to use our input data (approximately 1 TB notebooks and
 the accopanying notebook-repository mapping file), it can be downloaded from
 https://export.uppmax.uu.se/snic2020-6-136/notebooks.zip. The data set contains
-a large number of groups of notebooks where all notebooks in a certain group
+a large number of groups of notebooks where all notebooks in a group
 contain an identical sequence of code cells (where a code cell is considered
-identical to its CMW clones). If you want to exclude all notebooks but one from
-each of these groups, you can also download
+identical to its CMW clones). If you want to exclude all notebooks except one
+from each of these groups, you can also download
 https://export.uppmax.uu.se/snic2020-6-136/notebook_clones.csv and exclude all
 notebooks listed in this file from the analysis.
 
@@ -124,8 +124,9 @@ path.
  * `--clones` if the program should run the clone analysis
  * `--ccc` if all analyzes listed above (i.e. all analyses made for the paper
    "Jupyter Notebooks on GitHub: Characteristics and Code Clones") should be
-   run. (The number of notebooks will not be presented explicitly, but is easily
-   found by a line count of the output files.)
+   run. (The number of notebooks will not be presented explicitly when this flag
+   is used, but it is easily found by a line count of the output files. Don't
+   forget to exclude the header!)
  * `--modules` if the program should list imported modules, and the most
    frequently called functions in the top ten most imported modules.
  * `--functions=FCN_LIST_FILE`, if all calls to the functions specified in
@@ -133,7 +134,9 @@ path.
 
 The arguments can be given in any order, and several analyses can be run in the
 same execution (i.e. you may combine the arguments `--count`, `--lang`,
-`--lang-all`, `--loc`, `--clones`, `--modules` and/or `--functions`).
+`--lang-all`, `--loc`, `--clones`, `--ccc`, `--modules` and/or `--functions`,
+although combining `--ccc` with one or several of the first five flags seems
+unnecessary).
 
 #### PythonDumper and PythonZipDumper
 When running the dumper programs, `org.json` must be in the class path. A jar
@@ -194,9 +197,10 @@ The following files are produced by each analysis respectively:
  * The clone analysis produces four CSV files:
     * file2hashesA<timestamp>.csv contains a list of the MD5 hash of
       each code cell in each notebook.
-    * hash2filesA<timestamp>.csv contains one line per unique code snippet.
-      The line contains the MD5 hash and line count of the snippet, followed by
-      a list of all places where this code snippet can be found, on the format
+    * hash2filesA<timestamp>.csv contains one line per unique code snippet, and
+      one line per snippet clone group. Each line contains the MD5 hash and line
+      count of the snippet(s), followed by a list of all places where this code
+      snippet can be found, on the format
       `notebook_name1, cell_index1, notebook_name2, cell_index2, ...`.
       The value 0 of a cell index means the first code cell in the
       notebook, 1 means the second code cell in the notebook and so on.
@@ -239,10 +243,11 @@ The following files are produced by each analysis respectively:
  * The function calls listing creates one file per function listed in the file
    pointed out by `--functions`. The file names are on the format
    `<module>.<function>-calls<timestamp>.csv`. Each file lists all calls to the
-   function whose name is included in the file name. Each call is preceeded by
-   the notebook in which it was found, followed by ':'.
+   function whose name is specified in the file name. Each call is preceeded by
+   the notebook in which it was found, followed by ': '.
 
-For details on how the data is collected, see "Jupyter Notebooks on GitHub:
+All CSV files except the module top list and the function calls lists start with
+a header row. For details on how the data is collected, see "Jupyter Notebooks on GitHub:
 Characteristics and Code Clones" by Källén, Sigvardsson and Wrigstad and
 "To Err or Not to Err?" by Källén and Wrigstad.
 
@@ -251,19 +256,22 @@ Just as the output from the notebook analyzer, that of `SccOutputAnalyzer`
 is stored on CSV format. The following files are created:
  * `cloneLoc<timestamp>.csv` has no header and contains the line count
    for each snippet that has at least one clone.
- * `cloneFrequency<timestamp>.csv`contains information about clone frequencies
+ * `cloneFrequency<timestamp>.csv` contains information about clone frequencies
    as described for `NotebookAnalyzer`.
  * `connections<timestamp>.csv` contains information about connections as
    described for `NotebookAnalyzer`.
 
+The CSV files `cloneFrequency<timestamp>.csv` and `connections<timestamp>.csv`
+both start with a header.
+
 
 ## risky_comb_finder.py
-This Python script can be used to find smelly argument combinations for in
-calls to `numpy.array`, `pandas.read_csv`, `pandas.DataFrame`,
-`matplotlib.pyplot.plot`, `matplotlib.pyplot.show`, `numpy.arange` and
-`numpy.zeros`. Output files from `NotebookAnalyzer`'s function calls listing
-are supposed to be used as input files. For details on input, output and
-arguments, see the documentation in `risky_comb_finder.py`.
+This Python script can be used to find smelly argument combinations in calls to
+`numpy.array`, `pandas.read_csv`, `pandas.DataFrame`, `matplotlib.pyplot.plot`,
+`matplotlib.pyplot.show`, `numpy.arange` and `numpy.zeros`. Output files from
+`NotebookAnalyzer`'s function calls listing are supposed to be used as input
+files. For details on input, output and arguments, see the documentation in
+`risky_comb_finder.py`.
 
 
 ## Scripts
@@ -281,18 +289,17 @@ The following scripts are intended to be used for post processing:
  * language_inconsistencies.sh
  * list_duplicated_notebooks.sh
  * print_most_common_snippets.sh
- * statistics_ccc_nba.R (with create_sym_links_nba.sh as preprocessing)
- * statistics_ccc_scc.R (with create_sym_links_scc.sh as preprocessing)
+ * statistics_ccc_nba.R (with create_sym_links_nba.sh as preprocessing!)
+ * statistics_ccc_scc.R (with create_sym_links_scc.sh as preprocessing!)
  * modules_post_processing.sh
  * count_param_usages.sh
  * find_keywords.sh
 
 Before running post processing scripts whose names contain `scc`, you need to
-create a symbolic link called `Output` in the root directory of this repository
-pointing at the
-directory where the output from `SccOutputAnalyzer` is located.
+create a symbolic link called `Output` in the root directory of this repository,
+pointing at the directory where the output from `SccOutputAnalyzer` is located.
 Before running any of the other post processing scripts, you need to
-create a symbolic link named `Output` in the root directory of this repository
+create a symbolic link named `Output` in the root directory of this repository,
 pointing at the directory where the output from `NotebookAnalyzer` is located.
 
 After having executed the R scripts, you may want to run
@@ -351,7 +358,7 @@ Wrigstad, you need to do the following:
     in the file.
  4. Make sure that all Python modules that are expected to be frequently
     imported in the courpus are installed on your system. See the paper for a
-    list of frequently imported modules.
+    list of the ten most frequently imported modules.
  5. Execute `run_notebookAnalyzer_mod.sh`: `./run_notebookAnalyzer_mod.sh`.
 
     If you get many output lines saying: "Module <name> is not available. Some
@@ -361,7 +368,7 @@ Wrigstad, you need to do the following:
  6. Create a symbolic link to your output directory (`outputNBA` in `paths.sh`)
     The link must be named `Output` and placed in the same directory as the
     directory `Scripts` (i.e. the root directory of this repository):
-    `ln -s <name-of-your-output-directory> Output`.
+    `ln -s <path-to-your-output-directory> Output`.
  7. Enter the scripts directory and execute `modules_post_processing.sh`:
     `cd Scripts`
     `./modules_post_processing.sh`
@@ -377,7 +384,7 @@ Wrigstad, you need to do the following:
 
 If the files $f list calls to `numpy.array`, `pandas.read_csv`,
 `pandas.DataFrame`, `matplotlib.pyplot.plot`, `matplotlib.pyplot.show`,
-`numpy.arange` and `numpy.zeros`, `risky_comb_finder.py` (step 11) will identify
+`numpy.arange` and `numpy.zeros`, `risky_comb_finder.py` (step 12) will identify
 calls with smelly argument combinations in the lists of calls to the functions.
 Risky parameter combinations are not identified, and `risky_comb_finder.py`
 will not identify any smelly argument combinations, for other functions.
