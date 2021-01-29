@@ -64,7 +64,7 @@ public class NotebookAnalyzer extends Analyzer {
 	 * @param fileName Name of file with mapping from notebook number to repro
 	 * @return The map from notebook name to repro name
 	 */
-	protected static Map<String, String> createReproMap(String fileName) throws IOException {
+	private static Map<String, String> createReproMap(String fileName) throws IOException {
 		Map<String, String> result = new HashMap<String, String>();
 		BufferedReader reader = new BufferedReader(new FileReader(fileName));
 		String line = reader.readLine();

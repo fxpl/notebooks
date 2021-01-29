@@ -49,8 +49,7 @@ public class SccOutputAnalyzer extends Analyzer {
 	 * cloneFrequencies<current-date-time>.csv and
 	 * connections<current-date-time>.csv accordingly.
 	 * Note that you have to initialize the snippet and repro information, by
-	 * calling initializeSnippetInfo and initializeReproMap respectively before
-	 * calling this method!
+	 * calling initializeSnippetInfo before calling this method!
 	 * Note that the ''hashes'' written by this method are not the MD5 hashes
 	 * of the snippets, but just the value of a counter. However, all instances
 	 * of the ''hash'' of a snippet are the same.
