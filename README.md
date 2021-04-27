@@ -361,7 +361,7 @@ Wrigstad, you need to do the following:
     list of the ten most frequently imported modules.
  5. Execute `run_notebookAnalyzer_mod.sh`: `./run_notebookAnalyzer_mod.sh`.
 
-    If you get many output lines saying: "Module <name> is not available. Some
+    If you get many output lines saying: "Module `<name>` is not available. Some
     function calls for this module will not be identified." for certain values
     of `<name>`, you might want to interrupt the execution and install these
     Python modules.
